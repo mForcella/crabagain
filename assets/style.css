@@ -1,0 +1,354 @@
+
+/* detect touchscreen */
+@media (hover: none) {
+  #is_mobile {
+  	display: none;
+  }
+}
+/* hide number spinners on inputs */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type=number] {
+    -moz-appearance:textfield; /* Firefox */
+}
+body {
+	font-family: "Merriweather";
+	background-color: #cccccc;
+	color: black;
+}
+label {
+	font-weight: 300;
+}
+input {
+	padding: 0 !important;
+	text-align: center;
+}
+form {
+	max-width: 1200px;
+	margin: 0 auto;
+}
+h1 {
+	text-align: center;
+	font-family: "Alegreya";
+	font-weight: bold;
+	font-size: 5vw !important;
+	/*font-style: italic;*/
+}
+@media screen and (min-width:1200px) {
+	h1 {
+		font-size: 60px !important;
+	}
+}
+@media screen and (max-width:767px) {
+	h1 {
+		font-size: 2em;
+	}
+}
+.align-right {
+	text-align: right !important;
+}
+@media screen and (min-width:768px) {
+	#anchor_links {
+		display: none;
+	}
+}
+.attribute-col {
+	padding: 0;
+}
+.btn-default {
+	border: none;
+	width: 100%;
+	cursor: default;
+	background-color: #f2f2f2 !important;
+}
+.btn-default:focus, .btn-default:active {
+	outline: none !important;
+	box-shadow: none;
+}
+.button-bar {
+	text-align: center;
+	margin-top: 15px;
+}
+.button-bar .btn {
+	text-transform: uppercase;
+}
+.center {
+	text-align: center !important;
+	/*width: 100%;*/
+}
+@media screen and (max-width:767px) {
+	.col-xs-1 {
+		padding: 0;
+	}
+}
+.feat p {
+	display: inline;
+	/*font-size: 0.9em;*/
+}
+.feat-title {
+	font-style: italic;
+	font-weight: bold;
+}
+.forgot-password-btn {
+	font-size: 12px;
+	margin-bottom: 5px;
+}
+.form-check-input, .form-check-label {
+	display: inline;
+	margin-top: 10px !important;
+}
+.form-control {
+	height: 26px;
+}
+.form-group .control-label {
+	text-align: left;
+}
+.form-group {
+	margin-bottom: 5px;
+}
+.form-group .glyphicon-remove {
+	margin-top: 10px;
+}
+.full-width {
+	width: 100%;
+}
+.glyphicon {
+	line-height: 0.5;
+}
+.glyphicon:hover {
+	text-shadow: 0px 0px 3px #404040;
+	cursor: pointer;
+}
+.glyphicon-edit, .glyphicon-remove, .glyphicon-chevron-up, .glyphicon-chevron-down {
+	margin: 0 5px;
+}
+@media screen and (min-width:768px) {
+	.glyphicon-chevron-up, .glyphicon-chevron-down {
+		display: none;
+	}
+}
+.glyphicon-remove {
+	color: red;
+}
+.glyphicon.spinning {
+    animation: spin 1s infinite linear;
+    -webkit-animation: spin2 1s infinite linear;
+}
+
+@keyframes spin {
+    from { transform: scale(1) rotate(0deg); }
+    to { transform: scale(1) rotate(360deg); }
+}
+@-webkit-keyframes spin2 {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(360deg); }
+}
+.grecaptcha-badge {
+   	visibility: hidden;
+}
+.header {
+	background-image: url('image/treasure-header-desaturated.jpg');
+	background-size: contain;
+	width: 100vw;
+	height: 34vw;
+	max-width: 1200px;
+	max-height: 406px;
+	margin: 0px auto 10px auto;
+}
+.header .row {
+	padding-top: 6vw;
+	color: black;
+}
+.header .row .col-xs-4 {
+	margin-left: 4vw;
+	padding: 0;
+}
+@media screen and (min-width:1200px) {
+	.header .row {
+		padding-top: 72px;
+	}
+	.header .row .col-xs-4 {
+		margin-left: 48px;
+	}
+}
+@media (hover: hover) {
+	.hover-hide {
+		display: none;
+	}
+}
+@media (hover: none) {
+	.hover-hide {
+		display: inline-block;
+	}
+}
+.hidden-number {
+	margin-top: -26px;
+}
+.highlight {
+	text-shadow: 0px 0px 3px #404040;
+}
+.inline-row {
+	/*display: inline-block !important;*/
+}
+@media screen and (max-width:991px) {
+	.inline-row .control-label {
+		padding-top: 0;
+	}
+}
+.left-col {
+	margin-left: 15px;
+	margin-right: -15px;
+}
+@media screen and (max-width:991px) {
+	.mobile-pad-bottom {
+		padding-bottom: 5px;
+	}
+}
+@media screen and (min-width:992px)  {
+.mobile-break {
+	display: none;
+}
+}
+.modal-title {
+	text-align: center;
+}
+.no-pad {
+	padding: 0;
+}
+@media screen and (max-width:767px) {
+	.no-pad-mobile {
+		padding: 0 1px;
+	}
+	.no-pad-mobile input {
+		font-size: 12px;
+	}
+}
+.penalty {
+	color: red;
+	font-weight: bold;
+}
+@media screen and (max-width:767px) {
+	.resize-mobile {
+		font-size: 2.6vw;
+		padding: 0;
+	}
+	.resize-mobile-small {
+		font-size: 1.9vw;
+		padding: 0;
+	}
+}
+.row {
+	margin: 0;
+}
+.section {
+	position: relative;
+	border: 2px solid #999999;
+	border-radius: 3px;
+	padding: 10px 20px;
+	margin: 10px 20px;
+	background-color: #f2f2f2;
+}
+.section:before {
+	background-image: url('image/texture.jpeg');
+	/*background-size: auto;*/
+	background-size: cover;
+	content: ' ';
+	display: block;
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0.3;
+	background-repeat: no-repeat;
+	background-position: 50% 0;
+}
+@media screen and (max-width:767px) {
+	.section {
+		margin: 10px 0;
+	}
+}
+.section-title {
+	font-size: 16px;
+	text-align: center;
+	font-weight: bold;
+	text-decoration: underline;
+	text-transform: uppercase;
+	margin-bottom: 5px;
+}
+.submit-btn {
+	text-align: center;
+	margin: 50px;
+}
+@media screen and (max-width:767px) {
+	.submit-btn {
+		margin: 20px;
+	}
+}
+.training {
+	font-style: italic;
+	margin-top: 5px;
+}
+.training-row {
+	margin-bottom: 2px;
+}
+.training button {
+	width: 14px;
+	height: 0;
+    padding: 0;
+    margin-top: -5px;
+    margin-bottom: 15px;
+}
+@media screen and (max-width:767px) {
+	.training button {
+		padding: 0;
+	}
+}
+.training .button-bar {
+	margin-top: 0;
+}
+.training .col-md-3 {
+	padding-left: 2px;
+}
+.training .col-md-9 {
+	padding-left: 5px;
+	padding-right: 0;
+	font-size: 0.9em;
+}
+@media screen and (max-width:991px) {
+	.training .col-md-3 {
+		padding-left: 10px;
+		padding-right: 0px;
+	}
+	.training .col-md-9 {
+		padding-left: 15px;
+		padding-right: 15px;
+	}
+}
+.training .left-col .col-md-4 {
+	padding-left: 5px;
+	padding-right: 15px;
+}
+.training .left-col .col-md-8 {
+	margin-left: -15px;
+	margin-right: 15px;
+}
+select.form-control {
+	width: 300px;
+	margin: 5px auto;
+	height: 35px;
+	text-align: center;
+}
+@media screen and (max-width:767px) {
+	.weapon-container {
+		display: none;
+	}
+}
+@media screen and (min-width:768px) {
+	.weapon-container {
+		display: block !important;
+	}
+}
