@@ -2,6 +2,7 @@
 
 	// establish database connection
 	include_once('db_config.php');
+	include_once('keys.php');
 	$db = new mysqli($db_config['servername'], $db_config['username'], $db_config['password'], $db_config['dbname']);
 
 	// check connection
@@ -23,7 +24,7 @@
 		$user_id = $_POST['user_id'];
 	} else {
 		// get reCAPTCHA score from Google
-		$recaptcha_secret = '6Lc_NB8gAAAAAEMZKMK4UJSHxfYYoSJ4BVaiwROm';
+		$recaptcha_secret = $keys['recaptcha_secret'];
 		$recaptcha_response = $_POST['recaptcha_response'];
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL,"https://www.google.com/recaptcha/api/siteverify");
