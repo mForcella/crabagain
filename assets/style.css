@@ -92,6 +92,17 @@ h1 {
 		padding: 0;
 	}
 }
+.col-md-7.col-xs-8 {
+	padding: 0 5px;
+}
+@media screen and (max-width:991px) {
+	.col-md-7.col-xs-8 {
+		padding: 0 15px;
+	}
+}
+.col-md-5.col-xs-4, .col-md-4.col-xs-4 {
+	padding: 0;
+}
 .feat p {
 	display: inline;
 	/*font-size: 0.9em;*/
@@ -144,6 +155,11 @@ h1 {
 .glyphicon-plus, .glyphicon-minus {
 	font-size: 0.9em;
 	user-select: none;
+}
+@media screen and (max-width:767px) {
+	.glyphicon-plus, .glyphicon-minus {
+		margin-left: 10px;
+	}
 }
 @media (hover: hover) {
 	.glyphicon-plus, .glyphicon-minus {
@@ -332,34 +348,31 @@ h1 {
 .training .button-bar {
 	margin-top: 0;
 }
-.training .col-md-4 {
-	padding-left: 0;
+.training .col-md-5 {
 	padding-right: 0;
+	padding-left: 7px;
 }
-.training .col-md-4 .glyphicon-plus, .training .col-md-4 .glyphicon-minus {
-	padding-left: 3px;
-}
-.training .col-md-8 {
-	padding-left: 5px;
-	padding-right: 0;
+.training .col-md-7 {
+	margin-left: -5px;
+	padding: 0;
 	font-size: 0.9em;
 }
+.training .col-md-5 .glyphicon-plus, .training .col-md-5 .glyphicon-minus {
+	padding-left: 3px;
+}
 @media screen and (max-width:991px) {
-	.training .col-md-4 {
-		padding-left: 20px;
+	.training .col-md-5 {
+		padding-left: 10px;
 		padding-right: 0;
 	}
-	.training .col-md-8 {
-		padding-left: 5px;
+	.training .col-md-7 {
+		padding-left: 10px;
 	}
 }
-.training .left-col .col-md-4 {
-	padding-left: 5px;
-	padding-right: 15px;
-}
-.training .left-col .col-md-8 {
-	margin-left: -15px;
-	margin-right: 15px;
+@media screen and (max-width:767px) {
+	.training .col-md-4 {
+		padding-left: 5px;
+	}
 }
 select.form-control {
 	width: 300px;

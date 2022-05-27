@@ -1351,7 +1351,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script async src="https://www.google.com/recaptcha/api.js?render=6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
-	<script src="/assets/script_v22_05_25_02.js"></script>
+	<script src="/assets/script_v22_05_27.js"></script>
 
 	<script type="text/javascript">
 

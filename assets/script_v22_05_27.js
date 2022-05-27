@@ -147,18 +147,21 @@ function adjustAttribute(attribute, val) {
 	$("#"+attribute+"_val").val(newVal);
 }
 
-$(".attribute-col").each(function(){
-	$(this).on("mouseenter", function(){
-		// show glyphicon-plus, glyphicon-minus
-		$(this).find('.glyphicon-plus').show();
-		$(this).find('.glyphicon-minus').show();
+// enable attribute adjust hide / show - don't hide on mobile
+if (!is_mobile) {
+	$(".attribute-col").each(function(){
+		$(this).on("mouseenter", function(){
+			// show glyphicon-plus, glyphicon-minus
+			$(this).find('.glyphicon-plus').show();
+			$(this).find('.glyphicon-minus').show();
+		});
+		$(this).on("mouseleave", function(){
+			// hide glyphicon-plus, glyphicon-minus
+			$(this).find('.glyphicon-plus').hide();
+			$(this).find('.glyphicon-minus').hide();
+		});
 	});
-	$(this).on("mouseleave", function(){
-		// hide glyphicon-plus, glyphicon-minus
-		$(this).find('.glyphicon-plus').hide();
-		$(this).find('.glyphicon-minus').hide();
-	});
-});
+}
 
 // hide / show weapon inputs
 function toggleWeapon(weapon, element) {
@@ -421,7 +424,7 @@ function addTrainingElements(trainingName, attribute, value='') {
 	}).appendTo('#'+attribute);
 
 	var div_left = $('<div />', {
-	  'class': 'col-md-8 col-xs-8',
+	  'class': 'col-md-7 col-xs-8',
 	}).appendTo(row);
 
 	var label_left = $('<label />', {
@@ -437,12 +440,8 @@ function addTrainingElements(trainingName, attribute, value='') {
 	}).appendTo(label_left);
 
 	var div_right = $('<div />', {
-	  'class': 'col-md-4 col-xs-4',
+	  'class': 'col-md-5 col-xs-4',
 	}).appendTo(row);
-
-	// createInput('', 'text', 'training_val[]', value, div_right, training_name+"_text");
-	// createInput('hidden-number', 'number', '', '', div_right, training_name);
-	// createInput('', 'hidden', 'training[]', trainingName+":"+attribute, div_right);
 
 	var label_right = $('<label />', {
 	  'class': 'control-label'
