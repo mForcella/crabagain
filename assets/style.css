@@ -5,14 +5,14 @@
   	display: none;
   }
 }
-/* hide number spinners on inputs */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
+/* hide number spinners on hidden number inputs */
+.hidden-number::-webkit-outer-spin-button,
+.hidden-number::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
-input[type=number] {
-    -moz-appearance:textfield; /* Firefox */
+.hidden-number[type=number] {
+    -moz-appearance:textfield;
 }
 body {
 	font-family: "Merriweather";
@@ -57,6 +57,14 @@ h1 {
 }
 .attribute-col {
 	padding: 0;
+}
+.attribute-val {
+	margin-right: 15px;
+	font-size: 1.1em;
+	display: inline-block;
+	width: 15px !important;
+	font-weight: bold;
+	font-style: normal !important;
 }
 .btn-default {
 	border: none;
@@ -133,11 +141,24 @@ h1 {
 .glyphicon-remove {
 	color: red;
 }
+.glyphicon-plus, .glyphicon-minus {
+	font-size: 0.9em;
+	user-select: none;
+}
+@media (hover: hover) {
+	.glyphicon-plus, .glyphicon-minus {
+		display: none;
+	}
+}
+@media (hover: none) {
+	.glyphicon-plus, .glyphicon-minus {
+		display: inline-block;
+	}
+}
 .glyphicon.spinning {
     animation: spin 1s infinite linear;
     -webkit-animation: spin2 1s infinite linear;
 }
-
 @keyframes spin {
     from { transform: scale(1) rotate(0deg); }
     to { transform: scale(1) rotate(360deg); }
@@ -246,7 +267,8 @@ h1 {
 .section {
 	position: relative;
 	border: 2px solid #999999;
-	border-radius: 3px;
+	/*border-radius: 3px;*/
+	border-style: groove;
 	padding: 10px 20px;
 	margin: 10px 20px;
 	background-color: #f2f2f2;
@@ -310,22 +332,25 @@ h1 {
 .training .button-bar {
 	margin-top: 0;
 }
-.training .col-md-3 {
-	padding-left: 2px;
+.training .col-md-4 {
+	padding-left: 0;
+	padding-right: 0;
 }
-.training .col-md-9 {
+.training .col-md-4 .glyphicon-plus, .training .col-md-4 .glyphicon-minus {
+	padding-left: 3px;
+}
+.training .col-md-8 {
 	padding-left: 5px;
 	padding-right: 0;
 	font-size: 0.9em;
 }
 @media screen and (max-width:991px) {
-	.training .col-md-3 {
-		padding-left: 10px;
-		padding-right: 0px;
+	.training .col-md-4 {
+		padding-left: 20px;
+		padding-right: 0;
 	}
-	.training .col-md-9 {
-		padding-left: 15px;
-		padding-right: 15px;
+	.training .col-md-8 {
+		padding-left: 5px;
 	}
 }
 .training .left-col .col-md-4 {

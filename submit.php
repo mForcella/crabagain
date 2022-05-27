@@ -1,8 +1,9 @@
 <?php
 
-	// establish database connection
 	include_once('db_config.php');
 	include_once('keys.php');
+	
+	// establish database connection
 	$db = new mysqli($db_config['servername'], $db_config['username'], $db_config['password'], $db_config['dbname']);
 
 	// check connection
@@ -11,16 +12,24 @@
 	  	die("Connection failed: " . $db->connect_error);
 	}
 
-	$user_columns = ['character_name', 'xp', 'level', 'morale', 'morale_effect', 'race', 'height', 'weight', 'age', 'eyes', 'hair', 'gender', 'other', 'strength', 'fortitude', 'speed', 'agility', 'precision_', 'awareness', 'allure', 'deception', 'intellect', 'innovation', 'intuition', 'vitality', 'notes', 'background', 'standard', 'quick', 'free', 'move', 'initiative', 'move_penalty', 'toughness', 'defend', 'dodge', 'fear', 'poison', 'disease', 'damage', 'resilience', 'wounds', 'wound_penalty', 'total_weight', 'unhindered', 'encumbered', 'burdened', 'overburdened', 'motivator_1', 'motivator_2', 'motivator_3', 'motivator_4', 'motivator_1_pts', 'motivator_2_pts', 'motivator_3_pts', 'motivator_4_pts', 'weapon_1', 'weapon_1_damage', 'weapon_1_crit', 'weapon_1_range', 'weapon_1_rof', 'weapon_2', 'weapon_2_damage', 'weapon_2_crit', 'weapon_2_range', 'weapon_2_rof', 'weapon_3', 'weapon_3_damage', 'weapon_3_crit', 'weapon_3_range', 'weapon_3_rof'];
+	$user_columns = ['character_name', 'xp', 'level', 'morale', 'morale_effect', 'race', 'height', 'weight', 'age', 'eyes', 'hair', 'gender', 'other', 'strength', 'fortitude', 'speed', 'agility', 'precision_', 'awareness', 'allure', 'deception', 'intellect', 'innovation', 'intuition', 'vitality', 'notes', 'standard', 'quick', 'free', 'move', 'initiative', 'move_penalty', 'toughness', 'defend', 'dodge', 'fear', 'poison', 'disease', 'damage', 'resilience', 'wounds', 'wound_penalty', 'total_weight', 'unhindered', 'encumbered', 'burdened', 'overburdened', 'motivator_1', 'motivator_2', 'motivator_3', 'motivator_4', 'motivator_1_pts', 'motivator_2_pts', 'motivator_3_pts', 'motivator_4_pts', 'weapon_1', 'weapon_1_damage', 'weapon_1_crit', 'weapon_1_range', 'weapon_1_rof', 'weapon_2', 'weapon_2_damage', 'weapon_2_crit', 'weapon_2_range', 'weapon_2_rof', 'weapon_3', 'weapon_3_damage', 'weapon_3_crit', 'weapon_3_range', 'weapon_3_rof'];
 
 	// new or existing character?
 	if ($_POST['user_id'] != null) {
 		$sql = "UPDATE user SET";
 		foreach ($user_columns as $column) {
-			$sql .= " " . $column . " = '" . addslashes($_POST[$column]) . "',";
+			// convert '' value to NULL
+			$insert_value;
+			if ($_POST[$column] == '') {
+				$insert_value = 'NULL';
+			} else {
+				$insert_value = "'" . addslashes($_POST[$column]) . "'";
+			}
+			$sql .= " " . $column . " = " . $insert_value . ",";
 		}
 		$sql = substr($sql, 0, -1) . " WHERE id = ".$_POST['user_id'];
 		$db->query($sql);
+		// echo $db->error;
 		$user_id = $_POST['user_id'];
 	} else {
 		// get reCAPTCHA score from Google
@@ -44,10 +53,18 @@
 			}
 			$sql = substr($sql, 0, -2) . ") VALUES ('".$hashed_password."', ";
 			foreach ($user_columns as $column) {
-				$sql .= "'" . addslashes($_POST[$column]) . "', ";
+				// convert '' value to NULL
+				$insert_value;
+				if ($_POST[$column] == '') {
+					$insert_value = 'NULL';
+				} else {
+					$insert_value = "'" . addslashes($_POST[$column]) . "'";
+				}
+				$sql .= $insert_value . ", ";
 			}
 			$sql = substr($sql, 0, -2) . ")";
 			$db->query($sql);
+			// echo $db->error;
 			$user_id = $db->insert_id;
 		} else {
 			// Score less than 0.5 indicates suspicious activity. Return an error

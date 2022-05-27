@@ -139,6 +139,8 @@
 			<option value="#section_attributes">Attributes</option>
 			<option value="#section_feats">Feats</option>
 			<option value="#section_items">Items</option>
+			<option value="#section_weight">Weight Capacity</option>
+			<option value="#section_notes">Notes</option>
 		</select>
 
 		<!-- TODO add character picture? -->
@@ -151,38 +153,35 @@
 					<!-- section: name, level, xp -->
 					<div class="section form-horizontal">
 						<div class="form-group">
-							<label class="control-label col-md-2 col-xs-4" for="character_name">Name</label>
-							<div class="col-md-10 col-xs-8">
+							<label class="control-label col-sm-2 col-xs-4" for="character_name">Name</label>
+							<div class="col-sm-10 col-xs-8">
 								<input class="form-control" type="text" id="character_name" name="character_name" value="<?php echo isset($user) ? htmlspecialchars($user['character_name']) : '' ?>">
 							</div>
 						</div>
 						<div class="form-group">
 							<div class="inline-row">
-								<label class="control-label col-md-2 col-xs-4" for="xp">Experience</label>
-								<div class="col-md-4 col-xs-8 mobile-pad-bottom">
-									<input class="form-control" type="text" name="xp" id="xp_text" value="<?php echo isset($user) ? htmlspecialchars($user['xp']) : '' ?>">
-									<input class="form-control hidden-number" type="number" id="xp">
+								<label class="control-label col-sm-2 col-xs-4" for="xp">Experience</label>
+								<div class="col-sm-4 col-xs-8 mobile-pad-bottom">
+									<input class="form-control" type="number" name="xp" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['xp']) : '' ?>">
 								</div>
 							</div>
 							<div class="inline-row">
-								<label class="control-label col-md-2 col-xs-4" for="level">Level</label>
-								<div class="col-md-4 col-xs-8">
-									<input class="form-control" type="text" name="level" id="level_text" value="<?php echo isset($user) ? htmlspecialchars($user['level']) : '' ?>">
-									<input class="form-control hidden-number" type="number" id="level">
+								<label class="control-label col-sm-2 col-xs-4" for="level">Level</label>
+								<div class="col-sm-4 col-xs-8">
+									<input class="form-control" type="number" name="level" min="1" value="<?php echo isset($user) ? htmlspecialchars($user['level']) : '' ?>">
 								</div>
 							</div>
 						</div>
 						<div class="form-group">
 							<div class="inline-row">
-								<label class="control-label col-md-2 col-xs-4" for="morale">Morale</label>
-								<div class="col-md-2 col-xs-8 mobile-pad-bottom">
-									<input class="form-control" type="text" name="morale" id="morale_text" value="<?php echo isset($user) ? htmlspecialchars($user['morale']) : '' ?>">
-									<input class="form-control hidden-number" type="number" id="morale">
+								<label class="control-label col-sm-2 col-xs-4" for="morale">Morale</label>
+								<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+									<input class="form-control" type="number" name="morale" min="-10" value="<?php echo isset($user) ? htmlspecialchars($user['morale']) : '' ?>">
 								</div>
 							</div>
 							<div class="inline-row">
-								<label class="control-label col-md-2 col-xs-4" for="morale_effect">Effect</label>
-								<div class="col-md-6 col-xs-8">
+								<label class="control-label col-sm-2 col-xs-4" for="morale_effect">Effect</label>
+								<div class="col-sm-6 col-xs-8">
 									<input class="form-control" type="text" name="morale_effect" value="<?php echo isset($user) ? htmlspecialchars($user['morale_effect']) : '' ?>">
 								</div>
 							</div>
@@ -196,43 +195,43 @@
 					<!-- section: characteristics -->
 					<div class="section form-horizontal">
 						<div class="form-group">
-							<label class="control-label col-md-2 col-xs-4" for="race">Race</label>
-							<div class="col-md-2 col-xs-8 mobile-pad-bottom">
+							<label class="control-label col-sm-2 col-xs-4" for="race">Race</label>
+							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 								<input class="form-control" type="text" name="race" value="<?php echo isset($user) ? htmlspecialchars($user['race']) : '' ?>">
 							</div>
-							<label class="control-label col-md-2 col-xs-4" for="age">Age</label>
-							<div class="col-md-2 col-xs-8 mobile-pad-bottom">
+							<label class="control-label col-sm-2 col-xs-4" for="age">Age</label>
+							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 								<input class="form-control" type="text" name="age" id="age_text" value="<?php echo isset($user) ? htmlspecialchars($user['age']) : '' ?>">
 								<input class="form-control hidden-number" type="number" id="age">
 							</div>
-							<label class="control-label col-md-2 col-xs-4" for="gender">Gender</label>
-							<div class="col-md-2 col-xs-8">
+							<label class="control-label col-sm-2 col-xs-4" for="gender">Gender</label>
+							<div class="col-sm-2 col-xs-8">
 								<input class="form-control" type="text" name="gender" value="<?php echo isset($user) ? htmlspecialchars($user['gender']) : '' ?>">
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="control-label col-md-2 col-xs-4" for="height">Height</label>
-							<div class="col-md-2 col-xs-8 mobile-pad-bottom">
+							<label class="control-label col-sm-2 col-xs-4" for="height">Height</label>
+							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 								<input class="form-control" type="text" name="height" id="height_text" value="<?php echo isset($user) ? htmlspecialchars($user['height']) : '' ?>">
 								<input class="form-control hidden-number" type="number" id="height">
 							</div>
-							<label class="control-label col-md-2 col-xs-4" for="weight">Weight</label>
-							<div class="col-md-2 col-xs-8 mobile-pad-bottom">
+							<label class="control-label col-sm-2 col-xs-4" for="weight">Weight</label>
+							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 								<input class="form-control" type="text" name="weight" id="weight_text" value="<?php echo isset($user) ? htmlspecialchars($user['weight']) : '' ?>">
 								<input class="form-control hidden-number" type="number" id="weight">
 							</div>
-							<label class="control-label col-md-2 col-xs-4" for="eyes">Eyes</label>
-							<div class="col-md-2 col-xs-8">
+							<label class="control-label col-sm-2 col-xs-4" for="eyes">Eyes</label>
+							<div class="col-sm-2 col-xs-8">
 								<input class="form-control" type="text" name="eyes" value="<?php echo isset($user) ? htmlspecialchars($user['eyes']) : '' ?>">
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="control-label col-md-2 col-xs-4" for="hair">Hair</label>
-							<div class="col-md-2 col-xs-8 mobile-pad-bottom">
+							<label class="control-label col-sm-2 col-xs-4" for="hair">Hair</label>
+							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 								<input class="form-control" type="text" name="hair" value="<?php echo isset($user) ? htmlspecialchars($user['hair']) : '' ?>">
 							</div>
-							<label class="control-label col-md-2 col-xs-4" for="other">Other</label>
-							<div class="col-md-6 col-xs-8">
+							<label class="control-label col-sm-2 col-xs-4" for="other">Other</label>
+							<div class="col-sm-6 col-xs-8">
 								<input class="form-control" type="text" name="other" value="<?php echo isset($user) ? htmlspecialchars($user['other']) : '' ?>">
 							</div>
 						</div>
@@ -262,22 +261,19 @@
 										<div class="form-group">
 											<label class="control-label col-md-7 col-xs-4" for="weapon_1_damage">Damage</label>
 											<div class="col-md-5 col-xs-8">
-												<input class="form-control" type="text" name="weapon_1_damage" id="weapon_1_damage_text" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_1_damage']) : '' ?>">
-												<input class="form-control hidden-number" type="number" id="weapon_1_damage">
+												<input class="form-control" type="number" name="weapon_1_damage" min="1" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_1_damage']) : '' ?>">
 											</div>
 										</div>
 										<div class="form-group">
 											<label class="control-label col-md-7 col-xs-4" for="weapon_1_crit">Critical</label>
 											<div class="col-md-5 col-xs-8">
-												<input class="form-control" type="text" name="weapon_1_crit" id="weapon_1_crit_text" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_1_crit']) : '' ?>">
-												<input class="form-control hidden-number" type="number" id="weapon_1_crit">
+												<input class="form-control" type="number" name="weapon_1_crit" min="1" max="6" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_1_crit']) : '' ?>">
 											</div>
 										</div>
 										<div class="form-group">
 											<label class="control-label col-md-7 col-xs-4" for="weapon_1_range">Range</label>
 											<div class="col-md-5 col-xs-8">
-												<input class="form-control" type="text" name="weapon_1_range" id="weapon_1_range_text" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_1_range']) : '' ?>">
-												<input class="form-control hidden-number" type="number" id="weapon_1_range">
+												<input class="form-control" type="number" name="weapon_1_range" min="1" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_1_range']) : '' ?>">
 											</div>
 										</div>
 										<div class="form-group">
@@ -301,22 +297,19 @@
 										<div class="form-group">
 											<label class="control-label col-md-7 col-xs-4" for="weapon_2_damage">Damage</label>
 											<div class="col-md-5 col-xs-8">
-												<input class="form-control" type="text" name="weapon_2_damage" id="weapon_2_damage_text" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_2_damage']) : '' ?>">
-												<input class="form-control hidden-number" type="number" id="weapon_2_damage">
+												<input class="form-control" type="number" name="weapon_2_damage" min="1" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_2_damage']) : '' ?>">
 											</div>
 										</div>
 										<div class="form-group">
 											<label class="control-label col-md-7 col-xs-4" for="weapon_2_crit">Critical</label>
 											<div class="col-md-5 col-xs-8">
-												<input class="form-control" type="text" name="weapon_2_crit" id="weapon_2_crit_text" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_2_crit']) : '' ?>">
-												<input class="form-control hidden-number" type="number" id="weapon_2_crit">
+												<input class="form-control" type="number" name="weapon_2_crit" min="1" max="6" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_2_crit']) : '' ?>">
 											</div>
 										</div>
 										<div class="form-group">
 											<label class="control-label col-md-7 col-xs-4" for="weapon_2_range">Range</label>
 											<div class="col-md-5 col-xs-8">
-												<input class="form-control" type="text" name="weapon_2_range" id="weapon_2_range_text" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_2_range']) : '' ?>">
-												<input class="form-control hidden-number" type="number" id="weapon_2_range">
+												<input class="form-control" type="number" name="weapon_2_range" min="1" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_2_range']) : '' ?>">
 											</div>
 										</div>
 										<div class="form-group">
@@ -340,22 +333,19 @@
 										<div class="form-group">
 											<label class="control-label col-md-7 col-xs-4" for="weapon_3_damage">Damage</label>
 											<div class="col-md-5 col-xs-8">
-												<input class="form-control" type="text" name="weapon_3_damage" id="weapon_3_damage_text" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_3_damage']) : '' ?>">
-												<input class="form-control hidden-number" type="number" id="weapon_3_damage">
+												<input class="form-control" type="number" name="weapon_3_damage" min="1" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_3_damage']) : '' ?>">
 											</div>
 										</div>
 										<div class="form-group">
 											<label class="control-label col-md-7 col-xs-4" for="weapon_3_crit">Critical</label>
 											<div class="col-md-5 col-xs-8">
-												<input class="form-control" type="text" name="weapon_3_crit" id="weapon_3_crit_text" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_3_crit']) : '' ?>">
-												<input class="form-control hidden-number" type="number" id="weapon_3_crit">
+												<input class="form-control" type="number" name="weapon_3_crit" min="1" max="6" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_3_crit']) : '' ?>">
 											</div>
 										</div>
 										<div class="form-group">
 											<label class="control-label col-md-7 col-xs-4" for="weapon_3_range">Range</label>
 											<div class="col-md-5 col-xs-8">
-												<input class="form-control" type="text" name="weapon_3_range" id="weapon_3_range_text" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_3_range']) : '' ?>">
-												<input class="form-control hidden-number" type="number" id="weapon_3_range">
+												<input class="form-control" type="number" name="weapon_3_range" min="1" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_3_range']) : '' ?>">
 											</div>
 										</div>
 										<div class="form-group">
@@ -381,22 +371,22 @@
 						<div class="section-title" id="section_defense">Defense</div>
 						<div class="form-group">
 							<div class="inline-row">
-								<label class="control-label col-md-2 col-xs-4" for="toughness">Toughness</label>
-								<div class="col-md-2 col-xs-8 mobile-pad-bottom">
+								<label class="control-label col-sm-2 col-xs-4" for="toughness">Toughness</label>
+								<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 									<input class="form-control" type="text" name="toughness" id="toughness_text" value="<?php echo isset($user) ? htmlspecialchars($user['toughness']) : '' ?>">
 									<input class="form-control hidden-number" type="number" id="toughness">
 								</div>
 							</div>
 							<div class="inline-row">
-								<label class="control-label col-md-2 col-xs-4" for="defend">Defend</label>
-								<div class="col-md-2 col-xs-8 mobile-pad-bottom">
+								<label class="control-label col-sm-2 col-xs-4" for="defend">Defend</label>
+								<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 									<input class="form-control" type="text" name="defend" id="defend_text" value="<?php echo isset($user) ? htmlspecialchars($user['defend']) : '' ?>">
 									<input class="form-control hidden-number" type="number" id="defend">
 								</div>
 							</div>
 							<div class="inline-row">
-								<label class="control-label col-md-2 col-xs-4" for="dodge">Dodge</label>
-								<div class="col-md-2 col-xs-8">
+								<label class="control-label col-sm-2 col-xs-4" for="dodge">Dodge</label>
+								<div class="col-sm-2 col-xs-8">
 									<input class="form-control" type="text" name="dodge" id="dodge_text" value="<?php echo isset($user) ? htmlspecialchars($user['dodge']) : '' ?>">
 									<input class="form-control hidden-number" type="number" id="dodge">
 								</div>
@@ -408,22 +398,22 @@
 								<input class="form-control" type="text" name="magic">
 							</div> -->
 							<div class="inline-row">
-								<label class="control-label col-md-2 col-xs-4" for="fear">Fear</label>
-								<div class="col-md-2 col-xs-8 mobile-pad-bottom">
+								<label class="control-label col-sm-2 col-xs-4" for="fear">Fear</label>
+								<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 									<input class="form-control" type="text" name="fear" id="fear_text" value="<?php echo isset($user) ? htmlspecialchars($user['fear']) : '' ?>">
 									<input class="form-control hidden-number" type="number" id="fear">
 								</div>
 							</div>
 							<div class="inline-row">
-								<label class="control-label col-md-2 col-xs-4" for="poison">Poison</label>
-								<div class="col-md-2 col-xs-8 mobile-pad-bottom">
+								<label class="control-label col-sm-2 col-xs-4" for="poison">Poison</label>
+								<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 									<input class="form-control" type="text" name="poison" id="poison_text" value="<?php echo isset($user) ? htmlspecialchars($user['poison']) : '' ?>">
 									<input class="form-control hidden-number" type="number" id="poison">
 								</div>
 							</div>
 							<div class="inline-row">
-								<label class="control-label col-md-2 col-xs-4" for="disease">Disease</label>
-								<div class="col-md-2 col-xs-8">
+								<label class="control-label col-sm-2 col-xs-4" for="disease">Disease</label>
+								<div class="col-sm-2 col-xs-8">
 									<input class="form-control" type="text" name="disease" id="disease_text" value="<?php echo isset($user) ? htmlspecialchars($user['disease']) : '' ?>">
 									<input class="form-control hidden-number" type="number" id="disease">
 								</div>
@@ -443,15 +433,16 @@
 								</div>
 								<div class="row">
 									<div class="col-xs-5 no-pad">
-										<input class="form-control" type="text" name="damage" id="damage_text" value="<?php echo isset($user) ? htmlspecialchars($user['damage']) : '' ?>">
-										<input class="form-control hidden-number" type="number" id="damage">
+										<input class="form-control" type="number" name="damage" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['damage']) : '' ?>">
+										<!-- <input class="form-control hidden-number" type="number" id="damage"> -->
 									</div>
 									<div class="col-xs-2 center no-pad">
 										/
 									</div>
 									<div class="col-xs-5 no-pad">
-										<input class="form-control" type="text" name="resilience" id="resilience_text" value="<?php echo isset($user) ? htmlspecialchars($user['resilience']) : '' ?>">
-										<input class="form-control hidden-number" type="number" id="resilience">
+										<!-- TODO on change, set max value for damage -->
+										<input class="form-control" type="number" name="resilience" min="1" value="<?php echo isset($user) ? htmlspecialchars($user['resilience']) : '' ?>">
+										<!-- <input class="form-control hidden-number" type="number" id="resilience"> -->
 									</div>
 								</div>
 							</div>
@@ -462,8 +453,8 @@
 								</div>
 								<div class="row">
 									<div class="col-xs-5 no-pad">
-										<input class="form-control" type="text" name="wounds" id="wounds_text" value="<?php echo isset($user) ? htmlspecialchars($user['wounds']) : '' ?>">
-										<input class="form-control hidden-number" type="number" id="wounds">
+										<input class="form-control" type="number" name="wounds" min="0" max="2" value="<?php echo isset($user) ? htmlspecialchars($user['wounds']) : '' ?>">
+										<!-- <input class="form-control hidden-number" type="number" id="wounds"> -->
 									</div>
 									<div class="col-xs-2 center no-pad">
 										/
@@ -501,45 +492,40 @@
 						<div class="section-title" id="section_actions">Actions, Move, Initiative</div>
 						<div class="form-group">
 							<div class="inline-row">
-								<label class="control-label col-md-2 col-xs-4" for="standard">Standard</label>
-								<div class="col-md-2 col-xs-8 mobile-pad-bottom">
-									<input class="form-control" type="text" name="standard" id="standard_text" value="<?php echo isset($user) ? htmlspecialchars($user['standard']) : '' ?>">
-									<input class="form-control hidden-number" type="number" id="standard">
+								<label class="control-label col-sm-2 col-xs-4" for="standard">Standard</label>
+								<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+									<input class="form-control" type="number" name="standard" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['standard']) : '' ?>">
 								</div>
 							</div>
 							<div class="inline-row">
-								<label class="control-label col-md-2 col-xs-4" for="quick">Quick</label>
-								<div class="col-md-2 col-xs-8 mobile-pad-bottom">
-									<input class="form-control" type="text" name="quick" id="quick_text" value="<?php echo isset($user) ? htmlspecialchars($user['quick']) : '' ?>">
-									<input class="form-control hidden-number" type="number" id="quick">
+								<label class="control-label col-sm-2 col-xs-4" for="quick">Quick</label>
+								<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+									<input class="form-control" type="number" name="quick" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['quick']) : '' ?>">
 								</div>
 							</div>
 							<div class="inline-row">
-								<label class="control-label col-md-2 col-xs-4" for="free">Free</label>
-								<div class="col-md-2 col-xs-8">
-									<input class="form-control" type="text" name="free" id="free_text" value="<?php echo isset($user) ? htmlspecialchars($user['free']) : '' ?>">
-									<input class="form-control hidden-number" type="number" id="free">
+								<label class="control-label col-sm-2 col-xs-4" for="free">Free</label>
+								<div class="col-sm-2 col-xs-8">
+									<input class="form-control" type="number" name="free" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['free']) : '' ?>">
 								</div>
 							</div>
 						</div>
 						<div class="form-group">
 							<div class="inline-row">
-								<label class="control-label col-md-2 col-xs-4" for="move">Move</label>
-								<div class="col-md-2 col-xs-8 mobile-pad-bottom">
-									<input class="form-control" type="text" name="move" id="move_text" value="<?php echo isset($user) ? htmlspecialchars($user['move']) : '' ?>">
-									<input class="form-control hidden-number" type="number" id="move">
+								<label class="control-label col-sm-2 col-xs-4" for="move">Move</label>
+								<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+									<input class="form-control" type="number" name="move" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['move']) : '' ?>">
 								</div>
 							</div>
 							<div class="inline-row">
-								<label class="control-label col-md-2 col-xs-4" for="initiative">Initiative</label>
-								<div class="col-md-2 col-xs-8 mobile-pad-bottom">
-									<input class="form-control" type="text" name="initiative" id="initiative_text" value="<?php echo isset($user) ? htmlspecialchars($user['initiative']) : '' ?>">
-									<input class="form-control hidden-number" type="number" id="initiative">
+								<label class="control-label col-sm-2 col-xs-4" for="initiative">Initiative</label>
+								<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+									<input class="form-control" type="number" name="initiative" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['initiative']) : '' ?>">
 								</div>
 							</div>
 							<div class="inline-row">
-								<label class="control-label col-md-2 col-xs-4 penalty" for="move_penalty">Penalty</label>
-								<div class="col-md-2 col-xs-8">
+								<label class="control-label col-sm-2 col-xs-4 penalty" for="move_penalty">Penalty</label>
+								<div class="col-sm-2 col-xs-8">
 									<input class="form-control" type="text" name="move_penalty" id="move_penalty_text" value="<?php echo isset($user) ? htmlspecialchars($user['move_penalty']) : '' ?>">
 									<input class="form-control hidden-number" type="number" id="move_penalty">
 								</div>
@@ -553,12 +539,16 @@
 						<div class="section-title" id="section_attributes">Attributes</div>
 
 						<div class="form-group">
-							<div class="col-md-6 attribute-col">
+							<div class="col-sm-6 attribute-col">
 								<div class="row">
-									<label class="control-label col-md-8 col-xs-4" for="strength">Strength</label>
-									<div class="col-md-4 col-xs-8">
-										<input class="form-control" type="text" name="strength" id="strength_text" value="<?php echo isset($user) ? htmlspecialchars($user['strength']) : '' ?>">
-										<input class="form-control hidden-number" type="number" id="strength">
+									<label class="control-label col-md-7 col-xs-8" for="strength">Strength</label>
+									<div class="col-md-5 col-xs-4">
+										<label class="control-label">
+											<span class="attribute-val" id="strength_text"></span>
+											<input type="hidden" name="strength" id="strength_val" value="<?php echo isset($user) ? $user['strength'] : '' ?>">
+											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('strength', 1)"></span>
+											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('strength', -1)"></span>
+										</label>
 									</div>
 								</div>
 								<div class="row training">
@@ -575,12 +565,16 @@
 								</div>
 							</div>
 
-							<div class="col-md-6 attribute-col">
+							<div class="col-sm-6 attribute-col">
 								<div class="row">
-									<label class="control-label col-md-8 col-xs-4" for="fortitude">Fortitude</label>
-									<div class="col-md-4 col-xs-8">
-										<input class="form-control" type="text" name="fortitude" id="fortitude_text" value="<?php echo isset($user) ? htmlspecialchars($user['fortitude']) : '' ?>">
-										<input class="form-control hidden-number" type="number" id="fortitude">
+									<label class="control-label col-md-7 col-xs-8" for="fortitude">Fortitude</label>
+									<div class="col-md-5 col-xs-4">
+										<label class="control-label">
+											<span class="attribute-val" id="fortitude_text"></span>
+											<input type="hidden" name="fortitude" id="fortitude_val" value="<?php echo isset($user) ? $user['fortitude'] : '' ?>">
+											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('fortitude', 1)"></span>
+											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('fortitude', -1)"></span>
+										</label>
 									</div>
 								</div>
 								<div class="row training">
@@ -599,12 +593,16 @@
 						</div>
 
 						<div class="form-group">
-							<div class="col-md-6 attribute-col">
+							<div class="col-sm-6 attribute-col">
 								<div class="row">
-									<label class="control-label col-md-8 col-xs-4" for="speed">Speed</label>
-									<div class="col-md-4 col-xs-8">
-										<input class="form-control" type="text" name="speed" id="speed_text" value="<?php echo isset($user) ? htmlspecialchars($user['speed']) : '' ?>">
-										<input class="form-control hidden-number" type="number" id="speed">
+									<label class="control-label col-md-7 col-xs-8" for="speed">Speed</label>
+									<div class="col-md-5 col-xs-4">
+										<label class="control-label">
+											<span class="attribute-val" id="speed_text"></span>
+											<input type="hidden" name="speed" id="speed_val" value="<?php echo isset($user) ? $user['speed'] : '' ?>">
+											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('speed', 1)"></span>
+											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('speed', -1)"></span>
+										</label>
 									</div>
 								</div>
 								<div class="row training">
@@ -621,12 +619,16 @@
 								</div>
 							</div>
 
-							<div class="col-md-6 attribute-col">
+							<div class="col-sm-6 attribute-col">
 								<div class="row">
-									<label class="control-label col-md-8 col-xs-4" for="agility">Agility</label>
-									<div class="col-md-4 col-xs-8">
-										<input class="form-control" type="text" name="agility" id="agility_text" value="<?php echo isset($user) ? htmlspecialchars($user['agility']) : '' ?>">
-										<input class="form-control hidden-number" type="number" id="agility">
+									<label class="control-label col-md-7 col-xs-8" for="agility">Agility</label>
+									<div class="col-md-5 col-xs-4">
+										<label class="control-label">
+											<span class="attribute-val" id="agility_text"></span>
+											<input type="hidden" name="agility" id="agility_val" value="<?php echo isset($user) ? $user['agility'] : '' ?>">
+											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('agility', 1)"></span>
+											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('agility', -1)"></span>
+										</label>
 									</div>
 								</div>
 								<div class="row training">
@@ -645,12 +647,16 @@
 						</div>
 
 						<div class="form-group">
-							<div class="col-md-6 attribute-col">
+							<div class="col-sm-6 attribute-col">
 								<div class="row">
-									<label class="control-label col-md-8 col-xs-4" for="precision_">Precision</label>
-									<div class="col-md-4 col-xs-8">
-										<input class="form-control" type="text" name="precision_" id="precision__text" value="<?php echo isset($user) ? htmlspecialchars($user['precision_']) : '' ?>">
-										<input class="form-control hidden-number" type="number" id="precision_">
+									<label class="control-label col-md-7 col-xs-8" for="precision_">Precision</label>
+									<div class="col-md-5 col-xs-4">
+										<label class="control-label">
+											<span class="attribute-val" id="precision__text"></span>
+											<input type="hidden" name="precision_" id="precision__val" value="<?php echo isset($user) ? $user['precision_'] : '' ?>">
+											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('precision', 1)"></span>
+											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('precision', -1)"></span>
+										</label>
 									</div>
 								</div>
 								<div class="row training">
@@ -667,12 +673,16 @@
 								</div>
 							</div>
 
-							<div class="col-md-6 attribute-col">
+							<div class="col-sm-6 attribute-col">
 								<div class="row">
-									<label class="control-label col-md-8 col-xs-4" for="awareness">Awareness</label>
-									<div class="col-md-4 col-xs-8">
-										<input class="form-control" type="text" name="awareness" id="awareness_text" value="<?php echo isset($user) ? htmlspecialchars($user['awareness']) : '' ?>">
-										<input class="form-control hidden-number" type="number" id="awareness">
+									<label class="control-label col-md-7 col-xs-8" for="awareness">Awareness</label>
+									<div class="col-md-5 col-xs-4">
+										<label class="control-label">
+											<span class="attribute-val" id="awareness_text"></span>
+											<input type="hidden" name="awareness" id="awareness_val" value="<?php echo isset($user) ? $user['awareness'] : '' ?>">
+											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('awareness', 1)"></span>
+											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('awareness', -1)"></span>
+										</label>
 									</div>
 								</div>
 								<div class="row training">
@@ -691,12 +701,16 @@
 						</div>
 
 						<div class="form-group">
-							<div class="col-md-6 attribute-col">
+							<div class="col-sm-6 attribute-col">
 								<div class="row">
-									<label class="control-label col-md-8 col-xs-4" for="allure">Allure</label>
-									<div class="col-md-4 col-xs-8">
-										<input class="form-control" type="text" name="allure" id="allure_text" value="<?php echo isset($user) ? htmlspecialchars($user['allure']) : '' ?>">
-										<input class="form-control hidden-number" type="number" id="allure">
+									<label class="control-label col-md-7 col-xs-8" for="allure">Allure</label>
+									<div class="col-md-5 col-xs-4">
+										<label class="control-label">
+											<span class="attribute-val" id="allure_text"></span>
+											<input type="hidden" name="allure" id="allure_val" value="<?php echo isset($user) ? $user['allure'] : '' ?>">
+											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('allure', 1)"></span>
+											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('allure', -1)"></span>
+										</label>
 									</div>
 								</div>
 								<div class="row training">
@@ -713,12 +727,16 @@
 								</div>
 							</div>
 
-							<div class="col-md-6 attribute-col">
+							<div class="col-sm-6 attribute-col">
 								<div class="row">
-									<label class="control-label col-md-8 col-xs-4" for="deception">Deception</label>
-									<div class="col-md-4 col-xs-8">
-										<input class="form-control" type="text" name="deception" id="deception_text" value="<?php echo isset($user) ? htmlspecialchars($user['deception']) : '' ?>">
-										<input class="form-control hidden-number" type="number" id="deception">
+									<label class="control-label col-md-7 col-xs-8" for="deception">Deception</label>
+									<div class="col-md-5 col-xs-4">
+										<label class="control-label">
+											<span class="attribute-val" id="deception_text"></span>
+											<input type="hidden" name="deception" id="deception_val" value="<?php echo isset($user) ? $user['deception'] : '' ?>">
+											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('deception', 1)"></span>
+											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('deception', -1)"></span>
+										</label>
 									</div>
 								</div>
 								<div class="row training">
@@ -737,12 +755,16 @@
 						</div>
 
 						<div class="form-group">
-							<div class="col-md-6 attribute-col">
+							<div class="col-sm-6 attribute-col">
 								<div class="row">
-									<label class="control-label col-md-8 col-xs-4" for="intellect">Intellect</label>
-									<div class="col-md-4 col-xs-8">
-										<input class="form-control" type="text" name="intellect" id="intellect_text" value="<?php echo isset($user) ? htmlspecialchars($user['intellect']) : '' ?>">
-										<input class="form-control hidden-number" type="number" id="intellect">
+									<label class="control-label col-md-7 col-xs-8" for="intellect">Intellect</label>
+									<div class="col-md-5 col-xs-4">
+										<label class="control-label">
+											<span class="attribute-val" id="intellect_text"></span>
+											<input type="hidden" name="intellect" id="intellect_val" value="<?php echo isset($user) ? $user['intellect'] : '' ?>">
+											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('intellect', 1)"></span>
+											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('intellect', -1)"></span>
+										</label>
 									</div>
 								</div>
 								<div class="row training">
@@ -759,12 +781,16 @@
 								</div>
 							</div>
 
-							<div class="col-md-6 attribute-col">
+							<div class="col-sm-6 attribute-col">
 								<div class="row">
-									<label class="control-label col-md-8 col-xs-4" for="innovation">Innovation</label>
-									<div class="col-md-4 col-xs-8">
-										<input class="form-control" type="text" name="innovation" id="innovation_text" value="<?php echo isset($user) ? htmlspecialchars($user['innovation']) : '' ?>">
-										<input class="form-control hidden-number" type="number" id="innovation">
+									<label class="control-label col-md-7 col-xs-8" for="innovation">Innovation</label>
+									<div class="col-md-5 col-xs-4">
+										<label class="control-label">
+											<span class="attribute-val" id="innovation_text"></span>
+											<input type="hidden" name="innovation" id="innovation_val" value="<?php echo isset($user) ? $user['innovation'] : '' ?>">
+											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('innovation', 1)"></span>
+											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('innovation', -1)"></span>
+										</label>
 									</div>
 								</div>
 								<div class="row training">
@@ -783,12 +809,16 @@
 						</div>
 
 						<div class="form-group">
-							<div class="col-md-6 attribute-col">
+							<div class="col-sm-6 attribute-col">
 								<div class="row">
-									<label class="control-label col-md-8 col-xs-4" for="intuition">Intution</label>
-									<div class="col-md-4 col-xs-8">
-										<input class="form-control" type="text" name="intuition" id="intuition_text" value="<?php echo isset($user) ? htmlspecialchars($user['intuition']) : '' ?>">
-										<input class="form-control hidden-number" type="number" id="intuition">
+									<label class="control-label col-md-7 col-xs-8" for="intuition">Intution</label>
+									<div class="col-md-5 col-xs-4">
+										<label class="control-label">
+											<span class="attribute-val" id="intuition_text"></span>
+											<input type="hidden" name="intuition" id="intuition_val" value="<?php echo isset($user) ? $user['intuition'] : '' ?>">
+											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('intuition', 1)"></span>
+											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('intuition', -1)"></span>
+										</label>
 									</div>
 								</div>
 								<div class="row training">
@@ -805,12 +835,16 @@
 								</div>
 							</div>
 
-							<div class="col-md-6 attribute-col">
+							<div class="col-sm-6 attribute-col">
 								<div class="row">
-									<label class="control-label col-md-8 col-xs-4" for="vitality">Vitality</label>
-									<div class="col-md-4 col-xs-8">
-										<input class="form-control" type="text" name="vitality" id="vitality_text" value="<?php echo isset($user) ? htmlspecialchars($user['vitality']) : '' ?>">
-										<input class="form-control hidden-number" type="number" id="vitality">
+									<label class="control-label col-md-7 col-xs-8" for="vitality">Vitality</label>
+									<div class="col-md-5 col-xs-4">
+										<label class="control-label">
+											<span class="attribute-val" id="vitality_text"></span>
+											<input type="hidden" name="vitality" id="vitality_val" value="<?php echo isset($user) ? $user['vitality'] : '' ?>">
+											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('vitality', 1)"></span>
+											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('vitality', -1)"></span>
+										</label>
 									</div>
 								</div>
 								<div class="row training">
@@ -843,16 +877,16 @@
 							</div>
 							<label class="control-label col-xs-2 no-pad-mobile" for="motivator_1_pts">Points:</label>
 							<div class="col-xs-1 no-pad">
-								<input class="form-control" type="text" name="motivator_1_pts" id="motivator_1_pts_text" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_1_pts']) : '' ?>">
-								<input class="form-control hidden-number" type="number" id="motivator_1_pts">
+								<input class="form-control" type="number" name="motivator_1_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_1_pts']) : '' ?>">
+								<!-- <input class="form-control hidden-number" type="number" id="motivator_1_pts"> -->
 							</div>
 							<div class="col-xs-3 no-pad-mobile">
 								<input class="form-control" type="text" name="motivator_2" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_2']) : '' ?>">
 							</div>
 							<label class="control-label col-xs-2 no-pad-mobile" for="motivator_2_pts">Points:</label>
 							<div class="col-xs-1 no-pad">
-								<input class="form-control" type="text" name="motivator_2_pts" id="motivator_2_pts_text" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_2_pts']) : '' ?>">
-								<input class="form-control hidden-number" type="number" id="motivator_2_pts">
+								<input class="form-control" type="number" name="motivator_2_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_2_pts']) : '' ?>">
+								<!-- <input class="form-control hidden-number" type="number" id="motivator_2_pts"> -->
 							</div>
 						</div>
 
@@ -862,16 +896,16 @@
 							</div>
 							<label class="control-label col-xs-2 no-pad-mobile" for="motivator_3_pts">Points:</label>
 							<div class="col-xs-1 no-pad">
-								<input class="form-control" type="text" name="motivator_3_pts" id="motivator_3_pts_text" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_3_pts']) : '' ?>">
-								<input class="form-control hidden-number" type="number" id="motivator_3_pts">
+								<input class="form-control" type="number" name="motivator_3_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_3_pts']) : '' ?>">
+								<!-- <input class="form-control hidden-number" type="number" id="motivator_3_pts"> -->
 							</div>
 							<div class="col-xs-3 no-pad-mobile">
 								<input class="form-control" type="text" name="motivator_4" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_4']) : '' ?>">
 							</div>
 							<label class="control-label col-xs-2 no-pad-mobile" for="motivator_4_pts">Points:</label>
 							<div class="col-xs-1 no-pad">
-								<input class="form-control" type="text" name="motivator_4_pts" id="motivator_4_pts_text" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_4_pts']) : '' ?>">
-								<input class="form-control hidden-number" type="number" id="motivator_4_pts">
+								<input class="form-control" type="number" name="motivator_4_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_4_pts']) : '' ?>">
+								<!-- <input class="form-control hidden-number" type="number" id="motivator_4_pts"> -->
 							</div>
 						</div>
 
@@ -987,7 +1021,7 @@
 
 				<div class="col-md-12">
 					<div class="section form-horizontal">
-						<div class="section-title">Weight Capacity</div>
+						<div class="section-title" id="section_weight">Weight Capacity</div>
 						<div class="form-group">
 							<label class="control-label col-xs-3 center resize-mobile-small" for="unhindered">Unhindered (1/4)</label>
 							<label class="control-label col-xs-3 center resize-mobile-small" for="encumbered">Encumbered (1/2)</label>
@@ -995,20 +1029,16 @@
 							<label class="control-label col-xs-3 center resize-mobile-small" for="overburdened">Overburdened (Full)</label>
 
 							<div class="col-xs-3">
-								<input class="form-control" type="text" name="unhindered" id="unhindered_text" value="<?php echo isset($user) ? htmlspecialchars($user['unhindered']) : '' ?>">
-								<input class="form-control hidden-number" type="number" id="unhindered">
+								<input class="form-control" type="number" name="unhindered" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['unhindered']) : '' ?>">
 							</div>
 							<div class="col-xs-3">
-								<input class="form-control" type="text" name="encumbered" id="encumbered_text" value="<?php echo isset($user) ? htmlspecialchars($user['encumbered']) : '' ?>">
-								<input class="form-control hidden-number" type="number" id="encumbered">
+								<input class="form-control" type="number" name="encumbered" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['encumbered']) : '' ?>">
 							</div>
 							<div class="col-xs-3">
-								<input class="form-control" type="text" name="burdened" id="burdened_text" value="<?php echo isset($user) ? htmlspecialchars($user['burdened']) : '' ?>">
-								<input class="form-control hidden-number" type="number" id="burdened">
+								<input class="form-control" type="number" name="burdened" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['burdened']) : '' ?>">
 							</div>
 							<div class="col-xs-3">
-								<input class="form-control" type="text" name="overburdened" id="overburdened_text" value="<?php echo isset($user) ? htmlspecialchars($user['overburdened']) : '' ?>">
-								<input class="form-control hidden-number" type="number" id="overburdened">
+								<input class="form-control" type="number" name="overburdened" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['overburdened']) : '' ?>">
 							</div>
 
 							<p class="col-xs-3"></p>
@@ -1023,7 +1053,7 @@
 				<!-- section: notes -->
 				<div class="col-md-12">
 					<div class="section form-horizontal">
-						<div class="section-title">Notes</div>
+						<div class="section-title" id="section_notes">Notes</div>
 						<div class="form-group">
 							<div class="col-xs-12">
 								<textarea class="form-control" rows="4" name="notes" maxlength="2000"><?php echo isset($user) ? htmlspecialchars($user['notes']) : '' ?></textarea>
@@ -1324,6 +1354,10 @@
 	<script src="/assets/script_v22_05_25_02.js"></script>
 
 	<script type="text/javascript">
+
+		// check for user and set attributes
+		var user = <?php echo json_encode(isset($user) ? $user : []); ?>;
+		setAttributes(user);
 
 		// check for user feats
 		var feats = <?php echo json_encode($feats); ?>;

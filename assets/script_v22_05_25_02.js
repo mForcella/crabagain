@@ -10,6 +10,13 @@ var itemNames = [];
 // detect if we're on a touchscreen
 var is_mobile = $('#is_mobile').css('display')=='none';
 
+// penalty inputs - if val is zero, clear input
+$(".penalty-val").on("change", function(){
+	if ($(this).val() == 0) {
+		$(this).val("");
+	}
+});
+
 // disable form submit on 'enter' key
 $('#user_form').on('keyup keypress', function(e) {
   var keyCode = e.keyCode || e.which;
@@ -103,6 +110,53 @@ $(".weapon-name").each(function(){
 		if ($("#"+$(this).attr("name")).is(":visible") && $("#"+$(this).attr("name")).hasClass("glyphicon-chevron-down")) {
 			$("#"+$(this).attr("name")).trigger("click");
 		}
+	});
+});
+
+// set attribute values on page load
+function setAttributes(user) {
+	var attributes = [
+		'strength',
+		'fortitude',
+		'speed',
+		'agility',
+		'precision_',
+		'awareness',
+		'allure',
+		'deception',
+		'intellect',
+		'innovation',
+		'intuition',
+		'vitality'
+	];
+	for (var i = 0; i < attributes.length; i++) {
+		if (user[attributes[i]] != undefined) {
+			$("#"+attributes[i]+"_text").html(user[attributes[i]] >= 0 ? "+"+user[attributes[i]] : user[attributes[i]]);
+			$("#"+attributes[i]+"_val").val(user[[attributes[i]]]);
+		} else {
+			$("#"+attributes[i]+"_text").html("+0");
+			$("#"+attributes[i]+"_val").val(0);
+		}
+	}
+}
+
+// adjust attribute value
+function adjustAttribute(attribute, val) {
+	var newVal = parseInt($("#"+attribute+"_val").val())+parseInt(val);
+	$("#"+attribute+"_text").html(newVal >= 0 ? "+"+newVal : newVal);
+	$("#"+attribute+"_val").val(newVal);
+}
+
+$(".attribute-col").each(function(){
+	$(this).on("mouseenter", function(){
+		// show glyphicon-plus, glyphicon-minus
+		$(this).find('.glyphicon-plus').show();
+		$(this).find('.glyphicon-minus').show();
+	});
+	$(this).on("mouseleave", function(){
+		// hide glyphicon-plus, glyphicon-minus
+		$(this).find('.glyphicon-plus').hide();
+		$(this).find('.glyphicon-minus').hide();
 	});
 });
 
@@ -367,28 +421,51 @@ function addTrainingElements(trainingName, attribute, value='') {
 	}).appendTo('#'+attribute);
 
 	var div_left = $('<div />', {
-	  'class': 'col-md-9 col-xs-4',
+	  'class': 'col-md-8 col-xs-8',
 	}).appendTo(row);
 
-	var label = $('<label />', {
+	var label_left = $('<label />', {
 	  'class': 'control-label',
 	  'for': training_name,
-	  'text': trainingName
+	  'text': trainingName,
 	}).appendTo(div_left);
 
 	// add remove button
-	var remove = $('<span />', {
+	$('<span />', {
 		'id': training_name+"_text"+"_remove",
 	  'class': 'glyphicon glyphicon-remove hover-hide',
-	}).appendTo(label);
+	}).appendTo(label_left);
 
 	var div_right = $('<div />', {
-	  'class': 'col-md-3 col-xs-8 no-pad',
+	  'class': 'col-md-4 col-xs-4',
 	}).appendTo(row);
 
-	createInput('', 'text', 'training_val[]', value, div_right, training_name+"_text");
-	createInput('hidden-number', 'number', '', '', div_right, training_name);
-	createInput('', 'hidden', 'training[]', trainingName+":"+attribute, div_right);
+	// createInput('', 'text', 'training_val[]', value, div_right, training_name+"_text");
+	// createInput('hidden-number', 'number', '', '', div_right, training_name);
+	// createInput('', 'hidden', 'training[]', trainingName+":"+attribute, div_right);
+
+	var label_right = $('<label />', {
+	  'class': 'control-label'
+	}).appendTo(div_right);
+
+	$('<span />', {
+		'id': training_name+"_text",
+	  'class': 'attribute-val',
+	  'html': value == '' ? '+0' : (value >= 0 ? "+"+value : value),
+	}).appendTo(label_right);
+
+	createInput('', 'hidden', 'training[]', trainingName+":"+attribute, label_right);
+	createInput('', 'hidden', 'training_val[]', value == '' ? 0 : value, label_right, training_name+"_val");
+
+	$('<span />', {
+	  'class': 'glyphicon glyphicon-plus',
+	  'onclick': 'adjustAttribute("'+training_name+'", 1)',
+	}).appendTo(label_right);
+
+	$('<span />', {
+	  'class': 'glyphicon glyphicon-minus',
+	  'onclick': 'adjustAttribute("'+training_name+'", -1)',
+	}).appendTo(label_right);
 
 	// enable label highlighting
 	enableHighlighting();
