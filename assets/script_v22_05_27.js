@@ -147,20 +147,27 @@ function adjustAttribute(attribute, val) {
 	$("#"+attribute+"_val").val(newVal);
 }
 
-// enable attribute adjust hide / show - don't hide on mobile
+// enable attribute edit btn hide / show on hover; don't hide on mobile
 if (!is_mobile) {
 	$(".attribute-col").each(function(){
-		$(this).on("mouseenter", function(){
+		$(this).hover(function(){
 			// show glyphicon-plus, glyphicon-minus
-			$(this).find('.glyphicon-plus').show();
-			$(this).find('.glyphicon-minus').show();
-		});
-		$(this).on("mouseleave", function(){
+			$(this).find('.glyphicon-edit').show();
+			// toggleHidden(this.id);
+		},
+		function(){
 			// hide glyphicon-plus, glyphicon-minus
-			$(this).find('.glyphicon-plus').hide();
-			$(this).find('.glyphicon-minus').hide();
+			$(this).find('.glyphicon-edit').hide();
+			// toggleHidden(this.id);
 		});
 	});
+}
+
+// show all icons for editing attribute values
+function toggleHidden(col) {
+	$("#"+col).find('.hidden-icon').toggle();
+	// adjust padding on .with-hidden labels
+	$("#"+col).find(".with-hidden").css("padding-right", $("#"+col).find(".glyphicon-remove").is(":visible") ? "0" : "23px");
 }
 
 // hide / show weapon inputs
@@ -428,7 +435,7 @@ function addTrainingElements(trainingName, attribute, value='') {
 	}).appendTo(row);
 
 	var label_left = $('<label />', {
-	  'class': 'control-label',
+	  'class': 'control-label with-hidden',
 	  'for': training_name,
 	  'text': trainingName,
 	}).appendTo(div_left);
@@ -436,7 +443,7 @@ function addTrainingElements(trainingName, attribute, value='') {
 	// add remove button
 	$('<span />', {
 		'id': training_name+"_text"+"_remove",
-	  'class': 'glyphicon glyphicon-remove hover-hide',
+	  'class': 'glyphicon glyphicon-remove hidden-icon',
 	}).appendTo(label_left);
 
 	var div_right = $('<div />', {
@@ -457,28 +464,18 @@ function addTrainingElements(trainingName, attribute, value='') {
 	createInput('', 'hidden', 'training_val[]', value == '' ? 0 : value, label_right, training_name+"_val");
 
 	$('<span />', {
-	  'class': 'glyphicon glyphicon-plus',
+	  'class': 'glyphicon glyphicon-plus hidden-icon',
 	  'onclick': 'adjustAttribute("'+training_name+'", 1)',
 	}).appendTo(label_right);
 
 	$('<span />', {
-	  'class': 'glyphicon glyphicon-minus',
+	  'class': 'glyphicon glyphicon-minus hidden-icon',
 	  'onclick': 'adjustAttribute("'+training_name+'", -1)',
 	}).appendTo(label_right);
 
 	// enable label highlighting
 	enableHighlighting();
 	enableHiddenNumbers();
-
-	// enable hover function - don't enable on mobile
-	if (!is_mobile) {
-	  	$(div_left).hover(function () {
-			$(this).find(".glyphicon-remove").show();
-		}, 
-		function () {
-			$(this).find(".glyphicon-remove").hide();
-		});
-	}
 
 	// enable remove function
 	$("#"+training_name+"_text"+"_remove").on("click", function(){
@@ -738,12 +735,22 @@ function enableHighlighting() {
 			var inputElement = this.id.includes("_text") ? $("#"+this.id.split("_text")[0]) : $(this);
 			// if input is for an attribute training, use the ID value instead
 			var labelTrigger = $(this).attr("name") == 'training_val[]' ? this.id.split("_text")[0] : $(this).attr("name");
-			inputElement.on("focus", function(){
-				$("label[for='"+labelTrigger+"']").addClass("highlight");
-			});
-			inputElement.on("focusout", function(){
-				$("label[for='"+labelTrigger+"']").removeClass("highlight");
-			});
+			// on mobile, highlight label on focus; on desktop, highlight label on hover
+			if (is_mobile) {
+				inputElement.on("focus", function(){
+					$("label[for='"+labelTrigger+"']").addClass("highlight");
+				});
+				inputElement.on("focusout", function(){
+					$("label[for='"+labelTrigger+"']").removeClass("highlight");
+				});
+			} else {
+				inputElement.hover(function (){
+					$("label[for='"+labelTrigger+"']").addClass("highlight");
+				},
+				function(){
+					$("label[for='"+labelTrigger+"']").removeClass("highlight");
+				});
+			}
 		}
 		// find '_text' inputs and add focus function to skip over inputs on tab nav
 		if (this.id.includes("_text")) {
@@ -757,19 +764,25 @@ function enableHighlighting() {
 	});
 }
 
+// hidden number inputs - to trigger the number keypad for text inputs (mobile)
 function enableHiddenNumbers() {
 	$(".hidden-number").each(function(){
 		if (!hiddenEnabled.includes(this.id)) {
 			hiddenEnabled.push(this.id);
 			$(this).on("focus", function(){
+				// remove type='number' attribute to allow input of non-numeric input
 				$(this).removeAttr("type");
+				// get current input val of text field
 				var input = $("#"+this.id+"_text");
 				$(this).val(input.val());
+				// empty text field
 				input.val("");
 			});
 			$(this).on("focusout", function(){
+				// copy value from number input to text input
 				var input = $("#"+this.id+"_text");
 				input.val($(this).val());
+				// restore type='number' attribute to trigger number keyboard on next focus
 				$(this).attr("type", "number");
 			});
 		}

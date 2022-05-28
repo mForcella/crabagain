@@ -166,6 +166,7 @@
 								</div>
 							</div>
 							<div class="inline-row">
+								<!-- TODO calculate level from xp? -->
 								<label class="control-label col-sm-2 col-xs-4" for="level">Level</label>
 								<div class="col-sm-4 col-xs-8">
 									<input class="form-control" type="number" name="level" min="1" value="<?php echo isset($user) ? htmlspecialchars($user['level']) : '' ?>">
@@ -180,6 +181,7 @@
 								</div>
 							</div>
 							<div class="inline-row">
+								<!-- TODO calculate effect from morale? -->
 								<label class="control-label col-sm-2 col-xs-4" for="morale_effect">Effect</label>
 								<div class="col-sm-6 col-xs-8">
 									<input class="form-control" type="text" name="morale_effect" value="<?php echo isset($user) ? htmlspecialchars($user['morale_effect']) : '' ?>">
@@ -434,7 +436,6 @@
 								<div class="row">
 									<div class="col-xs-5 no-pad">
 										<input class="form-control" type="number" name="damage" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['damage']) : '' ?>">
-										<!-- <input class="form-control hidden-number" type="number" id="damage"> -->
 									</div>
 									<div class="col-xs-2 center no-pad">
 										/
@@ -442,7 +443,6 @@
 									<div class="col-xs-5 no-pad">
 										<!-- TODO on change, set max value for damage -->
 										<input class="form-control" type="number" name="resilience" min="1" value="<?php echo isset($user) ? htmlspecialchars($user['resilience']) : '' ?>">
-										<!-- <input class="form-control hidden-number" type="number" id="resilience"> -->
 									</div>
 								</div>
 							</div>
@@ -454,7 +454,6 @@
 								<div class="row">
 									<div class="col-xs-5 no-pad">
 										<input class="form-control" type="number" name="wounds" min="0" max="2" value="<?php echo isset($user) ? htmlspecialchars($user['wounds']) : '' ?>">
-										<!-- <input class="form-control hidden-number" type="number" id="wounds"> -->
 									</div>
 									<div class="col-xs-2 center no-pad">
 										/
@@ -470,7 +469,7 @@
 									<label class="control-label col-sm-12 center full-width penalty" for="wound_penalty">Penalty</label>
 								</div>
 								<div class="row">
-									<div class="col-sm-12">
+									<div class="col-sm-12 no-pad">
 										<input class="form-control" type="text" name="wound_penalty" id="wound_penalty_text" value="<?php echo isset($user) ? htmlspecialchars($user['wound_penalty']) : '' ?>">
 										<input class="form-control hidden-number" type="number" id="wound_penalty">
 									</div>
@@ -539,15 +538,15 @@
 						<div class="section-title" id="section_attributes">Attributes</div>
 
 						<div class="form-group">
-							<div class="col-sm-6 attribute-col">
+							<div class="col-sm-6 attribute-col" id="col_strength">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="strength">Strength</label>
+									<label class="control-label col-md-7 col-xs-8" for="strength">Strength<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_strength')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="strength_text"></span>
 											<input type="hidden" name="strength" id="strength_val" value="<?php echo isset($user) ? $user['strength'] : '' ?>">
-											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('strength', 1)"></span>
-											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('strength', -1)"></span>
+											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('strength', 1)"></span>
+											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('strength', -1)"></span>
 										</label>
 									</div>
 								</div>
@@ -558,22 +557,22 @@
 										</div>
 										<div class="row">
 											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Strength')"><span class="glyphicon glyphicon-plus-sign"></span></button>
+												<button type="button" class="btn btn-default" onclick="newTrainingModal('Strength')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 											</div>
 										</div>
 									</div>
 								</div>
 							</div>
 
-							<div class="col-sm-6 attribute-col">
+							<div class="col-sm-6 attribute-col" id="col_fortitude">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="fortitude">Fortitude</label>
+									<label class="control-label col-md-7 col-xs-8" for="fortitude">Fortitude<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_fortitude')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="fortitude_text"></span>
 											<input type="hidden" name="fortitude" id="fortitude_val" value="<?php echo isset($user) ? $user['fortitude'] : '' ?>">
-											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('fortitude', 1)"></span>
-											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('fortitude', -1)"></span>
+											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('fortitude', 1)"></span>
+											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('fortitude', -1)"></span>
 										</label>
 									</div>
 								</div>
@@ -584,7 +583,7 @@
 										</div>
 										<div class="row">
 											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Fortitude')"><span class="glyphicon glyphicon-plus-sign"></span></button>
+												<button type="button" class="btn btn-default" onclick="newTrainingModal('Fortitude')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 											</div>
 										</div>
 									</div>
@@ -593,15 +592,15 @@
 						</div>
 
 						<div class="form-group">
-							<div class="col-sm-6 attribute-col">
+							<div class="col-sm-6 attribute-col" id="col_speed">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="speed">Speed</label>
+									<label class="control-label col-md-7 col-xs-8" for="speed">Speed<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_speed')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="speed_text"></span>
 											<input type="hidden" name="speed" id="speed_val" value="<?php echo isset($user) ? $user['speed'] : '' ?>">
-											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('speed', 1)"></span>
-											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('speed', -1)"></span>
+											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('speed', 1)"></span>
+											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('speed', -1)"></span>
 										</label>
 									</div>
 								</div>
@@ -612,22 +611,22 @@
 										</div>
 										<div class="row">
 											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Speed')"><span class="glyphicon glyphicon-plus-sign"></span></button>
+												<button type="button" class="btn btn-default" onclick="newTrainingModal('Speed')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 											</div>
 										</div>
 									</div>
 								</div>
 							</div>
 
-							<div class="col-sm-6 attribute-col">
+							<div class="col-sm-6 attribute-col" id="col_agility">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="agility">Agility</label>
+									<label class="control-label col-md-7 col-xs-8" for="agility">Agility<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_agility')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="agility_text"></span>
 											<input type="hidden" name="agility" id="agility_val" value="<?php echo isset($user) ? $user['agility'] : '' ?>">
-											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('agility', 1)"></span>
-											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('agility', -1)"></span>
+											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('agility', 1)"></span>
+											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('agility', -1)"></span>
 										</label>
 									</div>
 								</div>
@@ -638,7 +637,7 @@
 										</div>
 										<div class="row">
 											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Agility')"><span class="glyphicon glyphicon-plus-sign"></span></button>
+												<button type="button" class="btn btn-default" onclick="newTrainingModal('Agility')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 											</div>
 										</div>
 									</div>
@@ -647,15 +646,15 @@
 						</div>
 
 						<div class="form-group">
-							<div class="col-sm-6 attribute-col">
+							<div class="col-sm-6 attribute-col" id="col_precision">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="precision_">Precision</label>
+									<label class="control-label col-md-7 col-xs-8" for="precision_">Precision<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_precision')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="precision__text"></span>
 											<input type="hidden" name="precision_" id="precision__val" value="<?php echo isset($user) ? $user['precision_'] : '' ?>">
-											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('precision', 1)"></span>
-											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('precision', -1)"></span>
+											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('precision', 1)"></span>
+											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('precision', -1)"></span>
 										</label>
 									</div>
 								</div>
@@ -666,22 +665,22 @@
 										</div>
 										<div class="row">
 											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Precision')"><span class="glyphicon glyphicon-plus-sign"></span></button>
+												<button type="button" class="btn btn-default" onclick="newTrainingModal('Precision')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 											</div>
 										</div>
 									</div>
 								</div>
 							</div>
 
-							<div class="col-sm-6 attribute-col">
+							<div class="col-sm-6 attribute-col" id="col_awareness">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="awareness">Awareness</label>
+									<label class="control-label col-md-7 col-xs-8" for="awareness">Awareness<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_awareness')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="awareness_text"></span>
 											<input type="hidden" name="awareness" id="awareness_val" value="<?php echo isset($user) ? $user['awareness'] : '' ?>">
-											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('awareness', 1)"></span>
-											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('awareness', -1)"></span>
+											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('awareness', 1)"></span>
+											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('awareness', -1)"></span>
 										</label>
 									</div>
 								</div>
@@ -692,7 +691,7 @@
 										</div>
 										<div class="row">
 											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Awareness')"><span class="glyphicon glyphicon-plus-sign"></span></button>
+												<button type="button" class="btn btn-default" onclick="newTrainingModal('Awareness')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 											</div>
 										</div>
 									</div>
@@ -701,15 +700,15 @@
 						</div>
 
 						<div class="form-group">
-							<div class="col-sm-6 attribute-col">
+							<div class="col-sm-6 attribute-col" id="col_allure">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="allure">Allure</label>
+									<label class="control-label col-md-7 col-xs-8" for="allure">Allure<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_allure')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="allure_text"></span>
 											<input type="hidden" name="allure" id="allure_val" value="<?php echo isset($user) ? $user['allure'] : '' ?>">
-											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('allure', 1)"></span>
-											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('allure', -1)"></span>
+											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('allure', 1)"></span>
+											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('allure', -1)"></span>
 										</label>
 									</div>
 								</div>
@@ -720,22 +719,22 @@
 										</div>
 										<div class="row">
 											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Allure')"><span class="glyphicon glyphicon-plus-sign"></span></button>
+												<button type="button" class="btn btn-default" onclick="newTrainingModal('Allure')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 											</div>
 										</div>
 									</div>
 								</div>
 							</div>
 
-							<div class="col-sm-6 attribute-col">
+							<div class="col-sm-6 attribute-col" id="col_deception">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="deception">Deception</label>
+									<label class="control-label col-md-7 col-xs-8" for="deception">Deception<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_deception')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="deception_text"></span>
 											<input type="hidden" name="deception" id="deception_val" value="<?php echo isset($user) ? $user['deception'] : '' ?>">
-											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('deception', 1)"></span>
-											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('deception', -1)"></span>
+											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('deception', 1)"></span>
+											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('deception', -1)"></span>
 										</label>
 									</div>
 								</div>
@@ -746,7 +745,7 @@
 										</div>
 										<div class="row">
 											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Deception')"><span class="glyphicon glyphicon-plus-sign"></span></button>
+												<button type="button" class="btn btn-default" onclick="newTrainingModal('Deception')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 											</div>
 										</div>
 									</div>
@@ -755,15 +754,15 @@
 						</div>
 
 						<div class="form-group">
-							<div class="col-sm-6 attribute-col">
+							<div class="col-sm-6 attribute-col" id="col_intellect">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="intellect">Intellect</label>
+									<label class="control-label col-md-7 col-xs-8" for="intellect">Intellect<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_intellect')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="intellect_text"></span>
 											<input type="hidden" name="intellect" id="intellect_val" value="<?php echo isset($user) ? $user['intellect'] : '' ?>">
-											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('intellect', 1)"></span>
-											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('intellect', -1)"></span>
+											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('intellect', 1)"></span>
+											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('intellect', -1)"></span>
 										</label>
 									</div>
 								</div>
@@ -774,22 +773,22 @@
 										</div>
 										<div class="row">
 											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Intellect')"><span class="glyphicon glyphicon-plus-sign"></span></button>
+												<button type="button" class="btn btn-default" onclick="newTrainingModal('Intellect')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 											</div>
 										</div>
 									</div>
 								</div>
 							</div>
 
-							<div class="col-sm-6 attribute-col">
+							<div class="col-sm-6 attribute-col" id="col_innovation">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="innovation">Innovation</label>
+									<label class="control-label col-md-7 col-xs-8" for="innovation">Innovation<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_innovation')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="innovation_text"></span>
 											<input type="hidden" name="innovation" id="innovation_val" value="<?php echo isset($user) ? $user['innovation'] : '' ?>">
-											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('innovation', 1)"></span>
-											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('innovation', -1)"></span>
+											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('innovation', 1)"></span>
+											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('innovation', -1)"></span>
 										</label>
 									</div>
 								</div>
@@ -800,7 +799,7 @@
 										</div>
 										<div class="row">
 											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Innovation')"><span class="glyphicon glyphicon-plus-sign"></span></button>
+												<button type="button" class="btn btn-default" onclick="newTrainingModal('Innovation')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 											</div>
 										</div>
 									</div>
@@ -809,15 +808,15 @@
 						</div>
 
 						<div class="form-group">
-							<div class="col-sm-6 attribute-col">
+							<div class="col-sm-6 attribute-col" id="col_intuition">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="intuition">Intution</label>
+									<label class="control-label col-md-7 col-xs-8" for="intuition">Intution<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_intuition')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="intuition_text"></span>
 											<input type="hidden" name="intuition" id="intuition_val" value="<?php echo isset($user) ? $user['intuition'] : '' ?>">
-											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('intuition', 1)"></span>
-											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('intuition', -1)"></span>
+											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('intuition', 1)"></span>
+											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('intuition', -1)"></span>
 										</label>
 									</div>
 								</div>
@@ -828,22 +827,22 @@
 										</div>
 										<div class="row">
 											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Intution')"><span class="glyphicon glyphicon-plus-sign"></span></button>
+												<button type="button" class="btn btn-default" onclick="newTrainingModal('Intution')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 											</div>
 										</div>
 									</div>
 								</div>
 							</div>
 
-							<div class="col-sm-6 attribute-col">
+							<div class="col-sm-6 attribute-col" id="col_vitality">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="vitality">Vitality</label>
+									<label class="control-label col-md-7 col-xs-8" for="vitality">Vitality<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_vitality')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="vitality_text"></span>
 											<input type="hidden" name="vitality" id="vitality_val" value="<?php echo isset($user) ? $user['vitality'] : '' ?>">
-											<span class="glyphicon glyphicon-plus" onclick="adjustAttribute('vitality', 1)"></span>
-											<span class="glyphicon glyphicon-minus" onclick="adjustAttribute('vitality', -1)"></span>
+											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('vitality', 1)"></span>
+											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('vitality', -1)"></span>
 										</label>
 									</div>
 								</div>
@@ -854,7 +853,7 @@
 										</div>
 										<div class="row">
 											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Vitality')"><span class="glyphicon glyphicon-plus-sign"></span></button>
+												<button type="button" class="btn btn-default" onclick="newTrainingModal('Vitality')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 											</div>
 										</div>
 									</div>
@@ -871,41 +870,39 @@
 					<div class="section form-horizontal">
 						<div class="section-title" id="section_motivators">Motivators</div>
 
-						<div class="form-group">
-							<div class="col-xs-3 no-pad-mobile">
+						<div class="form-group no-margin">
+							<div class="col-xs-3 no-pad-mobile no-pad-left">
 								<input class="form-control" type="text" name="motivator_1" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_1']) : '' ?>">
 							</div>
 							<label class="control-label col-xs-2 no-pad-mobile" for="motivator_1_pts">Points:</label>
 							<div class="col-xs-1 no-pad">
 								<input class="form-control" type="number" name="motivator_1_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_1_pts']) : '' ?>">
-								<!-- <input class="form-control hidden-number" type="number" id="motivator_1_pts"> -->
 							</div>
-							<div class="col-xs-3 no-pad-mobile">
+
+							<div class="col-xs-3 no-pad-mobile pad-left-mobile">
 								<input class="form-control" type="text" name="motivator_2" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_2']) : '' ?>">
 							</div>
 							<label class="control-label col-xs-2 no-pad-mobile" for="motivator_2_pts">Points:</label>
 							<div class="col-xs-1 no-pad">
 								<input class="form-control" type="number" name="motivator_2_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_2_pts']) : '' ?>">
-								<!-- <input class="form-control hidden-number" type="number" id="motivator_2_pts"> -->
 							</div>
 						</div>
 
-						<div class="form-group">
-							<div class="col-xs-3 no-pad-mobile">
+						<div class="form-group no-margin">
+							<div class="col-xs-3 no-pad-mobile no-pad-left">
 								<input class="form-control" type="text" name="motivator_3" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_3']) : '' ?>">
 							</div>
 							<label class="control-label col-xs-2 no-pad-mobile" for="motivator_3_pts">Points:</label>
 							<div class="col-xs-1 no-pad">
 								<input class="form-control" type="number" name="motivator_3_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_3_pts']) : '' ?>">
-								<!-- <input class="form-control hidden-number" type="number" id="motivator_3_pts"> -->
 							</div>
-							<div class="col-xs-3 no-pad-mobile">
+
+							<div class="col-xs-3 no-pad-mobile pad-left-mobile">
 								<input class="form-control" type="text" name="motivator_4" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_4']) : '' ?>">
 							</div>
 							<label class="control-label col-xs-2 no-pad-mobile" for="motivator_4_pts">Points:</label>
 							<div class="col-xs-1 no-pad">
 								<input class="form-control" type="number" name="motivator_4_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_4_pts']) : '' ?>">
-								<!-- <input class="form-control hidden-number" type="number" id="motivator_4_pts"> -->
 							</div>
 						</div>
 
