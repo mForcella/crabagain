@@ -1,3 +1,75 @@
+/* top menu */
+.navbar {
+    padding: 2.5rem;
+    float: right;
+}
+@media screen and (min-width:1200px) {
+	.navbar {
+	    padding-right: calc((100vw - 1200px)/2 + 2.5rem);
+	}
+}
+.nav-menu, .attribute-pts {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    right: -100%;
+    top: 7rem;
+    transition: 0.3s;
+	background-color: #f2f2f2;
+	border: 2px solid #999999;
+	border-style: groove;
+	z-index: 999;
+    padding: 1.5rem 2rem;
+}
+.attribute-pts {
+	padding: 1.5rem;
+    top: 2rem;
+}
+.attribute-pts div {
+    margin: 0.5rem 0;
+}
+.attribute-pts .glyphicon-remove {
+	color: black;
+}
+.attribute-count {
+	font-size: 3rem;
+	text-align: center;
+}
+.nav-menu.active, .attribute-pts.active {
+    right: -2px;
+}
+.nav-item {
+    margin: 0.3rem 0;
+    font-size: 1.8rem;
+}
+.nav-item-label {
+	font-family: "Merriweather";
+	margin-left: 15px;
+    font-size: 2.0rem;
+}
+.glyphicon-menu-hamburger {
+    font-size: 3.6rem;
+    color: #b3b3b3;
+    transition: 0.3s;
+}
+.glyphicon-menu-hamburger.active {
+	transform: rotate(90deg);
+}
+@media screen and (max-width:767px) {
+	.nav-item {
+	    font-size: 1.4rem;
+	}
+	.nav-item-label {
+	    font-size: 1.6rem;
+	}
+	.glyphicon-menu-hamburger {
+	    font-size: 3.6rem;
+	}
+	.attribute-count {
+		font-size: 2rem;
+	}
+}
+
 /* detect touchscreen */
 @media (hover: none) {
   #is_mobile {
@@ -65,6 +137,10 @@ h1 {
 	font-weight: bold;
 	font-style: normal !important;
 }
+.attribute-name {
+	width: 80px;
+	display: inline-block;
+}
 .btn-default {
 	border: none;
 	width: 100%;
@@ -100,6 +176,11 @@ h1 {
 	display: inline;
 	/*font-size: 0.9em;*/
 }
+@media screen and (max-width:767px) {
+	.feat p {
+		font-size: 0.9em;
+	}
+}
 .feat-title {
 	font-style: italic;
 	font-weight: bold;
@@ -130,11 +211,13 @@ h1 {
 .glyphicon {
 	line-height: 0.5;
 }
-.glyphicon:hover {
-	text-shadow: 0px 0px 3px #404040;
-	cursor: pointer;
+@media (hover: hover) {
+	.glyphicon:hover {
+		text-shadow: 0px 0px 3px #404040;
+		cursor: pointer;
+	}
 }
-.glyphicon-edit, .glyphicon-remove, .glyphicon-chevron-up, .glyphicon-chevron-down {
+.glyphicon-edit, .glyphicon-remove, .glyphicon-chevron-up, .glyphicon-chevron-down, .glyphicon-ok {
 	margin: 0 5px;
 }
 @media screen and (min-width:768px) {
@@ -188,6 +271,7 @@ h1 {
 .header .row .col-xs-4 {
 	margin-left: 4vw;
 	padding: 0;
+	position: static;
 }
 @media screen and (min-width:1200px) {
 	.header .row {
@@ -212,14 +296,6 @@ h1 {
 }
 .highlight {
 	text-shadow: 0px 0px 3px #404040;
-}
-.inline-row {
-	/*display: inline-block !important;*/
-}
-@media screen and (max-width:991px) {
-	.inline-row .control-label {
-		padding-top: 0;
-	}
 }
 .left-col {
 	margin-left: 15px;
@@ -288,7 +364,7 @@ h1 {
 	margin: 10px 20px;
 	background-color: #f2f2f2;
 }
-.section:before {
+.section:before, .nav-menu:before, .attribute-count:before {
 	background-image: url('image/texture.jpeg');
 	/*background-size: auto;*/
 	background-size: cover;
@@ -316,7 +392,7 @@ h1 {
 	text-transform: uppercase;
 	margin-bottom: 5px;
 }
-.submit-btn {
+/*.submit-btn {
 	text-align: center;
 	margin: 50px;
 }
@@ -324,7 +400,7 @@ h1 {
 	.submit-btn {
 		margin: 20px;
 	}
-}
+}*/
 .training {
 	font-style: italic;
 	margin-top: 5px;

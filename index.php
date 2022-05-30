@@ -91,6 +91,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, height=device-height,  initial-scale=1.0, user-scalable=no, user-scalable=0"/>
 	<meta name="robots" content="noindex">
+	<meta property="og:image" content="https://crabagain.com/assets/image/treasure-header-desaturated.jpg">
 	<title>The Lost City!</title>
 	<link rel="icon" type="image/png" href="/assets/image/favicon.ico"/>
 
@@ -107,8 +108,26 @@
 </head>
 
 <body>
+
+	<!-- user menu -->
+  <nav class="navbar">
+    <div class="nav-menu">
+      <div class="nav-item">
+         <span class="glyphicon glyphicon-floppy-save" onclick="formSubmit()"><span class="nav-item-label"> Save Character Data</span></span>
+      </div>
+      <div class="nav-item">
+         <span class="glyphicon glyphicon-circle-arrow-up" onclick="allocateAttributePts()"><span class="nav-item-label"> Allocate Attribute Points</span></span>
+      </div>
+    </div>
+    <div class="attribute-pts">
+	    <div class="attribute-count"></div>
+	    <div><span class="glyphicon glyphicon-ok" onclick="endEditAttributes(true)"><span class="nav-item-label"> Accept Changes</span></span></div>
+	    <div><span class="glyphicon glyphicon-remove" onclick="endEditAttributes(false)"><span class="nav-item-label"> Discard Changes</span></span></div>
+    </div>
+		<span class="glyphicon glyphicon-menu-hamburger" onclick="toggleMenu()"></span>
+  </nav>
+
 	<!-- <div class="container"> -->
-		<!-- header image dimensions - 1920x650 -->
 		<div class="header">
 			<div class="row">
 				<div class="col-xs-4">
@@ -154,38 +173,34 @@
 					<div class="section form-horizontal">
 						<div class="form-group">
 							<label class="control-label col-sm-2 col-xs-4" for="character_name">Name</label>
-							<div class="col-sm-10 col-xs-8">
+							<div class="col-sm-4 col-xs-8 mobile-pad-bottom">
 								<input class="form-control" type="text" id="character_name" name="character_name" value="<?php echo isset($user) ? htmlspecialchars($user['character_name']) : '' ?>">
 							</div>
-						</div>
-						<div class="form-group">
-							<div class="inline-row">
-								<label class="control-label col-sm-2 col-xs-4" for="xp">Experience</label>
-								<div class="col-sm-4 col-xs-8 mobile-pad-bottom">
-									<input class="form-control" type="number" name="xp" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['xp']) : '' ?>">
-								</div>
-							</div>
-							<div class="inline-row">
-								<!-- TODO calculate level from xp? -->
-								<label class="control-label col-sm-2 col-xs-4" for="level">Level</label>
-								<div class="col-sm-4 col-xs-8">
-									<input class="form-control" type="number" name="level" min="1" value="<?php echo isset($user) ? htmlspecialchars($user['level']) : '' ?>">
-								</div>
+							<label class="control-label col-sm-4 col-xs-4" for="attribute_pts">Attribute Pts</label>
+							<div class="col-sm-2 col-xs-8">
+								<input class="form-control" type="number" id="attribute_pts" name="attribute_pts" value="<?php echo isset($user) ? htmlspecialchars($user['attribute_pts']) : 12 ?>">
 							</div>
 						</div>
 						<div class="form-group">
-							<div class="inline-row">
-								<label class="control-label col-sm-2 col-xs-4" for="morale">Morale</label>
-								<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-									<input class="form-control" type="number" name="morale" min="-10" value="<?php echo isset($user) ? htmlspecialchars($user['morale']) : '' ?>">
-								</div>
+							<label class="control-label col-sm-2 col-xs-4" for="xp">Experience</label>
+							<div class="col-sm-4 col-xs-8 mobile-pad-bottom">
+								<input class="form-control" type="number" name="xp" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['xp']) : '' ?>">
 							</div>
-							<div class="inline-row">
-								<!-- TODO calculate effect from morale? -->
-								<label class="control-label col-sm-2 col-xs-4" for="morale_effect">Effect</label>
-								<div class="col-sm-6 col-xs-8">
-									<input class="form-control" type="text" name="morale_effect" value="<?php echo isset($user) ? htmlspecialchars($user['morale_effect']) : '' ?>">
-								</div>
+							<!-- TODO calculate level from xp? -->
+							<label class="control-label col-sm-2 col-xs-4" for="level">Level</label>
+							<div class="col-sm-4 col-xs-8">
+								<input class="form-control" type="number" name="level" min="1" value="<?php echo isset($user) ? htmlspecialchars($user['level']) : '' ?>">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-sm-2 col-xs-4" for="morale">Morale</label>
+							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+								<input class="form-control" type="number" name="morale" min="-10" value="<?php echo isset($user) ? htmlspecialchars($user['morale']) : '' ?>">
+							</div>
+							<!-- TODO calculate effect from morale? -->
+							<label class="control-label col-sm-2 col-xs-4" for="morale_effect">Effect</label>
+							<div class="col-sm-6 col-xs-8">
+								<input class="form-control" type="text" name="morale_effect" value="<?php echo isset($user) ? htmlspecialchars($user['morale_effect']) : '' ?>">
 							</div>
 						</div>
 					</div>
@@ -372,26 +387,20 @@
 					<div class="section form-horizontal">
 						<div class="section-title" id="section_defense">Defense</div>
 						<div class="form-group">
-							<div class="inline-row">
-								<label class="control-label col-sm-2 col-xs-4" for="toughness">Toughness</label>
-								<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-									<input class="form-control" type="text" name="toughness" id="toughness_text" value="<?php echo isset($user) ? htmlspecialchars($user['toughness']) : '' ?>">
-									<input class="form-control hidden-number" type="number" id="toughness">
-								</div>
+							<label class="control-label col-sm-2 col-xs-4" for="toughness">Toughness</label>
+							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+								<input class="form-control" type="text" name="toughness" id="toughness_text" value="<?php echo isset($user) ? htmlspecialchars($user['toughness']) : '' ?>">
+								<input class="form-control hidden-number" type="number" id="toughness">
 							</div>
-							<div class="inline-row">
-								<label class="control-label col-sm-2 col-xs-4" for="defend">Defend</label>
-								<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-									<input class="form-control" type="text" name="defend" id="defend_text" value="<?php echo isset($user) ? htmlspecialchars($user['defend']) : '' ?>">
-									<input class="form-control hidden-number" type="number" id="defend">
-								</div>
+							<label class="control-label col-sm-2 col-xs-4" for="defend">Defend</label>
+							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+								<input class="form-control" type="text" name="defend" id="defend_text" value="<?php echo isset($user) ? htmlspecialchars($user['defend']) : '' ?>">
+								<input class="form-control hidden-number" type="number" id="defend">
 							</div>
-							<div class="inline-row">
-								<label class="control-label col-sm-2 col-xs-4" for="dodge">Dodge</label>
-								<div class="col-sm-2 col-xs-8">
-									<input class="form-control" type="text" name="dodge" id="dodge_text" value="<?php echo isset($user) ? htmlspecialchars($user['dodge']) : '' ?>">
-									<input class="form-control hidden-number" type="number" id="dodge">
-								</div>
+							<label class="control-label col-sm-2 col-xs-4" for="dodge">Dodge</label>
+							<div class="col-sm-2 col-xs-8">
+								<input class="form-control" type="text" name="dodge" id="dodge_text" value="<?php echo isset($user) ? htmlspecialchars($user['dodge']) : '' ?>">
+								<input class="form-control hidden-number" type="number" id="dodge">
 							</div>
 						</div>
 						<div class="form-group">
@@ -399,26 +408,20 @@
 							<div class="col-md-1 no-pad">
 								<input class="form-control" type="text" name="magic">
 							</div> -->
-							<div class="inline-row">
-								<label class="control-label col-sm-2 col-xs-4" for="fear">Fear</label>
-								<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-									<input class="form-control" type="text" name="fear" id="fear_text" value="<?php echo isset($user) ? htmlspecialchars($user['fear']) : '' ?>">
-									<input class="form-control hidden-number" type="number" id="fear">
-								</div>
+							<label class="control-label col-sm-2 col-xs-4" for="fear">Fear</label>
+							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+								<input class="form-control" type="text" name="fear" id="fear_text" value="<?php echo isset($user) ? htmlspecialchars($user['fear']) : '' ?>">
+								<input class="form-control hidden-number" type="number" id="fear">
 							</div>
-							<div class="inline-row">
-								<label class="control-label col-sm-2 col-xs-4" for="poison">Poison</label>
-								<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-									<input class="form-control" type="text" name="poison" id="poison_text" value="<?php echo isset($user) ? htmlspecialchars($user['poison']) : '' ?>">
-									<input class="form-control hidden-number" type="number" id="poison">
-								</div>
+							<label class="control-label col-sm-2 col-xs-4" for="poison">Poison</label>
+							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+								<input class="form-control" type="text" name="poison" id="poison_text" value="<?php echo isset($user) ? htmlspecialchars($user['poison']) : '' ?>">
+								<input class="form-control hidden-number" type="number" id="poison">
 							</div>
-							<div class="inline-row">
-								<label class="control-label col-sm-2 col-xs-4" for="disease">Disease</label>
-								<div class="col-sm-2 col-xs-8">
-									<input class="form-control" type="text" name="disease" id="disease_text" value="<?php echo isset($user) ? htmlspecialchars($user['disease']) : '' ?>">
-									<input class="form-control hidden-number" type="number" id="disease">
-								</div>
+							<label class="control-label col-sm-2 col-xs-4" for="disease">Disease</label>
+							<div class="col-sm-2 col-xs-8">
+								<input class="form-control" type="text" name="disease" id="disease_text" value="<?php echo isset($user) ? htmlspecialchars($user['disease']) : '' ?>">
+								<input class="form-control hidden-number" type="number" id="disease">
 							</div>
 						</div>
 					</div>
@@ -490,44 +493,32 @@
 					<div class="section form-horizontal">
 						<div class="section-title" id="section_actions">Actions, Move, Initiative</div>
 						<div class="form-group">
-							<div class="inline-row">
-								<label class="control-label col-sm-2 col-xs-4" for="standard">Standard</label>
-								<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-									<input class="form-control" type="number" name="standard" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['standard']) : '' ?>">
-								</div>
+							<label class="control-label col-sm-2 col-xs-4" for="standard">Standard</label>
+							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+								<input class="form-control" type="number" name="standard" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['standard']) : '' ?>">
 							</div>
-							<div class="inline-row">
-								<label class="control-label col-sm-2 col-xs-4" for="quick">Quick</label>
-								<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-									<input class="form-control" type="number" name="quick" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['quick']) : '' ?>">
-								</div>
+							<label class="control-label col-sm-2 col-xs-4" for="quick">Quick</label>
+							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+								<input class="form-control" type="number" name="quick" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['quick']) : '' ?>">
 							</div>
-							<div class="inline-row">
-								<label class="control-label col-sm-2 col-xs-4" for="free">Free</label>
-								<div class="col-sm-2 col-xs-8">
-									<input class="form-control" type="number" name="free" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['free']) : '' ?>">
-								</div>
+							<label class="control-label col-sm-2 col-xs-4" for="free">Free</label>
+							<div class="col-sm-2 col-xs-8">
+								<input class="form-control" type="number" name="free" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['free']) : '' ?>">
 							</div>
 						</div>
 						<div class="form-group">
-							<div class="inline-row">
-								<label class="control-label col-sm-2 col-xs-4" for="move">Move</label>
-								<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-									<input class="form-control" type="number" name="move" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['move']) : '' ?>">
-								</div>
+							<label class="control-label col-sm-2 col-xs-4" for="move">Move</label>
+							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+								<input class="form-control" type="number" name="move" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['move']) : '' ?>">
 							</div>
-							<div class="inline-row">
-								<label class="control-label col-sm-2 col-xs-4" for="initiative">Initiative</label>
-								<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-									<input class="form-control" type="number" name="initiative" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['initiative']) : '' ?>">
-								</div>
+							<label class="control-label col-sm-2 col-xs-4" for="initiative">Initiative</label>
+							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+								<input class="form-control" type="number" name="initiative" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['initiative']) : '' ?>">
 							</div>
-							<div class="inline-row">
-								<label class="control-label col-sm-2 col-xs-4 penalty" for="move_penalty">Penalty</label>
-								<div class="col-sm-2 col-xs-8">
-									<input class="form-control" type="text" name="move_penalty" id="move_penalty_text" value="<?php echo isset($user) ? htmlspecialchars($user['move_penalty']) : '' ?>">
-									<input class="form-control hidden-number" type="number" id="move_penalty">
-								</div>
+							<label class="control-label col-sm-2 col-xs-4 penalty" for="move_penalty">Penalty</label>
+							<div class="col-sm-2 col-xs-8">
+								<input class="form-control" type="text" name="move_penalty" id="move_penalty_text" value="<?php echo isset($user) ? htmlspecialchars($user['move_penalty']) : '' ?>">
+								<input class="form-control hidden-number" type="number" id="move_penalty">
 							</div>
 						</div>
 					</div>
@@ -540,7 +531,7 @@
 						<div class="form-group">
 							<div class="col-sm-6 attribute-col" id="col_strength">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="strength">Strength<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_strength')"></label>
+									<label class="control-label col-md-7 col-xs-8" for="strength"><span class="attribute-name">Strength</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_strength" onclick="toggleHidden('col_strength')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="strength_text"></span>
@@ -566,7 +557,7 @@
 
 							<div class="col-sm-6 attribute-col" id="col_fortitude">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="fortitude">Fortitude<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_fortitude')"></label>
+									<label class="control-label col-md-7 col-xs-8" for="fortitude"><span class="attribute-name">Fortitude</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_fortitude" onclick="toggleHidden('col_fortitude')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="fortitude_text"></span>
@@ -594,7 +585,7 @@
 						<div class="form-group">
 							<div class="col-sm-6 attribute-col" id="col_speed">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="speed">Speed<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_speed')"></label>
+									<label class="control-label col-md-7 col-xs-8" for="speed"><span class="attribute-name">Speed</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_speed" onclick="toggleHidden('col_speed')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="speed_text"></span>
@@ -620,7 +611,7 @@
 
 							<div class="col-sm-6 attribute-col" id="col_agility">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="agility">Agility<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_agility')"></label>
+									<label class="control-label col-md-7 col-xs-8" for="agility"><span class="attribute-name">Agility</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_agility" onclick="toggleHidden('col_agility')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="agility_text"></span>
@@ -648,13 +639,13 @@
 						<div class="form-group">
 							<div class="col-sm-6 attribute-col" id="col_precision">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="precision_">Precision<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_precision')"></label>
+									<label class="control-label col-md-7 col-xs-8" for="precision_"><span class="attribute-name">Precision</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_precision" onclick="toggleHidden('col_precision')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="precision__text"></span>
 											<input type="hidden" name="precision_" id="precision__val" value="<?php echo isset($user) ? $user['precision_'] : '' ?>">
-											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('precision', 1)"></span>
-											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('precision', -1)"></span>
+											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('precision_', 1)"></span>
+											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('precision_', -1)"></span>
 										</label>
 									</div>
 								</div>
@@ -674,7 +665,7 @@
 
 							<div class="col-sm-6 attribute-col" id="col_awareness">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="awareness">Awareness<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_awareness')"></label>
+									<label class="control-label col-md-7 col-xs-8" for="awareness"><span class="attribute-name">Awareness</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_awareness" onclick="toggleHidden('col_awareness')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="awareness_text"></span>
@@ -702,7 +693,7 @@
 						<div class="form-group">
 							<div class="col-sm-6 attribute-col" id="col_allure">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="allure">Allure<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_allure')"></label>
+									<label class="control-label col-md-7 col-xs-8" for="allure"><span class="attribute-name">Allure</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_allure" onclick="toggleHidden('col_allure')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="allure_text"></span>
@@ -728,7 +719,7 @@
 
 							<div class="col-sm-6 attribute-col" id="col_deception">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="deception">Deception<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_deception')"></label>
+									<label class="control-label col-md-7 col-xs-8" for="deception"><span class="attribute-name">Deception</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_deception" onclick="toggleHidden('col_deception')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="deception_text"></span>
@@ -756,7 +747,7 @@
 						<div class="form-group">
 							<div class="col-sm-6 attribute-col" id="col_intellect">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="intellect">Intellect<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_intellect')"></label>
+									<label class="control-label col-md-7 col-xs-8" for="intellect"><span class="attribute-name">Intellect</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_intellect" onclick="toggleHidden('col_intellect')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="intellect_text"></span>
@@ -782,7 +773,7 @@
 
 							<div class="col-sm-6 attribute-col" id="col_innovation">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="innovation">Innovation<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_innovation')"></label>
+									<label class="control-label col-md-7 col-xs-8" for="innovation"><span class="attribute-name">Innovation</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_innovation" onclick="toggleHidden('col_innovation')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="innovation_text"></span>
@@ -810,7 +801,7 @@
 						<div class="form-group">
 							<div class="col-sm-6 attribute-col" id="col_intuition">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="intuition">Intution<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_intuition')"></label>
+									<label class="control-label col-md-7 col-xs-8" for="intuition"><span class="attribute-name">Intution</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_intuition" onclick="toggleHidden('col_intuition')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="intuition_text"></span>
@@ -836,7 +827,7 @@
 
 							<div class="col-sm-6 attribute-col" id="col_vitality">
 								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="vitality">Vitality<span class="glyphicon glyphicon-edit hover-hide" onclick="toggleHidden('col_vitality')"></label>
+									<label class="control-label col-md-7 col-xs-8" for="vitality"><span class="attribute-name">Vitality</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_vitality" onclick="toggleHidden('col_vitality')"></label>
 									<div class="col-md-5 col-xs-4">
 										<label class="control-label">
 											<span class="attribute-val" id="vitality_text"></span>
@@ -1061,18 +1052,22 @@
 				<!-- end section: notes -->
 
 				<!-- section: background -->
-				<!-- <div class="col-md-12">
+				<div class="col-md-12">
 					<div class="section form-horizontal">
-						<div class="section-title">Background</div>
-						<textarea class="form-control" rows="6" name="background" maxlength="2000"><?php echo isset($user) ? htmlspecialchars($user['background']) : '' ?></textarea>
+						<div class="section-title">Character Background</div>
+						<div class="form-group">
+							<div class="col-xs-12">
+								<textarea class="form-control" rows="6" name="background" maxlength="2000"><?php echo isset($user) ? htmlspecialchars($user['background']) : '' ?></textarea>
+							</div>
+						</div>
 					</div>
-				</div> -->
+				</div>
 				<!-- end section: background -->
 
 			</div>
-			<div class="submit-btn">
+			<!-- <div class="submit-btn">
 				<button type="button" class="btn btn-primary" onclick="formSubmit()">Save Player Data</button>
-			</div>
+			</div> -->
 			<input type="hidden" name="password" id="password_val">
 			<input type="hidden" name="recaptcha_response" id="recaptcha_response">
 			<input type="hidden" name="duckdacoy" id="duckdacoy">
@@ -1105,11 +1100,26 @@
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
       <div class="modal-content searching-prompt">
         <div class="modal-header">
-          <h4 class="modal-title" id="training_modal_title">New Training</h4>
+          <h4 class="modal-title" id="training_modal_title">New Skill Training</h4>
         </div>
         <div class="modal-body">
-        	<label class="control-label">Training Name</label>
+        	<h4 class="control-label">Training Name</h4>
         	<input class="form-control" type="text" id="training_name">
+        	<br>
+        	<!-- skill type: hidden unless allocating points -->
+        	<div id="skill_type">
+        		<h4 class="control-label">
+        			Unique or standard skill?
+        		</h4>
+	        	<div class="form-check">
+		        	<input class="form-check-input" type="radio" name="skill_type" id="unique" value="4">
+		        	<label class="form-check-label" for="unique">Unique Skill (4 attribute pts)</label>
+	        	</div>
+	        	<div class="form-check">
+		        	<input class="form-check-input" type="radio" name="skill_type" id="standard" value="1">
+		        	<label class="form-check-label" for="standard">Standard Skill (1 attribute pt)</label>
+	        	</div>
+        	</div>
         	<input type="hidden" id="attribute_type">
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
@@ -1348,7 +1358,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script async src="https://www.google.com/recaptcha/api.js?render=6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
-	<script src="/assets/script_v22_05_27.js"></script>
+	<script src="/assets/script_v22_05_30.js"></script>
 
 	<script type="text/javascript">
 

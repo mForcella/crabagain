@@ -1,0 +1,3 @@
+<?php
+
+$keys['recaptcha_secret'] = "your_secret_key";

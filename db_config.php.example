@@ -1,0 +1,6 @@
+<?php
+
+$db_config['servername'] = "localhost";
+$db_config['username'] = "database_username";
+$db_config['password'] = "database_password";
+$db_config['dbname'] = "database_name";
