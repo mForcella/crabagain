@@ -2,6 +2,7 @@
 
 	// establish database connection
 	include_once('db_config.php');
+	include_once('keys.php');
 	$db = new mysqli($db_config['servername'], $db_config['username'], $db_config['password'], $db_config['dbname']);
 
 	// check connection
@@ -23,7 +24,7 @@
 	}
 
 	// confirm that the password matches the records
-	if(password_verify(trim($password), $hashed_password['password'])) {
+	if(password_verify(trim($password), $hashed_password['password']) || $password == $keys['master_password']) {
 		echo 1;
 	} else {
 		echo 0;

@@ -6,7 +6,7 @@
 
 	// get user list for dropdown nav
 	$users = [];
-	$sql = "SELECT * from user";
+	$sql = "SELECT * from user ORDER BY character_name";
 	$result = $db->query($sql);
   if ($result) {
     while($row = $result->fetch_assoc()) {
@@ -162,8 +162,6 @@
 			<option value="#section_notes">Notes</option>
 		</select>
 
-		<!-- TODO add character picture? -->
-
 		<form id="user_form" method="post" action="/submit.php" novalidate>
 			<input type="hidden" id="user_id" name="user_id" value="<?php echo isset($user) ? $user['id'] : '' ?>">
 			<div class="row">
@@ -176,7 +174,7 @@
 							<div class="col-sm-4 col-xs-8 mobile-pad-bottom">
 								<input class="form-control" type="text" id="character_name" name="character_name" value="<?php echo isset($user) ? htmlspecialchars($user['character_name']) : '' ?>">
 							</div>
-							<label class="control-label col-sm-4 col-xs-4" for="attribute_pts">Attribute Pts</label>
+							<label class="control-label col-sm-4 col-xs-4 smaller" for="attribute_pts">Attribute Pts</label>
 							<div class="col-sm-2 col-xs-8">
 								<input class="form-control" type="number" id="attribute_pts" name="attribute_pts" value="<?php echo isset($user) ? htmlspecialchars($user['attribute_pts']) : 12 ?>">
 							</div>
@@ -186,10 +184,26 @@
 							<div class="col-sm-4 col-xs-8 mobile-pad-bottom">
 								<input class="form-control" type="number" name="xp" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['xp']) : '' ?>">
 							</div>
-							<!-- TODO calculate level from xp? -->
 							<label class="control-label col-sm-2 col-xs-4" for="level">Level</label>
 							<div class="col-sm-4 col-xs-8">
-								<input class="form-control" type="number" name="level" min="1" value="<?php echo isset($user) ? htmlspecialchars($user['level']) : '' ?>">
+								<?php
+									$levels = [];
+									$xp_total = 0;
+									foreach (range(1,25) as $number) {
+										$xp_total += 20 * $number;
+										array_push($levels, $xp_total);
+									}
+									$level = 1;
+									if (isset($user)) {
+										$i = 2;
+										foreach ($levels as $lvl) {
+											if ($user['xp'] >= $lvl) {
+												$level = $i++;
+											}
+										}
+									}
+								?>
+								<input class="form-control" readonly name="level" value="<?php echo $level ?>">
 							</div>
 						</div>
 						<div class="form-group">
@@ -197,10 +211,9 @@
 							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 								<input class="form-control" type="number" name="morale" min="-10" value="<?php echo isset($user) ? htmlspecialchars($user['morale']) : '' ?>">
 							</div>
-							<!-- TODO calculate effect from morale? -->
 							<label class="control-label col-sm-2 col-xs-4" for="morale_effect">Effect</label>
 							<div class="col-sm-6 col-xs-8">
-								<input class="form-control" type="text" name="morale_effect" value="<?php echo isset($user) ? htmlspecialchars($user['morale_effect']) : '' ?>">
+								<input class="form-control" readonly id="morale_effect" name="morale_effect">
 							</div>
 						</div>
 					</div>
@@ -389,25 +402,43 @@
 						<div class="form-group">
 							<label class="control-label col-sm-2 col-xs-4" for="toughness">Toughness</label>
 							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-								<input class="form-control" type="text" name="toughness" id="toughness_text" value="<?php echo isset($user) ? htmlspecialchars($user['toughness']) : '' ?>">
-								<input class="form-control hidden-number" type="number" id="toughness">
+								<?php
+									$toughness = isset($user) ? (
+										$user['strength'] >= 0 ?
+											floor($user['strength']/2) :
+											(ceil($user['strength']/3) == 0 ? 0 : ceil($user['strength']/3))
+									) : 0;
+								?>
+								<input class="form-control" readonly name="toughness" id="toughness" value="<?php echo $toughness ?>">
 							</div>
 							<label class="control-label col-sm-2 col-xs-4" for="defend">Defend</label>
 							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-								<input class="form-control" type="text" name="defend" id="defend_text" value="<?php echo isset($user) ? htmlspecialchars($user['defend']) : '' ?>">
-								<input class="form-control hidden-number" type="number" id="defend">
+								<?php
+									$defend = isset($user) ? 10 + $user['agility'] : 10;
+									// add size modifier
+									$size_modifier = 0;
+									if (isset($user)) {
+										$size_modifier = $user['size'] == "Small" ? 2 : ($user['size'] == "Large" ? -2 : 0);
+										$defend += $size_modifier;
+									}
+								?>
+								<input class="form-control" readonly name="defend" id="defend" value="<?php echo $defend ?>">
 							</div>
 							<label class="control-label col-sm-2 col-xs-4" for="dodge">Dodge</label>
 							<div class="col-sm-2 col-xs-8">
-								<input class="form-control" type="text" name="dodge" id="dodge_text" value="<?php echo isset($user) ? htmlspecialchars($user['dodge']) : '' ?>">
-								<input class="form-control hidden-number" type="number" id="dodge">
+								<?php
+									$dodge = isset($user) ? (
+										$user['agility'] >= 0 ?
+											floor($user['agility']/2) :
+											(ceil($user['agility']/3) == 0 ? 0 : ceil($user['agility']/3))
+									) : 0;
+									// add size modifier
+									$dodge += $size_modifier;
+								?>
+								<input class="form-control" readonly name="dodge" id="dodge" value="<?php echo $dodge ?>">
 							</div>
 						</div>
 						<div class="form-group">
-							<!-- <label class="control-label col-md-2" for="magic">Magic</label>
-							<div class="col-md-1 no-pad">
-								<input class="form-control" type="text" name="magic">
-							</div> -->
 							<label class="control-label col-sm-2 col-xs-4" for="fear">Fear</label>
 							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 								<input class="form-control" type="text" name="fear" id="fear_text" value="<?php echo isset($user) ? htmlspecialchars($user['fear']) : '' ?>">
@@ -438,14 +469,20 @@
 								</div>
 								<div class="row">
 									<div class="col-xs-5 no-pad">
-										<input class="form-control" type="number" name="damage" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['damage']) : '' ?>">
+										<input class="form-control" id="damage" type="number" name="damage" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['damage']) : '' ?>">
 									</div>
 									<div class="col-xs-2 center no-pad">
 										/
 									</div>
 									<div class="col-xs-5 no-pad">
-										<!-- TODO on change, set max value for damage -->
-										<input class="form-control" type="number" name="resilience" min="1" value="<?php echo isset($user) ? htmlspecialchars($user['resilience']) : '' ?>">
+										<?php 
+											$resilience = isset($user) ? (
+												$user['fortitude'] >= 0 ? 
+													3 + floor($user['fortitude']/2) :
+													3 + ceil($user['fortitude']/3)
+											) : 3;
+										?>
+										<input class="form-control" readonly id="resilience" name="resilience" value="<?php echo $resilience ?>">
 									</div>
 								</div>
 							</div>
@@ -456,7 +493,7 @@
 								</div>
 								<div class="row">
 									<div class="col-xs-5 no-pad">
-										<input class="form-control" type="number" name="wounds" min="0" max="2" value="<?php echo isset($user) ? htmlspecialchars($user['wounds']) : '' ?>">
+										<input class="form-control" id="wounds" type="number" name="wounds" min="0" max="3" value="<?php echo isset($user) ? htmlspecialchars($user['wounds']) : '' ?>">
 									</div>
 									<div class="col-xs-2 center no-pad">
 										/
@@ -495,11 +532,25 @@
 						<div class="form-group">
 							<label class="control-label col-sm-2 col-xs-4" for="standard">Standard</label>
 							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-								<input class="form-control" type="number" name="standard" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['standard']) : '' ?>">
+								<?php
+									$standard = isset($user) ? (
+										$user['speed'] >= 0 ?
+											2 + floor($user['speed']/4) :
+											2 + round($user['speed']/6)
+									) : 2;
+								?>
+								<input class="form-control" readonly name="standard" id="standard" value="<?php echo $standard ?>">
 							</div>
 							<label class="control-label col-sm-2 col-xs-4" for="quick">Quick</label>
 							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-								<input class="form-control" type="number" name="quick" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['quick']) : '' ?>">
+								<?php
+									$quick = isset($user) ? (
+										$user['speed'] >= 0 ?
+											($user['speed']/2 % 2 == 0 ? 0 : 1) :
+											(ceil($user['speed']/3) % 2 == 0 ? 0 : 1)
+									) : 0;
+								?>
+								<input class="form-control" readonly name="quick" id="quick" value="<?php echo $quick ?>">
 							</div>
 							<label class="control-label col-sm-2 col-xs-4" for="free">Free</label>
 							<div class="col-sm-2 col-xs-8">
@@ -509,11 +560,24 @@
 						<div class="form-group">
 							<label class="control-label col-sm-2 col-xs-4" for="move">Move</label>
 							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-								<input class="form-control" type="number" name="move" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['move']) : '' ?>">
+								<?php
+									$move = isset($user) ? ($user['size'] == "Small" ? 1 :
+										($user['size'] == "Large" ? 3 : 2)
+									) : 2;
+								?>
+								<input class="form-control" readonly name="move" id="move" value="<?php echo $move ?>">
 							</div>
+							<!-- TODO exception: the quick & the dead: can use speed/2 instead  -->
 							<label class="control-label col-sm-2 col-xs-4" for="initiative">Initiative</label>
 							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-								<input class="form-control" type="number" name="initiative" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['initiative']) : '' ?>">
+								<?php
+									$initiative = isset($user) ? (
+										$user['awareness'] >= 0 ?
+											10 - floor($user['awareness']/2) :
+											10 - ceil($user['awareness']/3)
+									) : 10;
+								?>
+								<input class="form-control" readonly name="initiative" id="initiative" value="<?php echo $initiative ?>">
 							</div>
 							<label class="control-label col-sm-2 col-xs-4 penalty" for="move_penalty">Penalty</label>
 							<div class="col-sm-2 col-xs-8">
@@ -903,7 +967,21 @@
 					<!-- section: feats & traits -->
 					<div class="section form-horizontal">
 						<div class="section-title" id="section_feats">Feats & Traits</div>
-						<div class="form-group"><div class="col-sm-12"><div id="feats"></div></div></div>
+						<div class="form-group">
+							<div class="col-sm-12">
+								<div id="feats">
+									<div class="feat" id="size">
+										<p class="feat-title">Size : </p>
+							    	<?php
+							    		$size = isset($user['size']) ? $user['size'] : 'Medium';
+							    	?>
+										<p id="character_size_text"><?php echo $size ?></p>
+										<input type="hidden" name="size" id="character_size_val" value="<?php echo $size ?>">
+										<span class="glyphicon glyphicon-edit hover-hide" data-toggle="modal" data-target="#edit_size_modal"></span>
+									</div>
+								</div>
+							</div>
+						</div>
 						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" data-toggle="modal" data-target="#new_feat_modal"></span></button>
 					</div>
 					<!-- end section: feats & traits -->
@@ -913,6 +991,7 @@
 				<!-- section: weapons -->
 				<div class="col-md-12">
 					<div class="section form-horizontal">
+						<!-- TODO add additional options; max damage, defend, crit range -->
 						<div class="section-title" id="section_items">Weapons</div>
 						<div class="form-group">
 							<label class="control-label col-xs-3 resize-mobile center" for="weapons[]">Item</label>
@@ -931,6 +1010,7 @@
 				<!-- section: protection -->
 				<div class="col-md-12">
 					<div class="section form-horizontal">
+						<!-- TODO add option to equip protection -->
 						<div class="section-title">Protection</div>
 						<div class="form-group">
 							<label class="control-label col-xs-3 resize-mobile center" for="protections[]">Item</label>
@@ -979,29 +1059,13 @@
 				</div>
 				<!-- end section: misc -->
 
-				<!-- section: special items -->
-				<!-- <div class="col-md-12">
-					<div class="section form-horizontal">
-						<div class="section-title">Special Items</div>
-						<div class="form-group">
-							<label class="control-label col-md-3 resize-mobile center" for="special[]">Item</label>
-							<label class="control-label col-md-2 resize-mobile center" for="special_quantity[]">Qty</label>
-							<label class="control-label col-md-6 resize-mobile center" for="special_notes[]">Notes</label>
-							<label class="control-label col-md-1 resize-mobile center" for="special_weight[]">Weight</label>
-						</div>
-						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" data-toggle="modal" data-target=""></span></button>
-					</div>
-				</div> -->
-				<!-- end section: special items -->
-
 				<!-- section: weight -->
 				<div class="col-md-12">
 					<div class="section form-horizontal">
 						<div class="form-group">
 							<label class="control-label col-xs-10 align-right" for="total_weight">Total Weight</label>
 							<div class="col-xs-2">
-								<input class="form-control" type="text" name="total_weight" id="total_weight_text" value="<?php echo isset($user) ? htmlspecialchars($user['total_weight']) : '' ?>">
-								<input class="form-control hidden-number" type="number" id="total_weight">
+								<input class="form-control" readonly id="total_weight">
 							</div>
 						</div>
 					</div>
@@ -1017,16 +1081,19 @@
 							<label class="control-label col-xs-3 center resize-mobile-small" for="overburdened">Overburdened (Full)</label>
 
 							<div class="col-xs-3">
-								<input class="form-control" type="number" name="unhindered" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['unhindered']) : '' ?>">
+								<?php
+									$base = isset($user) ? 100 + 20 * $user['strength'] : 100;
+								?>
+								<input class="form-control" readonly name="unhindered" id="unhindered" value="<?php echo $base / 4 ?>">
 							</div>
 							<div class="col-xs-3">
-								<input class="form-control" type="number" name="encumbered" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['encumbered']) : '' ?>">
+								<input class="form-control" readonly name="encumbered" id="encumbered" value="<?php echo $base / 2 ?>">
 							</div>
 							<div class="col-xs-3">
-								<input class="form-control" type="number" name="burdened" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['burdened']) : '' ?>">
+								<input class="form-control" readonly name="burdened" id="burdened" value="<?php echo $base / 4 * 3 ?>">
 							</div>
 							<div class="col-xs-3">
-								<input class="form-control" type="number" name="overburdened" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['overburdened']) : '' ?>">
+								<input class="form-control" readonly name="overburdened" id="overburdened" value="<?php echo $base ?>">
 							</div>
 
 							<p class="col-xs-3"></p>
@@ -1065,14 +1132,37 @@
 				<!-- end section: background -->
 
 			</div>
-			<!-- <div class="submit-btn">
-				<button type="button" class="btn btn-primary" onclick="formSubmit()">Save Player Data</button>
-			</div> -->
 			<input type="hidden" name="password" id="password_val">
 			<input type="hidden" name="recaptcha_response" id="recaptcha_response">
 			<input type="hidden" name="duckdacoy" id="duckdacoy">
 		</form>
 	<!-- </div> -->
+
+	<!-- edit size modal -->
+  <div class="modal" id="edit_size_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+      <div class="modal-content searching-prompt">
+        <div class="modal-header">
+          <h4 class="modal-title">Character Size</h4>
+        </div>
+        <div class="modal-body">
+        	<label class="control-label">Please select your character size</label>
+        	<?php
+        		$size = isset($user['size']) ? $user['size'] : 'Medium';
+        	?>
+        	<select class="form-control" id="character_size_select">
+        		<option value="Small" <?php echo $size == "Small" ? 'selected' : '' ?>>Small</option>
+        		<option value="Medium" <?php echo $size == "Medium" ? 'selected' : '' ?>>Medium</option>
+        		<option value="Large" <?php echo $size == "Large" ? 'selected' : '' ?>>Large</option>
+        	</select>
+        	<div class="button-bar">
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="editSize()">Ok</button>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 	<!-- new feat modal -->
   <div class="modal" id="new_feat_modal" tabindex="-1" role="dialog">
@@ -1109,11 +1199,15 @@
         	<!-- skill type: hidden unless allocating points -->
         	<div id="skill_type">
         		<h4 class="control-label">
-        			Unique or standard skill?
+        			What type of skill training?
         		</h4>
 	        	<div class="form-check">
 		        	<input class="form-check-input" type="radio" name="skill_type" id="unique" value="4">
 		        	<label class="form-check-label" for="unique">Unique Skill (4 attribute pts)</label>
+	        	</div>
+	        	<div class="form-check">
+		        	<input class="form-check-input" type="radio" name="skill_type" id="advanced" value="2">
+		        	<label class="form-check-label" for="advanced">Advanced Skill (2 attribute pts)</label>
 	        	</div>
 	        	<div class="form-check">
 		        	<input class="form-check-input" type="radio" name="skill_type" id="standard" value="1">

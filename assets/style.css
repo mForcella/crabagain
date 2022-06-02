@@ -196,6 +196,9 @@ h1 {
 .form-control {
 	height: 26px;
 }
+.form-control[readonly] {
+	background-color: white;
+}
 .form-group .control-label {
 	text-align: left;
 }
@@ -355,6 +358,10 @@ h1 {
 .row {
 	margin: 0;
 }
+select.form-control {
+	height: 35px;
+	text-align: center;
+}
 .section {
 	position: relative;
 	border: 2px solid #999999;
@@ -392,15 +399,12 @@ h1 {
 	text-transform: uppercase;
 	margin-bottom: 5px;
 }
-/*.submit-btn {
-	text-align: center;
-	margin: 50px;
-}
 @media screen and (max-width:767px) {
-	.submit-btn {
-		margin: 20px;
+	.smaller {
+		font-size: 0.9em;
+		padding-right: 0;
 	}
-}*/
+}
 .training {
 	font-style: italic;
 	margin-top: 5px;
@@ -449,7 +453,7 @@ h1 {
 		padding-left: 5px;
 	}
 }
-select.form-control {
+#user_select {
 	width: 300px;
 	margin: 5px auto;
 	height: 35px;

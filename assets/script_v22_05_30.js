@@ -6,6 +6,7 @@ var skipEnabled = [];
 var trainingNames = [];
 var featNames = [];
 var itemNames = [];
+var totalWeight = 0;
 var allocatingAttributePts = false;
 var attributeVals = [];
 var trainingVals = [];
@@ -150,20 +151,58 @@ function endEditAttributes(accept) {
 // detect if we're on a touchscreen
 var is_mobile = $('#is_mobile').css('display')=='none';
 
+// set max damage to resilience
+$("#damage").attr("max", $("#resilience").val());
+// on damage change, modify wounds
+$("#damage").change(function(){
+	if ($(this).val() == $(this).attr("max")) {
+		$(this).val(0);
+		$("#wounds").val( parseInt($("#wounds").val())+1 >= 3 ? 3 : parseInt($("#wounds").val())+1 );
+	}
+});
+
+// enable size edit button
+if (!is_mobile) {
+	$("#size").hover(function () {
+		$(this).find(".hover-hide").show();
+	}, 
+	function () {
+		$(this).find(".hover-hide").hide();
+	});
+}
+
+function editSize() {
+	// set size text
+	var size = $("#character_size_select").val();
+	$("#character_size_text").html(size);
+	$("#character_size_val").val(size);
+	$("#move").val(size == "Small" ? 1 : (size == "Large" ? 3 : 2));
+	setDodge();
+	setDefend();
+	// TODO check if stealth training exists; +2?
+}
+
+function setDodge() {
+	// get size value and agility value
+	var size = $("#character_size_select").val();
+	var agility = parseInt($("#agility_val").val());
+	var dodge = (agility >= 0 ? Math.floor(agility/2) : Math.ceil(agility/3)) + (size == "Small" ? 2 : (size == "Large" ? -2 : 0));
+	$("#dodge").val(dodge);
+}
+
+function setDefend() {
+	// get size value and agility value
+	var size = $("#character_size_select").val();
+	var agility = parseInt($("#agility_val").val());
+	var defend = 10 + agility + (size == "Small" ? 2 : (size == "Large" ? -2 : 0));
+	$("#defend").val(defend);
+}
+
 // penalty inputs - if val is zero, clear input
 $(".penalty-val").on("change", function(){
 	if ($(this).val() == 0) {
 		$(this).val("");
 	}
-});
-
-// disable form submit on 'enter' key
-$('#user_form').on('keyup keypress', function(e) {
-  var keyCode = e.keyCode || e.which;
-  if (keyCode === 13) { 
-    e.preventDefault();
-    return false;
-  }
 });
 
 // anchor link dropdown
@@ -283,6 +322,23 @@ function setAttributes(user) {
 			$("#"+attributes[i]+"_val").val(0);
 		}
 	}
+	// set morale effect from morale
+	var moraleEffects = {
+		2: "Once per Encounter you can re-roll a Fate",
+		4: "Once per Encounter you can re-roll a d20",
+		6: "Once per Session you can declare a Fate 6",
+		8: "You gain 1 additional Motivator Bonus per Session",
+		10: "You gain a Benefit on a Fate 5 or 6"
+	};
+	var moraleEffect = "No Effect";
+	if (user['morale'] != null) {
+		for (var key in moraleEffects) {
+			if (parseInt(user['morale']) >= key) {
+				moraleEffect = moraleEffects[key];
+			}
+		}
+	}
+	$("#morale_effect").val(moraleEffect);
 }
 
 // adjust attribute value
@@ -307,6 +363,48 @@ function adjustAttribute(attribute, val) {
 		} else {
 			$(".attribute-count").html(pts+Math.abs(originalVal > 0 ? originalVal : newVal)+" Points");
 		}
+	}
+	// adjust stats based on attribute
+	switch(attribute) {
+		case 'strength':
+			// adjust toughness
+			var toughness = newVal >= 0 ? Math.floor(newVal/2) : Math.ceil(newVal/3);
+			$("#toughness").val(toughness);
+			// adjust weight capcity
+			var base = 100 + 20 * newVal;
+			$("#unhindered").val(base/4);
+			$("#encumbered").val(base/2);
+			$("#burdened").val(base/4*3);
+			$("#overburdened").val(base);
+			// TODO adjust melee weapon damage
+			break;
+		case 'fortitude':
+			// adjust resilience
+			var resilience = newVal >= 0 ? 3 + Math.floor(newVal/2) : 3 + Math.ceil(newVal/3);
+			$("#resilience").val(resilience);
+			// adjust max damage
+			$("#damage").attr("max", resilience);
+			break;
+		case 'speed':
+			// adjust standard and quick actions
+			var standard = newVal >=0 ? 2 + Math.floor(newVal/4) : 2 - Math.round(-1*newVal/6);
+			$("#standard").val(standard);
+			var quick = newVal >= 0 ? (Math.floor(newVal/2) % 2 == 0 ? 0 : 1) : (Math.ceil(newVal/3) % 2 == 0 ? 0 : 1);
+			$("#quick").val(quick);
+			break;
+		case 'agility':
+			// adjust dodge and defend
+			setDodge();
+			setDefend();
+			break;
+		case 'precision_':
+			// TODO adjust ranged weapon damage
+			break;
+		case 'awareness':
+			// adjust initiative
+			var initiative = newVal >= 0 ? 10 - Math.floor(newVal/2) : 10 - Math.ceil(newVal/3);
+			$("#initiative").val(initiative);
+			break;
 	}
 }
 
@@ -694,8 +792,11 @@ function addWeaponElements(name, qty, damage, notes, weight) {
 		alert("Item name already in use");
 		return;
 	}
+	totalWeight += weight == "" ? 0 : parseFloat(weight);
+	$("#total_weight").val(totalWeight);
 	itemNames.push(name.toLowerCase());
-	var name_val = name.replaceAll(" ", "_");
+	// replace all characters not allowed in id
+	var name_val = name.replace(/[^a-zA-Z0-9\-_:]+/g, "_");
 
 	var div = createElement('div', 'form-group', '#weapons', name_val);
 	var div1 = createElement('div', 'col-xs-3 no-pad-mobile', div);
@@ -751,8 +852,11 @@ function addProtectionElements(name, bonus, notes, weight) {
 		alert("Item name already in use");
 		return;
 	}
+	totalWeight += weight == "" ? 0 : parseFloat(weight);
+	$("#total_weight").val(totalWeight);
 	itemNames.push(name.toLowerCase());
-	var name_val = name.replaceAll(" ", "_");
+	// replace all characters not allowed in id
+	var name_val = name.replace(/[^a-zA-Z0-9\-_:]+/g, "_");
 
 	var div = createElement('div', 'form-group', '#protections', name_val);
 	var div1 = createElement('div', 'col-xs-3 no-pad-mobile', div);
@@ -805,8 +909,11 @@ function addHealingElements(name, quantity, effect, weight) {
 		alert("Item name already in use");
 		return;
 	}
+	totalWeight += weight == "" ? 0 : parseFloat(weight);
+	$("#total_weight").val(totalWeight);
 	itemNames.push(name.toLowerCase());
-	var name_val = name.replaceAll(" ", "_");
+	// replace all characters not allowed in id
+	var name_val = name.replace(/[^a-zA-Z0-9\-_:]+/g, "_");
 
 	var div = createElement('div', 'form-group', '#healings', name_val);
 	var div1 = createElement('div', 'col-xs-3 no-pad-mobile', div);
@@ -859,8 +966,11 @@ function addMiscElements(name, quantity, notes, weight) {
 		alert("Item name already in use");
 		return;
 	}
+	totalWeight += weight == "" ? 0 : parseFloat(weight);
+	$("#total_weight").val(totalWeight);
 	itemNames.push(name.toLowerCase());
-	var name_val = name.replaceAll(" ", "_");
+	// replace all characters not allowed in id
+	var name_val = name.replace(/[^a-zA-Z0-9\-_:]+/g, "_");
 
 	var div = createElement('div', 'form-group', '#misc', name_val);
 	var div1 = createElement('div', 'col-xs-3 no-pad-mobile', div);

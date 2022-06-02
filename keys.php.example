@@ -1,3 +1,4 @@
 <?php
 
 $keys['recaptcha_secret'] = "your_secret_key";
+$keys['master_password'] = "your_master_password";
