@@ -151,6 +151,44 @@ function endEditAttributes(accept) {
 // detect if we're on a touchscreen
 var is_mobile = $('#is_mobile').css('display')=='none';
 
+// on xp change, adjust level
+$("#xp").change(function(){
+	var levels = [];
+	var xp_total = 0;
+	for (var i = 1; i <= 25; i++) {
+		xp_total += 20 * i;
+		levels.push(xp_total);
+	}
+	var level = 1;
+	var lvl = 2;
+	for (var i in levels) {
+		if ($(this).val() >= levels[i]) {
+			level = lvl++;
+		}
+	}
+	// get old level
+	var current = $("#level").val();
+	// update if changed
+	if (level != current) {
+		$("#level").val(level);
+		// alert if increased
+		if (level > current) {
+			alert("Huzzah! You made it to level "+level+"!");
+			// increase attribute points
+			var innovation_val = parseInt($("#innovation_val").val());
+			var innovation_mod = innovation_val > 0 ? Math.floor(innovation_val/2) : 0;
+			var attribute_pts = $("#attribute_pts").val() == undefined || $("#attribute_pts").val() == "" ? 
+				0 : parseInt($("#attribute_pts").val());
+			$("#attribute_pts").val(attribute_pts+12+innovation_mod);
+		}
+	}
+});
+
+// on morale change, set morale effect
+$("#morale").change(function(){
+	setMoraleEffect(parseInt($(this).val()));
+});
+
 // set max damage to resilience
 $("#damage").attr("max", $("#resilience").val());
 // on damage change, modify wounds
@@ -323,6 +361,12 @@ function setAttributes(user) {
 		}
 	}
 	// set morale effect from morale
+	if (user['morale'] != null) {
+		setMoraleEffect(parseInt(user['morale']));
+	}
+}
+
+function setMoraleEffect(morale) {
 	var moraleEffects = {
 		2: "Once per Encounter you can re-roll a Fate",
 		4: "Once per Encounter you can re-roll a d20",
@@ -331,11 +375,9 @@ function setAttributes(user) {
 		10: "You gain a Benefit on a Fate 5 or 6"
 	};
 	var moraleEffect = "No Effect";
-	if (user['morale'] != null) {
-		for (var key in moraleEffects) {
-			if (parseInt(user['morale']) >= key) {
-				moraleEffect = moraleEffects[key];
-			}
+	for (var key in moraleEffects) {
+		if (morale >= key) {
+			moraleEffect = moraleEffects[key];
 		}
 	}
 	$("#morale_effect").val(moraleEffect);
@@ -792,7 +834,8 @@ function addWeaponElements(name, qty, damage, notes, weight) {
 		alert("Item name already in use");
 		return;
 	}
-	totalWeight += weight == "" ? 0 : parseFloat(weight);
+	weight = weight == "" ? 0 : weight;
+	totalWeight += parseFloat(weight);
 	$("#total_weight").val(totalWeight);
 	itemNames.push(name.toLowerCase());
 	// replace all characters not allowed in id
@@ -812,8 +855,7 @@ function addWeaponElements(name, qty, damage, notes, weight) {
 	createInput('', 'text', 'weapon_damage[]', damage, div3, name_val+"_damage_text");
 	createInput('hidden-number', 'number', '', '', div3, name_val+"_damage");
 	createInput('', 'text', 'weapon_notes[]', notes, div4);
-	createInput('', 'text', 'weapon_weight[]', weight, div5, name_val+"_weight_text");
-	createInput('hidden-number', 'number', '', '', div5, name_val+"_weight");
+	createInput('', 'number', 'weapon_weight[]', weight, div5);
 
 	// add remove button
 	createElement('span', 'glyphicon glyphicon-remove', div6, name_val+"_remove");
@@ -852,7 +894,8 @@ function addProtectionElements(name, bonus, notes, weight) {
 		alert("Item name already in use");
 		return;
 	}
-	totalWeight += weight == "" ? 0 : parseFloat(weight);
+	weight = weight == "" ? 0 : weight;
+	totalWeight += parseFloat(weight);
 	$("#total_weight").val(totalWeight);
 	itemNames.push(name.toLowerCase());
 	// replace all characters not allowed in id
@@ -869,8 +912,7 @@ function addProtectionElements(name, bonus, notes, weight) {
 	createInput('', 'text', 'protection_bonus[]', bonus, div2, name_val+"_bonus_text");
 	createInput('hidden-number', 'number', '', '', div2, name_val+"_bonus");
 	createInput('', 'text', 'protection_notes[]', notes, div3);
-	createInput('', 'text', 'protection_weight[]', weight, div4, name_val+"_weight_text");
-	createInput('hidden-number', 'number', '', '', div4, name_val+"_weight");
+	createInput('', 'number', 'protection_weight[]', weight, div4);
 
 	// add remove button
 	createElement('span', 'glyphicon glyphicon-remove', div5, name_val+"_remove");
@@ -909,7 +951,8 @@ function addHealingElements(name, quantity, effect, weight) {
 		alert("Item name already in use");
 		return;
 	}
-	totalWeight += weight == "" ? 0 : parseFloat(weight);
+	weight = weight == "" ? 0 : weight;
+	totalWeight += parseFloat(weight);
 	$("#total_weight").val(totalWeight);
 	itemNames.push(name.toLowerCase());
 	// replace all characters not allowed in id
@@ -926,8 +969,7 @@ function addHealingElements(name, quantity, effect, weight) {
 	createInput('', 'text', 'healing_quantity[]', quantity, div2, name_val+"_quantity_text");
 	createInput('hidden-number', 'number', '', '', div2, name_val+"_quantity");
 	createInput('', 'text', 'healing_effect[]', effect, div3);
-	createInput('', 'text', 'healing_weight[]', weight, div4, name_val+"_weight_text");
-	createInput('hidden-number', 'number', '', '', div4, name_val+"_weight");
+	createInput('', 'number', 'healing_weight[]', weight, div4);
 
 	// add remove button
 	createElement('span', 'glyphicon glyphicon-remove', div5, name_val+"_remove");
@@ -966,7 +1008,8 @@ function addMiscElements(name, quantity, notes, weight) {
 		alert("Item name already in use");
 		return;
 	}
-	totalWeight += weight == "" ? 0 : parseFloat(weight);
+	weight = weight == "" ? 0 : weight;
+	totalWeight += parseFloat(weight);
 	$("#total_weight").val(totalWeight);
 	itemNames.push(name.toLowerCase());
 	// replace all characters not allowed in id
@@ -983,8 +1026,7 @@ function addMiscElements(name, quantity, notes, weight) {
 	createInput('', 'text', 'misc_quantity[]', quantity, div2, name_val+"_quantity_text");
 	createInput('hidden-number', 'number', '', '', div2, name_val+"_quantity");
 	createInput('', 'text', 'misc_notes[]', notes, div3);
-	createInput('', 'text', 'misc_weight[]', weight, div4, name_val+"_weight_text");
-	createInput('hidden-number', 'number', '', '', div4, name_val+"_weight");
+	createInput('', 'number', 'misc_weight[]', weight, div4);
 
 	// add remove button
 	createElement('span', 'glyphicon glyphicon-remove', div5, name_val+"_remove");

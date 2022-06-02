@@ -182,7 +182,7 @@
 						<div class="form-group">
 							<label class="control-label col-sm-2 col-xs-4" for="xp">Experience</label>
 							<div class="col-sm-4 col-xs-8 mobile-pad-bottom">
-								<input class="form-control" type="number" name="xp" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['xp']) : '' ?>">
+								<input class="form-control" type="number" name="xp" id="xp" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['xp']) : '' ?>">
 							</div>
 							<label class="control-label col-sm-2 col-xs-4" for="level">Level</label>
 							<div class="col-sm-4 col-xs-8">
@@ -203,13 +203,14 @@
 										}
 									}
 								?>
-								<input class="form-control" readonly name="level" value="<?php echo $level ?>">
+								<input class="form-control" readonly name="level" id="level" value="<?php echo $level ?>">
 							</div>
 						</div>
 						<div class="form-group">
 							<label class="control-label col-sm-2 col-xs-4" for="morale">Morale</label>
+							<!-- TODO on change, adjust morale effect -->
 							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-								<input class="form-control" type="number" name="morale" min="-10" value="<?php echo isset($user) ? htmlspecialchars($user['morale']) : '' ?>">
+								<input class="form-control" type="number" name="morale" id="morale" min="-10" value="<?php echo isset($user) ? htmlspecialchars($user['morale']) : '' ?>">
 							</div>
 							<label class="control-label col-sm-2 col-xs-4" for="morale_effect">Effect</label>
 							<div class="col-sm-6 col-xs-8">
@@ -924,6 +925,7 @@
 					<!-- section: motivators -->
 					<div class="section form-horizontal">
 						<div class="section-title" id="section_motivators">Motivators</div>
+						<!-- TODO add motivator bonuses -->
 
 						<div class="form-group no-margin">
 							<div class="col-xs-3 no-pad-mobile no-pad-left">
@@ -1065,7 +1067,7 @@
 						<div class="form-group">
 							<label class="control-label col-xs-10 align-right" for="total_weight">Total Weight</label>
 							<div class="col-xs-2">
-								<input class="form-control" readonly id="total_weight">
+								<input class="form-control" readonly id="total_weight" value="0">
 							</div>
 						</div>
 					</div>
@@ -1232,14 +1234,27 @@
           <h4 class="modal-title">New Weapon</h4>
         </div>
         <div class="modal-body">
+        	<label class="control-label">Weapon Type</label>
+        	<select class="form-control" id="weapon_type">
+        		<option value="Melee">Melee</option>
+        		<option value="Ranged">Ranged</option>
+        	</select>
         	<label class="control-label">Weapon Name</label>
         	<input class="form-control" type="text" id="weapon_name">
         	<label class="control-label">Damage</label>
-        	<input class="form-control" type="text" id="weapon_damage">
-        	<label class="control-label">Notes</label>
+        	<input class="form-control" type="number" id="weapon_damage">
+        	<label class="control-label">Max Damage</label>
+        	<input class="form-control" type="number" id="weapon_max_damage">
+        	<label class="control-label">Range</label>
+        	<input class="form-control" type="number" id="weapon_range">
+        	<label class="control-label">Rate of Fire</label>
+        	<input class="form-control" type="text" id="weapon_rof">
+        	<label class="control-label">Defend Bonus</label>
+        	<input class="form-control" type="number" id="weapon_defend">
+        	<label class="control-label">Other Notes</label>
         	<input class="form-control" type="text" id="weapon_notes">
         	<label class="control-label">Weight</label>
-        	<input class="form-control" type="text" id="weapon_weight">
+        	<input class="form-control" type="number" id="weapon_weight">
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newWeapon()">Ok</button>
@@ -1452,7 +1467,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script async src="https://www.google.com/recaptcha/api.js?render=6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
-	<script src="/assets/script_v22_05_30.js"></script>
+	<script src="/assets/script_v22_06_02.js"></script>
 
 	<script type="text/javascript">
 

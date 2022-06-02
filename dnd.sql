@@ -63,23 +63,6 @@
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
   );
 
-alter table user
-  drop column move,
-  drop column unhindered,
-  drop column encumbered,
-  drop column burdened,
-  drop column overburdened,
-  drop column toughness,
-  drop column dodge,
-  drop column standard,
-  drop column quick,
-  drop column resilience,
-  drop column level,
-  drop column total_weight,
-  drop column initiative,
-  drop column morale_effect,
-  add column size varchar(64);
-
   CREATE TABLE user_training (
     id int PRIMARY KEY AUTO_INCREMENT,
     name varchar(64),
@@ -103,43 +86,61 @@ alter table user
     id int PRIMARY KEY AUTO_INCREMENT,
     name varchar(64),
     quantity varchar(64),
-    damage varchar(64),
+    damage int,
     notes varchar(255),
-    weight varchar(64),
+    weight int,
     user_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES user(id)
   );
+
+  alter table user_weapon
+  add column weapon_type varchar(64),
+  add column max_damage int,
+  add column range_ int,
+  add column rof varchar(64),
+  add column defend int,
+  modify column damage int,
+  modify column weight int;
 
   CREATE TABLE user_protection (
     id int PRIMARY KEY AUTO_INCREMENT,
     name varchar(64),
     bonus varchar(64),
     notes varchar(255),
-    weight varchar(64),
+    weight int,
     user_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES user(id)
   );
+
+  alter table user_protection
+  modify column weight int;
 
   CREATE TABLE user_healing (
     id int PRIMARY KEY AUTO_INCREMENT,
     name varchar(64),
     quantity varchar(64),
     effect varchar(255),
-    weight varchar(64),
+    weight int,
     user_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES user(id)
   );
+
+  alter table user_healing
+  modify column weight int;
 
   CREATE TABLE user_misc (
     id int PRIMARY KEY AUTO_INCREMENT,
     name varchar(64),
     quantity varchar(64),
     notes varchar(255),
-    weight varchar(64),
+    weight int,
     user_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES user(id)
   );
+
+  alter table user_misc
+  modify column weight int;
