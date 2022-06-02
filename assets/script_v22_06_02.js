@@ -27,11 +27,68 @@ var attributes = [
 	'vitality'
 ];
 
+// show user menu
 function toggleMenu() {
   $(".nav-menu").toggleClass("active");
   $(".glyphicon-menu-hamburger").toggleClass("active");
 }
 
+// select a weapon from the dropdown
+function selectWeapon(id) {
+	var selected = $("#weapon_select_"+id).val();
+	// make sure the weapon isn't already selected
+	var duplicate = false;
+	$(".weapon-select").each(function(){
+		if (this.id != "weapon_select_"+id && selected == $(this).val() && selected != "") {
+			$("#weapon_select_"+id).val("");
+			duplicate = true;
+		}
+	});
+	if (duplicate) {
+		return;
+	}
+	if (selected != "") {
+		for (var i in weapons) {
+			if (weapons[i]['name'] == selected) {
+				var damage = weapons[i]['damage'];
+				$("#weapon_damage_"+id).val(damage);
+				// TODO look for crit modifiers
+				$("#weapon_crit_"+id).val(6);
+				$("#weapon_range_"+id).val(weapons[i]['range_'] == null || weapons[i]['range_'] == "" ? "-" : weapons[i]['range_']);
+				$("#weapon_rof_"+id).val(weapons[i]['rof'] == "" ? "-" : weapons[i]['rof']);
+				if (weapons[i]['type'] == "Melee") {
+					// check for strength modifier for melee weapons
+					var damage_mod = parseInt($("#strength_val").val()) >= 0 ? 
+						Math.floor(parseInt($("#strength_val").val())/2) : Math.ceil(parseInt($("#strength_val").val())/3);
+				} else {
+					// check for precision modifier for ranged weapons
+					var damage_mod = parseInt($("#precision__val").val()) >= 0 ? 
+						Math.floor(parseInt($("#precision__val").val())/2) : Math.ceil(parseInt($("#precision__val").val())/3);
+				}
+				// make sure damage doesn't exceed max
+				if (damage_mod > 0) {
+					var max_damage = weapons[i]['max_damage'] == null || weapons[i]['max_damage'] == "" ? 0 : weapons[i]['max_damage'];
+					if (max_damage == 0 || parseInt($("#weapon_damage_"+id).val())+damage_mod <= weapons[i]['max_damage']) {
+						damage = parseInt($("#weapon_damage_"+id).val())+damage_mod;
+					} else {
+						damage = max_damage;
+					}
+					$("#weapon_damage_"+id).val(damage);
+				}
+			}
+		}
+	} else {
+		// clear inputs
+		$("#weapon_damage_"+id).val("");
+		$("#weapon_crit_"+id).val("");
+		$("#weapon_range_"+id).val("");
+		$("#weapon_rof_"+id).val("");
+	}
+	// update defend value
+	setDefend();
+}
+
+// start point allocation mode
 function allocateAttributePts() {
 	// check if we have points to allocate
 	if (parseInt($("#attribute_pts").val()) == 0) {
@@ -85,6 +142,7 @@ function allocateAttributePts() {
 	});
 }
 
+// finish point allocation mode
 function endEditAttributes(accept) {
   allocatingAttributePts = false;
 	$(".attribute-pts").toggleClass("active");
@@ -233,6 +291,16 @@ function setDefend() {
 	var size = $("#character_size_select").val();
 	var agility = parseInt($("#agility_val").val());
 	var defend = 10 + agility + (size == "Small" ? 2 : (size == "Large" ? -2 : 0));
+	// check for weapon defend mofifier
+	$(".weapon-select").each(function(){
+		if ($(this).val() != "") {
+			for (var i in weapons) {
+				if ($(this).val() == weapons[i]['name'] && weapons[i]['defend'] != ''&& weapons[i]['defend'] != undefined) {
+					defend += parseInt(weapons[i]['defend']);
+				}
+			}
+		}
+	});
 	$("#defend").val(defend);
 }
 
@@ -418,7 +486,24 @@ function adjustAttribute(attribute, val) {
 			$("#encumbered").val(base/2);
 			$("#burdened").val(base/4*3);
 			$("#overburdened").val(base);
-			// TODO adjust melee weapon damage
+			// adjust melee weapon damage
+			$(".weapon-select").each(function(){
+				for(var i in weapons) {
+					if ($(this).val() == weapons[i]['name'] && weapons[i]['type'] == 'Melee') {
+						// set damage to max or damage + mod
+						var id = this.id.slice(-1);
+						var damage_mod = parseInt($("#strength_val").val()) >= 0 ? 
+							Math.floor(parseInt($("#strength_val").val())/2) : Math.ceil(parseInt($("#strength_val").val())/3);	
+						var max_damage = weapons[i]['max_damage'] == null || weapons[i]['max_damage'] == "" ? 0 : weapons[i]['max_damage'];
+						if (max_damage == 0 || parseInt(weapons[i]['damage'])+damage_mod <= weapons[i]['max_damage']) {
+							damage = parseInt(weapons[i]['damage'])+damage_mod;
+						} else {
+							damage = max_damage;
+						}
+						$("#weapon_damage_"+id).val(damage);
+					}
+				}
+			});
 			break;
 		case 'fortitude':
 			// adjust resilience
@@ -440,7 +525,24 @@ function adjustAttribute(attribute, val) {
 			setDefend();
 			break;
 		case 'precision_':
-			// TODO adjust ranged weapon damage
+			// adjust ranged weapon damage
+			$(".weapon-select").each(function(){
+				for(var i in weapons) {
+					if ($(this).val() == weapons[i]['name'] && weapons[i]['type'] == 'Ranged') {
+						// set damage to max or damage + mod
+						var id = this.id.slice(-1);
+						var damage_mod = parseInt($("#precision__val").val()) >= 0 ? 
+							Math.floor(parseInt($("#precision__val").val())/2) : Math.ceil(parseInt($("#precision__val").val())/3);	
+						var max_damage = weapons[i]['max_damage'] == null || weapons[i]['max_damage'] == "" ? 0 : weapons[i]['max_damage'];
+						if (max_damage == 0 || parseInt(weapons[i]['damage'])+damage_mod <= weapons[i]['max_damage']) {
+							damage = parseInt(weapons[i]['damage'])+damage_mod;
+						} else {
+							damage = max_damage;
+						}
+						$("#weapon_damage_"+id).val(damage);
+					}
+				}
+			});
 			break;
 		case 'awareness':
 			// adjust initiative
@@ -813,23 +915,79 @@ function addTrainingElements(trainingName, attribute, value='') {
 
 }
 
-// add a new weapon from modal values
+// add a new weapon from modal values - or edit existing weapon
 function newWeapon() {
+	// check if we are editing
+	var editing = $("#weapon_modal_title").html() == "Edit Weapon";
+	// reset modal title
+	$("#weapon_modal_title").html("New Weapon");
+	var type = $("#weapon_type").val();
 	var name = $("#weapon_name").val();
 	$("#weapon_name").val("");
 	var damage = $("#weapon_damage").val();
 	$("#weapon_damage").val("");
+	var max_damage = $("#weapon_max_damage").val();
+	$("#weapon_max_damage").val("");
+	var range = $("#weapon_range").val();
+	$("#weapon_range").val("");
+	var rof = $("#weapon_rof").val();
+	$("#weapon_rof").val("");
+	var defend = $("#weapon_defend").val();
+	$("#weapon_defend").val("");
 	var notes = $("#weapon_notes").val();
 	$("#weapon_notes").val("");
 	var weight = $("#weapon_weight").val();
 	$("#weapon_weight").val("");
-	if (name != "") {
-		addWeaponElements(name, 1, damage, notes, weight);
+	if (name == "") {
+		alert("Name is required");
+		return;
+	} else if (damage == "") {
+		alert("Damage is required");
+		return;
+	}
+	if (editing) {
+		// update weapon inputs
+		var weapon_id = $("#weapon_id").val();
+		$("#"+weapon_id+"_type").val(type);
+		var originalName = $("#"+weapon_id+"_name").val();
+		$("#"+weapon_id+"_name").val(name);
+		$("#"+weapon_id+"_weight").val(weight);
+		$("#"+weapon_id+"_damage_val").val(damage);
+		var damage_text = max_damage != "" ? damage +" ("+max_damage+")" : damage;
+		$("#"+weapon_id+"_damage").val(damage_text);
+		$("#"+weapon_id+"_max_damage").val(max_damage);
+		var noteMod = "";
+		noteMod += range != "" ? "Range: "+range+"; " : "";
+		noteMod += rof != "" ? "RoF: "+rof+"; " : "";
+		noteMod += defend != "" ? "+"+defend+" Defend; " : "";
+		$("#"+weapon_id+"_notes").val(noteMod+notes);
+		$("#"+weapon_id+"_notes_val").val(notes);
+		$("#"+weapon_id+"_range").val(range);
+		$("#"+weapon_id+"_rof").val(rof);
+		$("#"+weapon_id+"_defend").val(defend);
+		// check if this weapon is selected - update stats
+		for (var i in weapons) {
+			if (weapons[i]['name'] == originalName) {
+				$(".weapon-select").each(function(){
+					if ($(this).val() == originalName) {
+						weapons[i]['damage'] = damage;
+						weapons[i]['defend'] = defend;
+						weapons[i]['max_damage'] = max_damage;
+						weapons[i]['name'] = name;
+						weapons[i]['range_'] = range;
+						weapons[i]['rof'] = rof;
+						selectWeapon(this.id.slice(-1));
+					}
+				});
+			}
+		}
+	} else {
+		addWeaponElements(type, name, 1, damage, max_damage, range, rof, defend, notes, weight);
 	}
 }
 
 // create html elements for weapon
-function addWeaponElements(name, qty, damage, notes, weight) {
+function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defend, notes, weight) {
 	if (itemNames.includes(name.toLowerCase())) {
 		alert("Item name already in use");
 		return;
@@ -852,10 +1010,33 @@ function addWeaponElements(name, qty, damage, notes, weight) {
 	createInput('', 'text', 'weapons[]', name, div1, name_val+"_name");
 	createInput('', 'text', 'weapon_qty[]', qty, div2, name_val+"_qty_text");
 	createInput('hidden-number', 'number', '', '', div2, name_val+"_qty");
-	createInput('', 'text', 'weapon_damage[]', damage, div3, name_val+"_damage_text");
-	createInput('hidden-number', 'number', '', '', div3, name_val+"_damage");
-	createInput('', 'text', 'weapon_notes[]', notes, div4);
-	createInput('', 'number', 'weapon_weight[]', weight, div5);
+	// check for max damage
+	createInput('', 'hidden', 'weapon_damage[]', damage, div3, name_val+"_damage_val");
+	damage = max_damage != null && max_damage != "" ? damage +" ("+max_damage+")" : damage;
+	var dmg = createInput('', 'text', '', damage, div3, name_val+"_damage");
+	dmg.attr("readonly", true);
+	// add range, rof & defend bonus to notes
+	var noteMod = "";
+	noteMod += range != null && range != "" ? "Range: "+range+"; " : "";
+	noteMod += rof != null && rof != "" ? "RoF: "+rof+"; " : "";
+	noteMod += defend != null && defend != "" ? "+"+defend+" Defend; " : "";
+	var note = createInput('', 'text', '', noteMod+notes, div4, name_val+"_notes");
+	note.attr("readonly", true);
+	createInput('', 'hidden', 'weapon_notes[]', notes, div4, name_val+"_notes_val");
+	createInput('', 'number', 'weapon_weight[]', weight, div5, name_val+"_weight");
+	createInput('', 'hidden', 'weapon_type[]', type, div5, name_val+"_type");
+	createInput('', 'hidden', 'weapon_max_damage[]', max_damage, div5, name_val+"_max_damage");
+	createInput('', 'hidden', 'weapon_range[]', range, div5, name_val+"_range");
+	createInput('', 'hidden', 'weapon_rof[]', rof, div5, name_val+"_rof");
+	createInput('', 'hidden', 'weapon_defend[]', defend, div5, name_val+"_defend");
+
+	// on dmg and note click, edit weapon
+	dmg.click(function(){
+		editWeapon(name_val);
+	});
+	note.click(function(){
+		editWeapon(name_val);
+	});
 
 	// add remove button
 	createElement('span', 'glyphicon glyphicon-remove', div6, name_val+"_remove");
@@ -864,6 +1045,10 @@ function addWeaponElements(name, qty, damage, notes, weight) {
 		var conf = confirm("Remove item '"+item+"'?");
 		if (conf) {
 			$("#"+name_val).remove();
+			var index = itemNames.indexOf(name.toLowerCase());
+			if (index !== -1) {
+			  itemNames.splice(index, 1);
+			}
 		}
 	});
 
@@ -872,6 +1057,42 @@ function addWeaponElements(name, qty, damage, notes, weight) {
 	enableHiddenNumbers();
 
 }
+
+function editWeapon(weapon_id) {
+	// separate damage from max damage
+	var damage = $("#"+weapon_id+"_damage").val();
+	var max_damage = $("#"+weapon_id+"_max_damage").val();
+	damage = max_damage != "" ? damage.split(" (")[0] : damage;
+	// separate notes from range, rof, and defend
+	var range = $("#"+weapon_id+"_range").val();
+	var rof = $("#"+weapon_id+"_rof").val();
+	var defend = $("#"+weapon_id+"_defend").val();
+	var notes = $("#"+weapon_id+"_notes").val();
+	notes = range != "" ? notes.slice(notes.indexOf("; ")+2) : notes;
+	notes = rof != "" ? notes.slice(notes.indexOf("; ")+2) : notes;
+	notes = defend != "" ? notes.slice(notes.indexOf("; ")+2) : notes;
+	// set modal values and launch
+	$("#weapon_modal_title").html("Edit Weapon");
+	$("#weapon_type").val($("#"+weapon_id+"_type").val());
+	$("#weapon_name").val($("#"+weapon_id+"_name").val());
+	$("#weapon_damage").val(damage);
+	$("#weapon_max_damage").val(max_damage);
+	$("#weapon_range").val(range);
+	$("#weapon_rof").val(rof);
+	$("#weapon_defend").val(defend);
+	$("#weapon_notes").val(notes);
+	$("#weapon_weight").val($("#"+weapon_id+"_weight").val());
+	$("#weapon_id").val(weapon_id);
+	$("#new_weapon_modal").modal("show");
+}
+
+// don't allow ; in RoF inputs; used for parsing note value
+$("#weapon_rof").on('keypress', function(e){
+	if (e.charCode == 59) {
+		e.preventDefault();
+		return false;
+	}
+});
 
 // add a new protection from modal values
 function newProtection() {
@@ -921,6 +1142,10 @@ function addProtectionElements(name, bonus, notes, weight) {
 		var conf = confirm("Remove item '"+item+"'?");
 		if (conf) {
 			$("#"+name_val).remove();
+			var index = itemNames.indexOf(name.toLowerCase());
+			if (index !== -1) {
+			  itemNames.splice(index, 1);
+			}
 		}
 	});
 
@@ -978,6 +1203,10 @@ function addHealingElements(name, quantity, effect, weight) {
 		var conf = confirm("Remove item '"+item+"'?");
 		if (conf) {
 			$("#"+name_val).remove();
+			var index = itemNames.indexOf(name.toLowerCase());
+			if (index !== -1) {
+			  itemNames.splice(index, 1);
+			}
 		}
 	});
 
@@ -1035,6 +1264,10 @@ function addMiscElements(name, quantity, notes, weight) {
 		var conf = confirm("Remove item '"+item+"'?");
 		if (conf) {
 			$("#"+name_val).remove();
+			var index = itemNames.indexOf(name.toLowerCase());
+			if (index !== -1) {
+			  itemNames.splice(index, 1);
+			}
 		}
 	});
 
@@ -1114,11 +1347,12 @@ function createElement(type, className, appendTo, id=null) {
 }
 
 function createInput(additionalClass, type, name, value, appendTo, id=null) {
-	$('<input />', {
+	var input = $('<input />', {
 		'id': id,
 		'class': 'form-control '+additionalClass,
 		'type': type,
 	  	'name': name,
 	  	'value': value
 	}).appendTo(appendTo);
+	return input;
 }

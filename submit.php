@@ -12,7 +12,7 @@
 	  	die("Connection failed: " . $db->connect_error);
 	}
 
-	$user_columns = ['character_name', 'attribute_pts', 'xp', 'morale', 'race', 'height', 'weight', 'age', 'eyes', 'hair', 'gender', 'other', 'size', 'strength', 'fortitude', 'speed', 'agility', 'precision_', 'awareness', 'allure', 'deception', 'intellect', 'innovation', 'intuition', 'vitality', 'notes', 'background', 'free', 'move_penalty', 'defend', 'fear', 'poison', 'disease', 'damage', 'wounds', 'wound_penalty', 'motivator_1', 'motivator_2', 'motivator_3', 'motivator_4', 'motivator_1_pts', 'motivator_2_pts', 'motivator_3_pts', 'motivator_4_pts', 'weapon_1', 'weapon_1_damage', 'weapon_1_crit', 'weapon_1_range', 'weapon_1_rof', 'weapon_2', 'weapon_2_damage', 'weapon_2_crit', 'weapon_2_range', 'weapon_2_rof', 'weapon_3', 'weapon_3_damage', 'weapon_3_crit', 'weapon_3_range', 'weapon_3_rof'];
+	$user_columns = ['character_name', 'attribute_pts', 'xp', 'morale', 'race', 'height', 'weight', 'age', 'eyes', 'hair', 'gender', 'other', 'size', 'strength', 'fortitude', 'speed', 'agility', 'precision_', 'awareness', 'allure', 'deception', 'intellect', 'innovation', 'intuition', 'vitality', 'notes', 'background', 'free', 'move_penalty', 'defend', 'fear', 'poison', 'disease', 'damage', 'wounds', 'wound_penalty', 'motivator_1', 'motivator_2', 'motivator_3', 'motivator_4', 'motivator_1_pts', 'motivator_2_pts', 'motivator_3_pts', 'motivator_4_pts'];
 
 	// new or existing character?
 	if ($_POST['user_id'] != null) {
@@ -115,8 +115,17 @@
 		$weapon_damage = $_POST['weapon_damage'];
 		$weapon_notes = $_POST['weapon_notes'];
 		$weapon_weight = $_POST['weapon_weight'];
+		$weapon_type = $_POST['weapon_type'];
+		$weapon_max_damage = $_POST['weapon_max_damage'];
+		$weapon_range = $_POST['weapon_range'];
+		$weapon_rof = $_POST['weapon_rof'];
+		$weapon_defend = $_POST['weapon_defend'];
 		for ($i = 0; $i < count($weapons); $i++) {
-			$sql = "INSERT INTO user_weapon (name, quantity, damage, notes, weight, user_id) VALUES ('".$weapons[$i]."', '".$weapon_qty[$i]."', '".$weapon_damage[$i]."', '".$weapon_notes[$i]."', '".$weapon_weight[$i]."', '".$user_id."')";
+			$weapon_damage[$i] = empty($weapon_damage[$i]) ? "NULL" : $weapon_damage[$i];
+			$weapon_max_damage[$i] = empty($weapon_max_damage[$i]) ? "NULL" : $weapon_max_damage[$i];
+			$weapon_range[$i] = empty($weapon_range[$i]) ? "NULL" : $weapon_range[$i];
+			$weapon_defend[$i] = empty($weapon_defend[$i]) ? "NULL" : $weapon_defend[$i];
+			$sql = "INSERT INTO user_weapon (name, type, quantity, damage, max_damage, range_, rof, defend, notes, weight, user_id) VALUES ('".$weapons[$i]."', '".$weapon_type[$i]."', '".$weapon_qty[$i]."', ".$weapon_damage[$i].", ".$weapon_max_damage[$i].", ".$weapon_range[$i].", '".$weapon_rof[$i]."', ".$weapon_defend[$i].", '".$weapon_notes[$i]."', ".$weapon_weight[$i].", '".$user_id."')";
 			$db->query($sql);
 		}
 	}

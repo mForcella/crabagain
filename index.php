@@ -208,7 +208,6 @@
 						</div>
 						<div class="form-group">
 							<label class="control-label col-sm-2 col-xs-4" for="morale">Morale</label>
-							<!-- TODO on change, adjust morale effect -->
 							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 								<input class="form-control" type="number" name="morale" id="morale" min="-10" value="<?php echo isset($user) ? htmlspecialchars($user['morale']) : '' ?>">
 							</div>
@@ -285,33 +284,39 @@
 									<div class="form-group">
 										<label class="control-label col-md-12 center full-width" for="weapon_1">Weapon 1<span class="glyphicon glyphicon-chevron-down" id="weapon_1" onclick="toggleWeapon('weapon_1', this)"></span></label>
 										<div class="col-md-12">
-											<input class="form-control weapon-name" type="text" name="weapon_1" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_1']) : '' ?>">
+											<select class="form-control weapon-select" id="weapon_select_1" onchange="selectWeapon(1)">
+												<option></option>
+												<?php 
+													foreach ($weapons as $weapon) {
+														echo '<option value="'.$weapon['name'].'">'.$weapon['name'].'</option>';
+													}
+												?>
+											</select>
 										</div>
 									</div>
 									<div id="weapon_1_container" class="weapon-container">
 										<div class="form-group">
 											<label class="control-label col-md-7 col-xs-4" for="weapon_1_damage">Damage</label>
 											<div class="col-md-5 col-xs-8">
-												<input class="form-control" type="number" name="weapon_1_damage" min="1" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_1_damage']) : '' ?>">
+												<input class="form-control" readonly id="weapon_damage_1" name="weapon_1_damage">
 											</div>
 										</div>
 										<div class="form-group">
 											<label class="control-label col-md-7 col-xs-4" for="weapon_1_crit">Critical</label>
 											<div class="col-md-5 col-xs-8">
-												<input class="form-control" type="number" name="weapon_1_crit" min="1" max="6" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_1_crit']) : '' ?>">
+												<input class="form-control" readonly id="weapon_crit_1" name="weapon_1_crit">
 											</div>
 										</div>
 										<div class="form-group">
 											<label class="control-label col-md-7 col-xs-4" for="weapon_1_range">Range</label>
 											<div class="col-md-5 col-xs-8">
-												<input class="form-control" type="number" name="weapon_1_range" min="1" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_1_range']) : '' ?>">
+												<input class="form-control" readonly id="weapon_range_1" name="weapon_1_range">
 											</div>
 										</div>
 										<div class="form-group">
 											<label class="control-label col-md-7 col-xs-4" for="weapon_1_rof">R o F</label>
 											<div class="col-md-5 col-xs-8">
-												<input class="form-control" type="text" name="weapon_1_rof" id="weapon_1_rof_text" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_1_rof']) : '' ?>">
-												<input class="form-control hidden-number" type="number" id="weapon_1_rof">
+												<input class="form-control" readonly id="weapon_rof_1" name="weapon_1_rof">
 											</div>
 										</div>
 									</div>
@@ -321,33 +326,39 @@
 									<div class="form-group">
 										<label class="control-label col-md-12 center full-width" for="weapon_2">Weapon 2<span class="glyphicon glyphicon-chevron-down" id="weapon_2" onclick="toggleWeapon('weapon_2', this)"></span></label>
 										<div class="col-md-12">
-											<input class="form-control weapon-name" type="text" name="weapon_2" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_2']) : '' ?>">
+											<select class="form-control weapon-select" id="weapon_select_2" onchange="selectWeapon(2)">
+												<option></option>
+												<?php 
+													foreach ($weapons as $weapon) {
+														echo '<option value="'.$weapon['name'].'">'.$weapon['name'].'</option>';
+													}
+												?>
+											</select>
 										</div>
 									</div>
 									<div id="weapon_2_container" class="weapon-container">
 										<div class="form-group">
 											<label class="control-label col-md-7 col-xs-4" for="weapon_2_damage">Damage</label>
 											<div class="col-md-5 col-xs-8">
-												<input class="form-control" type="number" name="weapon_2_damage" min="1" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_2_damage']) : '' ?>">
+												<input class="form-control" readonly id="weapon_damage_2" name="weapon_2_damage">
 											</div>
 										</div>
 										<div class="form-group">
 											<label class="control-label col-md-7 col-xs-4" for="weapon_2_crit">Critical</label>
 											<div class="col-md-5 col-xs-8">
-												<input class="form-control" type="number" name="weapon_2_crit" min="1" max="6" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_2_crit']) : '' ?>">
+												<input class="form-control" readonly id="weapon_crit_2" name="weapon_2_crit">
 											</div>
 										</div>
 										<div class="form-group">
 											<label class="control-label col-md-7 col-xs-4" for="weapon_2_range">Range</label>
 											<div class="col-md-5 col-xs-8">
-												<input class="form-control" type="number" name="weapon_2_range" min="1" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_2_range']) : '' ?>">
+												<input class="form-control" readonly id="weapon_range_2" name="weapon_2_range">
 											</div>
 										</div>
 										<div class="form-group">
 											<label class="control-label col-md-7 col-xs-4" for="weapon_2_rof">R o F</label>
 											<div class="col-md-5 col-xs-8">
-												<input class="form-control" type="text" name="weapon_2_rof" id="weapon_2_rof_text" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_2_rof']) : '' ?>">
-												<input class="form-control hidden-number" type="number" id="weapon_2_rof">
+												<input class="form-control" readonly id="weapon_rof_2" name="weapon_2_rof">
 											</div>
 										</div>
 									</div>
@@ -357,33 +368,39 @@
 									<div class="form-group">
 										<label class="control-label col-md-12 center full-width" for="weapon_3">Weapon 3<span class="glyphicon glyphicon-chevron-down" id="weapon_3" onclick="toggleWeapon('weapon_3', this)"></span></label>
 										<div class="col-md-12">
-											<input class="form-control weapon-name" type="text" name="weapon_3" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_3']) : '' ?>">
+											<select class="form-control weapon-select" id="weapon_select_3" onchange="selectWeapon(3)">
+												<option></option>
+												<?php 
+													foreach ($weapons as $weapon) {
+														echo '<option value="'.$weapon['name'].'">'.$weapon['name'].'</option>';
+													}
+												?>
+											</select>
 										</div>
 									</div>
 									<div id="weapon_3_container" class="weapon-container">
 										<div class="form-group">
 											<label class="control-label col-md-7 col-xs-4" for="weapon_3_damage">Damage</label>
 											<div class="col-md-5 col-xs-8">
-												<input class="form-control" type="number" name="weapon_3_damage" min="1" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_3_damage']) : '' ?>">
+												<input class="form-control" readonly id="weapon_damage_3" name="weapon_3_damage">
 											</div>
 										</div>
 										<div class="form-group">
 											<label class="control-label col-md-7 col-xs-4" for="weapon_3_crit">Critical</label>
 											<div class="col-md-5 col-xs-8">
-												<input class="form-control" type="number" name="weapon_3_crit" min="1" max="6" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_3_crit']) : '' ?>">
+												<input class="form-control" readonly id="weapon_crit_3" name="weapon_3_crit">
 											</div>
 										</div>
 										<div class="form-group">
 											<label class="control-label col-md-7 col-xs-4" for="weapon_3_range">Range</label>
 											<div class="col-md-5 col-xs-8">
-												<input class="form-control" type="number" name="weapon_3_range" min="1" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_3_range']) : '' ?>">
+												<input class="form-control" readonly id="weapon_range_3" name="weapon_3_range">
 											</div>
 										</div>
 										<div class="form-group">
 											<label class="control-label col-md-7 col-xs-4" for="weapon_3_rof">R o F</label>
 											<div class="col-md-5 col-xs-8">
-												<input class="form-control" type="text" name="weapon_3_rof" id="weapon_3_rof_text" value="<?php echo isset($user) ? htmlspecialchars($user['weapon_3_rof']) : '' ?>">
-												<input class="form-control hidden-number" type="number" id="weapon_3_rof">
+												<input class="form-control" readonly id="weapon_rof_3" name="weapon_3_rof">
 											</div>
 										</div>
 									</div>
@@ -993,7 +1010,6 @@
 				<!-- section: weapons -->
 				<div class="col-md-12">
 					<div class="section form-horizontal">
-						<!-- TODO add additional options; max damage, defend, crit range -->
 						<div class="section-title" id="section_items">Weapons</div>
 						<div class="form-group">
 							<label class="control-label col-xs-3 resize-mobile center" for="weapons[]">Item</label>
@@ -1231,7 +1247,7 @@
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
       <div class="modal-content searching-prompt">
         <div class="modal-header">
-          <h4 class="modal-title">New Weapon</h4>
+          <h4 class="modal-title" id="weapon_modal_title">New Weapon</h4>
         </div>
         <div class="modal-body">
         	<label class="control-label">Weapon Type</label>
@@ -1239,9 +1255,9 @@
         		<option value="Melee">Melee</option>
         		<option value="Ranged">Ranged</option>
         	</select>
-        	<label class="control-label">Weapon Name</label>
+        	<label class="control-label">Weapon Name*</label>
         	<input class="form-control" type="text" id="weapon_name">
-        	<label class="control-label">Damage</label>
+        	<label class="control-label">Damage*</label>
         	<input class="form-control" type="number" id="weapon_damage">
         	<label class="control-label">Max Damage</label>
         	<input class="form-control" type="number" id="weapon_max_damage">
@@ -1255,6 +1271,7 @@
         	<input class="form-control" type="text" id="weapon_notes">
         	<label class="control-label">Weight</label>
         	<input class="form-control" type="number" id="weapon_weight">
+        	<input type="hidden" id="weapon_id">
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newWeapon()">Ok</button>
@@ -1490,7 +1507,7 @@
 		// check for user weapons
 		var weapons = <?php echo json_encode($weapons); ?>;
 		for (var i in weapons) {
-			addWeaponElements(weapons[i]['name'], weapons[i]['quantity'], weapons[i]['damage'], weapons[i]['notes'], weapons[i]['weight']);
+			addWeaponElements(weapons[i]['type'], weapons[i]['name'], weapons[i]['quantity'], weapons[i]['damage'], weapons[i]['max_damage'], weapons[i]['range_'], weapons[i]['rof'], weapons[i]['defend'], weapons[i]['notes'], weapons[i]['weight']);
 		}
 
 		// check for user protections

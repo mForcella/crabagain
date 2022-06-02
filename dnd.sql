@@ -45,23 +45,25 @@
     motivator_2_pts int,
     motivator_3_pts int,
     motivator_4_pts int,
-    weapon_1 varchar(64),
-    weapon_1_damage int,
-    weapon_1_crit int,
-    weapon_1_range int,
-    weapon_1_rof varchar(64),
-    weapon_2 varchar(64),
-    weapon_2_damage int,
-    weapon_2_crit int,
-    weapon_2_range int,
-    weapon_2_rof varchar(64),
-    weapon_3 varchar(64),
-    weapon_3_damage int,
-    weapon_3_crit int,
-    weapon_3_range int,
-    weapon_3_rof varchar(64),
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
   );
+
+  alter table user 
+    drop column weapon_1 varchar(64),
+    drop column weapon_1_damage int,
+    drop column weapon_1_crit int,
+    drop column weapon_1_range int,
+    drop column weapon_1_rof varchar(64),
+    drop column weapon_2 varchar(64),
+    drop column weapon_2_damage int,
+    drop column weapon_2_crit int,
+    drop column weapon_2_range int,
+    drop column weapon_2_rof varchar(64),
+    drop column weapon_3 varchar(64),
+    drop column weapon_3_damage int,
+    drop column weapon_3_crit int,
+    drop column weapon_3_range int,
+    drop column weapon_3_rof varchar(64),
 
   CREATE TABLE user_training (
     id int PRIMARY KEY AUTO_INCREMENT,
@@ -85,8 +87,13 @@
   CREATE TABLE user_weapon (
     id int PRIMARY KEY AUTO_INCREMENT,
     name varchar(64),
+    type varchar(64),
     quantity varchar(64),
     damage int,
+    max_damage int,
+    range_ float,
+    rof varchar(64),
+    defend int,
     notes varchar(255),
     weight int,
     user_id int,
@@ -95,9 +102,9 @@
   );
 
   alter table user_weapon
-  add column weapon_type varchar(64),
+  add column type varchar(64),
   add column max_damage int,
-  add column range_ int,
+  add column range_ float,
   add column rof varchar(64),
   add column defend int,
   modify column damage int,
