@@ -317,6 +317,33 @@ h1 {
 .modal-title {
 	text-align: center;
 }
+.motivator-title {
+	padding-left: 100px;
+}
+.motivator-bonus {
+	display: inline-block;
+	float: right;
+	text-transform: none;
+	font-weight: 300;
+}
+.motivator-bonus label {
+	font-size: 0.9em;
+}
+.motivator-bonus input {
+	width: 50px;
+	position: relative;
+	display: inline-block;
+	margin-right: 15px;
+}
+@media screen and (max-width:767px) {
+	.motivator-title {
+		padding-left: 0;
+	}
+	.motivator-bonus {
+		display: block;
+		float: none;
+	}
+}
 .no-pad {
 	padding-left: 0;
 	padding-right: 0;
@@ -399,6 +426,12 @@ select.form-control {
 	text-transform: uppercase;
 	margin-bottom: 5px;
 }
+#section_motivators {
+	text-decoration: none;
+}
+#section_motivators .motivator-title {
+	text-decoration: underline;
+}
 @media screen and (max-width:767px) {
 	.smaller {
 		font-size: 0.9em;
@@ -453,7 +486,7 @@ select.form-control {
 		padding-left: 5px;
 	}
 }
-#user_select {
+#user_select, #anchor_links {
 	width: 300px;
 	margin: 5px auto;
 	height: 35px;

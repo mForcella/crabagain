@@ -12,7 +12,7 @@
 	  	die("Connection failed: " . $db->connect_error);
 	}
 
-	$user_columns = ['character_name', 'attribute_pts', 'xp', 'morale', 'race', 'height', 'weight', 'age', 'eyes', 'hair', 'gender', 'other', 'size', 'strength', 'fortitude', 'speed', 'agility', 'precision_', 'awareness', 'allure', 'deception', 'intellect', 'innovation', 'intuition', 'vitality', 'notes', 'background', 'free', 'move_penalty', 'defend', 'fear', 'poison', 'disease', 'damage', 'wounds', 'wound_penalty', 'motivator_1', 'motivator_2', 'motivator_3', 'motivator_4', 'motivator_1_pts', 'motivator_2_pts', 'motivator_3_pts', 'motivator_4_pts'];
+	$user_columns = ['character_name', 'attribute_pts', 'xp', 'morale', 'race', 'height', 'weight', 'age', 'eyes', 'hair', 'gender', 'other', 'size', 'strength', 'fortitude', 'speed', 'agility', 'precision_', 'awareness', 'allure', 'deception', 'intellect', 'innovation', 'intuition', 'vitality', 'notes', 'background', 'free', 'move_penalty', 'fear', 'poison', 'disease', 'damage', 'wounds', 'wound_penalty', 'weapon_1', 'weapon_2', 'weapon_3', 'motivator_1', 'motivator_2', 'motivator_3', 'motivator_4', 'motivator_1_pts', 'motivator_2_pts', 'motivator_3_pts', 'motivator_4_pts'];
 
 	// new or existing character?
 	if ($_POST['user_id'] != null) {
@@ -33,18 +33,18 @@
 		$user_id = $_POST['user_id'];
 	} else {
 		// get reCAPTCHA score from Google
-		$recaptcha_secret = $keys['recaptcha_secret'];
-		$recaptcha_response = $_POST['recaptcha_response'];
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL,"https://www.google.com/recaptcha/api/siteverify");
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('secret' => $recaptcha_secret, 'response' => $recaptcha_response)));
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		$response = curl_exec($ch);
-		curl_close($ch);
-		$arrResponse = json_decode($response, true);
-		// check response values
-		if($arrResponse["success"] == '1' && $arrResponse["action"] == 'new_user' && $arrResponse["score"] >= 0.5) {
+		// $recaptcha_secret = $keys['recaptcha_secret'];
+		// $recaptcha_response = $_POST['recaptcha_response'];
+		// $ch = curl_init();
+		// curl_setopt($ch, CURLOPT_URL,"https://www.google.com/recaptcha/api/siteverify");
+		// curl_setopt($ch, CURLOPT_POST, 1);
+		// curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('secret' => $recaptcha_secret, 'response' => $recaptcha_response)));
+		// curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		// $response = curl_exec($ch);
+		// curl_close($ch);
+		// $arrResponse = json_decode($response, true);
+		// // check response values
+		// if($arrResponse["success"] == '1' && $arrResponse["action"] == 'new_user' && $arrResponse["score"] >= 0.5) {
 			// hash password
 			$hashed_password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 			$sql = "INSERT INTO user (password, ";
@@ -66,12 +66,12 @@
 			$db->query($sql);
 			// echo $db->error;
 			$user_id = $db->insert_id;
-		} else {
-			// Score less than 0.5 indicates suspicious activity. Return an error
-			$db->close();
-			$error_output = "Something went wrong. Please try again later";
-		  	die($error_output);
-		}
+		// } else {
+		// 	// Score less than 0.5 indicates suspicious activity. Return an error
+		// 	$db->close();
+		// 	$error_output = "Something went wrong. Please try again later";
+		//   	die($error_output);
+		// }
 
 	}
 

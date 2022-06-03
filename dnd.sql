@@ -37,6 +37,9 @@
     wound_penalty varchar(64),
     notes varchar(2000),
     background varchar(2000),
+    weapon_1 varchar(64),
+    weapon_2 varchar(64),
+    weapon_3 varchar(64),
     motivator_1 varchar(64),
     motivator_2 varchar(64),
     motivator_3 varchar(64),
@@ -47,23 +50,6 @@
     motivator_4_pts int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
   );
-
-  alter table user 
-    drop column weapon_1 varchar(64),
-    drop column weapon_1_damage int,
-    drop column weapon_1_crit int,
-    drop column weapon_1_range int,
-    drop column weapon_1_rof varchar(64),
-    drop column weapon_2 varchar(64),
-    drop column weapon_2_damage int,
-    drop column weapon_2_crit int,
-    drop column weapon_2_range int,
-    drop column weapon_2_rof varchar(64),
-    drop column weapon_3 varchar(64),
-    drop column weapon_3_damage int,
-    drop column weapon_3_crit int,
-    drop column weapon_3_range int,
-    drop column weapon_3_rof varchar(64),
 
   CREATE TABLE user_training (
     id int PRIMARY KEY AUTO_INCREMENT,
@@ -101,15 +87,6 @@
     FOREIGN KEY (user_id) REFERENCES user(id)
   );
 
-  alter table user_weapon
-  add column type varchar(64),
-  add column max_damage int,
-  add column range_ float,
-  add column rof varchar(64),
-  add column defend int,
-  modify column damage int,
-  modify column weight int;
-
   CREATE TABLE user_protection (
     id int PRIMARY KEY AUTO_INCREMENT,
     name varchar(64),
@@ -120,9 +97,6 @@
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES user(id)
   );
-
-  alter table user_protection
-  modify column weight int;
 
   CREATE TABLE user_healing (
     id int PRIMARY KEY AUTO_INCREMENT,
@@ -135,9 +109,6 @@
     FOREIGN KEY (user_id) REFERENCES user(id)
   );
 
-  alter table user_healing
-  modify column weight int;
-
   CREATE TABLE user_misc (
     id int PRIMARY KEY AUTO_INCREMENT,
     name varchar(64),
@@ -148,6 +119,3 @@
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES user(id)
   );
-
-  alter table user_misc
-  modify column weight int;

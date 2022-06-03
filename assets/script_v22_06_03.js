@@ -52,7 +52,7 @@ function selectWeapon(id) {
 			if (weapons[i]['name'] == selected) {
 				var damage = weapons[i]['damage'];
 				$("#weapon_damage_"+id).val(damage);
-				// TODO look for crit modifiers
+				// TODO look for crit modifiers - improved crit feat
 				$("#weapon_crit_"+id).val(6);
 				$("#weapon_range_"+id).val(weapons[i]['range_'] == null || weapons[i]['range_'] == "" ? "-" : weapons[i]['range_']);
 				$("#weapon_rof_"+id).val(weapons[i]['rof'] == "" ? "-" : weapons[i]['rof']);
@@ -208,6 +208,16 @@ function endEditAttributes(accept) {
 
 // detect if we're on a touchscreen
 var is_mobile = $('#is_mobile').css('display')=='none';
+
+// on motivator pt change, adjust bonuses
+$(".motivator-pts").on("change", function(){
+	var pts = 0;
+	$(".motivator-pts").each(function(){
+		pts += parseInt($(this).val());
+	});
+	var bonuses = pts >= 64 ? 5 : (pts >= 32 ? 4 : (pts >= 16 ? 3 : (pts >= 8 ? 2 : (pts >= 4 ? 1 : 0))));
+	$("#bonuses").val(bonuses);
+});
 
 // on xp change, adjust level
 $("#xp").change(function(){
@@ -1012,8 +1022,8 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 	createInput('hidden-number', 'number', '', '', div2, name_val+"_qty");
 	// check for max damage
 	createInput('', 'hidden', 'weapon_damage[]', damage, div3, name_val+"_damage_val");
-	damage = max_damage != null && max_damage != "" ? damage +" ("+max_damage+")" : damage;
-	var dmg = createInput('', 'text', '', damage, div3, name_val+"_damage");
+	var damageText = max_damage != null && max_damage != "" ? damage +" ("+max_damage+")" : damage;
+	var dmg = createInput('', 'text', '', damageText, div3, name_val+"_damage");
 	dmg.attr("readonly", true);
 	// add range, rof & defend bonus to notes
 	var noteMod = "";
@@ -1051,6 +1061,33 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 			}
 		}
 	});
+
+	// make sure it isn't already in the select list
+	var found = false;
+	$("#weapon_select_1").find("option").each(function(){
+		if ($(this).val() == name) {
+			found = true;
+		}
+	});
+	if (!found) {
+		// add to dropdown
+		var option1 = $('<option />', {
+	  	'text': name,
+	  	'value': name
+		}).appendTo("#weapon_select_1");
+		var option2 = option1.clone().appendTo("#weapon_select_2");
+		var option3 = option1.clone().appendTo("#weapon_select_3");
+		// add to weapons array
+		var newWeapon = {};
+		newWeapon['damage'] = damage;
+		newWeapon['defend'] = defend;
+		newWeapon['max_damage'] = max_damage;
+		newWeapon['name'] = name;
+		newWeapon['range_'] = range;
+		newWeapon['rof'] = rof;
+		newWeapon['type'] = type;
+		weapons.push(newWeapon);
+	}
 
 	// enable label highlighting
 	enableHighlighting();

@@ -29,7 +29,7 @@
 	    while($row = $result->fetch_assoc()) {
 	    	$user = $row;
 	    	// get user feats
-	    	$sql = "SELECT * FROM user_feat WHERE user_id = ".$_GET["user"];
+	    	$sql = "SELECT * FROM user_feat WHERE user_id = ".$_GET["user"]." ORDER BY name";
 	    	$result = $db->query($sql);
 	    	if ($result) {
 		    	while($row = $result->fetch_assoc()) {
@@ -37,7 +37,7 @@
 		    	}
 	    	}
 	    	// get user trainings
-	    	$sql = "SELECT * FROM user_training WHERE user_id = ".$_GET["user"];
+	    	$sql = "SELECT * FROM user_training WHERE user_id = ".$_GET["user"]." ORDER BY name";
 	    	$result = $db->query($sql);
 	    	if ($result) {
 		    	while($row = $result->fetch_assoc()) {
@@ -45,7 +45,7 @@
 		    	}
 	    	}
 	    	// get user weapons
-	    	$sql = "SELECT * FROM user_weapon WHERE user_id = ".$_GET["user"];
+	    	$sql = "SELECT * FROM user_weapon WHERE user_id = ".$_GET["user"]." ORDER BY name";
 	    	$result = $db->query($sql);
 	    	if ($result) {
 		    	while($row = $result->fetch_assoc()) {
@@ -53,7 +53,7 @@
 		    	}
 	    	}
 	    	// get user protections
-	    	$sql = "SELECT * FROM user_protection WHERE user_id = ".$_GET["user"];
+	    	$sql = "SELECT * FROM user_protection WHERE user_id = ".$_GET["user"]." ORDER BY name";
 	    	$result = $db->query($sql);
 	    	if ($result) {
 		    	while($row = $result->fetch_assoc()) {
@@ -61,7 +61,7 @@
 		    	}
 	    	}
 	    	// get user healings
-	    	$sql = "SELECT * FROM user_healing WHERE user_id = ".$_GET["user"];
+	    	$sql = "SELECT * FROM user_healing WHERE user_id = ".$_GET["user"]." ORDER BY name";
 	    	$result = $db->query($sql);
 	    	if ($result) {
 		    	while($row = $result->fetch_assoc()) {
@@ -69,7 +69,7 @@
 		    	}
 	    	}
 	    	// get user misc
-	    	$sql = "SELECT * FROM user_misc WHERE user_id = ".$_GET["user"];
+	    	$sql = "SELECT * FROM user_misc WHERE user_id = ".$_GET["user"]." ORDER BY name";
 	    	$result = $db->query($sql);
 	    	if ($result) {
 		    	while($row = $result->fetch_assoc()) {
@@ -284,11 +284,11 @@
 									<div class="form-group">
 										<label class="control-label col-md-12 center full-width" for="weapon_1">Weapon 1<span class="glyphicon glyphicon-chevron-down" id="weapon_1" onclick="toggleWeapon('weapon_1', this)"></span></label>
 										<div class="col-md-12">
-											<select class="form-control weapon-select" id="weapon_select_1" onchange="selectWeapon(1)">
+											<select class="form-control weapon-select" id="weapon_select_1" name="weapon_1" onchange="selectWeapon(1)">
 												<option></option>
 												<?php 
 													foreach ($weapons as $weapon) {
-														echo '<option value="'.$weapon['name'].'">'.$weapon['name'].'</option>';
+														echo '<option value="'.$weapon['name'].'" '.($user['weapon_1'] == $weapon['name'] ? 'selected' : '').'>'.$weapon['name'].'</option>';
 													}
 												?>
 											</select>
@@ -326,11 +326,11 @@
 									<div class="form-group">
 										<label class="control-label col-md-12 center full-width" for="weapon_2">Weapon 2<span class="glyphicon glyphicon-chevron-down" id="weapon_2" onclick="toggleWeapon('weapon_2', this)"></span></label>
 										<div class="col-md-12">
-											<select class="form-control weapon-select" id="weapon_select_2" onchange="selectWeapon(2)">
+											<select class="form-control weapon-select" id="weapon_select_2" name="weapon_2" onchange="selectWeapon(2)">
 												<option></option>
 												<?php 
 													foreach ($weapons as $weapon) {
-														echo '<option value="'.$weapon['name'].'">'.$weapon['name'].'</option>';
+														echo '<option value="'.$weapon['name'].'" '.($user['weapon_2'] == $weapon['name'] ? 'selected' : '').'>'.$weapon['name'].'</option>';
 													}
 												?>
 											</select>
@@ -368,11 +368,11 @@
 									<div class="form-group">
 										<label class="control-label col-md-12 center full-width" for="weapon_3">Weapon 3<span class="glyphicon glyphicon-chevron-down" id="weapon_3" onclick="toggleWeapon('weapon_3', this)"></span></label>
 										<div class="col-md-12">
-											<select class="form-control weapon-select" id="weapon_select_3" onchange="selectWeapon(3)">
+											<select class="form-control weapon-select" id="weapon_select_3" name="weapon_3" onchange="selectWeapon(3)">
 												<option></option>
 												<?php 
 													foreach ($weapons as $weapon) {
-														echo '<option value="'.$weapon['name'].'">'.$weapon['name'].'</option>';
+														echo '<option value="'.$weapon['name'].'" '.($user['weapon_3'] == $weapon['name'] ? 'selected' : '').'>'.$weapon['name'].'</option>';
 													}
 												?>
 											</select>
@@ -941,8 +941,24 @@
 
 					<!-- section: motivators -->
 					<div class="section form-horizontal">
-						<div class="section-title" id="section_motivators">Motivators</div>
-						<!-- TODO add motivator bonuses -->
+						<div class="section-title" id="section_motivators">
+							<span class="motivator-title">Motivators</span>
+							<div class="form-group motivator-bonus">
+								<label for="bonuses">Bonuses:</label>
+								<?php
+									// get two highest motivator values
+									$motivators = [];
+									array_push($motivators, $user['motivator_1'] == '' ? 0 : $user['motivator_1_pts']);
+									array_push($motivators, $user['motivator_2'] == '' ? 0 : $user['motivator_2_pts']);
+									array_push($motivators, $user['motivator_3'] == '' ? 0 : $user['motivator_3_pts']);
+									array_push($motivators, $user['motivator_4'] == '' ? 0 : $user['motivator_4_pts']);
+									arsort($motivators);
+									$total_pts = intval($motivators[0]) + intval($motivators[1]);
+									$bonuses = $total_pts >= 64 ? 5 : ($total_pts >= 32 ? 4 : ($total_pts >= 16 ? 3 : ($total_pts >= 8 ? 2 : ($total_pts >= 4 ? 1 : 0))));
+								?>
+								<input class="form-control" readonly name="bonuses" id="bonuses" value="<?php echo $bonuses ?>">
+							</div>
+						</div>
 
 						<div class="form-group no-margin">
 							<div class="col-xs-3 no-pad-mobile no-pad-left">
@@ -950,7 +966,7 @@
 							</div>
 							<label class="control-label col-xs-2 no-pad-mobile" for="motivator_1_pts">Points:</label>
 							<div class="col-xs-1 no-pad">
-								<input class="form-control" type="number" name="motivator_1_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_1_pts']) : '' ?>">
+								<input class="form-control motivator-pts" type="number" name="motivator_1_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_1_pts']) : '' ?>">
 							</div>
 
 							<div class="col-xs-3 no-pad-mobile pad-left-mobile">
@@ -958,7 +974,7 @@
 							</div>
 							<label class="control-label col-xs-2 no-pad-mobile" for="motivator_2_pts">Points:</label>
 							<div class="col-xs-1 no-pad">
-								<input class="form-control" type="number" name="motivator_2_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_2_pts']) : '' ?>">
+								<input class="form-control motivator-pts" type="number" name="motivator_2_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_2_pts']) : '' ?>">
 							</div>
 						</div>
 
@@ -968,7 +984,7 @@
 							</div>
 							<label class="control-label col-xs-2 no-pad-mobile" for="motivator_3_pts">Points:</label>
 							<div class="col-xs-1 no-pad">
-								<input class="form-control" type="number" name="motivator_3_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_3_pts']) : '' ?>">
+								<input class="form-control motivator-pts" type="number" name="motivator_3_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_3_pts']) : '' ?>">
 							</div>
 
 							<div class="col-xs-3 no-pad-mobile pad-left-mobile">
@@ -976,7 +992,7 @@
 							</div>
 							<label class="control-label col-xs-2 no-pad-mobile" for="motivator_4_pts">Points:</label>
 							<div class="col-xs-1 no-pad">
-								<input class="form-control" type="number" name="motivator_4_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_4_pts']) : '' ?>">
+								<input class="form-control motivator-pts" type="number" name="motivator_4_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_4_pts']) : '' ?>">
 							</div>
 						</div>
 
@@ -1482,9 +1498,9 @@
 
 	<!-- JavaScript -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-	<script async src="https://www.google.com/recaptcha/api.js?render=6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi"></script>
+	<!-- <script async src="https://www.google.com/recaptcha/api.js?render=6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi"></script> -->
 	<script src="bootstrap/js/bootstrap.min.js"></script>
-	<script src="/assets/script_v22_06_02.js"></script>
+	<script src="/assets/script_v22_06_03.js"></script>
 
 	<script type="text/javascript">
 
@@ -1509,6 +1525,11 @@
 		for (var i in weapons) {
 			addWeaponElements(weapons[i]['type'], weapons[i]['name'], weapons[i]['quantity'], weapons[i]['damage'], weapons[i]['max_damage'], weapons[i]['range_'], weapons[i]['rof'], weapons[i]['defend'], weapons[i]['notes'], weapons[i]['weight']);
 		}
+
+		// select weapons
+		$(".weapon-select").each(function(){
+			$(this).trigger("change");
+		});
 
 		// check for user protections
 		var protections = <?php echo json_encode($protections); ?>;
