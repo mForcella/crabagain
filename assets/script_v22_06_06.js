@@ -8,6 +8,8 @@ var featNames = [];
 var itemNames = [];
 var totalWeight = 0;
 var allocatingAttributePts = false;
+var character_creation = false;
+var adminEditMode = false;
 var attributeVals = [];
 var trainingVals = [];
 var trainings = [];
@@ -27,6 +29,84 @@ var attributes = [
 	'vitality'
 ];
 
+// enter GM edit mode
+function GMEditMode() {
+	// check password
+	var password = $("#gm_password").val();
+	$("#gm_password").val("");
+	if (password == keys['master_password']) {
+		adminEditMode = true;
+		
+		// show GM menu, hide hamburger menu
+	  $(".gm-menu").toggleClass("active");
+		$(".glyphicon-menu-hamburger").hide().toggleClass("active");
+
+		// show hidden attribute icons
+		$(".attribute-col").find(".hidden-icon").each(function(){
+			$(this).show();
+		});
+
+		// show new feat button
+		$("#new_feat_btn").show();
+
+		// show hidden feat buttons and unbind hover functions
+		$("#feats").find(".glyphicon").show();
+		$(".feat").unbind("mouseenter mouseleave");
+
+		// enable edit attribute pts input, enable edit xp input
+		$("#attribute_pts").attr("readonly", false).attr("type", "number");
+		$("#xp").attr("readonly", false).attr("type", "number").attr("data-toggle", null);
+
+	} else {
+		// wrong password
+		alert("Sorry sucker, that ain't it.");
+	}
+}
+
+// exit GM edit mode
+function endGMEdit(accept) {
+	if (!accept) {
+		// reload page
+		window.location.reload();
+	} else {
+		adminEditMode = false
+		// hide GM menu, show hamburger menu
+	  $(".gm-menu").toggleClass("active");
+		$(".glyphicon-menu-hamburger").show().toggleClass("active");
+		// hide icons and re-enable hover functions
+		$(".attribute-col").find(".hidden-icon").hide();
+		$("#feats").find(".hover-hide").hide();
+		if (!is_mobile) {
+			$("#feats").find(".feat").hover(function () {
+				$(this).find(".hover-hide.glyphicon-edit").show();
+			}, 
+			function () {
+				$(this).find(".hover-hide").hide();
+			});
+		} else {
+			$("#feats").find(".hover-hide.glyphicon-edit").show();
+		}
+		// disable edit attribute pts input, enable edit xp input
+		$("#attribute_pts").attr("readonly", true).removeAttr("type", "number");
+		$("#xp").attr("readonly", true).removeAttr("type", "number").attr("data-toggle", "modal");
+	}
+}
+
+// function for 'add' button in xp modal
+function addXP() {
+	if ($("#add_xp").val() != "") {
+		var current = parseInt($("#xp_text").html());
+		$("#xp_text").html(current + parseInt($("#add_xp").val()));
+		$("#add_xp").val("");
+	}
+}
+
+// function for 'ok' button in xp modal
+function setXP() {
+	var current = parseInt($("#xp_text").html());
+	$("#xp").val(current).trigger("change");
+}
+
 // show user menu
 function toggleMenu() {
   $(".nav-menu").toggleClass("active");
@@ -44,10 +124,11 @@ function selectWeapon(id) {
 			duplicate = true;
 		}
 	});
-	if (duplicate) {
-		return;
-	}
-	if (selected != "") {
+	// TODO don't clear inputs - undo selection instead - no way to get previous selection...
+	// if (duplicate) {
+	// 	return;
+	// }
+	if (!duplicate && selected != "") {
 		for (var i in weapons) {
 			if (weapons[i]['name'] == selected) {
 				var damage = weapons[i]['damage'];
@@ -91,10 +172,11 @@ function selectWeapon(id) {
 // start point allocation mode
 function allocateAttributePts() {
 	// check if we have points to allocate
-	if (parseInt($("#attribute_pts").val()) == 0) {
+	if ($("#attribute_pts").val() == "" || parseInt($("#attribute_pts").val()) == 0) {
 		alert("No attribute points to allocate.");
 		return;
 	}
+
 	// show hidden attribute icons
 	$(".attribute-col").find(".hidden-icon").each(function(){
 		// don't show remove buttons
@@ -104,12 +186,16 @@ function allocateAttributePts() {
 			$(this).hide();
 		}
 	});
-	// hide edit buttons
-	$(".attribute-col").unbind("mouseenter mouseleave");
-	if (is_mobile) {
-		$(".attribute-col").each(function(){
-			$(this).find(".glyphicon-edit").hide();
-		});
+	// show new feat button
+	$("#new_feat_btn").show();
+	if (character_creation) {
+		// hide edit buttons
+		$(".attribute-col").unbind("mouseenter mouseleave");
+		if (is_mobile) {
+			$(".attribute-col").each(function(){
+				$(this).find(".glyphicon-edit").hide();
+			});
+		}
 	}
 	// hide hamburger menu
 	$(".glyphicon-menu-hamburger").hide().toggleClass("active");
@@ -148,29 +234,36 @@ function endEditAttributes(accept) {
 	$(".attribute-pts").toggleClass("active");
 	$(".glyphicon-menu-hamburger").show();
 	$(".attribute-col").find(".hidden-icon").hide();
+	if (!character_creation) {
+		$("#new_feat_btn").hide();
+	}
 	if (!is_mobile) {
-		// restore attribute-col hover functions
-		$(".attribute-col").each(function(){
-			$(this).hover(function(){
-				$(this).find('.hover-hide').show();
-			},
-			function(){
-				$(this).find('.hover-hide').hide();
+		if (character_creation) {
+			// restore attribute-col hover functions
+			$(".attribute-col").each(function(){
+				$(this).hover(function(){
+					$(this).find('.hover-hide').show();
+				},
+				function(){
+					$(this).find('.hover-hide').hide();
+				});
 			});
-		});
+		}
 		// restore feat hover functions
 	  $(".feat").hover(function () {
-			$(this).find(".hover-hide").show();
+			$(this).find(character_creation ? ".hover-hide" : ".hover-hide.glyphicon-edit").show();
 		}, 
 		function () {
 			$(this).find(".hover-hide").hide();
 		});
 	} else {
-		$(".attribute-col").each(function(){
-			$(this).find(".glyphicon-edit").show();
-		});
+		if (character_creation) {
+			$(".attribute-col").each(function(){
+				$(this).find(".glyphicon-edit").show();
+			});
+		}
 	  $(".feat").each(function () {
-			$(this).find(".hover-hide").show();
+			$(this).find(".hover-hide.glyphicon-edit").show();
 		});
 	}
 	if (accept) {
@@ -241,13 +334,50 @@ $("#xp").change(function(){
 		$("#level").val(level);
 		// alert if increased
 		if (level > current) {
-			alert("Huzzah! You made it to level "+level+"!");
+			var exclamations = [
+				"Huzzah!",
+				"Shazam!",
+				"Booyah!",
+				"Boom!",
+				"Crabcakes!",
+				"Fruit on the bottom!",
+				"Jumpin' Jehoshaphat!",
+				"Crom!",
+				"Fish on a stick!",
+				"Oingo Boingo!",
+				"Abracadabra!",
+				"Hootie McBoobs!",
+				"Poop-a-doodle-doo!",
+				"Dancin' Danzig!",
+				"Leapin' linguine!",
+				"Dorka Dorka Dorkass!",
+				"Rock'em Sock'em Robots!",
+				"Toaster Pastry Pop Tarts!",
+				"Testicular torsion!",
+				"Potato pancakes!",
+				"Yahtzee!",
+				"Fart on a forklift!",
+				"Blammo!",
+				"Kapow!",
+			];
+			var index = Math.floor(Math.random() * (exclamations.length));
+			alert(exclamations[index]+" You made it to level "+level+"!");
 			// increase attribute points
 			var innovation_val = parseInt($("#innovation_val").val());
 			var innovation_mod = innovation_val > 0 ? Math.floor(innovation_val/2) : 0;
 			var attribute_pts = $("#attribute_pts").val() == undefined || $("#attribute_pts").val() == "" ? 
 				0 : parseInt($("#attribute_pts").val());
 			$("#attribute_pts").val(attribute_pts+12+innovation_mod);
+			// update next_level in xp modal
+			var current_xp = $(this).val();
+			var next_level = 0;
+			for (var i in levels) {
+				if (current_xp < levels[i]) {
+					next_level = levels[i];
+					break;
+				}
+			}
+			$("#next_level").html(next_level);
 		}
 	}
 });
@@ -371,11 +501,20 @@ $("#new_healing_modal").on('shown.bs.modal', function(){
 $("#new_misc_modal").on('shown.bs.modal', function(){
 	$("#misc_name").focus();
 });
+$("#xp_modal").on('shown.bs.modal', function(){
+	$("#add_xp").focus();
+});
 $("#new_password_modal").on('shown.bs.modal', function(){
 	$("#new_password").focus();
+	toggleMenu();
 });
 $("#password_modal").on('shown.bs.modal', function(){
 	$("#password").focus();
+	toggleMenu();
+});
+$("#gm_edit_modal").on('shown.bs.modal', function(){
+	$("#gm_password").focus();
+	toggleMenu();
 });
 
 // on modal shown, update modal title and clear inputs
@@ -465,25 +604,34 @@ function setMoraleEffect(morale) {
 function adjustAttribute(attribute, val) {
 	var originalVal = parseInt($("#"+attribute+"_val").val());
 	var newVal = originalVal+parseInt(val);
-	$("#"+attribute+"_text").html(newVal >= 0 ? "+"+newVal : newVal);
-	$("#"+attribute+"_val").val(newVal);
 	// check if we are allocating attribute points
 	if (allocatingAttributePts) {
+		// only allow +1 increase from saved val
+		if (!character_creation) {
+			var savedVal = attributes.indexOf(attribute) == -1 ? trainingVals[attribute] : attributeVals[attributes.indexOf(attribute)];
+			if (newVal < savedVal || newVal > parseInt(savedVal) + 1) {
+				return;
+			}
+		}
 		var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
 		// increasing attribute; reduce points by newVal, if newVal > 0, else reduce by originalVal
 		if (val == 1) {
 			var newPts = pts-Math.abs(newVal > 0 ? newVal : originalVal);
+		// make sure we have enough points to allocate
 			if (newPts >= 0) {
 				$(".attribute-count").html(newPts+" Points");
 			} else {
 				$("#"+attribute+"_text").html(originalVal >= 0 ? "+"+originalVal : originalVal);
 				$("#"+attribute+"_val").val(originalVal);
+				return;
 			}
 			// decreasing attribute; increase points by originalVal, if original > 0, else increase by newVal
 		} else {
 			$(".attribute-count").html(pts+Math.abs(originalVal > 0 ? originalVal : newVal)+" Points");
 		}
 	}
+	$("#"+attribute+"_text").html(newVal >= 0 ? "+"+newVal : newVal);
+	$("#"+attribute+"_val").val(newVal);
 	// adjust stats based on attribute
 	switch(attribute) {
 		case 'strength':
@@ -564,17 +712,21 @@ function adjustAttribute(attribute, val) {
 
 // enable attribute edit btn hide / show on hover; don't hide on mobile
 if (!is_mobile) {
+	// $(".attribute-col").each(function(){
+	// 	$(this).hover(function(){
+	// 		// show glyphicon-plus, glyphicon-minus
+	// 		$(this).find('.hover-hide').show();
+	// 		// toggleHidden(this.id);
+	// 	},
+	// 	function(){
+	// 		// hide glyphicon-plus, glyphicon-minus
+	// 		$(this).find('.hover-hide').hide();
+	// 		// toggleHidden(this.id);
+	// 	});
+	// });
+} else {
 	$(".attribute-col").each(function(){
-		$(this).hover(function(){
-			// show glyphicon-plus, glyphicon-minus
-			$(this).find('.hover-hide').show();
-			// toggleHidden(this.id);
-		},
-		function(){
-			// hide glyphicon-plus, glyphicon-minus
-			$(this).find('.hover-hide').hide();
-			// toggleHidden(this.id);
-		});
+		$(this).find('.hover-hide').hide();
 	});
 }
 
@@ -653,7 +805,7 @@ function setPassword() {
 	} else if ($("#duckdacoy").val() != "") {
 		alert("You look more like a robot than a flesh sack");
 	// make sure human response is correct
-	} else if ($("#nerd_test").val().toLowerCase() != "gygax") {
+	} else if ($("#nerd_test").val().toLowerCase() != keys['nerd_test']) {
 		alert("You're either a robot or a sorry excuse for a nerd. Either way, bugger off.");
 	} else {
 		// show submitting message
@@ -733,6 +885,10 @@ function addFeatElements(featName, featDescription) {
     	var conf = confirm("Remove feat '"+name.split(" : ")[0]+"'?");
     	if (conf) {
     		$("#"+feat_name).remove();
+				var index = featNames.indexOf(feat_name.toLowerCase());
+				if (index !== -1) {
+				  featNames.splice(index, 1);
+				}
     	}
     });
 
@@ -747,16 +903,21 @@ function addFeatElements(featName, featDescription) {
 		$("#"+originalFeatName.replaceAll(" ", "_")+"_descrip_val").attr("id", feat_name+"_descrip_val");
 
 	} else {
-		// if allocating attribute points, decrease points
-		if (allocatingAttributePts) {
-			var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
-			$(".attribute-count").html(pts - 4+" Points");
-		}
-
 		// make sure we're not adding a duplicate training name
 		if (featNames.includes(feat_name.toLowerCase())) {
 			alert("Feat name already in use");
 			return;
+		}
+
+		// if allocating attribute points, decrease points
+		if (allocatingAttributePts) {
+			console.log("allocating");
+			if (feats.length > 0 || trainings.length > 0) {
+				alert("Only one new feat or training can be added per level.");
+				return;
+			}
+			var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
+			$(".attribute-count").html(pts - 4+" Points");
 		}
 
 		featNames.push(feat_name.toLowerCase());
@@ -796,22 +957,37 @@ function addFeatElements(featName, featDescription) {
     	var conf = confirm("Remove feat '"+name.split(" : ")[0]+"'?");
     	if (conf) {
     		$("#"+feat_name).remove();
+				var index = featNames.indexOf(feat_name.toLowerCase());
+				if (index !== -1) {
+				  featNames.splice(index, 1);
+				}
 	    	// if allocating attribute points, increase points
 	    	if (allocatingAttributePts) {
 					var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
 					$(".attribute-count").html(pts + 4+" Points");
+					var index = feats.indexOf(top);
+					if (index !== -1) {
+					  feats.splice(index, 1);
+					}
 	    	}
     	}
     });
 
     // enable hover function - don't enable on mobile
-    if (!is_mobile) {
-    	top.hover(function () {
-				$(this).find(".hover-hide").show();
-			}, 
-			function () {
-				$(this).find(".hover-hide").hide();
-			});
+    if (adminEditMode) {
+    	top.find(".hover-hide").show();
+    } else {
+	    if (!is_mobile) {
+	    	top.hover(function () {
+					$(this).find(allocatingAttributePts || character_creation ? ".hover-hide" : ".hover-hide.glyphicon-edit").show();
+				}, 
+				function () {
+					$(this).find(".hover-hide").hide();
+				});
+	    } else {
+	    	// hide remove buttons on mobile
+	    	top.find(".hover-hide.glyphicon-remove").hide();
+	    }
     }
 
 		// add hidden inputs
@@ -849,6 +1025,10 @@ function addTrainingElements(trainingName, attribute, value='') {
 
 	// allocating attribute points, make sure we have enough points
 	if (allocatingAttributePts) {
+		if (feats.length > 0 || trainings.length > 0) {
+			alert("Only one new feat or training can be added per level.");
+			return;
+		}
 		var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
 		var skill_pts = $('input[name=skill_type]:checked').val();
 		if (skill_pts == undefined) {
@@ -879,7 +1059,7 @@ function addTrainingElements(trainingName, attribute, value='') {
 	// add remove button
 	// if allocating points, make sure remove button is visible
 	var removeBtn = createElement('span', 'glyphicon glyphicon-remove hidden-icon', label_left, training_name+"_text"+"_remove");
-	if (allocatingAttributePts) {
+	if (allocatingAttributePts || adminEditMode) {
 		removeBtn.show();
 	}
 	removeBtn.on("click", function(){
@@ -891,6 +1071,10 @@ function addTrainingElements(trainingName, attribute, value='') {
 				$(".attribute-count").html(pts + skill_pts +" Points");
 			}
 			row.remove();
+			var index = trainingNames.indexOf(training_name.toLowerCase());
+			if (index !== -1) {
+			  trainingNames.splice(index, 1);
+			}
 		}
 	});
 
@@ -909,15 +1093,21 @@ function addTrainingElements(trainingName, attribute, value='') {
 	createInput('', 'hidden', 'training[]', trainingName+":"+attribute, label_right);
 	createInput('', 'hidden', 'training_val[]', value == '' ? 0 : value, label_right, training_name+"_val");
 
-	createElement('span', 'glyphicon glyphicon-plus hidden-icon', label_right, training_name+"_up");
+	var up = createElement('span', 'glyphicon glyphicon-plus hidden-icon', label_right, training_name+"_up");
 	$("#"+training_name+"_up").on("click", function(){
 		adjustAttribute(training_name, 1);
 	});
 
-	createElement('span', 'glyphicon glyphicon-minus hidden-icon', label_right, training_name+"_down");
+	var down = createElement('span', 'glyphicon glyphicon-minus hidden-icon', label_right, training_name+"_down");
 	$("#"+training_name+"_down").on("click", function(){
 		adjustAttribute(training_name, -1);
 	});
+
+	// GM edit mode - show plus minus icons
+	if (adminEditMode) {
+		up.show();
+		down.show();
+	}
 
 	// enable label highlighting
 	enableHighlighting();
@@ -988,6 +1178,13 @@ function newWeapon() {
 						weapons[i]['rof'] = rof;
 						selectWeapon(this.id.slice(-1));
 					}
+					// update select list with new name
+					$(this).find("option").each(function(){
+						if ($(this).val() == originalName) {
+							$(this).val(name);
+							$(this).html(name);
+						}
+					});
 				});
 			}
 		}
@@ -1040,12 +1237,24 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 	createInput('', 'hidden', 'weapon_rof[]', rof, div5, name_val+"_rof");
 	createInput('', 'hidden', 'weapon_defend[]', defend, div5, name_val+"_defend");
 
-	// on dmg and note click, edit weapon
+	// add click and hover functions
 	dmg.click(function(){
 		editWeapon(name_val);
 	});
 	note.click(function(){
 		editWeapon(name_val);
+	});
+	dmg.hover(function(){
+		$("#weapon_dmg_label").addClass("highlight");
+	},
+	function(){
+		$("#weapon_dmg_label").removeClass("highlight");
+	});
+	note.hover(function(){
+		$("#weapon_note_label").addClass("highlight");
+	},
+	function(){
+		$("#weapon_note_label").removeClass("highlight");
 	});
 
 	// add remove button
@@ -1058,6 +1267,27 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 			var index = itemNames.indexOf(name.toLowerCase());
 			if (index !== -1) {
 			  itemNames.splice(index, 1);
+			  // update weapons array and select list
+			  for (var i in weapons) {
+			  	if (weapons[i]['name'] == name) {
+			  		weapons.splice(i, 1);
+			  		break;
+			  	}
+			  }
+			  $(".weapon-select").find("option").each(function(){
+			  	if ($(this).val() == name) {
+				  	if ($(this).is(":selected")) {
+				  		// clear inputs
+				  		var id = $(this).parent().attr("id").split("weapon_select_")[1];
+							$("#weapon_damage_"+id).val("");
+							$("#weapon_crit_"+id).val("");
+							$("#weapon_range_"+id).val("");
+							$("#weapon_rof_"+id).val("");
+							setDefend();
+				  	}
+			  		$(this).remove();
+			  	}
+			  });
 			}
 		}
 	});
@@ -1309,6 +1539,7 @@ function addMiscElements(name, quantity, notes, weight) {
 	});
 
 	// enable label highlighting
+	// TODO highlighting 'notes' and 'weight' only enabled for first set of inputs...
 	enableHighlighting();
 	enableHiddenNumbers();
 

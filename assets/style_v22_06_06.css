@@ -8,7 +8,7 @@
 	    padding-right: calc((100vw - 1200px)/2 + 2.5rem);
 	}
 }
-.nav-menu, .attribute-pts {
+.nav-menu, .attribute-pts, .gm-menu {
     display: flex;
     flex-direction: column;
     position: fixed;
@@ -25,17 +25,17 @@
 	padding: 1.5rem;
     top: 2rem;
 }
-.attribute-pts div {
+.attribute-pts div, .gm-menu div {
     margin: 0.5rem 0;
 }
-.attribute-pts .glyphicon-remove {
+.attribute-pts .glyphicon-remove, .gm-menu .glyphicon-remove {
 	color: black;
 }
 .attribute-count {
 	font-size: 3rem;
 	text-align: center;
 }
-.nav-menu.active, .attribute-pts.active {
+.nav-menu.active, .attribute-pts.active, .gm-menu.active {
     right: -2px;
 }
 .nav-item {
@@ -117,6 +117,19 @@ h1 {
 	h1 {
 		font-size: 2em;
 	}
+}
+#add_xp {
+	width: 100px;
+}
+.add-xp {
+	justify-content: space-between;
+	display: flex;
+}
+.add-xp h3, .add-xp input {
+	margin-top: 15px;
+}
+.add-xp .button-bar {
+	margin-top: 10px;
 }
 .align-right {
 	text-align: right !important;
@@ -317,6 +330,10 @@ h1 {
 .modal-title {
 	text-align: center;
 }
+.modal-sm {
+	width: 300px !important;
+	margin: 30px auto !important;
+}
 .motivator-title {
 	padding-left: 100px;
 }
@@ -343,6 +360,12 @@ h1 {
 		display: block;
 		float: none;
 	}
+	.motivator-bonus input {
+		margin-right: 0;
+	}
+}
+#new_feat_btn {
+	display: none;
 }
 .no-pad {
 	padding-left: 0;

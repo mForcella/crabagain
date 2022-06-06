@@ -2,6 +2,7 @@
 
 	// establish database connection
 	include_once('db_config.php');
+	include_once('keys.php');
 	$db = new mysqli($db_config['servername'], $db_config['username'], $db_config['password'], $db_config['dbname']);
 
 	// get user list for dropdown nav
@@ -103,1074 +104,1154 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;1,400;1,600&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
 
-	<link rel="stylesheet" type="text/css" href="/assets/style.css">
+	<link rel="stylesheet" type="text/css" href="/assets/style_v22_06_06.css">
 
 </head>
 
 <body>
 
+	<!-- use div visibility to determine if we're on mobile -->
+	<div id="is_mobile"></div>
+
 	<!-- user menu -->
-  <nav class="navbar">
-    <div class="nav-menu">
-      <div class="nav-item">
-         <span class="glyphicon glyphicon-floppy-save" onclick="formSubmit()"><span class="nav-item-label"> Save Character Data</span></span>
-      </div>
-      <div class="nav-item">
-         <span class="glyphicon glyphicon-circle-arrow-up" onclick="allocateAttributePts()"><span class="nav-item-label"> Allocate Attribute Points</span></span>
-      </div>
-    </div>
-    <div class="attribute-pts">
+	<nav class="navbar">
+	  <div class="nav-menu">
+	    <div class="nav-item">
+	       <span class="glyphicon glyphicon-floppy-save" onclick="formSubmit()"><span class="nav-item-label"> Save Character Data</span></span>
+	    </div>
+	    <div class="nav-item">
+	       <span class="glyphicon glyphicon-circle-arrow-up" onclick="allocateAttributePts()"><span class="nav-item-label"> Allocate Attribute Points</span></span>
+	    </div>
+	    <?php
+	    	if (isset($user)) {
+	    		echo '
+				    <div class="nav-item">
+				       <span class="glyphicon glyphicon-pencil" data-toggle="modal" data-target="#gm_edit_modal"><span class="nav-item-label"> GM Edit Mode</span></span>
+				    </div>
+				   ';
+	    	}
+	    ?>
+	  </div>
+
+	  <!-- attribute point menu -->
+	  <div class="attribute-pts">
 	    <div class="attribute-count"></div>
 	    <div><span class="glyphicon glyphicon-ok" onclick="endEditAttributes(true)"><span class="nav-item-label"> Accept Changes</span></span></div>
 	    <div><span class="glyphicon glyphicon-remove" onclick="endEditAttributes(false)"><span class="nav-item-label"> Discard Changes</span></span></div>
-    </div>
-		<span class="glyphicon glyphicon-menu-hamburger" onclick="toggleMenu()"></span>
-  </nav>
+	  </div>
 
-	<!-- <div class="container"> -->
-		<div class="header">
-			<div class="row">
-				<div class="col-xs-4">
-					<h1>Welcome to...<br>The Lost City!</h1>
-				</div>
+	  <!-- GM edit menu -->
+	  <div class="gm-menu">
+	    <div><span class="glyphicon glyphicon-ok" onclick="endGMEdit(true)"><span class="nav-item-label"> Accept Changes</span></span></div>
+	    <div><span class="glyphicon glyphicon-remove" onclick="endGMEdit(false)"><span class="nav-item-label"> Discard Changes</span></span></div>
+	  </div>
+
+		<span class="glyphicon glyphicon-menu-hamburger" onclick="toggleMenu()"></span>
+	</nav>
+
+	<div class="header">
+		<div class="row">
+			<div class="col-xs-4">
+				<h1>Welcome to...<br>The Lost City!</h1>
 			</div>
 		</div>
-		<div id="is_mobile"></div>
+	</div>
 
-		<!-- character select -->
-		<select class="form-control" id="user_select">
-			<option value="">NEW CHARACTER</option>
-			<?php
-				foreach($users as $option) {
-					echo '<option value='.$option['id'].' '.($option['id'] == $user['id'] ? 'selected' : '').'>'.$option['character_name'].'</option>';
-				}
-			?>
-		</select>
+	<!-- character select -->
+	<select class="form-control" id="user_select">
+		<option value="">NEW CHARACTER</option>
+		<?php
+			foreach($users as $option) {
+				echo '<option value='.$option['id'].' '.($option['id'] == $user['id'] ? 'selected' : '').'>'.$option['character_name'].'</option>';
+			}
+		?>
+	</select>
 
-		<!-- anchor links -->
-		<select class="form-control" id="anchor_links">
-			<option value="">JUMP TO SECTION...</option>
-			<option value="#section_attack">Attack</option>
-			<option value="#section_defense">Defense</option>
-			<option value="#section_health">Health</option>
-			<option value="#section_actions">Actions, Move, & Initiative</option>
-			<option value="#section_motivators">Motivators</option>
-			<option value="#section_attributes">Attributes</option>
-			<option value="#section_feats">Feats</option>
-			<option value="#section_items">Items</option>
-			<option value="#section_weight">Weight Capacity</option>
-			<option value="#section_notes">Notes</option>
-		</select>
+	<!-- anchor links -->
+	<select class="form-control" id="anchor_links">
+		<option value="">JUMP TO SECTION...</option>
+		<option value="#section_attack">Attack</option>
+		<option value="#section_defense">Defense</option>
+		<option value="#section_health">Health</option>
+		<option value="#section_actions">Actions, Move, & Initiative</option>
+		<option value="#section_motivators">Motivators</option>
+		<option value="#section_attributes">Attributes</option>
+		<option value="#section_feats">Feats</option>
+		<option value="#section_items">Items</option>
+		<option value="#section_weight">Weight Capacity</option>
+		<option value="#section_notes">Notes</option>
+	</select>
 
-		<form id="user_form" method="post" action="/submit.php" novalidate>
-			<input type="hidden" id="user_id" name="user_id" value="<?php echo isset($user) ? $user['id'] : '' ?>">
-			<div class="row">
-				<div class="col-md-6">
+	<form id="user_form" method="post" action="/submit.php" novalidate>
+		<input type="hidden" id="user_id" name="user_id" value="<?php echo isset($user) ? $user['id'] : '' ?>">
+		<div class="row">
+			<div class="col-md-6">
 
-					<!-- section: name, level, xp -->
-					<div class="section form-horizontal">
-						<div class="form-group">
-							<label class="control-label col-sm-2 col-xs-4" for="character_name">Name</label>
-							<div class="col-sm-4 col-xs-8 mobile-pad-bottom">
-								<input class="form-control" type="text" id="character_name" name="character_name" value="<?php echo isset($user) ? htmlspecialchars($user['character_name']) : '' ?>">
-							</div>
-							<label class="control-label col-sm-4 col-xs-4 smaller" for="attribute_pts">Attribute Pts</label>
-							<div class="col-sm-2 col-xs-8">
-								<input class="form-control" type="number" id="attribute_pts" name="attribute_pts" value="<?php echo isset($user) ? htmlspecialchars($user['attribute_pts']) : 12 ?>">
-							</div>
+				<!-- section: name, level, xp -->
+				<div class="section form-horizontal">
+					<div class="form-group">
+						<label class="control-label col-sm-2 col-xs-4" for="character_name">Name</label>
+						<div class="col-sm-4 col-xs-8 mobile-pad-bottom">
+							<input class="form-control" type="text" id="character_name" name="character_name" value="<?php echo isset($user) ? htmlspecialchars($user['character_name']) : '' ?>">
 						</div>
-						<div class="form-group">
-							<label class="control-label col-sm-2 col-xs-4" for="xp">Experience</label>
-							<div class="col-sm-4 col-xs-8 mobile-pad-bottom">
-								<input class="form-control" type="number" name="xp" id="xp" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['xp']) : '' ?>">
-							</div>
-							<label class="control-label col-sm-2 col-xs-4" for="level">Level</label>
-							<div class="col-sm-4 col-xs-8">
-								<?php
-									$levels = [];
-									$xp_total = 0;
-									foreach (range(1,25) as $number) {
-										$xp_total += 20 * $number;
-										array_push($levels, $xp_total);
-									}
-									$level = 1;
-									if (isset($user)) {
-										$i = 2;
-										foreach ($levels as $lvl) {
-											if ($user['xp'] >= $lvl) {
-												$level = $i++;
-											}
+						<!-- readonly, unless new character -->
+						<label class="control-label col-sm-4 col-xs-4 smaller" for="attribute_pts">Attribute Pts</label>
+						<div class="col-sm-2 col-xs-8">
+							<input class="form-control" <?php echo isset($user) ? 'readonly' : 'type="number"' ?> id="attribute_pts" name="attribute_pts" value="<?php echo isset($user) ? htmlspecialchars($user['attribute_pts']) : 12 ?>">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-2 col-xs-4" for="xp">Experience</label>
+						<div class="col-sm-4 col-xs-8 mobile-pad-bottom">
+							<input class="form-control" readonly data-toggle="modal" data-target="#xp_modal" name="xp" id="xp" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['xp']) : '' ?>">
+						</div>
+						<label class="control-label col-sm-2 col-xs-4" for="level">Level</label>
+						<div class="col-sm-4 col-xs-8">
+							<?php
+								$levels = [];
+								$xp_total = 0;
+								foreach (range(1,25) as $number) {
+									$xp_total += 20 * $number;
+									array_push($levels, $xp_total);
+								}
+								$level = 1;
+								if (isset($user)) {
+									$i = 2;
+									foreach ($levels as $lvl) {
+										if ($user['xp'] >= $lvl) {
+											$level = $i++;
 										}
 									}
-								?>
-								<input class="form-control" readonly name="level" id="level" value="<?php echo $level ?>">
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="control-label col-sm-2 col-xs-4" for="morale">Morale</label>
-							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-								<input class="form-control" type="number" name="morale" id="morale" min="-10" value="<?php echo isset($user) ? htmlspecialchars($user['morale']) : '' ?>">
-							</div>
-							<label class="control-label col-sm-2 col-xs-4" for="morale_effect">Effect</label>
-							<div class="col-sm-6 col-xs-8">
-								<input class="form-control" readonly id="morale_effect" name="morale_effect">
-							</div>
+								}
+							?>
+							<input class="form-control" readonly name="level" id="level" value="<?php echo $level ?>">
 						</div>
 					</div>
-					<!-- end section: name, level, xp -->
-
-				</div>
-				<div class="col-md-6">
-
-					<!-- section: characteristics -->
-					<div class="section form-horizontal">
-						<div class="form-group">
-							<label class="control-label col-sm-2 col-xs-4" for="race">Race</label>
-							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-								<input class="form-control" type="text" name="race" value="<?php echo isset($user) ? htmlspecialchars($user['race']) : '' ?>">
-							</div>
-							<label class="control-label col-sm-2 col-xs-4" for="age">Age</label>
-							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-								<input class="form-control" type="text" name="age" id="age_text" value="<?php echo isset($user) ? htmlspecialchars($user['age']) : '' ?>">
-								<input class="form-control hidden-number" type="number" id="age">
-							</div>
-							<label class="control-label col-sm-2 col-xs-4" for="gender">Gender</label>
-							<div class="col-sm-2 col-xs-8">
-								<input class="form-control" type="text" name="gender" value="<?php echo isset($user) ? htmlspecialchars($user['gender']) : '' ?>">
-							</div>
+					<div class="form-group">
+						<label class="control-label col-sm-2 col-xs-4" for="morale">Morale</label>
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+							<input class="form-control" type="number" name="morale" id="morale" min="-10" value="<?php echo isset($user) ? htmlspecialchars($user['morale']) : '' ?>">
 						</div>
-						<div class="form-group">
-							<label class="control-label col-sm-2 col-xs-4" for="height">Height</label>
-							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-								<input class="form-control" type="text" name="height" id="height_text" value="<?php echo isset($user) ? htmlspecialchars($user['height']) : '' ?>">
-								<input class="form-control hidden-number" type="number" id="height">
-							</div>
-							<label class="control-label col-sm-2 col-xs-4" for="weight">Weight</label>
-							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-								<input class="form-control" type="text" name="weight" id="weight_text" value="<?php echo isset($user) ? htmlspecialchars($user['weight']) : '' ?>">
-								<input class="form-control hidden-number" type="number" id="weight">
-							</div>
-							<label class="control-label col-sm-2 col-xs-4" for="eyes">Eyes</label>
-							<div class="col-sm-2 col-xs-8">
-								<input class="form-control" type="text" name="eyes" value="<?php echo isset($user) ? htmlspecialchars($user['eyes']) : '' ?>">
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="control-label col-sm-2 col-xs-4" for="hair">Hair</label>
-							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-								<input class="form-control" type="text" name="hair" value="<?php echo isset($user) ? htmlspecialchars($user['hair']) : '' ?>">
-							</div>
-							<label class="control-label col-sm-2 col-xs-4" for="other">Other</label>
-							<div class="col-sm-6 col-xs-8">
-								<input class="form-control" type="text" name="other" value="<?php echo isset($user) ? htmlspecialchars($user['other']) : '' ?>">
-							</div>
+						<label class="control-label col-sm-2 col-xs-4" for="morale_effect">Effect</label>
+						<div class="col-sm-6 col-xs-8">
+							<input class="form-control" readonly id="morale_effect" name="morale_effect">
 						</div>
 					</div>
-					<!-- end section: characteristics -->
-					
 				</div>
+				<!-- end section: name, level, xp -->
+
 			</div>
+			<div class="col-md-6">
 
-			<div class="row">
-				<div class="col-md-6">
-
-					<!-- section: weapons -->
-					<div class="section form-horizontal">
-						<div class="form-group">
-							<div class="section-title" id="section_attack">Attack</div>
-							<div class="row">
-
-								<div class="col-sm-4">
-									<div class="form-group">
-										<label class="control-label col-md-12 center full-width" for="weapon_1">Weapon 1<span class="glyphicon glyphicon-chevron-down" id="weapon_1" onclick="toggleWeapon('weapon_1', this)"></span></label>
-										<div class="col-md-12">
-											<select class="form-control weapon-select" id="weapon_select_1" name="weapon_1" onchange="selectWeapon(1)">
-												<option></option>
-												<?php 
-													foreach ($weapons as $weapon) {
-														echo '<option value="'.$weapon['name'].'" '.($user['weapon_1'] == $weapon['name'] ? 'selected' : '').'>'.$weapon['name'].'</option>';
-													}
-												?>
-											</select>
-										</div>
-									</div>
-									<div id="weapon_1_container" class="weapon-container">
-										<div class="form-group">
-											<label class="control-label col-md-7 col-xs-4" for="weapon_1_damage">Damage</label>
-											<div class="col-md-5 col-xs-8">
-												<input class="form-control" readonly id="weapon_damage_1" name="weapon_1_damage">
-											</div>
-										</div>
-										<div class="form-group">
-											<label class="control-label col-md-7 col-xs-4" for="weapon_1_crit">Critical</label>
-											<div class="col-md-5 col-xs-8">
-												<input class="form-control" readonly id="weapon_crit_1" name="weapon_1_crit">
-											</div>
-										</div>
-										<div class="form-group">
-											<label class="control-label col-md-7 col-xs-4" for="weapon_1_range">Range</label>
-											<div class="col-md-5 col-xs-8">
-												<input class="form-control" readonly id="weapon_range_1" name="weapon_1_range">
-											</div>
-										</div>
-										<div class="form-group">
-											<label class="control-label col-md-7 col-xs-4" for="weapon_1_rof">R o F</label>
-											<div class="col-md-5 col-xs-8">
-												<input class="form-control" readonly id="weapon_rof_1" name="weapon_1_rof">
-											</div>
-										</div>
-									</div>
-								</div>
-
-								<div class="col-sm-4">
-									<div class="form-group">
-										<label class="control-label col-md-12 center full-width" for="weapon_2">Weapon 2<span class="glyphicon glyphicon-chevron-down" id="weapon_2" onclick="toggleWeapon('weapon_2', this)"></span></label>
-										<div class="col-md-12">
-											<select class="form-control weapon-select" id="weapon_select_2" name="weapon_2" onchange="selectWeapon(2)">
-												<option></option>
-												<?php 
-													foreach ($weapons as $weapon) {
-														echo '<option value="'.$weapon['name'].'" '.($user['weapon_2'] == $weapon['name'] ? 'selected' : '').'>'.$weapon['name'].'</option>';
-													}
-												?>
-											</select>
-										</div>
-									</div>
-									<div id="weapon_2_container" class="weapon-container">
-										<div class="form-group">
-											<label class="control-label col-md-7 col-xs-4" for="weapon_2_damage">Damage</label>
-											<div class="col-md-5 col-xs-8">
-												<input class="form-control" readonly id="weapon_damage_2" name="weapon_2_damage">
-											</div>
-										</div>
-										<div class="form-group">
-											<label class="control-label col-md-7 col-xs-4" for="weapon_2_crit">Critical</label>
-											<div class="col-md-5 col-xs-8">
-												<input class="form-control" readonly id="weapon_crit_2" name="weapon_2_crit">
-											</div>
-										</div>
-										<div class="form-group">
-											<label class="control-label col-md-7 col-xs-4" for="weapon_2_range">Range</label>
-											<div class="col-md-5 col-xs-8">
-												<input class="form-control" readonly id="weapon_range_2" name="weapon_2_range">
-											</div>
-										</div>
-										<div class="form-group">
-											<label class="control-label col-md-7 col-xs-4" for="weapon_2_rof">R o F</label>
-											<div class="col-md-5 col-xs-8">
-												<input class="form-control" readonly id="weapon_rof_2" name="weapon_2_rof">
-											</div>
-										</div>
-									</div>
-								</div>
-
-								<div class="col-sm-4">
-									<div class="form-group">
-										<label class="control-label col-md-12 center full-width" for="weapon_3">Weapon 3<span class="glyphicon glyphicon-chevron-down" id="weapon_3" onclick="toggleWeapon('weapon_3', this)"></span></label>
-										<div class="col-md-12">
-											<select class="form-control weapon-select" id="weapon_select_3" name="weapon_3" onchange="selectWeapon(3)">
-												<option></option>
-												<?php 
-													foreach ($weapons as $weapon) {
-														echo '<option value="'.$weapon['name'].'" '.($user['weapon_3'] == $weapon['name'] ? 'selected' : '').'>'.$weapon['name'].'</option>';
-													}
-												?>
-											</select>
-										</div>
-									</div>
-									<div id="weapon_3_container" class="weapon-container">
-										<div class="form-group">
-											<label class="control-label col-md-7 col-xs-4" for="weapon_3_damage">Damage</label>
-											<div class="col-md-5 col-xs-8">
-												<input class="form-control" readonly id="weapon_damage_3" name="weapon_3_damage">
-											</div>
-										</div>
-										<div class="form-group">
-											<label class="control-label col-md-7 col-xs-4" for="weapon_3_crit">Critical</label>
-											<div class="col-md-5 col-xs-8">
-												<input class="form-control" readonly id="weapon_crit_3" name="weapon_3_crit">
-											</div>
-										</div>
-										<div class="form-group">
-											<label class="control-label col-md-7 col-xs-4" for="weapon_3_range">Range</label>
-											<div class="col-md-5 col-xs-8">
-												<input class="form-control" readonly id="weapon_range_3" name="weapon_3_range">
-											</div>
-										</div>
-										<div class="form-group">
-											<label class="control-label col-md-7 col-xs-4" for="weapon_3_rof">R o F</label>
-											<div class="col-md-5 col-xs-8">
-												<input class="form-control" readonly id="weapon_rof_3" name="weapon_3_rof">
-											</div>
-										</div>
-									</div>
-								</div>
-
-							</div>
+				<!-- section: characteristics -->
+				<div class="section form-horizontal">
+					<div class="form-group">
+						<label class="control-label col-sm-2 col-xs-4" for="race">Race</label>
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+							<input class="form-control" type="text" name="race" value="<?php echo isset($user) ? htmlspecialchars($user['race']) : '' ?>">
+						</div>
+						<label class="control-label col-sm-2 col-xs-4" for="age">Age</label>
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+							<input class="form-control" type="text" name="age" id="age_text" value="<?php echo isset($user) ? htmlspecialchars($user['age']) : '' ?>">
+							<input class="form-control hidden-number" type="number" id="age">
+						</div>
+						<label class="control-label col-sm-2 col-xs-4" for="gender">Gender</label>
+						<div class="col-sm-2 col-xs-8">
+							<input class="form-control" type="text" name="gender" value="<?php echo isset($user) ? htmlspecialchars($user['gender']) : '' ?>">
 						</div>
 					</div>
-					<!-- end section: weapons -->
-
+					<div class="form-group">
+						<label class="control-label col-sm-2 col-xs-4" for="height">Height</label>
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+							<input class="form-control" type="text" name="height" id="height_text" value="<?php echo isset($user) ? htmlspecialchars($user['height']) : '' ?>">
+							<input class="form-control hidden-number" type="number" id="height">
+						</div>
+						<label class="control-label col-sm-2 col-xs-4" for="weight">Weight</label>
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+							<input class="form-control" type="text" name="weight" id="weight_text" value="<?php echo isset($user) ? htmlspecialchars($user['weight']) : '' ?>">
+							<input class="form-control hidden-number" type="number" id="weight">
+						</div>
+						<label class="control-label col-sm-2 col-xs-4" for="eyes">Eyes</label>
+						<div class="col-sm-2 col-xs-8">
+							<input class="form-control" type="text" name="eyes" value="<?php echo isset($user) ? htmlspecialchars($user['eyes']) : '' ?>">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-2 col-xs-4" for="hair">Hair</label>
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+							<input class="form-control" type="text" name="hair" value="<?php echo isset($user) ? htmlspecialchars($user['hair']) : '' ?>">
+						</div>
+						<label class="control-label col-sm-2 col-xs-4" for="other">Other</label>
+						<div class="col-sm-6 col-xs-8">
+							<input class="form-control" type="text" name="other" value="<?php echo isset($user) ? htmlspecialchars($user['other']) : '' ?>">
+						</div>
+					</div>
 				</div>
-				<div class="col-md-6">
-
-					<!-- section: defense -->
-					<div class="section form-horizontal">
-						<div class="section-title" id="section_defense">Defense</div>
-						<div class="form-group">
-							<label class="control-label col-sm-2 col-xs-4" for="toughness">Toughness</label>
-							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-								<?php
-									$toughness = isset($user) ? (
-										$user['strength'] >= 0 ?
-											floor($user['strength']/2) :
-											(ceil($user['strength']/3) == 0 ? 0 : ceil($user['strength']/3))
-									) : 0;
-								?>
-								<input class="form-control" readonly name="toughness" id="toughness" value="<?php echo $toughness ?>">
-							</div>
-							<label class="control-label col-sm-2 col-xs-4" for="defend">Defend</label>
-							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-								<?php
-									$defend = isset($user) ? 10 + $user['agility'] : 10;
-									// add size modifier
-									$size_modifier = 0;
-									if (isset($user)) {
-										$size_modifier = $user['size'] == "Small" ? 2 : ($user['size'] == "Large" ? -2 : 0);
-										$defend += $size_modifier;
-									}
-								?>
-								<input class="form-control" readonly name="defend" id="defend" value="<?php echo $defend ?>">
-							</div>
-							<label class="control-label col-sm-2 col-xs-4" for="dodge">Dodge</label>
-							<div class="col-sm-2 col-xs-8">
-								<?php
-									$dodge = isset($user) ? (
-										$user['agility'] >= 0 ?
-											floor($user['agility']/2) :
-											(ceil($user['agility']/3) == 0 ? 0 : ceil($user['agility']/3))
-									) : 0;
-									// add size modifier
-									$dodge += $size_modifier;
-								?>
-								<input class="form-control" readonly name="dodge" id="dodge" value="<?php echo $dodge ?>">
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="control-label col-sm-2 col-xs-4" for="fear">Fear</label>
-							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-								<input class="form-control" type="text" name="fear" id="fear_text" value="<?php echo isset($user) ? htmlspecialchars($user['fear']) : '' ?>">
-								<input class="form-control hidden-number" type="number" id="fear">
-							</div>
-							<label class="control-label col-sm-2 col-xs-4" for="poison">Poison</label>
-							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-								<input class="form-control" type="text" name="poison" id="poison_text" value="<?php echo isset($user) ? htmlspecialchars($user['poison']) : '' ?>">
-								<input class="form-control hidden-number" type="number" id="poison">
-							</div>
-							<label class="control-label col-sm-2 col-xs-4" for="disease">Disease</label>
-							<div class="col-sm-2 col-xs-8">
-								<input class="form-control" type="text" name="disease" id="disease_text" value="<?php echo isset($user) ? htmlspecialchars($user['disease']) : '' ?>">
-								<input class="form-control hidden-number" type="number" id="disease">
-							</div>
-						</div>
-					</div>
-					<!-- end section: defense -->
-
-					<!-- section: health -->
-					<div class="section form-horizontal">
-						<div class="section-title" id="section_health">Health</div>
-						<div class="form-group">
-
-							<div class="col-sm-4">
-								<div class="row">
-									<label class="control-label col-sm-12 center full-width" for="damage">Resilience</label>
-								</div>
-								<div class="row">
-									<div class="col-xs-5 no-pad">
-										<input class="form-control" id="damage" type="number" name="damage" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['damage']) : '' ?>">
-									</div>
-									<div class="col-xs-2 center no-pad">
-										/
-									</div>
-									<div class="col-xs-5 no-pad">
-										<?php 
-											$resilience = isset($user) ? (
-												$user['fortitude'] >= 0 ? 
-													3 + floor($user['fortitude']/2) :
-													3 + ceil($user['fortitude']/3)
-											) : 3;
-										?>
-										<input class="form-control" readonly id="resilience" name="resilience" value="<?php echo $resilience ?>">
-									</div>
-								</div>
-							</div>
-
-							<div class="col-sm-4">
-								<div class="row">
-									<label class="control-label col-sm-12 center full-width" for="wounds">Wounds</label>
-								</div>
-								<div class="row">
-									<div class="col-xs-5 no-pad">
-										<input class="form-control" id="wounds" type="number" name="wounds" min="0" max="3" value="<?php echo isset($user) ? htmlspecialchars($user['wounds']) : '' ?>">
-									</div>
-									<div class="col-xs-2 center no-pad">
-										/
-									</div>
-									<div class="col-xs-5 center no-pad">
-										3
-									</div>
-								</div>
-							</div>
-
-							<div class="col-sm-4">
-								<div class="row">
-									<label class="control-label col-sm-12 center full-width penalty" for="wound_penalty">Penalty</label>
-								</div>
-								<div class="row">
-									<div class="col-sm-12 no-pad">
-										<input class="form-control" type="text" name="wound_penalty" id="wound_penalty_text" value="<?php echo isset($user) ? htmlspecialchars($user['wound_penalty']) : '' ?>">
-										<input class="form-control hidden-number" type="number" id="wound_penalty">
-									</div>
-								</div>
-							</div>
-
-						</div>
-					</div>
-					<!-- end section: health -->
-					
-				</div>
+				<!-- end section: characteristics -->
+				
 			</div>
+		</div>
 
-			<div class="row">
-				<div class="col-md-6">
-
-					<!-- section: actions, move -->
-					<div class="section form-horizontal">
-						<div class="section-title" id="section_actions">Actions, Move, Initiative</div>
-						<div class="form-group">
-							<label class="control-label col-sm-2 col-xs-4" for="standard">Standard</label>
-							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-								<?php
-									$standard = isset($user) ? (
-										$user['speed'] >= 0 ?
-											2 + floor($user['speed']/4) :
-											2 + round($user['speed']/6)
-									) : 2;
-								?>
-								<input class="form-control" readonly name="standard" id="standard" value="<?php echo $standard ?>">
-							</div>
-							<label class="control-label col-sm-2 col-xs-4" for="quick">Quick</label>
-							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-								<?php
-									$quick = isset($user) ? (
-										$user['speed'] >= 0 ?
-											($user['speed']/2 % 2 == 0 ? 0 : 1) :
-											(ceil($user['speed']/3) % 2 == 0 ? 0 : 1)
-									) : 0;
-								?>
-								<input class="form-control" readonly name="quick" id="quick" value="<?php echo $quick ?>">
-							</div>
-							<label class="control-label col-sm-2 col-xs-4" for="free">Free</label>
-							<div class="col-sm-2 col-xs-8">
-								<input class="form-control" type="number" name="free" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['free']) : '' ?>">
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="control-label col-sm-2 col-xs-4" for="move">Move</label>
-							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-								<?php
-									$move = isset($user) ? ($user['size'] == "Small" ? 1 :
-										($user['size'] == "Large" ? 3 : 2)
-									) : 2;
-								?>
-								<input class="form-control" readonly name="move" id="move" value="<?php echo $move ?>">
-							</div>
-							<!-- TODO exception: the quick & the dead: can use speed/2 instead  -->
-							<label class="control-label col-sm-2 col-xs-4" for="initiative">Initiative</label>
-							<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-								<?php
-									$initiative = isset($user) ? (
-										$user['awareness'] >= 0 ?
-											10 - floor($user['awareness']/2) :
-											10 - ceil($user['awareness']/3)
-									) : 10;
-								?>
-								<input class="form-control" readonly name="initiative" id="initiative" value="<?php echo $initiative ?>">
-							</div>
-							<label class="control-label col-sm-2 col-xs-4 penalty" for="move_penalty">Penalty</label>
-							<div class="col-sm-2 col-xs-8">
-								<input class="form-control" type="text" name="move_penalty" id="move_penalty_text" value="<?php echo isset($user) ? htmlspecialchars($user['move_penalty']) : '' ?>">
-								<input class="form-control hidden-number" type="number" id="move_penalty">
-							</div>
-						</div>
-					</div>
-					<!-- end section: actions, move -->
-
-					<!-- section: attributes -->
-					<div class="section form-horizontal">
-						<div class="section-title" id="section_attributes">Attributes</div>
-
-						<div class="form-group">
-							<div class="col-sm-6 attribute-col" id="col_strength">
-								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="strength"><span class="attribute-name">Strength</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_strength" onclick="toggleHidden('col_strength')"></label>
-									<div class="col-md-5 col-xs-4">
-										<label class="control-label">
-											<span class="attribute-val" id="strength_text"></span>
-											<input type="hidden" name="strength" id="strength_val" value="<?php echo isset($user) ? $user['strength'] : '' ?>">
-											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('strength', 1)"></span>
-											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('strength', -1)"></span>
-										</label>
-									</div>
-								</div>
-								<div class="row training">
-									<div class="col-md-12">
-										<div class="row">
-											<div id="Strength"></div>
-										</div>
-										<div class="row">
-											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Strength')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<div class="col-sm-6 attribute-col" id="col_fortitude">
-								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="fortitude"><span class="attribute-name">Fortitude</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_fortitude" onclick="toggleHidden('col_fortitude')"></label>
-									<div class="col-md-5 col-xs-4">
-										<label class="control-label">
-											<span class="attribute-val" id="fortitude_text"></span>
-											<input type="hidden" name="fortitude" id="fortitude_val" value="<?php echo isset($user) ? $user['fortitude'] : '' ?>">
-											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('fortitude', 1)"></span>
-											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('fortitude', -1)"></span>
-										</label>
-									</div>
-								</div>
-								<div class="row training">
-									<div class="col-md-12">
-										<div class="row">
-											<div id="Fortitude"></div>
-										</div>
-										<div class="row">
-											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Fortitude')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div class="form-group">
-							<div class="col-sm-6 attribute-col" id="col_speed">
-								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="speed"><span class="attribute-name">Speed</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_speed" onclick="toggleHidden('col_speed')"></label>
-									<div class="col-md-5 col-xs-4">
-										<label class="control-label">
-											<span class="attribute-val" id="speed_text"></span>
-											<input type="hidden" name="speed" id="speed_val" value="<?php echo isset($user) ? $user['speed'] : '' ?>">
-											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('speed', 1)"></span>
-											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('speed', -1)"></span>
-										</label>
-									</div>
-								</div>
-								<div class="row training">
-									<div class="col-md-12">
-										<div class="row">
-											<div id="Speed"></div>
-										</div>
-										<div class="row">
-											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Speed')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<div class="col-sm-6 attribute-col" id="col_agility">
-								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="agility"><span class="attribute-name">Agility</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_agility" onclick="toggleHidden('col_agility')"></label>
-									<div class="col-md-5 col-xs-4">
-										<label class="control-label">
-											<span class="attribute-val" id="agility_text"></span>
-											<input type="hidden" name="agility" id="agility_val" value="<?php echo isset($user) ? $user['agility'] : '' ?>">
-											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('agility', 1)"></span>
-											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('agility', -1)"></span>
-										</label>
-									</div>
-								</div>
-								<div class="row training">
-									<div class="col-md-12">
-										<div class="row">
-											<div id="Agility"></div>
-										</div>
-										<div class="row">
-											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Agility')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div class="form-group">
-							<div class="col-sm-6 attribute-col" id="col_precision">
-								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="precision_"><span class="attribute-name">Precision</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_precision" onclick="toggleHidden('col_precision')"></label>
-									<div class="col-md-5 col-xs-4">
-										<label class="control-label">
-											<span class="attribute-val" id="precision__text"></span>
-											<input type="hidden" name="precision_" id="precision__val" value="<?php echo isset($user) ? $user['precision_'] : '' ?>">
-											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('precision_', 1)"></span>
-											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('precision_', -1)"></span>
-										</label>
-									</div>
-								</div>
-								<div class="row training">
-									<div class="col-md-12">
-										<div class="row">
-											<div id="Precision"></div>
-										</div>
-										<div class="row">
-											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Precision')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<div class="col-sm-6 attribute-col" id="col_awareness">
-								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="awareness"><span class="attribute-name">Awareness</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_awareness" onclick="toggleHidden('col_awareness')"></label>
-									<div class="col-md-5 col-xs-4">
-										<label class="control-label">
-											<span class="attribute-val" id="awareness_text"></span>
-											<input type="hidden" name="awareness" id="awareness_val" value="<?php echo isset($user) ? $user['awareness'] : '' ?>">
-											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('awareness', 1)"></span>
-											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('awareness', -1)"></span>
-										</label>
-									</div>
-								</div>
-								<div class="row training">
-									<div class="col-md-12">
-										<div class="row">
-											<div id="Awareness"></div>
-										</div>
-										<div class="row">
-											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Awareness')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div class="form-group">
-							<div class="col-sm-6 attribute-col" id="col_allure">
-								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="allure"><span class="attribute-name">Allure</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_allure" onclick="toggleHidden('col_allure')"></label>
-									<div class="col-md-5 col-xs-4">
-										<label class="control-label">
-											<span class="attribute-val" id="allure_text"></span>
-											<input type="hidden" name="allure" id="allure_val" value="<?php echo isset($user) ? $user['allure'] : '' ?>">
-											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('allure', 1)"></span>
-											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('allure', -1)"></span>
-										</label>
-									</div>
-								</div>
-								<div class="row training">
-									<div class="col-md-12">
-										<div class="row">
-											<div id="Allure"></div>
-										</div>
-										<div class="row">
-											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Allure')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<div class="col-sm-6 attribute-col" id="col_deception">
-								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="deception"><span class="attribute-name">Deception</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_deception" onclick="toggleHidden('col_deception')"></label>
-									<div class="col-md-5 col-xs-4">
-										<label class="control-label">
-											<span class="attribute-val" id="deception_text"></span>
-											<input type="hidden" name="deception" id="deception_val" value="<?php echo isset($user) ? $user['deception'] : '' ?>">
-											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('deception', 1)"></span>
-											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('deception', -1)"></span>
-										</label>
-									</div>
-								</div>
-								<div class="row training">
-									<div class="col-md-12">
-										<div class="row">
-											<div id="Deception"></div>
-										</div>
-										<div class="row">
-											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Deception')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div class="form-group">
-							<div class="col-sm-6 attribute-col" id="col_intellect">
-								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="intellect"><span class="attribute-name">Intellect</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_intellect" onclick="toggleHidden('col_intellect')"></label>
-									<div class="col-md-5 col-xs-4">
-										<label class="control-label">
-											<span class="attribute-val" id="intellect_text"></span>
-											<input type="hidden" name="intellect" id="intellect_val" value="<?php echo isset($user) ? $user['intellect'] : '' ?>">
-											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('intellect', 1)"></span>
-											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('intellect', -1)"></span>
-										</label>
-									</div>
-								</div>
-								<div class="row training">
-									<div class="col-md-12">
-										<div class="row">
-											<div id="Intellect"></div>
-										</div>
-										<div class="row">
-											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Intellect')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<div class="col-sm-6 attribute-col" id="col_innovation">
-								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="innovation"><span class="attribute-name">Innovation</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_innovation" onclick="toggleHidden('col_innovation')"></label>
-									<div class="col-md-5 col-xs-4">
-										<label class="control-label">
-											<span class="attribute-val" id="innovation_text"></span>
-											<input type="hidden" name="innovation" id="innovation_val" value="<?php echo isset($user) ? $user['innovation'] : '' ?>">
-											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('innovation', 1)"></span>
-											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('innovation', -1)"></span>
-										</label>
-									</div>
-								</div>
-								<div class="row training">
-									<div class="col-md-12">
-										<div class="row">
-											<div id="Innovation"></div>
-										</div>
-										<div class="row">
-											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Innovation')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div class="form-group">
-							<div class="col-sm-6 attribute-col" id="col_intuition">
-								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="intuition"><span class="attribute-name">Intution</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_intuition" onclick="toggleHidden('col_intuition')"></label>
-									<div class="col-md-5 col-xs-4">
-										<label class="control-label">
-											<span class="attribute-val" id="intuition_text"></span>
-											<input type="hidden" name="intuition" id="intuition_val" value="<?php echo isset($user) ? $user['intuition'] : '' ?>">
-											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('intuition', 1)"></span>
-											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('intuition', -1)"></span>
-										</label>
-									</div>
-								</div>
-								<div class="row training">
-									<div class="col-md-12">
-										<div class="row">
-											<div id="Intution"></div>
-										</div>
-										<div class="row">
-											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Intution')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<div class="col-sm-6 attribute-col" id="col_vitality">
-								<div class="row">
-									<label class="control-label col-md-7 col-xs-8" for="vitality"><span class="attribute-name">Vitality</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_vitality" onclick="toggleHidden('col_vitality')"></label>
-									<div class="col-md-5 col-xs-4">
-										<label class="control-label">
-											<span class="attribute-val" id="vitality_text"></span>
-											<input type="hidden" name="vitality" id="vitality_val" value="<?php echo isset($user) ? $user['vitality'] : '' ?>">
-											<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('vitality', 1)"></span>
-											<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('vitality', -1)"></span>
-										</label>
-									</div>
-								</div>
-								<div class="row training">
-									<div class="col-md-12">
-										<div class="row">
-											<div id="Vitality"></div>
-										</div>
-										<div class="row">
-											<div class="col-md-12 button-bar">
-												<button type="button" class="btn btn-default" onclick="newTrainingModal('Vitality')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- end section: attributes -->
-
-				</div>
-				<div class="col-md-6">
-
-					<!-- section: motivators -->
-					<div class="section form-horizontal">
-						<div class="section-title" id="section_motivators">
-							<span class="motivator-title">Motivators</span>
-							<div class="form-group motivator-bonus">
-								<label for="bonuses">Bonuses:</label>
-								<?php
-									// get two highest motivator values
-									$motivators = [];
-									array_push($motivators, $user['motivator_1'] == '' ? 0 : $user['motivator_1_pts']);
-									array_push($motivators, $user['motivator_2'] == '' ? 0 : $user['motivator_2_pts']);
-									array_push($motivators, $user['motivator_3'] == '' ? 0 : $user['motivator_3_pts']);
-									array_push($motivators, $user['motivator_4'] == '' ? 0 : $user['motivator_4_pts']);
-									arsort($motivators);
-									$total_pts = intval($motivators[0]) + intval($motivators[1]);
-									$bonuses = $total_pts >= 64 ? 5 : ($total_pts >= 32 ? 4 : ($total_pts >= 16 ? 3 : ($total_pts >= 8 ? 2 : ($total_pts >= 4 ? 1 : 0))));
-								?>
-								<input class="form-control" readonly name="bonuses" id="bonuses" value="<?php echo $bonuses ?>">
-							</div>
-						</div>
-
-						<div class="form-group no-margin">
-							<div class="col-xs-3 no-pad-mobile no-pad-left">
-								<input class="form-control" type="text" name="motivator_1" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_1']) : '' ?>">
-							</div>
-							<label class="control-label col-xs-2 no-pad-mobile" for="motivator_1_pts">Points:</label>
-							<div class="col-xs-1 no-pad">
-								<input class="form-control motivator-pts" type="number" name="motivator_1_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_1_pts']) : '' ?>">
-							</div>
-
-							<div class="col-xs-3 no-pad-mobile pad-left-mobile">
-								<input class="form-control" type="text" name="motivator_2" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_2']) : '' ?>">
-							</div>
-							<label class="control-label col-xs-2 no-pad-mobile" for="motivator_2_pts">Points:</label>
-							<div class="col-xs-1 no-pad">
-								<input class="form-control motivator-pts" type="number" name="motivator_2_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_2_pts']) : '' ?>">
-							</div>
-						</div>
-
-						<div class="form-group no-margin">
-							<div class="col-xs-3 no-pad-mobile no-pad-left">
-								<input class="form-control" type="text" name="motivator_3" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_3']) : '' ?>">
-							</div>
-							<label class="control-label col-xs-2 no-pad-mobile" for="motivator_3_pts">Points:</label>
-							<div class="col-xs-1 no-pad">
-								<input class="form-control motivator-pts" type="number" name="motivator_3_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_3_pts']) : '' ?>">
-							</div>
-
-							<div class="col-xs-3 no-pad-mobile pad-left-mobile">
-								<input class="form-control" type="text" name="motivator_4" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_4']) : '' ?>">
-							</div>
-							<label class="control-label col-xs-2 no-pad-mobile" for="motivator_4_pts">Points:</label>
-							<div class="col-xs-1 no-pad">
-								<input class="form-control motivator-pts" type="number" name="motivator_4_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_4_pts']) : '' ?>">
-							</div>
-						</div>
-
-					</div>
-					<!-- end section: motivators -->
-
-					<!-- section: feats & traits -->
-					<div class="section form-horizontal">
-						<div class="section-title" id="section_feats">Feats & Traits</div>
-						<div class="form-group">
-							<div class="col-sm-12">
-								<div id="feats">
-									<div class="feat" id="size">
-										<p class="feat-title">Size : </p>
-							    	<?php
-							    		$size = isset($user['size']) ? $user['size'] : 'Medium';
-							    	?>
-										<p id="character_size_text"><?php echo $size ?></p>
-										<input type="hidden" name="size" id="character_size_val" value="<?php echo $size ?>">
-										<span class="glyphicon glyphicon-edit hover-hide" data-toggle="modal" data-target="#edit_size_modal"></span>
-									</div>
-								</div>
-							</div>
-						</div>
-						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" data-toggle="modal" data-target="#new_feat_modal"></span></button>
-					</div>
-					<!-- end section: feats & traits -->
-					
-				</div>
+		<div class="row">
+			<div class="col-md-6">
 
 				<!-- section: weapons -->
-				<div class="col-md-12">
-					<div class="section form-horizontal">
-						<div class="section-title" id="section_items">Weapons</div>
-						<div class="form-group">
-							<label class="control-label col-xs-3 resize-mobile center" for="weapons[]">Item</label>
-							<label class="control-label col-xs-1 resize-mobile center" for="weapon_qty[]">Qty</label>
-							<label class="control-label col-xs-1 resize-mobile center" for="weapon_damage[]">Damage</label>
-							<label class="control-label col-xs-5 resize-mobile center" for="weapon_notes[]">Notes</label>
-							<label class="control-label col-xs-1 resize-mobile center" for="weapon_weight[]">Weight</label>
-							<label class="control-label col-xs-1 resize-mobile center" for=""></label>
+				<div class="section form-horizontal">
+					<div class="form-group">
+						<div class="section-title" id="section_attack">Attack</div>
+						<div class="row">
+
+							<div class="col-sm-4">
+								<div class="form-group">
+									<label class="control-label col-md-12 center full-width" for="weapon_1">Weapon 1<span class="glyphicon glyphicon-chevron-down" id="weapon_1" onclick="toggleWeapon('weapon_1', this)"></span></label>
+									<div class="col-md-12">
+										<select class="form-control weapon-select" id="weapon_select_1" name="weapon_1" onchange="selectWeapon(1)">
+											<option></option>
+											<?php 
+												foreach ($weapons as $weapon) {
+													echo '<option value="'.$weapon['name'].'" '.($user['weapon_1'] == $weapon['name'] ? 'selected' : '').'>'.$weapon['name'].'</option>';
+												}
+											?>
+										</select>
+									</div>
+								</div>
+								<div id="weapon_1_container" class="weapon-container">
+									<div class="form-group">
+										<label class="control-label col-md-7 col-xs-4" for="weapon_1_damage">Damage</label>
+										<div class="col-md-5 col-xs-8">
+											<input class="form-control" readonly id="weapon_damage_1" name="weapon_1_damage">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-md-7 col-xs-4" for="weapon_1_crit">Critical</label>
+										<div class="col-md-5 col-xs-8">
+											<input class="form-control" readonly id="weapon_crit_1" name="weapon_1_crit">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-md-7 col-xs-4" for="weapon_1_range">Range</label>
+										<div class="col-md-5 col-xs-8">
+											<input class="form-control" readonly id="weapon_range_1" name="weapon_1_range">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-md-7 col-xs-4" for="weapon_1_rof">R o F</label>
+										<div class="col-md-5 col-xs-8">
+											<input class="form-control" readonly id="weapon_rof_1" name="weapon_1_rof">
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-sm-4">
+								<div class="form-group">
+									<label class="control-label col-md-12 center full-width" for="weapon_2">Weapon 2<span class="glyphicon glyphicon-chevron-down" id="weapon_2" onclick="toggleWeapon('weapon_2', this)"></span></label>
+									<div class="col-md-12">
+										<select class="form-control weapon-select" id="weapon_select_2" name="weapon_2" onchange="selectWeapon(2)">
+											<option></option>
+											<?php 
+												foreach ($weapons as $weapon) {
+													echo '<option value="'.$weapon['name'].'" '.($user['weapon_2'] == $weapon['name'] ? 'selected' : '').'>'.$weapon['name'].'</option>';
+												}
+											?>
+										</select>
+									</div>
+								</div>
+								<div id="weapon_2_container" class="weapon-container">
+									<div class="form-group">
+										<label class="control-label col-md-7 col-xs-4" for="weapon_2_damage">Damage</label>
+										<div class="col-md-5 col-xs-8">
+											<input class="form-control" readonly id="weapon_damage_2" name="weapon_2_damage">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-md-7 col-xs-4" for="weapon_2_crit">Critical</label>
+										<div class="col-md-5 col-xs-8">
+											<input class="form-control" readonly id="weapon_crit_2" name="weapon_2_crit">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-md-7 col-xs-4" for="weapon_2_range">Range</label>
+										<div class="col-md-5 col-xs-8">
+											<input class="form-control" readonly id="weapon_range_2" name="weapon_2_range">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-md-7 col-xs-4" for="weapon_2_rof">R o F</label>
+										<div class="col-md-5 col-xs-8">
+											<input class="form-control" readonly id="weapon_rof_2" name="weapon_2_rof">
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-sm-4">
+								<div class="form-group">
+									<label class="control-label col-md-12 center full-width" for="weapon_3">Weapon 3<span class="glyphicon glyphicon-chevron-down" id="weapon_3" onclick="toggleWeapon('weapon_3', this)"></span></label>
+									<div class="col-md-12">
+										<select class="form-control weapon-select" id="weapon_select_3" name="weapon_3" onchange="selectWeapon(3)">
+											<option></option>
+											<?php 
+												foreach ($weapons as $weapon) {
+													echo '<option value="'.$weapon['name'].'" '.($user['weapon_3'] == $weapon['name'] ? 'selected' : '').'>'.$weapon['name'].'</option>';
+												}
+											?>
+										</select>
+									</div>
+								</div>
+								<div id="weapon_3_container" class="weapon-container">
+									<div class="form-group">
+										<label class="control-label col-md-7 col-xs-4" for="weapon_3_damage">Damage</label>
+										<div class="col-md-5 col-xs-8">
+											<input class="form-control" readonly id="weapon_damage_3" name="weapon_3_damage">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-md-7 col-xs-4" for="weapon_3_crit">Critical</label>
+										<div class="col-md-5 col-xs-8">
+											<input class="form-control" readonly id="weapon_crit_3" name="weapon_3_crit">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-md-7 col-xs-4" for="weapon_3_range">Range</label>
+										<div class="col-md-5 col-xs-8">
+											<input class="form-control" readonly id="weapon_range_3" name="weapon_3_range">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-md-7 col-xs-4" for="weapon_3_rof">R o F</label>
+										<div class="col-md-5 col-xs-8">
+											<input class="form-control" readonly id="weapon_rof_3" name="weapon_3_rof">
+										</div>
+									</div>
+								</div>
+							</div>
+
 						</div>
-						<div id="weapons"></div>
-						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" data-toggle="modal" data-target="#new_weapon_modal"></span></button>
 					</div>
 				</div>
 				<!-- end section: weapons -->
 
-				<!-- section: protection -->
-				<div class="col-md-12">
-					<div class="section form-horizontal">
-						<!-- TODO add option to equip protection -->
-						<div class="section-title">Protection</div>
-						<div class="form-group">
-							<label class="control-label col-xs-3 resize-mobile center" for="protections[]">Item</label>
-							<label class="control-label col-xs-2 resize-mobile center" for="protection_bonus[]">Bonus</label>
-							<label class="control-label col-xs-5 resize-mobile center" for="protection_notes[]">Notes</label>
-							<label class="control-label col-xs-1 resize-mobile center" for="protection_weight[]">Weight</label>
-							<label class="control-label col-xs-1 resize-mobile center" for=""></label>
+			</div>
+			<div class="col-md-6">
+
+				<!-- section: defense -->
+				<div class="section form-horizontal">
+					<div class="section-title" id="section_defense">Defense</div>
+					<div class="form-group">
+						<label class="control-label col-sm-2 col-xs-4" for="toughness">Toughness</label>
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+							<?php
+								$toughness = isset($user) ? (
+									$user['strength'] >= 0 ?
+										floor($user['strength']/2) :
+										(ceil($user['strength']/3) == 0 ? 0 : ceil($user['strength']/3))
+								) : 0;
+							?>
+							<input class="form-control" readonly name="toughness" id="toughness" value="<?php echo $toughness ?>">
 						</div>
-						<div id="protections"></div>
-						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" data-toggle="modal" data-target="#new_protection_modal"></span></button>
+						<label class="control-label col-sm-2 col-xs-4" for="defend">Defend</label>
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+							<?php
+								$defend = isset($user) ? 10 + $user['agility'] : 10;
+								// add size modifier
+								$size_modifier = 0;
+								if (isset($user)) {
+									$size_modifier = $user['size'] == "Small" ? 2 : ($user['size'] == "Large" ? -2 : 0);
+									$defend += $size_modifier;
+								}
+							?>
+							<input class="form-control" readonly name="defend" id="defend" value="<?php echo $defend ?>">
+						</div>
+						<label class="control-label col-sm-2 col-xs-4" for="dodge">Dodge</label>
+						<div class="col-sm-2 col-xs-8">
+							<?php
+								$dodge = isset($user) ? (
+									$user['agility'] >= 0 ?
+										floor($user['agility']/2) :
+										(ceil($user['agility']/3) == 0 ? 0 : ceil($user['agility']/3))
+								) : 0;
+								// add size modifier
+								$dodge += $size_modifier;
+							?>
+							<input class="form-control" readonly name="dodge" id="dodge" value="<?php echo $dodge ?>">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-2 col-xs-4" for="fear">Fear</label>
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+							<input class="form-control" type="text" name="fear" id="fear_text" value="<?php echo isset($user) ? htmlspecialchars($user['fear']) : '' ?>">
+							<input class="form-control hidden-number" type="number" id="fear">
+						</div>
+						<label class="control-label col-sm-2 col-xs-4" for="poison">Poison</label>
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+							<input class="form-control" type="text" name="poison" id="poison_text" value="<?php echo isset($user) ? htmlspecialchars($user['poison']) : '' ?>">
+							<input class="form-control hidden-number" type="number" id="poison">
+						</div>
+						<label class="control-label col-sm-2 col-xs-4" for="disease">Disease</label>
+						<div class="col-sm-2 col-xs-8">
+							<input class="form-control" type="text" name="disease" id="disease_text" value="<?php echo isset($user) ? htmlspecialchars($user['disease']) : '' ?>">
+							<input class="form-control hidden-number" type="number" id="disease">
+						</div>
 					</div>
 				</div>
-				<!-- end section: protection -->
+				<!-- end section: defense -->
 
-				<!-- section: healing -->
-				<div class="col-md-12">
-					<div class="section form-horizontal">
-						<div class="section-title">Healing, Potions, & Drugs</div>
-						<div class="form-group">
-							<label class="control-label col-xs-3 resize-mobile center" for="healings[]">Item</label>
-							<label class="control-label col-xs-2 resize-mobile center" for="healing_quantity[]">Qty</label>
-							<label class="control-label col-xs-5 resize-mobile center" for="healing_effect[]">Effect</label>
-							<label class="control-label col-xs-1 resize-mobile center" for="healing_weight[]">Weight</label>
-							<label class="control-label col-xs-1 resize-mobile center" for=""></label>
+				<!-- section: health -->
+				<div class="section form-horizontal">
+					<div class="section-title" id="section_health">Health</div>
+					<div class="form-group">
+
+						<div class="col-sm-4">
+							<div class="row">
+								<label class="control-label col-sm-12 center full-width" for="damage">Resilience</label>
+							</div>
+							<div class="row">
+								<div class="col-xs-5 no-pad">
+									<input class="form-control" id="damage" type="number" name="damage" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['damage']) : '' ?>">
+								</div>
+								<div class="col-xs-2 center no-pad">
+									/
+								</div>
+								<div class="col-xs-5 no-pad">
+									<?php 
+										$resilience = isset($user) ? (
+											$user['fortitude'] >= 0 ? 
+												3 + floor($user['fortitude']/2) :
+												3 + ceil($user['fortitude']/3)
+										) : 3;
+									?>
+									<input class="form-control" readonly id="resilience" name="resilience" value="<?php echo $resilience ?>">
+								</div>
+							</div>
 						</div>
-						<div id="healings"></div>
-						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" data-toggle="modal" data-target="#new_healing_modal"></span></button>
+
+						<div class="col-sm-4">
+							<div class="row">
+								<label class="control-label col-sm-12 center full-width" for="wounds">Wounds</label>
+							</div>
+							<div class="row">
+								<div class="col-xs-5 no-pad">
+									<input class="form-control" id="wounds" type="number" name="wounds" min="0" max="3" value="<?php echo isset($user) ? htmlspecialchars($user['wounds']) : '' ?>">
+								</div>
+								<div class="col-xs-2 center no-pad">
+									/
+								</div>
+								<div class="col-xs-5 center no-pad">
+									3
+								</div>
+							</div>
+						</div>
+
+						<div class="col-sm-4">
+							<div class="row">
+								<label class="control-label col-sm-12 center full-width penalty" for="wound_penalty">Penalty</label>
+							</div>
+							<div class="row">
+								<div class="col-sm-12 no-pad">
+									<input class="form-control" type="text" name="wound_penalty" id="wound_penalty_text" value="<?php echo isset($user) ? htmlspecialchars($user['wound_penalty']) : '' ?>">
+									<input class="form-control hidden-number" type="number" id="wound_penalty">
+								</div>
+							</div>
+						</div>
+
 					</div>
 				</div>
-				<!-- end section: healing -->
+				<!-- end section: health -->
+				
+			</div>
+		</div>
 
-				<!-- section: misc -->
-				<div class="col-md-12">
-					<div class="section form-horizontal">
-						<div class="section-title">Miscellaneous & Special Items</div>
-						<div class="form-group">
-							<label class="control-label col-xs-3 resize-mobile center" for="misc[]">Item</label>
-							<label class="control-label col-xs-2 resize-mobile center" for="misc_quantity[]">Qty</label>
-							<label class="control-label col-xs-5 resize-mobile center" for="misc_notes[]">Notes</label>
-							<label class="control-label col-xs-1 resize-mobile center" for="misc_weight[]">Weight</label>
-							<label class="control-label col-xs-1 resize-mobile center" for=""></label>
+		<div class="row">
+			<div class="col-md-6">
+
+				<!-- section: actions, move -->
+				<div class="section form-horizontal">
+					<div class="section-title" id="section_actions">Actions, Move, Initiative</div>
+					<div class="form-group">
+						<label class="control-label col-sm-2 col-xs-4" for="standard">Standard</label>
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+							<?php
+								$standard = isset($user) ? (
+									$user['speed'] >= 0 ?
+										2 + floor($user['speed']/4) :
+										2 + round($user['speed']/6)
+								) : 2;
+							?>
+							<input class="form-control" readonly name="standard" id="standard" value="<?php echo $standard ?>">
 						</div>
-						<div id="misc"></div>
-						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" data-toggle="modal" data-target="#new_misc_modal"></span></button>
+						<label class="control-label col-sm-2 col-xs-4" for="quick">Quick</label>
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+							<?php
+								$quick = isset($user) ? (
+									$user['speed'] >= 0 ?
+										($user['speed']/2 % 2 == 0 ? 0 : 1) :
+										(ceil($user['speed']/3) % 2 == 0 ? 0 : 1)
+								) : 0;
+							?>
+							<input class="form-control" readonly name="quick" id="quick" value="<?php echo $quick ?>">
+						</div>
+						<label class="control-label col-sm-2 col-xs-4" for="free">Free</label>
+						<div class="col-sm-2 col-xs-8">
+							<input class="form-control" type="number" name="free" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['free']) : '' ?>">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-2 col-xs-4" for="move">Move</label>
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+							<?php
+								$move = isset($user) ? ($user['size'] == "Small" ? 1 :
+									($user['size'] == "Large" ? 3 : 2)
+								) : 2;
+							?>
+							<input class="form-control" readonly name="move" id="move" value="<?php echo $move ?>">
+						</div>
+						<!-- TODO exception: the quick & the dead: can use speed/2 instead  -->
+						<label class="control-label col-sm-2 col-xs-4" for="initiative">Initiative</label>
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+							<?php
+								$initiative = isset($user) ? (
+									$user['awareness'] >= 0 ?
+										10 - floor($user['awareness']/2) :
+										10 - ceil($user['awareness']/3)
+								) : 10;
+							?>
+							<input class="form-control" readonly name="initiative" id="initiative" value="<?php echo $initiative ?>">
+						</div>
+						<label class="control-label col-sm-2 col-xs-4 penalty" for="move_penalty">Penalty</label>
+						<div class="col-sm-2 col-xs-8">
+							<input class="form-control" type="text" name="move_penalty" id="move_penalty_text" value="<?php echo isset($user) ? htmlspecialchars($user['move_penalty']) : '' ?>">
+							<input class="form-control hidden-number" type="number" id="move_penalty">
+						</div>
 					</div>
 				</div>
-				<!-- end section: misc -->
+				<!-- end section: actions, move -->
 
-				<!-- section: weight -->
-				<div class="col-md-12">
-					<div class="section form-horizontal">
-						<div class="form-group">
-							<label class="control-label col-xs-10 align-right" for="total_weight">Total Weight</label>
-							<div class="col-xs-2">
-								<input class="form-control" readonly id="total_weight" value="0">
+				<!-- section: attributes -->
+				<div class="section form-horizontal">
+					<div class="section-title" id="section_attributes">Attributes</div>
+
+					<div class="form-group">
+						<div class="col-sm-6 attribute-col" id="col_strength">
+							<div class="row">
+								<label class="control-label col-md-7 col-xs-8" for="strength"><span class="attribute-name">Strength</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_strength" onclick="toggleHidden('col_strength')"></label>
+								<div class="col-md-5 col-xs-4">
+									<label class="control-label">
+										<span class="attribute-val" id="strength_text"></span>
+										<input type="hidden" name="strength" id="strength_val" value="<?php echo isset($user) ? $user['strength'] : '' ?>">
+										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('strength', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('strength', -1)"></span>
+									</label>
+								</div>
+							</div>
+							<div class="row training">
+								<div class="col-md-12">
+									<div class="row">
+										<div id="Strength"></div>
+									</div>
+									<div class="row">
+										<div class="col-md-12 button-bar">
+											<button type="button" class="btn btn-default" onclick="newTrainingModal('Strength')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-sm-6 attribute-col" id="col_fortitude">
+							<div class="row">
+								<label class="control-label col-md-7 col-xs-8" for="fortitude"><span class="attribute-name">Fortitude</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_fortitude" onclick="toggleHidden('col_fortitude')"></label>
+								<div class="col-md-5 col-xs-4">
+									<label class="control-label">
+										<span class="attribute-val" id="fortitude_text"></span>
+										<input type="hidden" name="fortitude" id="fortitude_val" value="<?php echo isset($user) ? $user['fortitude'] : '' ?>">
+										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('fortitude', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('fortitude', -1)"></span>
+									</label>
+								</div>
+							</div>
+							<div class="row training">
+								<div class="col-md-12">
+									<div class="row">
+										<div id="Fortitude"></div>
+									</div>
+									<div class="row">
+										<div class="col-md-12 button-bar">
+											<button type="button" class="btn btn-default" onclick="newTrainingModal('Fortitude')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="col-sm-6 attribute-col" id="col_speed">
+							<div class="row">
+								<label class="control-label col-md-7 col-xs-8" for="speed"><span class="attribute-name">Speed</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_speed" onclick="toggleHidden('col_speed')"></label>
+								<div class="col-md-5 col-xs-4">
+									<label class="control-label">
+										<span class="attribute-val" id="speed_text"></span>
+										<input type="hidden" name="speed" id="speed_val" value="<?php echo isset($user) ? $user['speed'] : '' ?>">
+										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('speed', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('speed', -1)"></span>
+									</label>
+								</div>
+							</div>
+							<div class="row training">
+								<div class="col-md-12">
+									<div class="row">
+										<div id="Speed"></div>
+									</div>
+									<div class="row">
+										<div class="col-md-12 button-bar">
+											<button type="button" class="btn btn-default" onclick="newTrainingModal('Speed')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-sm-6 attribute-col" id="col_agility">
+							<div class="row">
+								<label class="control-label col-md-7 col-xs-8" for="agility"><span class="attribute-name">Agility</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_agility" onclick="toggleHidden('col_agility')"></label>
+								<div class="col-md-5 col-xs-4">
+									<label class="control-label">
+										<span class="attribute-val" id="agility_text"></span>
+										<input type="hidden" name="agility" id="agility_val" value="<?php echo isset($user) ? $user['agility'] : '' ?>">
+										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('agility', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('agility', -1)"></span>
+									</label>
+								</div>
+							</div>
+							<div class="row training">
+								<div class="col-md-12">
+									<div class="row">
+										<div id="Agility"></div>
+									</div>
+									<div class="row">
+										<div class="col-md-12 button-bar">
+											<button type="button" class="btn btn-default" onclick="newTrainingModal('Agility')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="col-sm-6 attribute-col" id="col_precision">
+							<div class="row">
+								<label class="control-label col-md-7 col-xs-8" for="precision_"><span class="attribute-name">Precision</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_precision" onclick="toggleHidden('col_precision')"></label>
+								<div class="col-md-5 col-xs-4">
+									<label class="control-label">
+										<span class="attribute-val" id="precision__text"></span>
+										<input type="hidden" name="precision_" id="precision__val" value="<?php echo isset($user) ? $user['precision_'] : '' ?>">
+										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('precision_', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('precision_', -1)"></span>
+									</label>
+								</div>
+							</div>
+							<div class="row training">
+								<div class="col-md-12">
+									<div class="row">
+										<div id="Precision"></div>
+									</div>
+									<div class="row">
+										<div class="col-md-12 button-bar">
+											<button type="button" class="btn btn-default" onclick="newTrainingModal('Precision')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-sm-6 attribute-col" id="col_awareness">
+							<div class="row">
+								<label class="control-label col-md-7 col-xs-8" for="awareness"><span class="attribute-name">Awareness</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_awareness" onclick="toggleHidden('col_awareness')"></label>
+								<div class="col-md-5 col-xs-4">
+									<label class="control-label">
+										<span class="attribute-val" id="awareness_text"></span>
+										<input type="hidden" name="awareness" id="awareness_val" value="<?php echo isset($user) ? $user['awareness'] : '' ?>">
+										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('awareness', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('awareness', -1)"></span>
+									</label>
+								</div>
+							</div>
+							<div class="row training">
+								<div class="col-md-12">
+									<div class="row">
+										<div id="Awareness"></div>
+									</div>
+									<div class="row">
+										<div class="col-md-12 button-bar">
+											<button type="button" class="btn btn-default" onclick="newTrainingModal('Awareness')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="col-sm-6 attribute-col" id="col_allure">
+							<div class="row">
+								<label class="control-label col-md-7 col-xs-8" for="allure"><span class="attribute-name">Allure</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_allure" onclick="toggleHidden('col_allure')"></label>
+								<div class="col-md-5 col-xs-4">
+									<label class="control-label">
+										<span class="attribute-val" id="allure_text"></span>
+										<input type="hidden" name="allure" id="allure_val" value="<?php echo isset($user) ? $user['allure'] : '' ?>">
+										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('allure', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('allure', -1)"></span>
+									</label>
+								</div>
+							</div>
+							<div class="row training">
+								<div class="col-md-12">
+									<div class="row">
+										<div id="Allure"></div>
+									</div>
+									<div class="row">
+										<div class="col-md-12 button-bar">
+											<button type="button" class="btn btn-default" onclick="newTrainingModal('Allure')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-sm-6 attribute-col" id="col_deception">
+							<div class="row">
+								<label class="control-label col-md-7 col-xs-8" for="deception"><span class="attribute-name">Deception</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_deception" onclick="toggleHidden('col_deception')"></label>
+								<div class="col-md-5 col-xs-4">
+									<label class="control-label">
+										<span class="attribute-val" id="deception_text"></span>
+										<input type="hidden" name="deception" id="deception_val" value="<?php echo isset($user) ? $user['deception'] : '' ?>">
+										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('deception', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('deception', -1)"></span>
+									</label>
+								</div>
+							</div>
+							<div class="row training">
+								<div class="col-md-12">
+									<div class="row">
+										<div id="Deception"></div>
+									</div>
+									<div class="row">
+										<div class="col-md-12 button-bar">
+											<button type="button" class="btn btn-default" onclick="newTrainingModal('Deception')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="col-sm-6 attribute-col" id="col_intellect">
+							<div class="row">
+								<label class="control-label col-md-7 col-xs-8" for="intellect"><span class="attribute-name">Intellect</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_intellect" onclick="toggleHidden('col_intellect')"></label>
+								<div class="col-md-5 col-xs-4">
+									<label class="control-label">
+										<span class="attribute-val" id="intellect_text"></span>
+										<input type="hidden" name="intellect" id="intellect_val" value="<?php echo isset($user) ? $user['intellect'] : '' ?>">
+										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('intellect', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('intellect', -1)"></span>
+									</label>
+								</div>
+							</div>
+							<div class="row training">
+								<div class="col-md-12">
+									<div class="row">
+										<div id="Intellect"></div>
+									</div>
+									<div class="row">
+										<div class="col-md-12 button-bar">
+											<button type="button" class="btn btn-default" onclick="newTrainingModal('Intellect')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-sm-6 attribute-col" id="col_innovation">
+							<div class="row">
+								<label class="control-label col-md-7 col-xs-8" for="innovation"><span class="attribute-name">Innovation</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_innovation" onclick="toggleHidden('col_innovation')"></label>
+								<div class="col-md-5 col-xs-4">
+									<label class="control-label">
+										<span class="attribute-val" id="innovation_text"></span>
+										<input type="hidden" name="innovation" id="innovation_val" value="<?php echo isset($user) ? $user['innovation'] : '' ?>">
+										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('innovation', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('innovation', -1)"></span>
+									</label>
+								</div>
+							</div>
+							<div class="row training">
+								<div class="col-md-12">
+									<div class="row">
+										<div id="Innovation"></div>
+									</div>
+									<div class="row">
+										<div class="col-md-12 button-bar">
+											<button type="button" class="btn btn-default" onclick="newTrainingModal('Innovation')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="col-sm-6 attribute-col" id="col_intuition">
+							<div class="row">
+								<label class="control-label col-md-7 col-xs-8" for="intuition"><span class="attribute-name">Intution</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_intuition" onclick="toggleHidden('col_intuition')"></label>
+								<div class="col-md-5 col-xs-4">
+									<label class="control-label">
+										<span class="attribute-val" id="intuition_text"></span>
+										<input type="hidden" name="intuition" id="intuition_val" value="<?php echo isset($user) ? $user['intuition'] : '' ?>">
+										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('intuition', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('intuition', -1)"></span>
+									</label>
+								</div>
+							</div>
+							<div class="row training">
+								<div class="col-md-12">
+									<div class="row">
+										<div id="Intution"></div>
+									</div>
+									<div class="row">
+										<div class="col-md-12 button-bar">
+											<button type="button" class="btn btn-default" onclick="newTrainingModal('Intution')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-sm-6 attribute-col" id="col_vitality">
+							<div class="row">
+								<label class="control-label col-md-7 col-xs-8" for="vitality"><span class="attribute-name">Vitality</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_vitality" onclick="toggleHidden('col_vitality')"></label>
+								<div class="col-md-5 col-xs-4">
+									<label class="control-label">
+										<span class="attribute-val" id="vitality_text"></span>
+										<input type="hidden" name="vitality" id="vitality_val" value="<?php echo isset($user) ? $user['vitality'] : '' ?>">
+										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('vitality', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('vitality', -1)"></span>
+									</label>
+								</div>
+							</div>
+							<div class="row training">
+								<div class="col-md-12">
+									<div class="row">
+										<div id="Vitality"></div>
+									</div>
+									<div class="row">
+										<div class="col-md-12 button-bar">
+											<button type="button" class="btn btn-default" onclick="newTrainingModal('Vitality')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-
-				<div class="col-md-12">
-					<div class="section form-horizontal">
-						<div class="section-title" id="section_weight">Weight Capacity</div>
-						<div class="form-group">
-							<label class="control-label col-xs-3 center resize-mobile-small" for="unhindered">Unhindered (1/4)</label>
-							<label class="control-label col-xs-3 center resize-mobile-small" for="encumbered">Encumbered (1/2)</label>
-							<label class="control-label col-xs-3 center resize-mobile-small" for="burdened">Burdened (3/4)</label>
-							<label class="control-label col-xs-3 center resize-mobile-small" for="overburdened">Overburdened (Full)</label>
-
-							<div class="col-xs-3">
-								<?php
-									$base = isset($user) ? 100 + 20 * $user['strength'] : 100;
-								?>
-								<input class="form-control" readonly name="unhindered" id="unhindered" value="<?php echo $base / 4 ?>">
-							</div>
-							<div class="col-xs-3">
-								<input class="form-control" readonly name="encumbered" id="encumbered" value="<?php echo $base / 2 ?>">
-							</div>
-							<div class="col-xs-3">
-								<input class="form-control" readonly name="burdened" id="burdened" value="<?php echo $base / 4 * 3 ?>">
-							</div>
-							<div class="col-xs-3">
-								<input class="form-control" readonly name="overburdened" id="overburdened" value="<?php echo $base ?>">
-							</div>
-
-							<p class="col-xs-3"></p>
-							<p class="col-xs-3 center resize-mobile-small">(-1 Quick Action)</p>
-							<p class="col-xs-3 center resize-mobile-small">(-1 Quick Action, <br class="mobile-break">-0.5 Move)</p>
-							<p class="col-xs-3 center resize-mobile-small">(-1 Quick Action, <br class="mobile-break">-1 Move)</p>
-						</div>
-					</div>
-				</div>
-				<!-- end section: weight -->
-
-				<!-- section: notes -->
-				<div class="col-md-12">
-					<div class="section form-horizontal">
-						<div class="section-title" id="section_notes">Notes</div>
-						<div class="form-group">
-							<div class="col-xs-12">
-								<textarea class="form-control" rows="4" name="notes" maxlength="2000"><?php echo isset($user) ? htmlspecialchars($user['notes']) : '' ?></textarea>
-							</div>
-						</div>
-					</div>
-				</div>
-				<!-- end section: notes -->
-
-				<!-- section: background -->
-				<div class="col-md-12">
-					<div class="section form-horizontal">
-						<div class="section-title">Character Background</div>
-						<div class="form-group">
-							<div class="col-xs-12">
-								<textarea class="form-control" rows="6" name="background" maxlength="2000"><?php echo isset($user) ? htmlspecialchars($user['background']) : '' ?></textarea>
-							</div>
-						</div>
-					</div>
-				</div>
-				<!-- end section: background -->
+				<!-- end section: attributes -->
 
 			</div>
-			<input type="hidden" name="password" id="password_val">
-			<input type="hidden" name="recaptcha_response" id="recaptcha_response">
-			<input type="hidden" name="duckdacoy" id="duckdacoy">
-		</form>
-	<!-- </div> -->
+			<div class="col-md-6">
+
+				<!-- section: motivators -->
+				<div class="section form-horizontal">
+					<div class="section-title" id="section_motivators">
+						<span class="motivator-title">Motivators</span>
+						<div class="form-group motivator-bonus">
+							<label for="bonuses">Bonuses:</label>
+							<?php
+								// get two highest motivator values
+								if (isset($user)) {
+									$motivators = [];
+									array_push($motivators, $user['motivator_1_pts'] == '' ? 0 : $user['motivator_1_pts']);
+									array_push($motivators, $user['motivator_2_pts'] == '' ? 0 : $user['motivator_2_pts']);
+									array_push($motivators, $user['motivator_3_pts'] == '' ? 0 : $user['motivator_3_pts']);
+									array_push($motivators, $user['motivator_4_pts'] == '' ? 0 : $user['motivator_4_pts']);
+									arsort($motivators);
+									$total_pts = intval($motivators[0]) + intval($motivators[1]);
+									$bonuses = $total_pts >= 64 ? 5 : ($total_pts >= 32 ? 4 : ($total_pts >= 16 ? 3 : ($total_pts >= 8 ? 2 : ($total_pts >= 4 ? 1 : 0))));
+								} else {
+									$bonuses = 0;
+								}
+							?>
+							<input class="form-control" readonly name="bonuses" id="bonuses" value="<?php echo $bonuses ?>">
+						</div>
+					</div>
+
+					<div class="form-group no-margin">
+						<div class="col-xs-3 no-pad-mobile no-pad-left">
+							<input class="form-control" type="text" name="motivator_1" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_1']) : '' ?>">
+						</div>
+						<label class="control-label col-xs-2 no-pad-mobile" for="motivator_1_pts">Points:</label>
+						<div class="col-xs-1 no-pad">
+							<input class="form-control motivator-pts" type="number" name="motivator_1_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_1_pts']) : '' ?>">
+						</div>
+
+						<div class="col-xs-3 no-pad-mobile pad-left-mobile">
+							<input class="form-control" type="text" name="motivator_2" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_2']) : '' ?>">
+						</div>
+						<label class="control-label col-xs-2 no-pad-mobile" for="motivator_2_pts">Points:</label>
+						<div class="col-xs-1 no-pad">
+							<input class="form-control motivator-pts" type="number" name="motivator_2_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_2_pts']) : '' ?>">
+						</div>
+					</div>
+
+					<div class="form-group no-margin">
+						<div class="col-xs-3 no-pad-mobile no-pad-left">
+							<input class="form-control" type="text" name="motivator_3" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_3']) : '' ?>">
+						</div>
+						<label class="control-label col-xs-2 no-pad-mobile" for="motivator_3_pts">Points:</label>
+						<div class="col-xs-1 no-pad">
+							<input class="form-control motivator-pts" type="number" name="motivator_3_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_3_pts']) : '' ?>">
+						</div>
+
+						<div class="col-xs-3 no-pad-mobile pad-left-mobile">
+							<input class="form-control" type="text" name="motivator_4" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_4']) : '' ?>">
+						</div>
+						<label class="control-label col-xs-2 no-pad-mobile" for="motivator_4_pts">Points:</label>
+						<div class="col-xs-1 no-pad">
+							<input class="form-control motivator-pts" type="number" name="motivator_4_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_4_pts']) : '' ?>">
+						</div>
+					</div>
+
+				</div>
+				<!-- end section: motivators -->
+
+				<!-- section: feats & traits -->
+				<div class="section form-horizontal">
+					<div class="section-title" id="section_feats">Feats & Traits</div>
+					<div class="form-group">
+						<div class="col-sm-12">
+							<div id="feats">
+								<div class="feat" id="size">
+									<p class="feat-title">Size : </p>
+						    	<?php
+						    		$size = isset($user['size']) ? $user['size'] : 'Medium';
+						    	?>
+									<p id="character_size_text"><?php echo $size ?></p>
+									<input type="hidden" name="size" id="character_size_val" value="<?php echo $size ?>">
+									<span class="glyphicon glyphicon-edit hover-hide" data-toggle="modal" data-target="#edit_size_modal"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<button type="button" class="btn btn-default" id="new_feat_btn"><span class="glyphicon glyphicon-plus-sign" data-toggle="modal" data-target="#new_feat_modal"></span></button>
+				</div>
+				<!-- end section: feats & traits -->
+				
+			</div>
+
+			<!-- section: weapons -->
+			<div class="col-md-12">
+				<div class="section form-horizontal">
+					<div class="section-title" id="section_items">Weapons</div>
+					<div class="form-group">
+						<label class="control-label col-xs-3 resize-mobile center" for="weapons[]">Item</label>
+						<label class="control-label col-xs-1 resize-mobile center" for="weapon_qty[]">Qty</label>
+						<label class="control-label col-xs-1 resize-mobile center" id="weapon_dmg_label" for="weapon_damage[]">Damage</label>
+						<label class="control-label col-xs-5 resize-mobile center" id="weapon_note_label" for="weapon_notes[]">Notes</label>
+						<label class="control-label col-xs-1 resize-mobile center" for="weapon_weight[]">Weight</label>
+						<label class="control-label col-xs-1 resize-mobile center" for=""></label>
+					</div>
+					<div id="weapons"></div>
+					<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" data-toggle="modal" data-target="#new_weapon_modal"></span></button>
+				</div>
+			</div>
+			<!-- end section: weapons -->
+
+			<!-- section: protection -->
+			<div class="col-md-12">
+				<div class="section form-horizontal">
+					<!-- TODO add option to equip protection -->
+					<div class="section-title">Protection</div>
+					<div class="form-group">
+						<label class="control-label col-xs-3 resize-mobile center" for="protections[]">Item</label>
+						<label class="control-label col-xs-2 resize-mobile center" for="protection_bonus[]">Bonus</label>
+						<label class="control-label col-xs-5 resize-mobile center" for="protection_notes[]">Notes</label>
+						<label class="control-label col-xs-1 resize-mobile center" for="protection_weight[]">Weight</label>
+						<label class="control-label col-xs-1 resize-mobile center" for=""></label>
+					</div>
+					<div id="protections"></div>
+					<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" data-toggle="modal" data-target="#new_protection_modal"></span></button>
+				</div>
+			</div>
+			<!-- end section: protection -->
+
+			<!-- section: healing -->
+			<div class="col-md-12">
+				<div class="section form-horizontal">
+					<div class="section-title">Healing, Potions, & Drugs</div>
+					<div class="form-group">
+						<label class="control-label col-xs-3 resize-mobile center" for="healings[]">Item</label>
+						<label class="control-label col-xs-2 resize-mobile center" for="healing_quantity[]">Qty</label>
+						<label class="control-label col-xs-5 resize-mobile center" for="healing_effect[]">Effect</label>
+						<label class="control-label col-xs-1 resize-mobile center" for="healing_weight[]">Weight</label>
+						<label class="control-label col-xs-1 resize-mobile center" for=""></label>
+					</div>
+					<div id="healings"></div>
+					<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" data-toggle="modal" data-target="#new_healing_modal"></span></button>
+				</div>
+			</div>
+			<!-- end section: healing -->
+
+			<!-- section: misc -->
+			<div class="col-md-12">
+				<div class="section form-horizontal">
+					<div class="section-title">Miscellaneous & Special Items</div>
+					<div class="form-group">
+						<label class="control-label col-xs-3 resize-mobile center" for="misc[]">Item</label>
+						<label class="control-label col-xs-2 resize-mobile center" for="misc_quantity[]">Qty</label>
+						<label class="control-label col-xs-5 resize-mobile center" for="misc_notes[]">Notes</label>
+						<label class="control-label col-xs-1 resize-mobile center" for="misc_weight[]">Weight</label>
+						<label class="control-label col-xs-1 resize-mobile center" for=""></label>
+					</div>
+					<div id="misc"></div>
+					<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" data-toggle="modal" data-target="#new_misc_modal"></span></button>
+				</div>
+			</div>
+			<!-- end section: misc -->
+
+			<!-- section: weight -->
+			<div class="col-md-12">
+				<div class="section form-horizontal">
+					<div class="form-group">
+						<label class="control-label col-xs-10 align-right" for="total_weight">Total Weight</label>
+						<div class="col-xs-2">
+							<input class="form-control" readonly id="total_weight" name="total_weight" value="0">
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-12">
+				<div class="section form-horizontal">
+					<div class="section-title" id="section_weight">Weight Capacity</div>
+					<div class="form-group">
+						<label class="control-label col-xs-3 center resize-mobile-small" for="unhindered">Unhindered (1/4)</label>
+						<label class="control-label col-xs-3 center resize-mobile-small" for="encumbered">Encumbered (1/2)</label>
+						<label class="control-label col-xs-3 center resize-mobile-small" for="burdened">Burdened (3/4)</label>
+						<label class="control-label col-xs-3 center resize-mobile-small" for="overburdened">Overburdened (Full)</label>
+
+						<div class="col-xs-3">
+							<?php
+								$base = isset($user) ? 100 + 20 * $user['strength'] : 100;
+							?>
+							<input class="form-control" readonly name="unhindered" id="unhindered" value="<?php echo $base / 4 ?>">
+						</div>
+						<div class="col-xs-3">
+							<input class="form-control" readonly name="encumbered" id="encumbered" value="<?php echo $base / 2 ?>">
+						</div>
+						<div class="col-xs-3">
+							<input class="form-control" readonly name="burdened" id="burdened" value="<?php echo $base / 4 * 3 ?>">
+						</div>
+						<div class="col-xs-3">
+							<input class="form-control" readonly name="overburdened" id="overburdened" value="<?php echo $base ?>">
+						</div>
+
+						<p class="col-xs-3"></p>
+						<p class="col-xs-3 center resize-mobile-small">(-1 Quick Action)</p>
+						<p class="col-xs-3 center resize-mobile-small">(-1 Quick Action, <br class="mobile-break">-0.5 Move)</p>
+						<p class="col-xs-3 center resize-mobile-small">(-1 Quick Action, <br class="mobile-break">-1 Move)</p>
+					</div>
+				</div>
+			</div>
+			<!-- end section: weight -->
+
+			<!-- section: notes -->
+			<div class="col-md-12">
+				<div class="section form-horizontal">
+					<div class="section-title" id="section_notes">Notes</div>
+					<div class="form-group">
+						<div class="col-xs-12">
+							<textarea class="form-control" rows="4" name="notes" maxlength="2000"><?php echo isset($user) ? htmlspecialchars($user['notes']) : '' ?></textarea>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- end section: notes -->
+
+			<!-- section: background -->
+			<div class="col-md-12">
+				<div class="section form-horizontal">
+					<div class="section-title">Character Background</div>
+					<div class="form-group">
+						<div class="col-xs-12">
+							<textarea class="form-control" rows="6" name="background" maxlength="2000"><?php echo isset($user) ? htmlspecialchars($user['background']) : '' ?></textarea>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- end section: background -->
+
+		</div>
+		<input type="hidden" name="password" id="password_val">
+		<input type="hidden" name="recaptcha_response" id="recaptcha_response">
+		<input type="hidden" name="duckdacoy" id="duckdacoy">
+	</form>
+
+	<!-- xp modal -->
+  <div class="modal" id="xp_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+      <div class="modal-content searching-prompt">
+        <div class="modal-header">
+          <h4 class="modal-title">Experience Points</h4>
+        </div>
+        <div class="modal-body">
+        	<h3 class="center">Current XP: <span id="xp_text"><?php echo isset($user) ? $user['xp'] : 0 ?></span></h3>
+        	<!-- get xp to next level -->
+					<?php
+						$current_xp = isset($user) ? $user['xp'] : 0;
+						$next_level = 0;
+						foreach ($levels as $lvl) {
+							if ($current_xp < $lvl) {
+								$next_level = $lvl;
+								break;
+							}
+						}
+					?>
+        	<h3 class="center">Next Level: <span id="next_level"><?php echo $next_level ?></span></h3>
+        	<!-- input for adding xp -->
+        	<div class="add-xp">
+	        	<h3 class="center">Add XP:</h3>
+	        	<input class="form-control" type="number" id="add_xp">
+	        	<div class="button-bar">
+	        		<button type="button" class="btn btn-primary" onclick="addXP()"><span class="glyphicon glyphicon-plus-sign"></span></button>
+	        	</div>
+        	</div>
+        	<div class="button-bar">
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="setXP()">Ok</button>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GM edit modal -->
+  <div class="modal" id="gm_edit_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+      <div class="modal-content searching-prompt">
+        <div class="modal-header">
+          <h4 class="modal-title">GM Edit Mode</h4>
+        </div>
+        <div class="modal-body">
+        	<h4 class="control-label center">What's the secret word?</h4>
+        	<input class="form-control" type="text" id="gm_password">
+        	<div class="button-bar">
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="GMEditMode()">Ok</button>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 	<!-- edit size modal -->
   <div class="modal" id="edit_size_modal" tabindex="-1" role="dialog">
@@ -1244,8 +1325,8 @@
 		        	<label class="form-check-label" for="advanced">Advanced Skill (2 attribute pts)</label>
 	        	</div>
 	        	<div class="form-check">
-		        	<input class="form-check-input" type="radio" name="skill_type" id="standard" value="1">
-		        	<label class="form-check-label" for="standard">Standard Skill (1 attribute pt)</label>
+		        	<input class="form-check-input" type="radio" name="skill_type" id="standard_" value="1">
+		        	<label class="form-check-label" for="standard_">Standard Skill (1 attribute pt)</label>
 	        	</div>
         	</div>
         	<input type="hidden" id="attribute_type">
@@ -1401,8 +1482,7 @@
           <h4 class="modal-title">New Character</h4>
         </div>
         <div class="modal-body">
-        	<h4 class="center">Before we can let you pass, we just need to make sure you're not a robot. Please answer the following question that all nerds should know.</h4>
-        	<p>Ernest Gary _____ (July 27, 1938 – March 4, 2008) was an American game designer and author best known for co-creating the pioneering role-playing game Dungeons & Dragons with Dave Arneson.</p>
+        	<h4 class="center">Before we can let you pass, we just need to make sure you're not a robot. Please enter the most secret of secret codes.</h4>
         	<input class="form-control" type="text" name="nerd_test" id="nerd_test">
         	<div class="button-bar">
 		        <button type="button" class="btn btn-primary" id="password_btn_2" data-dismiss="modal" onclick="setPassword()">Ok</button>
@@ -1498,15 +1578,33 @@
 
 	<!-- JavaScript -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-	<!-- <script async src="https://www.google.com/recaptcha/api.js?render=6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi"></script> -->
+	<script async src="https://www.google.com/recaptcha/api.js?render=6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
-	<script src="/assets/script_v22_06_03.js"></script>
+	<script src="/assets/script_v22_06_06.js"></script>
 
 	<script type="text/javascript">
+
+		var keys = <?php echo json_encode($keys); ?>;
 
 		// check for user and set attributes
 		var user = <?php echo json_encode(isset($user) ? $user : []); ?>;
 		setAttributes(user);
+		if (user.length == 0) {
+			character_creation = true;
+			// show new feat btn
+			$("#new_feat_btn").show();
+			// enable hover-hide on attribute edits
+			if (is_mobile) {
+				$(".attribute-col").find(".hover-hide").show();
+			} else {
+				$(".attribute-col").hover(function(){
+					$(this).find(".hover-hide").show();
+				},
+				function(){
+					$(this).find(".hover-hide").hide();
+				});
+			}
+		}
 
 		// check for user feats
 		var feats = <?php echo json_encode($feats); ?>;

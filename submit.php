@@ -33,18 +33,24 @@
 		$user_id = $_POST['user_id'];
 	} else {
 		// get reCAPTCHA score from Google
-		// $recaptcha_secret = $keys['recaptcha_secret'];
-		// $recaptcha_response = $_POST['recaptcha_response'];
-		// $ch = curl_init();
-		// curl_setopt($ch, CURLOPT_URL,"https://www.google.com/recaptcha/api/siteverify");
-		// curl_setopt($ch, CURLOPT_POST, 1);
-		// curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('secret' => $recaptcha_secret, 'response' => $recaptcha_response)));
-		// curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		// $response = curl_exec($ch);
-		// curl_close($ch);
-		// $arrResponse = json_decode($response, true);
-		// // check response values
-		// if($arrResponse["success"] == '1' && $arrResponse["action"] == 'new_user' && $arrResponse["score"] >= 0.5) {
+		$recaptcha_secret = $keys['recaptcha_secret'];
+		$recaptcha_response = $_POST['recaptcha_response'];
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL,"https://www.google.com/recaptcha/api/siteverify");
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('secret' => $recaptcha_secret, 'response' => $recaptcha_response)));
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$response = curl_exec($ch);
+		curl_close($ch);
+		$arrResponse = json_decode($response, true);
+		// check response values
+		if($arrResponse["success"] == '1' && $arrResponse["action"] == 'new_user' && $arrResponse["score"] >= 0.5) {
+			// make sure character name isn't empty
+			if ($_POST['character_name'] == null|| $_POST['character_name'] == "") {
+				$db->close();
+				$error_output = "Something went wrong. Please try again later";
+			  	die($error_output);
+			}
 			// hash password
 			$hashed_password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 			$sql = "INSERT INTO user (password, ";
@@ -66,12 +72,12 @@
 			$db->query($sql);
 			// echo $db->error;
 			$user_id = $db->insert_id;
-		// } else {
-		// 	// Score less than 0.5 indicates suspicious activity. Return an error
-		// 	$db->close();
-		// 	$error_output = "Something went wrong. Please try again later";
-		//   	die($error_output);
-		// }
+		} else {
+			// Score less than 0.5 indicates suspicious activity. Return an error
+			$db->close();
+			$error_output = "Something went wrong. Please try again later";
+		  	die($error_output);
+		}
 
 	}
 
@@ -84,7 +90,7 @@
 		$feat_names = $_POST['feat_names'];
 		$feat_descriptions = $_POST['feat_descriptions'];
 		for ($i = 0; $i < count($feat_names); $i++) {
-			$sql = "INSERT INTO user_feat (name, description, user_id) VALUES ('".$feat_names[$i]."', '".$feat_descriptions[$i]."', '".$user_id."')";
+			$sql = "INSERT INTO user_feat (name, description, user_id) VALUES ('".addslashes($feat_names[$i])."', '".addslashes($feat_descriptions[$i])."', '".$user_id."')";
 			$db->query($sql);
 		}
 	}
@@ -99,7 +105,7 @@
 		$training_val = $_POST['training_val'];
 		for ($i = 0; $i < count($training); $i++) {
 			$vals = explode(":", $training[$i]);
-			$sql = "INSERT INTO user_training (name, attribute_group, value, user_id) VALUES ('".$vals[0]."', '".$vals[1]."', '".$training_val[$i]."', '".$user_id."')";
+			$sql = "INSERT INTO user_training (name, attribute_group, value, user_id) VALUES ('".addslashes($vals[0])."', '".$vals[1]."', '".$training_val[$i]."', '".$user_id."')";
 			$db->query($sql);
 		}
 	}
@@ -125,7 +131,7 @@
 			$weapon_max_damage[$i] = empty($weapon_max_damage[$i]) ? "NULL" : $weapon_max_damage[$i];
 			$weapon_range[$i] = empty($weapon_range[$i]) ? "NULL" : $weapon_range[$i];
 			$weapon_defend[$i] = empty($weapon_defend[$i]) ? "NULL" : $weapon_defend[$i];
-			$sql = "INSERT INTO user_weapon (name, type, quantity, damage, max_damage, range_, rof, defend, notes, weight, user_id) VALUES ('".$weapons[$i]."', '".$weapon_type[$i]."', '".$weapon_qty[$i]."', ".$weapon_damage[$i].", ".$weapon_max_damage[$i].", ".$weapon_range[$i].", '".$weapon_rof[$i]."', ".$weapon_defend[$i].", '".$weapon_notes[$i]."', ".$weapon_weight[$i].", '".$user_id."')";
+			$sql = "INSERT INTO user_weapon (name, type, quantity, damage, max_damage, range_, rof, defend, notes, weight, user_id) VALUES ('".addslashes($weapons[$i])."', '".$weapon_type[$i]."', '".addslashes($weapon_qty[$i])."', ".$weapon_damage[$i].", ".$weapon_max_damage[$i].", ".$weapon_range[$i].", '".addslashes($weapon_rof[$i])."', ".$weapon_defend[$i].", '".addslashes($weapon_notes[$i])."', ".$weapon_weight[$i].", '".$user_id."')";
 			$db->query($sql);
 		}
 	}
@@ -141,7 +147,7 @@
 		$protection_notes = $_POST['protection_notes'];
 		$protection_weight = $_POST['protection_weight'];
 		for ($i = 0; $i < count($protections); $i++) {
-			$sql = "INSERT INTO user_protection (name, bonus, notes, weight, user_id) VALUES ('".$protections[$i]."', '".$protection_bonus[$i]."', '".$protection_notes[$i]."', '".$protection_weight[$i]."', '".$user_id."')";
+			$sql = "INSERT INTO user_protection (name, bonus, notes, weight, user_id) VALUES ('".addslashes($protections[$i])."', '".addslashes($protection_bonus[$i])."', '".addslashes($protection_notes[$i])."', '".$protection_weight[$i]."', '".$user_id."')";
 			$db->query($sql);
 		}
 	}
@@ -157,7 +163,7 @@
 		$healing_effect = $_POST['healing_effect'];
 		$healing_weight = $_POST['healing_weight'];
 		for ($i = 0; $i < count($healings); $i++) {
-			$sql = "INSERT INTO user_healing (name, quantity, effect, weight, user_id) VALUES ('".$healings[$i]."', '".$healing_quantity[$i]."', '".$healing_effect[$i]."', '".$healing_weight[$i]."', '".$user_id."')";
+			$sql = "INSERT INTO user_healing (name, quantity, effect, weight, user_id) VALUES ('".addslashes($healings[$i])."', '".addslashes($healing_quantity[$i])."', '".addslashes($healing_effect[$i])."', '".$healing_weight[$i]."', '".$user_id."')";
 			$db->query($sql);
 		}
 	}
@@ -173,7 +179,7 @@
 		$misc_notes = $_POST['misc_notes'];
 		$misc_weight = $_POST['misc_weight'];
 		for ($i = 0; $i < count($misc); $i++) {
-			$sql = "INSERT INTO user_misc (name, quantity, notes, weight, user_id) VALUES ('".$misc[$i]."', '".$misc_quantity[$i]."', '".$misc_notes[$i]."', '".$misc_weight[$i]."', '".$user_id."')";
+			$sql = "INSERT INTO user_misc (name, quantity, notes, weight, user_id) VALUES ('".addslashes($misc[$i])."', '".addslashes($misc_quantity[$i])."', '".addslashes($misc_notes[$i])."', '".$misc_weight[$i]."', '".$user_id."')";
 			$db->query($sql);
 		}
 	}
