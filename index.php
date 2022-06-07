@@ -1087,7 +1087,7 @@
 			<!-- section: healing -->
 			<div class="col-md-12">
 				<div class="section form-horizontal">
-					<div class="section-title">Healing, Potions, & Drugs</div>
+					<div class="section-title">Healings, Potions, & Drugs</div>
 					<div class="form-group">
 						<label class="control-label col-xs-3 resize-mobile center" for="healings[]">Item</label>
 						<label class="control-label col-xs-2 resize-mobile center" for="healing_quantity[]">Qty</label>
@@ -1368,6 +1368,8 @@
         	<input class="form-control" type="text" id="weapon_notes">
         	<label class="control-label">Weight</label>
         	<input class="form-control" type="number" id="weapon_weight">
+        	<label class="control-label">Qty</label>
+        	<input class="form-control" type="number" id="weapon_qty">
         	<input type="hidden" id="weapon_id">
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
@@ -1383,17 +1385,18 @@
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
       <div class="modal-content searching-prompt">
         <div class="modal-header">
-          <h4 class="modal-title">New Protection</h4>
+          <h4 class="modal-title" id="protection_modal_title">New Protection</h4>
         </div>
         <div class="modal-body">
         	<label class="control-label">Protection Name</label>
         	<input class="form-control" type="text" id="protection_name">
         	<label class="control-label">Bonus</label>
-        	<input class="form-control" type="text" id="protection_bonus">
+        	<input class="form-control" type="number" id="protection_bonus">
         	<label class="control-label">Notes</label>
         	<input class="form-control" type="text" id="protection_notes">
         	<label class="control-label">Weight</label>
-        	<input class="form-control" type="text" id="protection_weight">
+        	<input class="form-control" type="number" id="protection_weight">
+        	<input type="hidden" id="protection_id">
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newProtection()">Ok</button>
@@ -1408,17 +1411,18 @@
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
       <div class="modal-content searching-prompt">
         <div class="modal-header">
-          <h4 class="modal-title">New Healing, Potion, or Drug</h4>
+          <h4 class="modal-title" id="healing_modal_title">New Healing/Potion/Drug</h4>
         </div>
         <div class="modal-body">
         	<label class="control-label">Item Name</label>
         	<input class="form-control" type="text" id="healing_name">
         	<label class="control-label">Quantity</label>
-        	<input class="form-control" type="text" id="healing_quantity">
+        	<input class="form-control" type="number" id="healing_quantity">
         	<label class="control-label">Effect</label>
         	<input class="form-control" type="text" id="healing_effect">
         	<label class="control-label">Weight</label>
-        	<input class="form-control" type="text" id="healing_weight">
+        	<input class="form-control" type="number" id="healing_weight">
+        	<input type="hidden" id="healing_id">
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newHealing()">Ok</button>
@@ -1433,17 +1437,18 @@
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
       <div class="modal-content searching-prompt">
         <div class="modal-header">
-          <h4 class="modal-title">New Miscellaneous Item</h4>
+          <h4 class="modal-title" id="misc_modal_title">New Miscellaneous Item</h4>
         </div>
         <div class="modal-body">
         	<label class="control-label">Item Name</label>
         	<input class="form-control" type="text" id="misc_name">
         	<label class="control-label">Quantity</label>
-        	<input class="form-control" type="text" id="misc_quantity">
+        	<input class="form-control" type="number" id="misc_quantity">
         	<label class="control-label">Notes</label>
         	<input class="form-control" type="text" id="misc_notes">
         	<label class="control-label">Weight</label>
-        	<input class="form-control" type="text" id="misc_weight">
+        	<input class="form-control" type="number" id="misc_weight">
+        	<input type="hidden" id="misc_id">
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newMisc()">Ok</button>
@@ -1580,7 +1585,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script async src="https://www.google.com/recaptcha/api.js?render=6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
-	<script src="/assets/script_v22_06_06.js"></script>
+	<script src="/assets/script_v22_06_07.js"></script>
 
 	<script type="text/javascript">
 

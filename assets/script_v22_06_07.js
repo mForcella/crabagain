@@ -492,14 +492,47 @@ $("#new_training_modal").on('shown.bs.modal', function(){
 $("#new_weapon_modal").on('shown.bs.modal', function(){
 	$("#weapon_name").focus();
 });
+$("#new_weapon_modal").on('hidden.bs.modal', function(){
+	$("#weapon_modal_title").html("New Weapon");
+	$("#weapon_name").val("");
+	$("#weapon_damage").val("");
+	$("#weapon_max_damage").val("");
+	$("#weapon_range").val("");
+	$("#weapon_rof").val("");
+	$("#weapon_defend").val("");
+	$("#weapon_notes").val("");
+	$("#weapon_weight").val("");
+	$("#weapon_qty").val("");
+});
 $("#new_protection_modal").on('shown.bs.modal', function(){
 	$("#protection_name").focus();
+});
+$("#new_protection_modal").on('hidden.bs.modal', function(){
+	$("#protection_modal_title").html("New Protection");
+	$("#protection_name").val("");
+	$("#protection_bonus").val("");
+	$("#protection_notes").val("");
+	$("#protection_weight").val("");
 });
 $("#new_healing_modal").on('shown.bs.modal', function(){
 	$("#healing_name").focus();
 });
+$("#new_healing_modal").on('hidden.bs.modal', function(){
+	$("#healing_modal_title").html("New Healing/Potion/Drug");
+	$("#healing_name").val("");
+	$("#healing_quantity").val("");
+	$("#healing_effect").val("");
+	$("#healing_weight").val("");
+});
 $("#new_misc_modal").on('shown.bs.modal', function(){
 	$("#misc_name").focus();
+});
+$("#new_misc_modal").on('hidden.bs.modal', function(){
+	$("#misc_modal_title").html("New Miscellaneous Item");
+	$("#misc_name").val("");
+	$("#misc_quantity").val("");
+	$("#misc_notes").val("");
+	$("#misc_weight").val("");
 });
 $("#xp_modal").on('shown.bs.modal', function(){
 	$("#add_xp").focus();
@@ -1123,21 +1156,14 @@ function newWeapon() {
 	$("#weapon_modal_title").html("New Weapon");
 	var type = $("#weapon_type").val();
 	var name = $("#weapon_name").val();
-	$("#weapon_name").val("");
 	var damage = $("#weapon_damage").val();
-	$("#weapon_damage").val("");
 	var max_damage = $("#weapon_max_damage").val();
-	$("#weapon_max_damage").val("");
 	var range = $("#weapon_range").val();
-	$("#weapon_range").val("");
 	var rof = $("#weapon_rof").val();
-	$("#weapon_rof").val("");
 	var defend = $("#weapon_defend").val();
-	$("#weapon_defend").val("");
 	var notes = $("#weapon_notes").val();
-	$("#weapon_notes").val("");
-	var weight = $("#weapon_weight").val();
-	$("#weapon_weight").val("");
+	var weight = $("#weapon_weight").val() == "" ? 0 : $("#weapon_weight").val();
+	var qty = $("#weapon_qty").val() == "" ? 1 : $("#weapon_qty").val();
 	if (name == "") {
 		alert("Name is required");
 		return;
@@ -1165,6 +1191,8 @@ function newWeapon() {
 		$("#"+weapon_id+"_range").val(range);
 		$("#"+weapon_id+"_rof").val(rof);
 		$("#"+weapon_id+"_defend").val(defend);
+		$("#"+weapon_id+"_qty").val(qty);
+		updateTotalWeight();
 		// check if this weapon is selected - update stats
 		for (var i in weapons) {
 			if (weapons[i]['name'] == originalName) {
@@ -1200,13 +1228,13 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 		return;
 	}
 	weight = weight == "" ? 0 : weight;
-	totalWeight += parseFloat(weight);
+	totalWeight += parseFloat(weight)*parseInt(qty == "" ? 1 : qty);
 	$("#total_weight").val(totalWeight);
 	itemNames.push(name.toLowerCase());
 	// replace all characters not allowed in id
 	var name_val = name.replace(/[^a-zA-Z0-9\-_:]+/g, "_");
 
-	var div = createElement('div', 'form-group', '#weapons', name_val);
+	var div = createElement('div', 'form-group item', '#weapons', name_val);
 	var div1 = createElement('div', 'col-xs-3 no-pad-mobile', div);
 	var div2 = createElement('div', 'col-xs-1 no-pad-mobile', div);
 	var div3 = createElement('div', 'col-xs-1 no-pad-mobile', div);
@@ -1214,23 +1242,20 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 	var div5 = createElement('div', 'col-xs-1 no-pad-mobile', div);
 	var div6 = createElement('div', 'col-xs-1 no-pad-mobile center', div);
 
-	createInput('', 'text', 'weapons[]', name, div1, name_val+"_name");
-	createInput('', 'text', 'weapon_qty[]', qty, div2, name_val+"_qty_text");
-	createInput('hidden-number', 'number', '', '', div2, name_val+"_qty");
+	var name_input = createInput('', 'text', 'weapons[]', name, div1, name_val+"_name");
+	var qty_input = createInput('qty', 'text', 'weapon_qty[]', qty, div2, name_val+"_qty");
 	// check for max damage
-	createInput('', 'hidden', 'weapon_damage[]', damage, div3, name_val+"_damage_val");
 	var damageText = max_damage != null && max_damage != "" ? damage +" ("+max_damage+")" : damage;
-	var dmg = createInput('', 'text', '', damageText, div3, name_val+"_damage");
-	dmg.attr("readonly", true);
+	var dmg_input = createInput('', 'text', '', damageText, div3, name_val+"_damage");
 	// add range, rof & defend bonus to notes
 	var noteMod = "";
 	noteMod += range != null && range != "" ? "Range: "+range+"; " : "";
 	noteMod += rof != null && rof != "" ? "RoF: "+rof+"; " : "";
 	noteMod += defend != null && defend != "" ? "+"+defend+" Defend; " : "";
-	var note = createInput('', 'text', '', noteMod+notes, div4, name_val+"_notes");
-	note.attr("readonly", true);
-	createInput('', 'hidden', 'weapon_notes[]', notes, div4, name_val+"_notes_val");
-	createInput('', 'number', 'weapon_weight[]', weight, div5, name_val+"_weight");
+	var note_input = createInput('', 'text', '', noteMod+notes, div4, name_val+"_notes");
+	var wgt_input = createInput('wgt', 'text', 'weapon_weight[]', weight, div5, name_val+"_weight");
+	createInput('', 'hidden', 'weapon_damage[]', damage, div5, name_val+"_damage_val");
+	createInput('', 'hidden', 'weapon_notes[]', notes, div5, name_val+"_notes_val");
 	createInput('', 'hidden', 'weapon_type[]', type, div5, name_val+"_type");
 	createInput('', 'hidden', 'weapon_max_damage[]', max_damage, div5, name_val+"_max_damage");
 	createInput('', 'hidden', 'weapon_range[]', range, div5, name_val+"_range");
@@ -1238,19 +1263,33 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 	createInput('', 'hidden', 'weapon_defend[]', defend, div5, name_val+"_defend");
 
 	// add click and hover functions
-	dmg.click(function(){
+	name_input.attr("readonly", true);
+	qty_input.attr("readonly", true);
+	dmg_input.attr("readonly", true);
+	note_input.attr("readonly", true);
+	wgt_input.attr("readonly", true);
+	name_input.click(function(){
 		editWeapon(name_val);
 	});
-	note.click(function(){
+	qty_input.click(function(){
 		editWeapon(name_val);
 	});
-	dmg.hover(function(){
+	dmg_input.click(function(){
+		editWeapon(name_val);
+	});
+	note_input.click(function(){
+		editWeapon(name_val);
+	});
+	wgt_input.click(function(){
+		editWeapon(name_val);
+	});
+	dmg_input.hover(function(){
 		$("#weapon_dmg_label").addClass("highlight");
 	},
 	function(){
 		$("#weapon_dmg_label").removeClass("highlight");
 	});
-	note.hover(function(){
+	note_input.hover(function(){
 		$("#weapon_note_label").addClass("highlight");
 	},
 	function(){
@@ -1334,6 +1373,7 @@ function editWeapon(weapon_id) {
 	var range = $("#"+weapon_id+"_range").val();
 	var rof = $("#"+weapon_id+"_rof").val();
 	var defend = $("#"+weapon_id+"_defend").val();
+	var qty = $("#"+weapon_id+"_qty").val();
 	var notes = $("#"+weapon_id+"_notes").val();
 	notes = range != "" ? notes.slice(notes.indexOf("; ")+2) : notes;
 	notes = rof != "" ? notes.slice(notes.indexOf("; ")+2) : notes;
@@ -1347,6 +1387,7 @@ function editWeapon(weapon_id) {
 	$("#weapon_range").val(range);
 	$("#weapon_rof").val(rof);
 	$("#weapon_defend").val(defend);
+	$("#weapon_qty").val(qty);
 	$("#weapon_notes").val(notes);
 	$("#weapon_weight").val($("#"+weapon_id+"_weight").val());
 	$("#weapon_id").val(weapon_id);
@@ -1363,15 +1404,29 @@ $("#weapon_rof").on('keypress', function(e){
 
 // add a new protection from modal values
 function newProtection() {
+	// check if we are editing
+	var editing = $("#protection_modal_title").html() == "Edit Protection";
 	var name = $("#protection_name").val();
 	$("#protection_name").val("");
-	var bonus = $("#protection_bonus").val();
+	var bonus = $("#protection_bonus").val() == "" ? 0 : $("#protection_bonus").val();
 	$("#protection_bonus").val("");
 	var notes = $("#protection_notes").val();
 	$("#protection_notes").val("");
-	var weight = $("#protection_weight").val();
+	var weight = $("#protection_weight").val() == "" ? 0 : $("#protection_weight").val();
 	$("#protection_weight").val("");
-	if (name != "") {
+	if (name == "") {
+		alert("Name is required");
+		return;
+	}
+	if (editing) {
+		// update protection inputs
+		var protection_id = $("#protection_id").val();
+		$("#"+protection_id+"_name").val(name);
+		$("#"+protection_id+"_bonus").val(bonus);
+		$("#"+protection_id+"_notes").val(notes);
+		$("#"+protection_id+"_weight").val(weight);
+		updateTotalWeight();
+	} else {
 		addProtectionElements(name, bonus, notes, weight);
 	}
 }
@@ -1389,18 +1444,33 @@ function addProtectionElements(name, bonus, notes, weight) {
 	// replace all characters not allowed in id
 	var name_val = name.replace(/[^a-zA-Z0-9\-_:]+/g, "_");
 
-	var div = createElement('div', 'form-group', '#protections', name_val);
+	var div = createElement('div', 'form-group item', '#protections', name_val);
 	var div1 = createElement('div', 'col-xs-3 no-pad-mobile', div);
 	var div2 = createElement('div', 'col-xs-2 no-pad-mobile', div);
 	var div3 = createElement('div', 'col-xs-5 no-pad-mobile', div);
 	var div4 = createElement('div', 'col-xs-1 no-pad-mobile', div);
 	var div5 = createElement('div', 'col-xs-1 no-pad-mobile center', div);
 
-	createInput('', 'text', 'protections[]', name, div1, name_val+"_name");
-	createInput('', 'text', 'protection_bonus[]', bonus, div2, name_val+"_bonus_text");
-	createInput('hidden-number', 'number', '', '', div2, name_val+"_bonus");
-	createInput('', 'text', 'protection_notes[]', notes, div3);
-	createInput('', 'number', 'protection_weight[]', weight, div4);
+	var name_input = createInput('', 'text', 'protections[]', name, div1, name_val+"_name");
+	var bonus_input = createInput('', 'text', 'protection_bonus[]', bonus, div2, name_val+"_bonus");
+	var notes_input = createInput('', 'text', 'protection_notes[]', notes, div3, name_val+"_notes");
+	var weight_input = createInput('wgt', 'text', 'protection_weight[]', weight, div4, name_val+"_weight");
+	name_input.attr("readonly", true);
+	bonus_input.attr("readonly", true);
+	notes_input.attr("readonly", true);
+	weight_input.attr("readonly", true);
+	name_input.click(function(){
+		editProtection(name_val);
+	});
+	bonus_input.click(function(){
+		editProtection(name_val);
+	});
+	notes_input.click(function(){
+		editProtection(name_val);
+	});
+	weight_input.click(function(){
+		editProtection(name_val);
+	});
 
 	// add remove button
 	createElement('span', 'glyphicon glyphicon-remove', div5, name_val+"_remove");
@@ -1422,17 +1492,42 @@ function addProtectionElements(name, bonus, notes, weight) {
 
 }
 
+function editProtection(protection_id) {
+	// set modal values and launch
+	$("#protection_modal_title").html("Edit Protection");
+	$("#protection_name").val($("#"+protection_id+"_name").val());
+	$("#protection_bonus").val($("#"+protection_id+"_bonus").val());
+	$("#protection_notes").val($("#"+protection_id+"_notes").val());
+	$("#protection_weight").val($("#"+protection_id+"_weight").val());
+	$("#protection_id").val(protection_id);
+	$("#new_protection_modal").modal("show");
+}
+
 // add a new healing/potion/drug from modal values
 function newHealing() {
+	// check if we are editing
+	var editing = $("#healing_modal_title").html() == "Edit Healing/Potion/Drug";
 	var name = $("#healing_name").val();
 	$("#healing_name").val("");
-	var quantity = $("#healing_quantity").val();
+	var quantity = $("#healing_quantity").val() == "" ? 1 : $("#healing_quantity").val();
 	$("#healing_quantity").val("");
 	var effect = $("#healing_effect").val();
 	$("#healing_effect").val("");
-	var weight = $("#healing_weight").val();
+	var weight = $("#healing_weight").val() == "" ? 0 : $("#healing_weight").val();
 	$("#healing_weight").val("");
-	if (name != "") {
+	if (name == "") {
+		alert("Name is required");
+		return;
+	}
+	if (editing) {
+		// update healing inputs
+		var healing_id = $("#healing_id").val();
+		$("#"+healing_id+"_name").val(name);
+		$("#"+healing_id+"_quantity").val(quantity);
+		$("#"+healing_id+"_effect").val(effect);
+		$("#"+healing_id+"_weight").val(weight);
+		updateTotalWeight();
+	} else {
 		addHealingElements(name, quantity, effect, weight);
 	}
 }
@@ -1444,24 +1539,39 @@ function addHealingElements(name, quantity, effect, weight) {
 		return;
 	}
 	weight = weight == "" ? 0 : weight;
-	totalWeight += parseFloat(weight);
+	totalWeight += parseFloat(weight)*parseInt(quantity == "" ? 1 : quantity);
 	$("#total_weight").val(totalWeight);
 	itemNames.push(name.toLowerCase());
 	// replace all characters not allowed in id
 	var name_val = name.replace(/[^a-zA-Z0-9\-_:]+/g, "_");
 
-	var div = createElement('div', 'form-group', '#healings', name_val);
+	var div = createElement('div', 'form-group item', '#healings', name_val);
 	var div1 = createElement('div', 'col-xs-3 no-pad-mobile', div);
 	var div2 = createElement('div', 'col-xs-2 no-pad-mobile', div);
 	var div3 = createElement('div', 'col-xs-5 no-pad-mobile', div);
 	var div4 = createElement('div', 'col-xs-1 no-pad-mobile', div);
 	var div5 = createElement('div', 'col-xs-1 no-pad-mobile center', div);
 
-	createInput('', 'text', 'healings[]', name, div1, name_val+"_name");
-	createInput('', 'text', 'healing_quantity[]', quantity, div2, name_val+"_quantity_text");
-	createInput('hidden-number', 'number', '', '', div2, name_val+"_quantity");
-	createInput('', 'text', 'healing_effect[]', effect, div3);
-	createInput('', 'number', 'healing_weight[]', weight, div4);
+	var name_input = createInput('', 'text', 'healings[]', name, div1, name_val+"_name");
+	var qty_input = createInput('qty', 'text', 'healing_quantity[]', quantity, div2, name_val+"_quantity");
+	var effect_input = createInput('', 'text', 'healing_effect[]', effect, div3, name_val+"_effect");
+	var weight_input = createInput('wgt', 'text', 'healing_weight[]', weight, div4, name_val+"_weight");
+	name_input.attr("readonly", true);
+	qty_input.attr("readonly", true);
+	effect_input.attr("readonly", true);
+	weight_input.attr("readonly", true);
+	name_input.click(function(){
+		editHealing(name_val);
+	});
+	qty_input.click(function(){
+		editHealing(name_val);
+	});
+	effect_input.click(function(){
+		editHealing(name_val);
+	});
+	weight_input.click(function(){
+		editHealing(name_val);
+	});
 
 	// add remove button
 	createElement('span', 'glyphicon glyphicon-remove', div5, name_val+"_remove");
@@ -1483,17 +1593,42 @@ function addHealingElements(name, quantity, effect, weight) {
 
 }
 
+function editHealing(healing_id) {
+	// set modal values and launch
+	$("#healing_modal_title").html("Edit Healing/Potion/Drug");
+	$("#healing_name").val($("#"+healing_id+"_name").val());
+	$("#healing_quantity").val($("#"+healing_id+"_quantity").val());
+	$("#healing_effect").val($("#"+healing_id+"_effect").val());
+	$("#healing_weight").val($("#"+healing_id+"_weight").val());
+	$("#healing_id").val(healing_id);
+	$("#new_healing_modal").modal("show");
+}
+
 // add a new misc item from modal values
 function newMisc() {
+	// check if we are editing
+	var editing = $("#misc_modal_title").html() == "Edit Miscellaneous Item";
 	var name = $("#misc_name").val();
 	$("#misc_name").val("");
-	var quantity = $("#misc_quantity").val();
+	var quantity = $("#misc_quantity").val() == "" ? 1 : $("#misc_quantity").val();
 	$("#misc_quantity").val("");
 	var notes = $("#misc_notes").val();
 	$("#misc_notes").val("");
-	var weight = $("#misc_weight").val();
+	var weight = $("#misc_weight").val() == "" ? 0 : $("#misc_weight").val();
 	$("#misc_weight").val("");
-	if (name != "") {
+	if (name == "") {
+		alert("Name is required");
+		return;
+	}
+	if (editing) {
+		// update misc inputs
+		var misc_id = $("#misc_id").val();
+		$("#"+misc_id+"_name").val(name);
+		$("#"+misc_id+"_quantity").val(quantity);
+		$("#"+misc_id+"_notes").val(notes);
+		$("#"+misc_id+"_weight").val(weight);
+		updateTotalWeight();
+	} else {
 		addMiscElements(name, quantity, notes, weight);
 	}
 }
@@ -1505,24 +1640,39 @@ function addMiscElements(name, quantity, notes, weight) {
 		return;
 	}
 	weight = weight == "" ? 0 : weight;
-	totalWeight += parseFloat(weight);
+	totalWeight += parseFloat(weight)*parseInt(quantity == "" ? 1 : quantity);
 	$("#total_weight").val(totalWeight);
 	itemNames.push(name.toLowerCase());
 	// replace all characters not allowed in id
 	var name_val = name.replace(/[^a-zA-Z0-9\-_:]+/g, "_");
 
-	var div = createElement('div', 'form-group', '#misc', name_val);
+	var div = createElement('div', 'form-group item', '#misc', name_val);
 	var div1 = createElement('div', 'col-xs-3 no-pad-mobile', div);
 	var div2 = createElement('div', 'col-xs-2 no-pad-mobile', div);
 	var div3 = createElement('div', 'col-xs-5 no-pad-mobile', div);
 	var div4 = createElement('div', 'col-xs-1 no-pad-mobile', div);
 	var div5 = createElement('div', 'col-xs-1 no-pad-mobile center', div);
 
-	createInput('', 'text', 'misc[]', name, div1, name_val+"_name");
-	createInput('', 'text', 'misc_quantity[]', quantity, div2, name_val+"_quantity_text");
-	createInput('hidden-number', 'number', '', '', div2, name_val+"_quantity");
-	createInput('', 'text', 'misc_notes[]', notes, div3);
-	createInput('', 'number', 'misc_weight[]', weight, div4);
+	var name_input = createInput('', 'text', 'misc[]', name, div1, name_val+"_name");
+	var qty_input = createInput('qty', 'text', 'misc_quantity[]', quantity, div2, name_val+"_quantity");
+	var notes_input = createInput('', 'text', 'misc_notes[]', notes, div3, name_val+"_notes");
+	var weight_input = createInput('wgt', 'text', 'misc_weight[]', weight, div4, name_val+"_weight");
+	name_input.attr("readonly", true);
+	qty_input.attr("readonly", true);
+	notes_input.attr("readonly", true);
+	weight_input.attr("readonly", true);
+	name_input.click(function(){
+		editMisc(name_val);
+	});
+	qty_input.click(function(){
+		editMisc(name_val);
+	});
+	notes_input.click(function(){
+		editMisc(name_val);
+	});
+	weight_input.click(function(){
+		editMisc(name_val);
+	});
 
 	// add remove button
 	createElement('span', 'glyphicon glyphicon-remove', div5, name_val+"_remove");
@@ -1539,10 +1689,37 @@ function addMiscElements(name, quantity, notes, weight) {
 	});
 
 	// enable label highlighting
-	// TODO highlighting 'notes' and 'weight' only enabled for first set of inputs...
 	enableHighlighting();
 	enableHiddenNumbers();
 
+}
+
+function editMisc(misc_id) {
+	// set modal values and launch
+	$("#misc_modal_title").html("Edit Miscellaneous Item");
+	$("#misc_name").val($("#"+misc_id+"_name").val());
+	$("#misc_quantity").val($("#"+misc_id+"_quantity").val());
+	$("#misc_notes").val($("#"+misc_id+"_notes").val());
+	$("#misc_weight").val($("#"+misc_id+"_weight").val());
+	$("#misc_id").val(misc_id);
+	$("#new_misc_modal").modal("show");
+}
+
+function updateTotalWeight() {
+	var totalWeight = 0
+	// find all wgt inputs
+	$(".item").each(function(){
+		var qty = 1;
+		var wgt = 0;
+		$(this).find('.qty').each(function(){
+			qty = $(this).val() == "" ? 1 : $(this).val();
+		});
+		$(this).find('.wgt').each(function(){
+			wgt = $(this).val() == "" ? 0 : $(this).val();
+		});
+		totalWeight += parseInt(qty) * parseInt(wgt);
+	});
+	$("#total_weight").val(totalWeight);
 }
 
 function enableHighlighting() {
