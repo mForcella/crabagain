@@ -104,7 +104,10 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;1,400;1,600&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
 
-	<link rel="stylesheet" type="text/css" href="/assets/style_v22_06_06.css">
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+	<link rel="stylesheet" type="text/css" href="/assets/style_v22_06_10.css">
+
+
 
 </head>
 
@@ -117,16 +120,16 @@
 	<nav class="navbar">
 	  <div class="nav-menu">
 	    <div class="nav-item">
-	       <span class="glyphicon glyphicon-floppy-save" onclick="formSubmit()"><span class="nav-item-label"> Save Character Data</span></span>
+	       <span class="glyphicon" onclick="formSubmit()"><span class="nav-item-label"><i class="fa-solid fa-floppy-disk"></i> Save Character Data</span></span>
 	    </div>
 	    <div class="nav-item">
-	       <span class="glyphicon glyphicon-circle-arrow-up" onclick="allocateAttributePts()"><span class="nav-item-label"> Allocate Attribute Points</span></span>
+	       <span class="glyphicon" onclick="allocateAttributePts()"><span class="nav-item-label"><i class="fa-solid fa-shield-heart"></i> Allocate Attribute Points</span></span>
 	    </div>
 	    <?php
 	    	if (isset($user)) {
 	    		echo '
 				    <div class="nav-item">
-				       <span class="glyphicon glyphicon-pencil" data-toggle="modal" data-target="#gm_edit_modal"><span class="nav-item-label"> GM Edit Mode</span></span>
+				       <span class="glyphicon" data-toggle="modal" data-target="#gm_edit_modal"><span class="nav-item-label"><i class="fa-solid fa-dice-d20"></i> GM Edit Mode</span></span>
 				    </div>
 				   ';
 	    	}
@@ -298,7 +301,7 @@
 				<!-- section: weapons -->
 				<div class="section form-horizontal">
 					<div class="form-group">
-						<div class="section-title" id="section_attack">Attack</div>
+						<div class="section-title" id="section_attack"><span>Attack</span> <i class="fa-solid icon-attack"></i><!-- <i class="fa-solid fa-hand-fist"></i> --></div>
 						<div class="row">
 
 							<div class="col-sm-4">
@@ -437,7 +440,7 @@
 
 				<!-- section: defense -->
 				<div class="section form-horizontal">
-					<div class="section-title" id="section_defense">Defense</div>
+					<div class="section-title" id="section_defense"><span>Defense</span> <i class="fa-solid fa-shield-halved"></i></div>
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="toughness">Toughness</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
@@ -478,7 +481,7 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2 col-xs-4" for="fear">Fear</label>
+						<label class="control-label col-sm-2 col-xs-4" for="fear">Fear <!-- <i class="fa-solid fa-spider"></i> --></label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 							<input class="form-control" type="text" name="fear" id="fear_text" value="<?php echo isset($user) ? htmlspecialchars($user['fear']) : '' ?>">
 							<input class="form-control hidden-number" type="number" id="fear">
@@ -499,7 +502,7 @@
 
 				<!-- section: health -->
 				<div class="section form-horizontal">
-					<div class="section-title" id="section_health">Health</div>
+					<div class="section-title" id="section_health"><span>Health</span> <i class="fa-solid fa-heart"></i></div>
 					<div class="form-group">
 
 						<div class="col-sm-4">
@@ -567,7 +570,7 @@
 
 				<!-- section: actions, move -->
 				<div class="section form-horizontal">
-					<div class="section-title" id="section_actions">Actions, Move, Initiative</div>
+					<div class="section-title" id="section_actions"><span>Actions, Move, Initiative</span> <i class="fa-solid fa-hourglass"></i></div>
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="standard">Standard</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
@@ -629,7 +632,7 @@
 
 				<!-- section: attributes -->
 				<div class="section form-horizontal">
-					<div class="section-title" id="section_attributes">Attributes</div>
+					<div class="section-title" id="section_attributes"><span>Attributes</span> <i class="fa-solid fa-dice"></i></div>
 
 					<div class="form-group">
 						<div class="col-sm-6 attribute-col" id="col_strength">
@@ -962,8 +965,8 @@
 
 				<!-- section: motivators -->
 				<div class="section form-horizontal">
-					<div class="section-title" id="section_motivators">
-						<span class="motivator-title">Motivators</span>
+					<div class="section-title">
+						<span class="motivator-title"><span>Motivators</span></span> <i class="fa-solid fa-yin-yang"></i>
 						<div class="form-group motivator-bonus">
 							<label for="bonuses">Bonuses:</label>
 							<?php
@@ -1026,7 +1029,7 @@
 
 				<!-- section: feats & traits -->
 				<div class="section form-horizontal">
-					<div class="section-title" id="section_feats">Feats & Traits</div>
+					<div class="section-title" id="section_feats"><span>Feats & Traits</span> <i class="fa-solid fa-trophy"></i></div>
 					<div class="form-group">
 						<div class="col-sm-12">
 							<div id="feats">
@@ -1051,7 +1054,7 @@
 			<!-- section: weapons -->
 			<div class="col-md-12">
 				<div class="section form-horizontal">
-					<div class="section-title" id="section_items">Weapons</div>
+					<div class="section-title" id="section_items"><span>Weapons</span> <i class="fa-solid icon-sword"></i><!-- <i class="fa-solid fa-hand-fist"></i> --></div>
 					<div class="form-group">
 						<label class="control-label col-xs-3 resize-mobile center" for="weapons[]">Item</label>
 						<label class="control-label col-xs-1 resize-mobile center" for="weapon_qty[]">Qty</label>
@@ -1070,7 +1073,7 @@
 			<div class="col-md-12">
 				<div class="section form-horizontal">
 					<!-- TODO add option to equip protection -->
-					<div class="section-title">Protection</div>
+					<div class="section-title"><span>Protection</span> <i class="fa-solid icon-armor"></i><!-- <i class="fa-solid fa-shield-halved"></i> --></div>
 					<div class="form-group">
 						<label class="control-label col-xs-3 resize-mobile center" for="protections[]">Item</label>
 						<label class="control-label col-xs-2 resize-mobile center" for="protection_bonus[]">Bonus</label>
@@ -1087,7 +1090,7 @@
 			<!-- section: healing -->
 			<div class="col-md-12">
 				<div class="section form-horizontal">
-					<div class="section-title">Healings, Potions, & Drugs</div>
+					<div class="section-title"><span>Healings, Potions, & Drugs</span> <i class="fa-solid fa-flask"></i></div>
 					<div class="form-group">
 						<label class="control-label col-xs-3 resize-mobile center" for="healings[]">Item</label>
 						<label class="control-label col-xs-2 resize-mobile center" for="healing_quantity[]">Qty</label>
@@ -1104,7 +1107,7 @@
 			<!-- section: misc -->
 			<div class="col-md-12">
 				<div class="section form-horizontal">
-					<div class="section-title">Miscellaneous & Special Items</div>
+					<div class="section-title"><span>Misc & Special Items</span> <i class="fa-solid icon-misc"></i><!-- <i class="fa-solid fa-wand-sparkles"></i> --></div>
 					<div class="form-group">
 						<label class="control-label col-xs-3 resize-mobile center" for="misc[]">Item</label>
 						<label class="control-label col-xs-2 resize-mobile center" for="misc_quantity[]">Qty</label>
@@ -1132,7 +1135,7 @@
 
 			<div class="col-md-12">
 				<div class="section form-horizontal">
-					<div class="section-title" id="section_weight">Weight Capacity</div>
+					<div class="section-title" id="section_weight"><span>Weight Capacity</span> <i class="fa-solid fa-scale-balanced"></i></div>
 					<div class="form-group">
 						<label class="control-label col-xs-3 center resize-mobile-small" for="unhindered">Unhindered (1/4)</label>
 						<label class="control-label col-xs-3 center resize-mobile-small" for="encumbered">Encumbered (1/2)</label>
@@ -1165,9 +1168,10 @@
 			<!-- end section: weight -->
 
 			<!-- section: notes -->
+			<!-- TODO create option 'add note' - create table 'user_note' -->
 			<div class="col-md-12">
 				<div class="section form-horizontal">
-					<div class="section-title" id="section_notes">Notes</div>
+					<div class="section-title" id="section_notes"><span>Notes</span> <i class="fa-solid fa-scroll"></i></div>
 					<div class="form-group">
 						<div class="col-xs-12">
 							<textarea class="form-control" rows="4" name="notes" maxlength="2000"><?php echo isset($user) ? htmlspecialchars($user['notes']) : '' ?></textarea>
@@ -1180,7 +1184,7 @@
 			<!-- section: background -->
 			<div class="col-md-12">
 				<div class="section form-horizontal">
-					<div class="section-title">Character Background</div>
+					<div class="section-title"><span>Character Background</span> <i class="fa-solid fa-signs-post"></i></div>
 					<div class="form-group">
 						<div class="col-xs-12">
 							<textarea class="form-control" rows="6" name="background" maxlength="2000"><?php echo isset($user) ? htmlspecialchars($user['background']) : '' ?></textarea>
@@ -1354,6 +1358,8 @@
         	</select>
         	<label class="control-label">Weapon Name*</label>
         	<input class="form-control" type="text" id="weapon_name">
+        	<label class="control-label">Quantity</label>
+        	<input class="form-control" type="number" id="weapon_qty">
         	<label class="control-label">Damage*</label>
         	<input class="form-control" type="number" id="weapon_damage">
         	<label class="control-label">Max Damage</label>
@@ -1368,8 +1374,6 @@
         	<input class="form-control" type="text" id="weapon_notes">
         	<label class="control-label">Weight</label>
         	<input class="form-control" type="number" id="weapon_weight">
-        	<label class="control-label">Qty</label>
-        	<input class="form-control" type="number" id="weapon_qty">
         	<input type="hidden" id="weapon_id">
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
@@ -1585,8 +1589,8 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script async src="https://www.google.com/recaptcha/api.js?render=6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
-	<script src="/assets/script_v22_06_07.js"></script>
-
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
+	<script src="/assets/script_v22_06_10.js"></script>
 	<script type="text/javascript">
 
 		var keys = <?php echo json_encode($keys); ?>;

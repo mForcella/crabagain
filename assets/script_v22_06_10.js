@@ -119,12 +119,13 @@ function selectWeapon(id) {
 	// make sure the weapon isn't already selected
 	var duplicate = false;
 	$(".weapon-select").each(function(){
+		// TODO if weapon quantity is > 1, allow two selections
 		if (this.id != "weapon_select_"+id && selected == $(this).val() && selected != "") {
 			$("#weapon_select_"+id).val("");
 			duplicate = true;
 		}
 	});
-	// TODO don't clear inputs - undo selection instead - no way to get previous selection...
+	// TODO don't clear inputs - undo selection instead - no way to get previous selection...?
 	// if (duplicate) {
 	// 	return;
 	// }
