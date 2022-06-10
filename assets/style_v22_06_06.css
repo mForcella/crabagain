@@ -211,6 +211,8 @@ h1 {
 }
 .form-control[readonly] {
 	background-color: white;
+	/*background-color: #f2f2f2;*/
+	/*color: black;*/
 }
 .form-group .control-label {
 	text-align: left;

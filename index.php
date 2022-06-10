@@ -203,7 +203,7 @@
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="xp">Experience</label>
 						<div class="col-sm-4 col-xs-8 mobile-pad-bottom">
-							<input class="form-control" readonly data-toggle="modal" data-target="#xp_modal" name="xp" id="xp" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['xp']) : '' ?>">
+							<input class="form-control" readonly data-toggle="modal" data-target="#xp_modal" name="xp" id="xp" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['xp']) : 0 ?>">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="level">Level</label>
 						<div class="col-sm-4 col-xs-8">
@@ -230,7 +230,7 @@
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="morale">Morale</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-							<input class="form-control" type="number" name="morale" id="morale" min="-10" value="<?php echo isset($user) ? htmlspecialchars($user['morale']) : '' ?>">
+							<input class="form-control" type="number" name="morale" id="morale" min="-10" value="<?php echo isset($user) ? htmlspecialchars($user['morale']) : 0 ?>">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="morale_effect">Effect</label>
 						<div class="col-sm-6 col-xs-8">
@@ -508,7 +508,7 @@
 							</div>
 							<div class="row">
 								<div class="col-xs-5 no-pad">
-									<input class="form-control" id="damage" type="number" name="damage" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['damage']) : '' ?>">
+									<input class="form-control" id="damage" type="number" name="damage" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['damage']) : 0 ?>">
 								</div>
 								<div class="col-xs-2 center no-pad">
 									/
@@ -532,7 +532,7 @@
 							</div>
 							<div class="row">
 								<div class="col-xs-5 no-pad">
-									<input class="form-control" id="wounds" type="number" name="wounds" min="0" max="3" value="<?php echo isset($user) ? htmlspecialchars($user['wounds']) : '' ?>">
+									<input class="form-control" id="wounds" type="number" name="wounds" min="0" max="3" value="<?php echo isset($user) ? htmlspecialchars($user['wounds']) : 0 ?>">
 								</div>
 								<div class="col-xs-2 center no-pad">
 									/
