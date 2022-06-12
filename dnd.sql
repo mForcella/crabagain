@@ -35,7 +35,6 @@
     damage int,
     wounds int,
     wound_penalty varchar(64),
-    notes varchar(2000),
     background varchar(2000),
     weapon_1 varchar(64),
     weapon_2 varchar(64),
@@ -49,6 +48,15 @@
     motivator_3_pts int,
     motivator_4_pts int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
+  );
+
+  CREATE TABLE user_note (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    title varchar(255),
+    note varchar(2000),
+    user_id int,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (user_id) REFERENCES user(id)
   );
 
   CREATE TABLE user_training (

@@ -14,6 +14,7 @@ var attributeVals = [];
 var trainingVals = [];
 var trainings = [];
 var feats = [];
+var notes = [];
 var attributes = [
 	'strength',
 	'fortitude',
@@ -532,6 +533,14 @@ $("#new_misc_modal").on('hidden.bs.modal', function(){
 	$("#misc_quantity").val("");
 	$("#misc_notes").val("");
 	$("#misc_weight").val("");
+});
+$("#new_note_modal").on('shown.bs.modal', function(){
+	$("#note_title").focus();
+});
+$("#new_note_modal").on('hidden.bs.modal', function(){
+	$("#note_modal_title").html("New Note");
+	$("#note_title").val("");
+	$("#note_content").val("");
 });
 $("#xp_modal").on('shown.bs.modal', function(){
 	$("#add_xp").focus();
@@ -1144,12 +1153,114 @@ function addTrainingElements(trainingName, attribute, value='') {
 
 }
 
+// get note values from modal
+function newNote() {
+	// check if we are editing
+	var editing = $("#note_modal_title").html() == "Edit Note";
+	var title = $("#note_title").val();
+	var note = $("#note_content").val();
+	if (note == "") {
+		return;
+	}
+	if (editing) {
+		// update note text
+		var note_id = $("#note_id").val();
+		// title could be empty
+		if (title == "") {
+			$("#"+note_id+"_title").html("");
+		} else {
+			$("#"+note_id+"_title").html(title+": ");
+		}
+		$("#"+note_id+"_content").html(note.length > 90 ? note.substring(0,90)+"..." : note);
+		$("#"+note_id+"_title_val").val(title);
+		$("#"+note_id+"_content_val").val(note);
+	} else {
+		addNoteElements(title, note);
+	}
+}
+
+// create note elements
+function addNoteElements(title, note) {
+
+	var li = $('<li />', {
+	}).appendTo("#notes");
+
+	var span = $('<span />', {
+	  'class': 'note',
+	}).appendTo(li);
+
+	// make sure title isn't empty
+	if (title == "") {
+		title = note.substring(0,30);
+		var title_val = title.replace(/[^a-zA-Z0-9\-_:]+/g, "_");
+		$('<span />', {
+			'id': title_val+"_title",
+			'html': "",
+		  'class': 'note-title',
+		}).appendTo(span);
+		createInput('', 'hidden', 'titles[]', "", span, title_val+"_title_val");
+	} else {
+		var title_val = title.replace(/[^a-zA-Z0-9\-_:]+/g, "_");
+		$('<span />', {
+			'id': title_val+"_title",
+			'html': title+": ",
+		  'class': 'note-title',
+		}).appendTo(span);
+		createInput('', 'hidden', 'titles[]', title, span, title_val+"_title_val");
+	}
+
+	// make sure title isn't a duplicate
+	if (notes.includes(title_val.toLowerCase())) {
+		alert("Title already in use");
+		li.remove();
+		return;
+	}
+	notes.push(title_val);
+
+	$('<span />', {
+		'id': title_val+"_content",
+		'html': note.length > 90 ? note.substring(0,90)+"..." : note,
+	  'class': 'note-content',
+	}).appendTo(span);
+
+	var remove = $('<span />', {
+	  'class': 'glyphicon glyphicon-remove',
+	}).appendTo(li);
+
+	createInput('', 'hidden', 'notes[]', note, span, title_val+"_content_val");
+
+	// highlight on hover
+	li.hover(function(){
+		$(this).addClass("highlight");
+	}, function(){
+		$(this).removeClass("highlight");
+	});
+
+	// edit on click
+	span.click(function(){
+		editNote(title_val);
+	});
+
+	// enable remove button
+	remove.click(function(){
+		var conf = confirm("Delete note, " + (title == "" ? "[no title]" : title) + "?");
+		if (conf) { li.remove(); }
+	});
+}
+
+function editNote(note_id) {
+	// set modal values and launch
+	$("#note_modal_title").html("Edit Note");
+	$("#note_title").val($("#"+note_id+"_title_val").val());
+	$("#note_content").val($("#"+note_id+"_content_val").val());
+	$("#note_id").val(note_id);
+	$("#new_note_modal").modal("show");
+}
+
 // add a new weapon from modal values - or edit existing weapon
 function newWeapon() {
 	// check if we are editing
 	var editing = $("#weapon_modal_title").html() == "Edit Weapon";
-	// reset modal title
-	$("#weapon_modal_title").html("New Weapon");
 	var type = $("#weapon_type").val();
 	var name = $("#weapon_name").val();
 	var damage = $("#weapon_damage").val();
@@ -1168,6 +1279,7 @@ function newWeapon() {
 		return;
 	}
 	if (editing) {
+		// TODO make sure weapon name isn't duplicate
 		// update weapon inputs
 		var weapon_id = $("#weapon_id").val();
 		$("#"+weapon_id+"_type").val(type);
@@ -1403,13 +1515,9 @@ function newProtection() {
 	// check if we are editing
 	var editing = $("#protection_modal_title").html() == "Edit Protection";
 	var name = $("#protection_name").val();
-	$("#protection_name").val("");
 	var bonus = $("#protection_bonus").val() == "" ? 0 : $("#protection_bonus").val();
-	$("#protection_bonus").val("");
 	var notes = $("#protection_notes").val();
-	$("#protection_notes").val("");
 	var weight = $("#protection_weight").val() == "" ? 0 : $("#protection_weight").val();
-	$("#protection_weight").val("");
 	if (name == "") {
 		alert("Name is required");
 		return;
@@ -1504,13 +1612,9 @@ function newHealing() {
 	// check if we are editing
 	var editing = $("#healing_modal_title").html() == "Edit Healing/Potion/Drug";
 	var name = $("#healing_name").val();
-	$("#healing_name").val("");
 	var quantity = $("#healing_quantity").val() == "" ? 1 : $("#healing_quantity").val();
-	$("#healing_quantity").val("");
 	var effect = $("#healing_effect").val();
-	$("#healing_effect").val("");
 	var weight = $("#healing_weight").val() == "" ? 0 : $("#healing_weight").val();
-	$("#healing_weight").val("");
 	if (name == "") {
 		alert("Name is required");
 		return;
@@ -1605,13 +1709,9 @@ function newMisc() {
 	// check if we are editing
 	var editing = $("#misc_modal_title").html() == "Edit Miscellaneous Item";
 	var name = $("#misc_name").val();
-	$("#misc_name").val("");
 	var quantity = $("#misc_quantity").val() == "" ? 1 : $("#misc_quantity").val();
-	$("#misc_quantity").val("");
 	var notes = $("#misc_notes").val();
-	$("#misc_notes").val("");
 	var weight = $("#misc_weight").val() == "" ? 0 : $("#misc_weight").val();
-	$("#misc_weight").val("");
 	if (name == "") {
 		alert("Name is required");
 		return;

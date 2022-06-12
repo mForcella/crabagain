@@ -21,6 +21,7 @@
 	$protections = [];
 	$healings = [];
 	$misc = [];
+	$notes = [];
 
 	// check for user parameter in url
 	if (isset($_GET["user"])) {
@@ -77,6 +78,14 @@
 		    		array_push($misc, $row);
 		    	}
 	    	}
+	    	// get user notes
+	    	$sql = "SELECT * FROM user_note WHERE user_id = ".$_GET["user"]." ORDER BY note";
+	    	$result = $db->query($sql);
+	    	if ($result) {
+		    	while($row = $result->fetch_assoc()) {
+		    		array_push($notes, $row);
+		    	}
+	    	}
 
 			}
     }
@@ -105,7 +114,7 @@
 	<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;1,400;1,600&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
 
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-	<link rel="stylesheet" type="text/css" href="/assets/style_v22_06_10.css">
+	<link rel="stylesheet" type="text/css" href="/assets/style_v22_06_12.css">
 
 
 
@@ -250,42 +259,42 @@
 				<div class="section form-horizontal">
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="race">Race</label>
-						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">
 							<input class="form-control" type="text" name="race" value="<?php echo isset($user) ? htmlspecialchars($user['race']) : '' ?>">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="age">Age</label>
-						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">
 							<input class="form-control" type="text" name="age" id="age_text" value="<?php echo isset($user) ? htmlspecialchars($user['age']) : '' ?>">
 							<input class="form-control hidden-number" type="number" id="age">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="gender">Gender</label>
-						<div class="col-sm-2 col-xs-8">
+						<div class="col-sm-2 col-xs-8 desktop-no-pad-left">
 							<input class="form-control" type="text" name="gender" value="<?php echo isset($user) ? htmlspecialchars($user['gender']) : '' ?>">
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="height">Height</label>
-						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">
 							<input class="form-control" type="text" name="height" id="height_text" value="<?php echo isset($user) ? htmlspecialchars($user['height']) : '' ?>">
 							<input class="form-control hidden-number" type="number" id="height">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="weight">Weight</label>
-						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">
 							<input class="form-control" type="text" name="weight" id="weight_text" value="<?php echo isset($user) ? htmlspecialchars($user['weight']) : '' ?>">
 							<input class="form-control hidden-number" type="number" id="weight">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="eyes">Eyes</label>
-						<div class="col-sm-2 col-xs-8">
+						<div class="col-sm-2 col-xs-8 desktop-no-pad-left">
 							<input class="form-control" type="text" name="eyes" value="<?php echo isset($user) ? htmlspecialchars($user['eyes']) : '' ?>">
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="hair">Hair</label>
-						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">
 							<input class="form-control" type="text" name="hair" value="<?php echo isset($user) ? htmlspecialchars($user['hair']) : '' ?>">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="other">Other</label>
-						<div class="col-sm-6 col-xs-8">
+						<div class="col-sm-6 col-xs-8 desktop-no-pad-left">
 							<input class="form-control" type="text" name="other" value="<?php echo isset($user) ? htmlspecialchars($user['other']) : '' ?>">
 						</div>
 					</div>
@@ -321,25 +330,25 @@
 								<div id="weapon_1_container" class="weapon-container">
 									<div class="form-group">
 										<label class="control-label col-md-7 col-xs-4" for="weapon_1_damage">Damage</label>
-										<div class="col-md-5 col-xs-8">
+										<div class="col-md-5 col-xs-8 no-pad-left">
 											<input class="form-control" readonly id="weapon_damage_1" name="weapon_1_damage">
 										</div>
 									</div>
 									<div class="form-group">
 										<label class="control-label col-md-7 col-xs-4" for="weapon_1_crit">Critical</label>
-										<div class="col-md-5 col-xs-8">
+										<div class="col-md-5 col-xs-8 no-pad-left">
 											<input class="form-control" readonly id="weapon_crit_1" name="weapon_1_crit">
 										</div>
 									</div>
 									<div class="form-group">
 										<label class="control-label col-md-7 col-xs-4" for="weapon_1_range">Range</label>
-										<div class="col-md-5 col-xs-8">
+										<div class="col-md-5 col-xs-8 no-pad-left">
 											<input class="form-control" readonly id="weapon_range_1" name="weapon_1_range">
 										</div>
 									</div>
 									<div class="form-group">
 										<label class="control-label col-md-7 col-xs-4" for="weapon_1_rof">R o F</label>
-										<div class="col-md-5 col-xs-8">
+										<div class="col-md-5 col-xs-8 no-pad-left">
 											<input class="form-control" readonly id="weapon_rof_1" name="weapon_1_rof">
 										</div>
 									</div>
@@ -363,25 +372,25 @@
 								<div id="weapon_2_container" class="weapon-container">
 									<div class="form-group">
 										<label class="control-label col-md-7 col-xs-4" for="weapon_2_damage">Damage</label>
-										<div class="col-md-5 col-xs-8">
+										<div class="col-md-5 col-xs-8 no-pad-left">
 											<input class="form-control" readonly id="weapon_damage_2" name="weapon_2_damage">
 										</div>
 									</div>
 									<div class="form-group">
 										<label class="control-label col-md-7 col-xs-4" for="weapon_2_crit">Critical</label>
-										<div class="col-md-5 col-xs-8">
+										<div class="col-md-5 col-xs-8 no-pad-left">
 											<input class="form-control" readonly id="weapon_crit_2" name="weapon_2_crit">
 										</div>
 									</div>
 									<div class="form-group">
 										<label class="control-label col-md-7 col-xs-4" for="weapon_2_range">Range</label>
-										<div class="col-md-5 col-xs-8">
+										<div class="col-md-5 col-xs-8 no-pad-left">
 											<input class="form-control" readonly id="weapon_range_2" name="weapon_2_range">
 										</div>
 									</div>
 									<div class="form-group">
 										<label class="control-label col-md-7 col-xs-4" for="weapon_2_rof">R o F</label>
-										<div class="col-md-5 col-xs-8">
+										<div class="col-md-5 col-xs-8 no-pad-left">
 											<input class="form-control" readonly id="weapon_rof_2" name="weapon_2_rof">
 										</div>
 									</div>
@@ -405,25 +414,25 @@
 								<div id="weapon_3_container" class="weapon-container">
 									<div class="form-group">
 										<label class="control-label col-md-7 col-xs-4" for="weapon_3_damage">Damage</label>
-										<div class="col-md-5 col-xs-8">
+										<div class="col-md-5 col-xs-8 no-pad-left">
 											<input class="form-control" readonly id="weapon_damage_3" name="weapon_3_damage">
 										</div>
 									</div>
 									<div class="form-group">
 										<label class="control-label col-md-7 col-xs-4" for="weapon_3_crit">Critical</label>
-										<div class="col-md-5 col-xs-8">
+										<div class="col-md-5 col-xs-8 no-pad-left">
 											<input class="form-control" readonly id="weapon_crit_3" name="weapon_3_crit">
 										</div>
 									</div>
 									<div class="form-group">
 										<label class="control-label col-md-7 col-xs-4" for="weapon_3_range">Range</label>
-										<div class="col-md-5 col-xs-8">
+										<div class="col-md-5 col-xs-8 no-pad-left">
 											<input class="form-control" readonly id="weapon_range_3" name="weapon_3_range">
 										</div>
 									</div>
 									<div class="form-group">
 										<label class="control-label col-md-7 col-xs-4" for="weapon_3_rof">R o F</label>
-										<div class="col-md-5 col-xs-8">
+										<div class="col-md-5 col-xs-8 no-pad-left">
 											<input class="form-control" readonly id="weapon_rof_3" name="weapon_3_rof">
 										</div>
 									</div>
@@ -1168,14 +1177,14 @@
 			<!-- end section: weight -->
 
 			<!-- section: notes -->
-			<!-- TODO create option 'add note' - create table 'user_note' -->
 			<div class="col-md-12">
 				<div class="section form-horizontal">
 					<div class="section-title" id="section_notes"><span>Notes</span> <i class="fa-solid fa-scroll"></i></div>
 					<div class="form-group">
 						<div class="col-xs-12">
-							<textarea class="form-control" rows="4" name="notes" maxlength="2000"><?php echo isset($user) ? htmlspecialchars($user['notes']) : '' ?></textarea>
+							<ul id="notes"></ul>
 						</div>
+						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" data-toggle="modal" data-target="#new_note_modal"></span></button>
 					</div>
 				</div>
 			</div>
@@ -1280,6 +1289,28 @@
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="editSize()">Ok</button>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+	<!-- new note modal -->
+  <div class="modal" id="new_note_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+      <div class="modal-content searching-prompt">
+        <div class="modal-header">
+          <h4 class="modal-title" id="note_modal_title">New Note</h4>
+        </div>
+        <div class="modal-body">
+        	<label class="control-label">Title</label>
+        	<input class="form-control" type="text" id="note_title">
+        	<label class="control-label">Note*</label>
+        	<textarea class="form-control" id="note_content" rows="10" maxlength="2000"></textarea>
+        	<input type="hidden" id="note_id">
+        	<div class="button-bar">
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newNote()">Ok</button>
         	</div>
         </div>
       </div>
@@ -1395,7 +1426,7 @@
           <h4 class="modal-title" id="protection_modal_title">New Protection</h4>
         </div>
         <div class="modal-body">
-        	<label class="control-label">Protection Name</label>
+        	<label class="control-label">Protection Name*</label>
         	<input class="form-control" type="text" id="protection_name">
         	<label class="control-label">Bonus</label>
         	<input class="form-control" type="number" id="protection_bonus">
@@ -1421,7 +1452,7 @@
           <h4 class="modal-title" id="healing_modal_title">New Healing/Potion/Drug</h4>
         </div>
         <div class="modal-body">
-        	<label class="control-label">Item Name</label>
+        	<label class="control-label">Item Name*</label>
         	<input class="form-control" type="text" id="healing_name">
         	<label class="control-label">Quantity</label>
         	<input class="form-control" type="number" id="healing_quantity">
@@ -1447,7 +1478,7 @@
           <h4 class="modal-title" id="misc_modal_title">New Miscellaneous Item</h4>
         </div>
         <div class="modal-body">
-        	<label class="control-label">Item Name</label>
+        	<label class="control-label">Item Name*</label>
         	<input class="form-control" type="text" id="misc_name">
         	<label class="control-label">Quantity</label>
         	<input class="form-control" type="number" id="misc_quantity">
@@ -1593,7 +1624,7 @@
 	<script async src="https://www.google.com/recaptcha/api.js?render=6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
-	<script src="/assets/script_v22_06_12.js"></script>
+	<script src="/assets/script_v22_06_12_1.js"></script>
 	<script type="text/javascript">
 
 		var keys = <?php echo json_encode($keys); ?>;
@@ -1657,6 +1688,12 @@
 		var misc = <?php echo json_encode($misc); ?>;
 		for (var i in misc) {
 			addMiscElements(misc[i]['name'], misc[i]['quantity'], misc[i]['notes'], misc[i]['weight']);
+		}
+
+		// check for user notes
+		var notes = <?php echo json_encode($notes); ?>;
+		for (var i in notes) {
+			addNoteElements(notes[i]['title'], notes[i]['note']);
 		}
 
 	</script>

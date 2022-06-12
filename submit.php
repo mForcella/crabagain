@@ -12,7 +12,7 @@
 	  	die("Connection failed: " . $db->connect_error);
 	}
 
-	$user_columns = ['character_name', 'attribute_pts', 'xp', 'morale', 'race', 'height', 'weight', 'age', 'eyes', 'hair', 'gender', 'other', 'size', 'strength', 'fortitude', 'speed', 'agility', 'precision_', 'awareness', 'allure', 'deception', 'intellect', 'innovation', 'intuition', 'vitality', 'notes', 'background', 'free', 'move_penalty', 'fear', 'poison', 'disease', 'damage', 'wounds', 'wound_penalty', 'weapon_1', 'weapon_2', 'weapon_3', 'motivator_1', 'motivator_2', 'motivator_3', 'motivator_4', 'motivator_1_pts', 'motivator_2_pts', 'motivator_3_pts', 'motivator_4_pts'];
+	$user_columns = ['character_name', 'attribute_pts', 'xp', 'morale', 'race', 'height', 'weight', 'age', 'eyes', 'hair', 'gender', 'other', 'size', 'strength', 'fortitude', 'speed', 'agility', 'precision_', 'awareness', 'allure', 'deception', 'intellect', 'innovation', 'intuition', 'vitality', 'background', 'free', 'move_penalty', 'fear', 'poison', 'disease', 'damage', 'wounds', 'wound_penalty', 'weapon_1', 'weapon_2', 'weapon_3', 'motivator_1', 'motivator_2', 'motivator_3', 'motivator_4', 'motivator_1_pts', 'motivator_2_pts', 'motivator_3_pts', 'motivator_4_pts'];
 
 	// new or existing character?
 	if ($_POST['user_id'] != null) {
@@ -180,6 +180,20 @@
 		$misc_weight = $_POST['misc_weight'];
 		for ($i = 0; $i < count($misc); $i++) {
 			$sql = "INSERT INTO user_misc (name, quantity, notes, weight, user_id) VALUES ('".addslashes($misc[$i])."', '".addslashes($misc_quantity[$i])."', '".addslashes($misc_notes[$i])."', '".$misc_weight[$i]."', '".$user_id."')";
+			$db->query($sql);
+		}
+	}
+
+	// remove any old notes
+	$sql = "DELETE FROM user_note WHERE user_id = " . $user_id;
+	$db->query($sql);
+
+	// look for new notes
+	if (isset($_POST['notes'])) {
+		$titles = $_POST['titles'];
+		$notes = $_POST['notes'];
+		for ($i = 0; $i < count($notes); $i++) {
+			$sql = "INSERT INTO user_note (title, note, user_id) VALUES ('".addslashes($titles[$i])."', '".addslashes($notes[$i])."', '".$user_id."')";
 			$db->query($sql);
 		}
 	}
