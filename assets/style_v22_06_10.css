@@ -47,6 +47,10 @@
 	margin-left: 15px;
     font-size: 2.0rem;
 }
+.nav-icon {
+	margin-right: 10px;
+	margin-left: -10px;
+}
 .glyphicon-menu-hamburger {
     font-size: 3.6rem;
     color: #b3b3b3;
@@ -315,21 +319,32 @@ h1 {
 .highlight {
 	text-shadow: 0px 0px 3px #404040;
 }
+.svg-inline--fa {
+	/* changes fa-icon color to black */
+	transform: translateX(1px);
+}
+.custom-icon {
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+.icon-armor, .icon-misc {
+    font-size: 1.2em;
+    transform: translateY(2px);
+}
 .icon-sword {
     background-image: url("image/sword.svg");
-    background-size: contain;
 }
 .icon-armor {
     background-image: url("image/helmet.svg");
-    background-size: contain;
 }
 .icon-misc {
     background-image: url("image/misc.svg");
-    background-size: contain;
 }
 .icon-attack {
     background-image: url("image/attack.svg");
-    background-size: contain;
+}
+.icon-path {
+    background-image: url("image/path.svg");
 }
 .left-col {
 	margin-left: 15px;

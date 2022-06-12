@@ -120,16 +120,16 @@
 	<nav class="navbar">
 	  <div class="nav-menu">
 	    <div class="nav-item">
-	       <span class="glyphicon" onclick="formSubmit()"><span class="nav-item-label"><i class="fa-solid fa-floppy-disk"></i> Save Character Data</span></span>
+	       <span class="glyphicon" onclick="formSubmit()"><span class="nav-item-label"><i class="fa-solid fa-floppy-disk nav-icon"></i> Save Character Data</span></span>
 	    </div>
 	    <div class="nav-item">
-	       <span class="glyphicon" onclick="allocateAttributePts()"><span class="nav-item-label"><i class="fa-solid fa-shield-heart"></i> Allocate Attribute Points</span></span>
+	       <span class="glyphicon" onclick="allocateAttributePts()"><span class="nav-item-label"><i class="fa-solid fa-shield-heart nav-icon"></i> Allocate Attribute Points</span></span>
 	    </div>
 	    <?php
 	    	if (isset($user)) {
 	    		echo '
 				    <div class="nav-item">
-				       <span class="glyphicon" data-toggle="modal" data-target="#gm_edit_modal"><span class="nav-item-label"><i class="fa-solid fa-dice-d20"></i> GM Edit Mode</span></span>
+				       <span class="glyphicon" data-toggle="modal" data-target="#gm_edit_modal"><span class="nav-item-label"><i class="fa-solid fa-dice-d20 nav-icon"></i> GM Edit Mode</span></span>
 				    </div>
 				   ';
 	    	}
@@ -301,7 +301,7 @@
 				<!-- section: weapons -->
 				<div class="section form-horizontal">
 					<div class="form-group">
-						<div class="section-title" id="section_attack"><span>Attack</span> <i class="fa-solid icon-attack"></i><!-- <i class="fa-solid fa-hand-fist"></i> --></div>
+						<div class="section-title" id="section_attack"><span>Attack</span> <i class="fa-solid icon-attack custom-icon"></i><!-- <i class="fa-solid fa-hand-fist"></i> --></div>
 						<div class="row">
 
 							<div class="col-sm-4">
@@ -577,9 +577,9 @@
 							<?php
 								$standard = isset($user) ? (
 									$user['speed'] >= 0 ?
-										2 + floor($user['speed']/4) :
-										2 + round($user['speed']/6)
-								) : 2;
+										1 + floor($user['speed']/4) :
+										1 + round($user['speed']/6)
+								) : 1;
 							?>
 							<input class="form-control" readonly name="standard" id="standard" value="<?php echo $standard ?>">
 						</div>
@@ -603,9 +603,9 @@
 						<label class="control-label col-sm-2 col-xs-4" for="move">Move</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 							<?php
-								$move = isset($user) ? ($user['size'] == "Small" ? 1 :
-									($user['size'] == "Large" ? 3 : 2)
-								) : 2;
+								$move = isset($user) ? ($user['size'] == "Small" ? 0.5 :
+									($user['size'] == "Large" ? 1.5 : 1)
+								) : 1;
 							?>
 							<input class="form-control" readonly name="move" id="move" value="<?php echo $move ?>">
 						</div>
@@ -1054,7 +1054,7 @@
 			<!-- section: weapons -->
 			<div class="col-md-12">
 				<div class="section form-horizontal">
-					<div class="section-title" id="section_items"><span>Weapons</span> <i class="fa-solid icon-sword"></i><!-- <i class="fa-solid fa-hand-fist"></i> --></div>
+					<div class="section-title" id="section_items"><span>Weapons</span> <i class="fa-solid icon-sword custom-icon"></i><!-- <i class="fa-solid fa-hand-fist"></i> --></div>
 					<div class="form-group">
 						<label class="control-label col-xs-3 resize-mobile center" for="weapons[]">Item</label>
 						<label class="control-label col-xs-1 resize-mobile center" for="weapon_qty[]">Qty</label>
@@ -1073,7 +1073,7 @@
 			<div class="col-md-12">
 				<div class="section form-horizontal">
 					<!-- TODO add option to equip protection -->
-					<div class="section-title"><span>Protection</span> <i class="fa-solid icon-armor"></i><!-- <i class="fa-solid fa-shield-halved"></i> --></div>
+					<div class="section-title"><span>Protection</span> <i class="fa-solid icon-armor custom-icon"></i><!-- <i class="fa-solid fa-shield-halved"></i> --></div>
 					<div class="form-group">
 						<label class="control-label col-xs-3 resize-mobile center" for="protections[]">Item</label>
 						<label class="control-label col-xs-2 resize-mobile center" for="protection_bonus[]">Bonus</label>
@@ -1107,7 +1107,7 @@
 			<!-- section: misc -->
 			<div class="col-md-12">
 				<div class="section form-horizontal">
-					<div class="section-title"><span>Misc & Special Items</span> <i class="fa-solid icon-misc"></i><!-- <i class="fa-solid fa-wand-sparkles"></i> --></div>
+					<div class="section-title"><span>Misc & Special Items</span> <i class="fa-solid icon-misc custom-icon"></i><!-- <i class="fa-solid fa-wand-sparkles"></i> --></div>
 					<div class="form-group">
 						<label class="control-label col-xs-3 resize-mobile center" for="misc[]">Item</label>
 						<label class="control-label col-xs-2 resize-mobile center" for="misc_quantity[]">Qty</label>
@@ -1184,7 +1184,10 @@
 			<!-- section: background -->
 			<div class="col-md-12">
 				<div class="section form-horizontal">
-					<div class="section-title"><span>Character Background</span> <i class="fa-solid fa-signs-post"></i></div>
+					<div class="section-title"><span>Character Background</span> 
+						<!-- <i class="fa-solid icon-path custom-icon"></i> -->
+						<i class="fa-solid fa-signs-post"></i>
+					</div>
 					<div class="form-group">
 						<div class="col-xs-12">
 							<textarea class="form-control" rows="6" name="background" maxlength="2000"><?php echo isset($user) ? htmlspecialchars($user['background']) : '' ?></textarea>
@@ -1590,7 +1593,7 @@
 	<script async src="https://www.google.com/recaptcha/api.js?render=6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
-	<script src="/assets/script_v22_06_10.js"></script>
+	<script src="/assets/script_v22_06_12.js"></script>
 	<script type="text/javascript">
 
 		var keys = <?php echo json_encode($keys); ?>;

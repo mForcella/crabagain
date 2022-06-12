@@ -150,12 +150,10 @@ function selectWeapon(id) {
 				// make sure damage doesn't exceed max
 				if (damage_mod > 0) {
 					var max_damage = weapons[i]['max_damage'] == null || weapons[i]['max_damage'] == "" ? 0 : weapons[i]['max_damage'];
-					if (max_damage == 0 || parseInt($("#weapon_damage_"+id).val())+damage_mod <= weapons[i]['max_damage']) {
-						damage = parseInt($("#weapon_damage_"+id).val())+damage_mod;
-					} else {
-						damage = max_damage;
+					if (max_damage != 0 && parseInt($("#weapon_damage_"+id).val())+damage_mod > weapons[i]['max_damage']) {
+						damage_mod = max_damage - damage;
 					}
-					$("#weapon_damage_"+id).val(damage);
+					$("#weapon_damage_"+id).val(damage+" (+"+damage_mod+")");
 				}
 			}
 		}
@@ -413,7 +411,7 @@ function editSize() {
 	var size = $("#character_size_select").val();
 	$("#character_size_text").html(size);
 	$("#character_size_val").val(size);
-	$("#move").val(size == "Small" ? 1 : (size == "Large" ? 3 : 2));
+	$("#move").val(size == "Small" ? 0.5 : (size == "Large" ? 1.5 : 1));
 	setDodge();
 	setDefend();
 	// TODO check if stealth training exists; +2?
@@ -685,14 +683,13 @@ function adjustAttribute(attribute, val) {
 						// set damage to max or damage + mod
 						var id = this.id.slice(-1);
 						var damage_mod = parseInt($("#strength_val").val()) >= 0 ? 
-							Math.floor(parseInt($("#strength_val").val())/2) : Math.ceil(parseInt($("#strength_val").val())/3);	
+							Math.floor(parseInt($("#strength_val").val())/2) : Math.ceil(parseInt($("#strength_val").val())/3);
+						var damage = weapons[i]['damage'];
 						var max_damage = weapons[i]['max_damage'] == null || weapons[i]['max_damage'] == "" ? 0 : weapons[i]['max_damage'];
-						if (max_damage == 0 || parseInt(weapons[i]['damage'])+damage_mod <= weapons[i]['max_damage']) {
-							damage = parseInt(weapons[i]['damage'])+damage_mod;
-						} else {
-							damage = max_damage;
+						if (max_damage != 0 && parseInt(damage)+damage_mod > weapons[i]['max_damage']) {
+							damage_mod = max_damage - damage;
 						}
-						$("#weapon_damage_"+id).val(damage);
+						$("#weapon_damage_"+id).val(damage_mod > 0 ? damage+" (+"+damage_mod+")" : damage);
 					}
 				}
 			});
@@ -706,7 +703,7 @@ function adjustAttribute(attribute, val) {
 			break;
 		case 'speed':
 			// adjust standard and quick actions
-			var standard = newVal >=0 ? 2 + Math.floor(newVal/4) : 2 - Math.round(-1*newVal/6);
+			var standard = newVal >=0 ? 1 + Math.floor(newVal/4) : 1 - Math.round(-1*newVal/6);
 			$("#standard").val(standard);
 			var quick = newVal >= 0 ? (Math.floor(newVal/2) % 2 == 0 ? 0 : 1) : (Math.ceil(newVal/3) % 2 == 0 ? 0 : 1);
 			$("#quick").val(quick);
@@ -724,14 +721,13 @@ function adjustAttribute(attribute, val) {
 						// set damage to max or damage + mod
 						var id = this.id.slice(-1);
 						var damage_mod = parseInt($("#precision__val").val()) >= 0 ? 
-							Math.floor(parseInt($("#precision__val").val())/2) : Math.ceil(parseInt($("#precision__val").val())/3);	
+							Math.floor(parseInt($("#precision__val").val())/2) : Math.ceil(parseInt($("#precision__val").val())/3);
+						var damage = weapons[i]['damage'];
 						var max_damage = weapons[i]['max_damage'] == null || weapons[i]['max_damage'] == "" ? 0 : weapons[i]['max_damage'];
-						if (max_damage == 0 || parseInt(weapons[i]['damage'])+damage_mod <= weapons[i]['max_damage']) {
-							damage = parseInt(weapons[i]['damage'])+damage_mod;
-						} else {
-							damage = max_damage;
+						if (max_damage != 0 && parseInt(damage)+damage_mod > weapons[i]['max_damage']) {
+							damage_mod = max_damage - damage;
 						}
-						$("#weapon_damage_"+id).val(damage);
+						$("#weapon_damage_"+id).val(damage_mod > 0 ? damage+" (+"+damage_mod+")" : damage);
 					}
 				}
 			});
@@ -945,7 +941,6 @@ function addFeatElements(featName, featDescription) {
 
 		// if allocating attribute points, decrease points
 		if (allocatingAttributePts) {
-			console.log("allocating");
 			if (feats.length > 0 || trainings.length > 0) {
 				alert("Only one new feat or training can be added per level.");
 				return;
