@@ -89,7 +89,7 @@
     rof varchar(64),
     defend int,
     notes varchar(255),
-    weight int,
+    weight float,
     user_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES user(id)
@@ -100,7 +100,7 @@
     name varchar(64),
     bonus varchar(64),
     notes varchar(255),
-    weight int,
+    weight float,
     user_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES user(id)
@@ -111,7 +111,7 @@
     name varchar(64),
     quantity varchar(64),
     effect varchar(255),
-    weight int,
+    weight float,
     user_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES user(id)
@@ -122,7 +122,7 @@
     name varchar(64),
     quantity varchar(64),
     notes varchar(255),
-    weight int,
+    weight float,
     user_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES user(id)

@@ -1,4 +1,3 @@
-var updateFeat = false;
 var originalFeatName = "";
 var hiddenEnabled = [];
 var highlightEnabled = [];
@@ -8,13 +7,14 @@ var featNames = [];
 var itemNames = [];
 var totalWeight = 0;
 var allocatingAttributePts = false;
-var character_creation = false;
+var characterCreation = false;
 var adminEditMode = false;
 var attributeVals = [];
 var trainingVals = [];
 var trainings = [];
 var feats = [];
 var notes = [];
+
 var attributes = [
 	'strength',
 	'fortitude',
@@ -29,6 +29,9 @@ var attributes = [
 	'intuition',
 	'vitality'
 ];
+
+// resize background textarea to fit text
+$("#background").height( $("#background")[0].scrollHeight );
 
 // enter GM edit mode
 function GMEditMode() {
@@ -188,7 +191,7 @@ function allocateAttributePts() {
 	});
 	// show new feat button
 	$("#new_feat_btn").show();
-	if (character_creation) {
+	if (characterCreation) {
 		// hide edit buttons
 		$(".attribute-col").unbind("mouseenter mouseleave");
 		if (is_mobile) {
@@ -234,11 +237,11 @@ function endEditAttributes(accept) {
 	$(".attribute-pts").toggleClass("active");
 	$(".glyphicon-menu-hamburger").show();
 	$(".attribute-col").find(".hidden-icon").hide();
-	if (!character_creation) {
+	if (!characterCreation) {
 		$("#new_feat_btn").hide();
 	}
 	if (!is_mobile) {
-		if (character_creation) {
+		if (characterCreation) {
 			// restore attribute-col hover functions
 			$(".attribute-col").each(function(){
 				$(this).hover(function(){
@@ -251,13 +254,13 @@ function endEditAttributes(accept) {
 		}
 		// restore feat hover functions
 	  $(".feat").hover(function () {
-			$(this).find(character_creation ? ".hover-hide" : ".hover-hide.glyphicon-edit").show();
+			$(this).find(characterCreation ? ".hover-hide" : ".hover-hide.glyphicon-edit").show();
 		}, 
 		function () {
 			$(this).find(".hover-hide").hide();
 		});
 	} else {
-		if (character_creation) {
+		if (characterCreation) {
 			$(".attribute-col").each(function(){
 				$(this).find(".glyphicon-edit").show();
 			});
@@ -304,11 +307,17 @@ var is_mobile = $('#is_mobile').css('display')=='none';
 
 // on motivator pt change, adjust bonuses
 $(".motivator-pts").on("change", function(){
-	var pts = 0;
+	var pts = [];
+	var score = 0;
 	$(".motivator-pts").each(function(){
-		pts += parseInt($(this).val());
+		pts.push($(this).val() == "" ? 0 : parseInt($(this).val()));
 	});
-	var bonuses = pts >= 64 ? 5 : (pts >= 32 ? 4 : (pts >= 16 ? 3 : (pts >= 8 ? 2 : (pts >= 4 ? 1 : 0))));
+	// add the highest 3 pt values
+	pts.sort(function(a, b) {
+	  return b - a;
+	});
+	score = pts[0] + pts[1] + pts[2];
+	var bonuses = score >= 64 ? 5 : (score >= 32 ? 4 : (score >= 16 ? 3 : (score >= 8 ? 2 : (score >= 4 ? 1 : 0))));
 	$("#bonuses").val(bonuses);
 });
 
@@ -485,7 +494,7 @@ $("#training_name").on('keypress', function (event) {
 	}
 });
 
-// focus on inputs on modal open
+// focus inputs on modal open - reset inputs on modal close
 $("#new_training_modal").on('shown.bs.modal', function(){
 	$("#training_name").focus();
 });
@@ -560,22 +569,13 @@ $("#gm_edit_modal").on('shown.bs.modal', function(){
 
 // on modal shown, update modal title and clear inputs
 $("#new_feat_modal").on('shown.bs.modal', function(){
-	// if allocating attribute points, make sure we have enough points for a new feat
-	if (allocatingAttributePts) {
-		if (parseInt($(".attribute-count").html().split(" Points")[0]) - 4 < 0) {
-			alert("Not enough attribute points to allocate for a new feat.");
-			$("#new_feat_modal").modal("hide");
-			return;
-		}
-	}
-
 	$("#feat_name").focus();
-	$("#feat_modal_title").html(updateFeat ? "Update Feat" : "New Feat");
-	if (!updateFeat) {
+});
+$("#new_feat_modal").on('hidden.bs.modal', function(){
+	$("#feat_modal_title").html("New Feat");
 		$("#feat_name").val("");
 		$("#feat_description").val("");
-	}
-	updateFeat = false;
+		$("#feat_id").val("");
 });
 
 $("#new_training_modal").on('shown.bs.modal', function(){
@@ -648,7 +648,7 @@ function adjustAttribute(attribute, val) {
 	// check if we are allocating attribute points
 	if (allocatingAttributePts) {
 		// only allow +1 increase from saved val
-		if (!character_creation) {
+		if (!characterCreation) {
 			var savedVal = attributes.indexOf(attribute) == -1 ? trainingVals[attribute] : attributeVals[attributes.indexOf(attribute)];
 			if (newVal < savedVal || newVal > parseInt(savedVal) + 1) {
 				return;
@@ -750,20 +750,7 @@ function adjustAttribute(attribute, val) {
 }
 
 // enable attribute edit btn hide / show on hover; don't hide on mobile
-if (!is_mobile) {
-	// $(".attribute-col").each(function(){
-	// 	$(this).hover(function(){
-	// 		// show glyphicon-plus, glyphicon-minus
-	// 		$(this).find('.hover-hide').show();
-	// 		// toggleHidden(this.id);
-	// 	},
-	// 	function(){
-	// 		// hide glyphicon-plus, glyphicon-minus
-	// 		$(this).find('.hover-hide').hide();
-	// 		// toggleHidden(this.id);
-	// 	});
-	// });
-} else {
+if (is_mobile) {
 	$(".attribute-col").each(function(){
 		$(this).find('.hover-hide').hide();
 	});
@@ -885,117 +872,87 @@ function forgotPassword(){
 // add a new feat from modal values
 function newFeat() {
 	var featName = $("#feat_name").val();
-	$("#feat_name").val("");
-	var featDescription = $("#feat_description").val()+" ";
-	$("#feat_description").val("");
+	var featDescription = $("#feat_description").val();
 	if (featName != "" && featDescription != " ") {
-		addFeatElements(featName, featDescription);
+		addFeatElements(featName, featDescription, $("#feat_id").val());
 	}
 }
 
 // create html elements for feat
-function addFeatElements(featName, featDescription) {
-	var feat_name = featName.replaceAll(' ', '_');
+function addFeatElements(featName, featDescription, id) {
+	var id_val = id == "" ? uuid() : "training_"+id;
 
 	// new or updating?
 	if ($("#feat_modal_title").html() == "Update Feat") {
 
 		// update feat name and description
-		$("#"+originalFeatName.replaceAll(" ", "_")+"_name").html(featName+" : ");
-		$("#"+originalFeatName.replaceAll(" ", "_")+"_descrip").html(featDescription);
-
-		// append edit/remove buttons
-		createElement('span', 'glyphicon glyphicon-edit hover-hide', "#"+originalFeatName.replaceAll(" ", "_")+"_descrip", feat_name+"_edit");
-		createElement('span', 'glyphicon glyphicon-remove hover-hide', "#"+originalFeatName.replaceAll(" ", "_")+"_descrip", feat_name+"_remove");
-
-    // add click functions
-    $("#"+feat_name+"_edit").on("click", function(){
-    	var name = $("#"+feat_name+"_name").html();
-    	var descrip = $("#"+feat_name+"_descrip").html();
-    	$("#feat_name").val(name.split(" : ")[0]);
-    	$("#feat_description").val(descrip.split(" <span")[0]);
-    	updateFeat = true;
-    	originalFeatName = name.split(" : ")[0];
-    	$("#new_feat_modal").modal("show");
-    });
-    $("#"+feat_name+"_remove").on("click", function(){
-    	var name = $("#"+feat_name+"_name").html();
-    	// confirm delete
-    	var conf = confirm("Remove feat '"+name.split(" : ")[0]+"'?");
-    	if (conf) {
-    		$("#"+feat_name).remove();
-				var index = featNames.indexOf(feat_name.toLowerCase());
-				if (index !== -1) {
-				  featNames.splice(index, 1);
-				}
-    	}
-    });
+		$("#"+id+"_name").html(featName+" : ");
+		$("#"+id+"_descrip").html(featDescription);
 
 		// update hidden input values
-		$("#"+originalFeatName.replaceAll(" ", "_")+"_name_val").val(featName);
-		$("#"+originalFeatName.replaceAll(" ", "_")+"_descrip_val").val(featDescription);
-
-		// update IDs
-		$("#"+originalFeatName.replaceAll(" ", "_")+"_name").attr("id", feat_name+"_name");
-		$("#"+originalFeatName.replaceAll(" ", "_")+"_descrip").attr("id", feat_name+"_descrip");
-		$("#"+originalFeatName.replaceAll(" ", "_")+"_name_val").attr("id", feat_name+"_name_val");
-		$("#"+originalFeatName.replaceAll(" ", "_")+"_descrip_val").attr("id", feat_name+"_descrip_val");
+		$("#"+id+"_name_val").val(featName);
+		$("#"+id+"_descrip_val").val(featDescription);
 
 	} else {
 		// make sure we're not adding a duplicate training name
-		if (featNames.includes(feat_name.toLowerCase())) {
+		if (featNames.includes(featName)) {
 			alert("Feat name already in use");
 			return;
 		}
 
 		// if allocating attribute points, decrease points
 		if (allocatingAttributePts) {
+			// only one feat/training per level
 			if (feats.length > 0 || trainings.length > 0) {
 				alert("Only one new feat or training can be added per level.");
+				return;
+			}
+			// make sure we have enough points
+			if (parseInt($(".attribute-count").html().split(" Points")[0]) - 4 < 0) {
+				alert("Not enough attribute points to allocate for a new feat.");
 				return;
 			}
 			var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
 			$(".attribute-count").html(pts - 4+" Points");
 		}
 
-		featNames.push(feat_name.toLowerCase());
-		var top = createElement('div', 'feat', '#feats', feat_name);
+		featNames.push(featName);
+		var feat_container = createElement('div', 'feat', '#feats', id_val);
 		if (allocatingAttributePts) {
-			feats.push(top);
+			feats.push(feat_container);
 		}
 
     $('<p />', {
-    	'id': feat_name+"_name",
+    	'id': id_val+"_name",
     	'class': 'feat-title',
     	'text': featName+" : "
-    }).appendTo(top);
+    }).appendTo(feat_container);
 
     var descrip = $('<p />', {
-    	'id': feat_name+"_descrip",
+    	'id': id_val+"_descrip",
       'text': featDescription
-    }).appendTo(top);
+    }).appendTo(feat_container);
 
-		createElement('span', 'glyphicon glyphicon-edit hover-hide', descrip, feat_name+"_edit");
-		createElement('span', 'glyphicon glyphicon-remove hover-hide', descrip, feat_name+"_remove");
+		createElement('span', 'glyphicon glyphicon-edit hover-hide', feat_container, id_val+"_edit");
+		createElement('span', 'glyphicon glyphicon-remove hover-hide', feat_container, id_val+"_remove");
 
     // add click function to edit button
-    $("#"+feat_name+"_edit").on("click", function(){
-    	var name = $("#"+feat_name+"_name").html();
-    	var descrip = $("#"+feat_name+"_descrip").html();
+    $("#"+id_val+"_edit").on("click", function(){
+    	var name = $("#"+id_val+"_name").html();
     	$("#feat_name").val(name.split(" : ")[0]);
-    	$("#feat_description").val(descrip.split(" <span")[0]);
-    	updateFeat = true;
-    	originalFeatName = name.split(" : ")[0];
+    	$("#feat_description").val($("#"+id_val+"_descrip").html());
+    	$("#feat_id").val(id_val);
+    	$("#feat_modal_title").html("Update Feat");
     	$("#new_feat_modal").modal("show");
     });
 
-    $("#"+feat_name+"_remove").on("click", function(){
-    	var name = $("#"+feat_name+"_name").html();
+    $("#"+id_val+"_remove").on("click", function(){
+    	var name = $("#"+id_val+"_name").html();
     	// confirm delete
     	var conf = confirm("Remove feat '"+name.split(" : ")[0]+"'?");
     	if (conf) {
-    		$("#"+feat_name).remove();
-				var index = featNames.indexOf(feat_name.toLowerCase());
+    		$("#"+id_val).remove();
+				var index = featNames.indexOf(featName);
 				if (index !== -1) {
 				  featNames.splice(index, 1);
 				}
@@ -1003,7 +960,7 @@ function addFeatElements(featName, featDescription) {
 	    	if (allocatingAttributePts) {
 					var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
 					$(".attribute-count").html(pts + 4+" Points");
-					var index = feats.indexOf(top);
+					var index = feats.indexOf(feat_container);
 					if (index !== -1) {
 					  feats.splice(index, 1);
 					}
@@ -1013,24 +970,25 @@ function addFeatElements(featName, featDescription) {
 
     // enable hover function - don't enable on mobile
     if (adminEditMode) {
-    	top.find(".hover-hide").show();
+    	feat_container.find(".hover-hide").show();
     } else {
 	    if (!is_mobile) {
-	    	top.hover(function () {
-					$(this).find(allocatingAttributePts || character_creation ? ".hover-hide" : ".hover-hide.glyphicon-edit").show();
+	    	feat_container.hover(function () {
+					$(this).find(allocatingAttributePts || characterCreation ? ".hover-hide" : ".hover-hide.glyphicon-edit").show();
 				}, 
 				function () {
 					$(this).find(".hover-hide").hide();
 				});
 	    } else {
 	    	// hide remove buttons on mobile
-	    	top.find(".hover-hide.glyphicon-remove").hide();
+	    	feat_container.find(".hover-hide.glyphicon-remove").hide();
 	    }
     }
 
 		// add hidden inputs
-    createInput('', 'hidden', 'feat_names[]', featName, top, feat_name+"_name_val");
-    createInput('', 'hidden', 'feat_descriptions[]', featDescription, top, feat_name+"_name_descrip");
+    createInput('', 'hidden', 'feat_names[]', featName, feat_container, id_val+"_name_val");
+    createInput('', 'hidden', 'feat_descriptions[]', featDescription, feat_container, id_val+"_descrip_val");
+		createInput('', 'hidden', 'feat_ids[]', id, feat_container);
 	}
 
 }
@@ -1048,15 +1006,14 @@ function newTraining() {
 	var trainingName = $("#training_name").val();
 	var attribute = $("#attribute_type").val();
 	if (trainingName != "") {
-		addTrainingElements(trainingName, attribute);
+		addTrainingElements(trainingName, attribute, '');
 	}
 }
 
 // create html elements for training
-function addTrainingElements(trainingName, attribute, value='') {
-	var training_name = trainingName.replaceAll(' ', '_');
+function addTrainingElements(trainingName, attribute, id, value='') {
 	// make sure we're not adding a duplicate training name
-	if (trainingNames.includes(training_name.toLowerCase())) {
+	if (trainingNames.includes(trainingName)) {
 		alert("Training name already in use");
 		return;
 	}
@@ -1081,8 +1038,10 @@ function addTrainingElements(trainingName, attribute, value='') {
 		$(".attribute-count").html(pts - skill_pts +" Points");
 	}
 
-	trainingNames.push(training_name.toLowerCase());
-	var row = createElement('div', 'row training-row', '#'+attribute, training_name.toLowerCase()+"_row");
+	trainingNames.push(trainingName);
+	var id_val = id == "" ? uuid() : "training_"+id;
+
+	var row = createElement('div', 'row training-row', '#'+attribute, id_val+"_row");
 	if (allocatingAttributePts) {
 		trainings.push(row);
 	}
@@ -1090,13 +1049,13 @@ function addTrainingElements(trainingName, attribute, value='') {
 
 	var label_left = $('<label />', {
 	  'class': 'control-label with-hidden',
-	  'for': training_name,
+	  'for': id_val,
 	  'text': trainingName,
 	}).appendTo(div_left);
 
 	// add remove button
 	// if allocating points, make sure remove button is visible
-	var removeBtn = createElement('span', 'glyphicon glyphicon-remove hidden-icon', label_left, training_name+"_text"+"_remove");
+	var removeBtn = createElement('span', 'glyphicon glyphicon-remove hidden-icon', label_left, id_val+"_text"+"_remove");
 	if (allocatingAttributePts || adminEditMode) {
 		removeBtn.show();
 	}
@@ -1109,7 +1068,7 @@ function addTrainingElements(trainingName, attribute, value='') {
 				$(".attribute-count").html(pts + skill_pts +" Points");
 			}
 			row.remove();
-			var index = trainingNames.indexOf(training_name.toLowerCase());
+			var index = trainingNames.indexOf(trainingName);
 			if (index !== -1) {
 			  trainingNames.splice(index, 1);
 			}
@@ -1123,22 +1082,23 @@ function addTrainingElements(trainingName, attribute, value='') {
 	}).appendTo(div_right);
 
 	$('<span />', {
-		'id': training_name+"_text",
+		'id': id_val+"_text",
 	  'class': 'attribute-val',
 	  'html': value == '' ? '+0' : (value >= 0 ? "+"+value : value),
 	}).appendTo(label_right);
 
 	createInput('', 'hidden', 'training[]', trainingName+":"+attribute, label_right);
-	createInput('', 'hidden', 'training_val[]', value == '' ? 0 : value, label_right, training_name+"_val");
+	createInput('', 'hidden', 'training_val[]', value == '' ? 0 : value, label_right, id_val+"_val");
+	createInput('', 'hidden', 'training_ids[]', id, label_right);
 
-	var up = createElement('span', 'glyphicon glyphicon-plus hidden-icon', label_right, training_name+"_up");
-	$("#"+training_name+"_up").on("click", function(){
-		adjustAttribute(training_name, 1);
+	var up = createElement('span', 'glyphicon glyphicon-plus hidden-icon', label_right, id_val+"_up");
+	$("#"+id_val+"_up").on("click", function(){
+		adjustAttribute(id_val, 1);
 	});
 
-	var down = createElement('span', 'glyphicon glyphicon-minus hidden-icon', label_right, training_name+"_down");
-	$("#"+training_name+"_down").on("click", function(){
-		adjustAttribute(training_name, -1);
+	var down = createElement('span', 'glyphicon glyphicon-minus hidden-icon', label_right, id_val+"_down");
+	$("#"+id_val+"_down").on("click", function(){
+		adjustAttribute(id_val, -1);
 	});
 
 	// GM edit mode - show plus minus icons
@@ -1159,7 +1119,7 @@ function newNote() {
 	var editing = $("#note_modal_title").html() == "Edit Note";
 	var title = $("#note_title").val();
 	var note = $("#note_content").val();
-	if (note == "") {
+	if (note == "" && title == "") {
 		return;
 	}
 	if (editing) {
@@ -1175,12 +1135,14 @@ function newNote() {
 		$("#"+note_id+"_title_val").val(title);
 		$("#"+note_id+"_content_val").val(note);
 	} else {
-		addNoteElements(title, note);
+		addNoteElements(title, note, '');
 	}
 }
 
 // create note elements
-function addNoteElements(title, note) {
+function addNoteElements(title, note, id) {
+
+	var id_val = id == "" ? uuid() : "note_"+id;
 
 	var li = $('<li />', {
 	}).appendTo("#notes");
@@ -1189,36 +1151,15 @@ function addNoteElements(title, note) {
 	  'class': 'note',
 	}).appendTo(li);
 
-	// make sure title isn't empty
-	if (title == "") {
-		title = note.substring(0,30);
-		var title_val = title.replace(/[^a-zA-Z0-9\-_:]+/g, "_");
-		$('<span />', {
-			'id': title_val+"_title",
-			'html': "",
-		  'class': 'note-title',
-		}).appendTo(span);
-		createInput('', 'hidden', 'titles[]', "", span, title_val+"_title_val");
-	} else {
-		var title_val = title.replace(/[^a-zA-Z0-9\-_:]+/g, "_");
-		$('<span />', {
-			'id': title_val+"_title",
-			'html': title+": ",
-		  'class': 'note-title',
-		}).appendTo(span);
-		createInput('', 'hidden', 'titles[]', title, span, title_val+"_title_val");
-	}
-
-	// make sure title isn't a duplicate
-	if (notes.includes(title_val.toLowerCase())) {
-		alert("Title already in use");
-		li.remove();
-		return;
-	}
-	notes.push(title_val);
+	$('<span />', {
+		'id': id_val+"_title",
+		'html': title == "" ? title : title+": ",
+	  'class': 'note-title',
+	}).appendTo(span);
+	createInput('', 'hidden', 'titles[]', title, span, id_val+"_title_val");
 
 	$('<span />', {
-		'id': title_val+"_content",
+		'id': id_val+"_content",
 		'html': note.length > 90 ? note.substring(0,90)+"..." : note,
 	  'class': 'note-content',
 	}).appendTo(span);
@@ -1227,7 +1168,8 @@ function addNoteElements(title, note) {
 	  'class': 'glyphicon glyphicon-remove',
 	}).appendTo(li);
 
-	createInput('', 'hidden', 'notes[]', note, span, title_val+"_content_val");
+	createInput('', 'hidden', 'notes[]', note, span, id_val+"_content_val");
+	createInput('', 'hidden', 'note_ids[]', id, span);
 
 	// highlight on hover
 	li.hover(function(){
@@ -1238,7 +1180,7 @@ function addNoteElements(title, note) {
 
 	// edit on click
 	span.click(function(){
-		editNote(title_val);
+		editNote(id_val);
 	});
 
 	// enable remove button
@@ -1279,7 +1221,6 @@ function newWeapon() {
 		return;
 	}
 	if (editing) {
-		// TODO make sure weapon name isn't duplicate
 		// update weapon inputs
 		var weapon_id = $("#weapon_id").val();
 		$("#"+weapon_id+"_type").val(type);
@@ -1325,24 +1266,16 @@ function newWeapon() {
 			}
 		}
 	} else {
-		addWeaponElements(type, name, 1, damage, max_damage, range, rof, defend, notes, weight);
+		addWeaponElements(type, name, 1, damage, max_damage, range, rof, defend, notes, weight, '');
 	}
 }
 
 // create html elements for weapon
-function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defend, notes, weight) {
-	if (itemNames.includes(name.toLowerCase())) {
-		alert("Item name already in use");
-		return;
-	}
-	weight = weight == "" ? 0 : weight;
-	totalWeight += parseFloat(weight)*parseInt(qty == "" ? 1 : qty);
-	$("#total_weight").val(totalWeight);
-	itemNames.push(name.toLowerCase());
-	// replace all characters not allowed in id
-	var name_val = name.replace(/[^a-zA-Z0-9\-_:]+/g, "_");
+function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defend, notes, weight, id) {
+	itemNames.push(name);
+	var id_val = id == "" ? uuid() : "weapon_"+id;
 
-	var div = createElement('div', 'form-group item', '#weapons', name_val);
+	var div = createElement('div', 'form-group item', '#weapons', id_val);
 	var div1 = createElement('div', 'col-xs-3 no-pad-mobile', div);
 	var div2 = createElement('div', 'col-xs-1 no-pad-mobile', div);
 	var div3 = createElement('div', 'col-xs-1 no-pad-mobile', div);
@@ -1350,25 +1283,27 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 	var div5 = createElement('div', 'col-xs-1 no-pad-mobile', div);
 	var div6 = createElement('div', 'col-xs-1 no-pad-mobile center', div);
 
-	var name_input = createInput('', 'text', 'weapons[]', name, div1, name_val+"_name");
-	var qty_input = createInput('qty', 'text', 'weapon_qty[]', qty, div2, name_val+"_qty");
+	var name_input = createInput('', 'text', 'weapons[]', name, div1, id_val+"_name");
+	var qty_input = createInput('qty', 'text', 'weapon_qty[]', qty, div2, id_val+"_qty");
 	// check for max damage
 	var damageText = max_damage != null && max_damage != "" ? damage +" ("+max_damage+")" : damage;
-	var dmg_input = createInput('', 'text', '', damageText, div3, name_val+"_damage");
+	var dmg_input = createInput('', 'text', '', damageText, div3, id_val+"_damage");
 	// add range, rof & defend bonus to notes
 	var noteMod = "";
 	noteMod += range != null && range != "" ? "Range: "+range+"; " : "";
 	noteMod += rof != null && rof != "" ? "RoF: "+rof+"; " : "";
 	noteMod += defend != null && defend != "" ? "+"+defend+" Defend; " : "";
-	var note_input = createInput('', 'text', '', noteMod+notes, div4, name_val+"_notes");
-	var wgt_input = createInput('wgt', 'text', 'weapon_weight[]', weight, div5, name_val+"_weight");
-	createInput('', 'hidden', 'weapon_damage[]', damage, div5, name_val+"_damage_val");
-	createInput('', 'hidden', 'weapon_notes[]', notes, div5, name_val+"_notes_val");
-	createInput('', 'hidden', 'weapon_type[]', type, div5, name_val+"_type");
-	createInput('', 'hidden', 'weapon_max_damage[]', max_damage, div5, name_val+"_max_damage");
-	createInput('', 'hidden', 'weapon_range[]', range, div5, name_val+"_range");
-	createInput('', 'hidden', 'weapon_rof[]', rof, div5, name_val+"_rof");
-	createInput('', 'hidden', 'weapon_defend[]', defend, div5, name_val+"_defend");
+	var note_input = createInput('', 'text', '', noteMod+notes, div4, id_val+"_notes");
+	var wgt_input = createInput('wgt', 'text', 'weapon_weight[]', weight, div5, id_val+"_weight");
+	createInput('', 'hidden', 'weapon_damage[]', damage, div5, id_val+"_damage_val");
+	createInput('', 'hidden', 'weapon_notes[]', notes, div5, id_val+"_notes_val");
+	createInput('', 'hidden', 'weapon_type[]', type, div5, id_val+"_type");
+	createInput('', 'hidden', 'weapon_max_damage[]', max_damage, div5, id_val+"_max_damage");
+	createInput('', 'hidden', 'weapon_range[]', range, div5, id_val+"_range");
+	createInput('', 'hidden', 'weapon_rof[]', rof, div5, id_val+"_rof");
+	createInput('', 'hidden', 'weapon_defend[]', defend, div5, id_val+"_defend");
+	createInput('', 'hidden', 'weapon_ids[]', id, div5);
+	updateTotalWeight();
 
 	// add click and hover functions
 	name_input.attr("readonly", true);
@@ -1377,19 +1312,19 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 	note_input.attr("readonly", true);
 	wgt_input.attr("readonly", true);
 	name_input.click(function(){
-		editWeapon(name_val);
+		editWeapon(id_val);
 	});
 	qty_input.click(function(){
-		editWeapon(name_val);
+		editWeapon(id_val);
 	});
 	dmg_input.click(function(){
-		editWeapon(name_val);
+		editWeapon(id_val);
 	});
 	note_input.click(function(){
-		editWeapon(name_val);
+		editWeapon(id_val);
 	});
 	wgt_input.click(function(){
-		editWeapon(name_val);
+		editWeapon(id_val);
 	});
 	dmg_input.hover(function(){
 		$("#weapon_dmg_label").addClass("highlight");
@@ -1405,13 +1340,13 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 	});
 
 	// add remove button
-	createElement('span', 'glyphicon glyphicon-remove', div6, name_val+"_remove");
-	$("#"+name_val+"_remove").on("click", function(){
-		var item = $("#"+name_val+"_name").val();
+	createElement('span', 'glyphicon glyphicon-remove', div6, id_val+"_remove");
+	$("#"+id_val+"_remove").on("click", function(){
+		var item = $("#"+id_val+"_name").val();
 		var conf = confirm("Remove item '"+item+"'?");
 		if (conf) {
-			$("#"+name_val).remove();
-			var index = itemNames.indexOf(name.toLowerCase());
+			$("#"+id_val).remove();
+			var index = itemNames.indexOf(name);
 			if (index !== -1) {
 			  itemNames.splice(index, 1);
 			  // update weapons array and select list
@@ -1531,59 +1466,54 @@ function newProtection() {
 		$("#"+protection_id+"_weight").val(weight);
 		updateTotalWeight();
 	} else {
-		addProtectionElements(name, bonus, notes, weight);
+		addProtectionElements(name, bonus, notes, weight, '');
 	}
 }
 
 // create html elements for protection
-function addProtectionElements(name, bonus, notes, weight) {
-	if (itemNames.includes(name.toLowerCase())) {
-		alert("Item name already in use");
-		return;
-	}
-	weight = weight == "" ? 0 : weight;
-	totalWeight += parseFloat(weight);
-	$("#total_weight").val(totalWeight);
-	itemNames.push(name.toLowerCase());
-	// replace all characters not allowed in id
-	var name_val = name.replace(/[^a-zA-Z0-9\-_:]+/g, "_");
+function addProtectionElements(name, bonus, notes, weight, id) {
+	itemNames.push(name);
+	var id_val = id == "" ? uuid() : "protection_"+id;
 
-	var div = createElement('div', 'form-group item', '#protections', name_val);
+	var div = createElement('div', 'form-group item', '#protections', id_val);
 	var div1 = createElement('div', 'col-xs-3 no-pad-mobile', div);
 	var div2 = createElement('div', 'col-xs-2 no-pad-mobile', div);
 	var div3 = createElement('div', 'col-xs-5 no-pad-mobile', div);
 	var div4 = createElement('div', 'col-xs-1 no-pad-mobile', div);
 	var div5 = createElement('div', 'col-xs-1 no-pad-mobile center', div);
 
-	var name_input = createInput('', 'text', 'protections[]', name, div1, name_val+"_name");
-	var bonus_input = createInput('', 'text', 'protection_bonus[]', bonus, div2, name_val+"_bonus");
-	var notes_input = createInput('', 'text', 'protection_notes[]', notes, div3, name_val+"_notes");
-	var weight_input = createInput('wgt', 'text', 'protection_weight[]', weight, div4, name_val+"_weight");
+	var name_input = createInput('', 'text', 'protections[]', name, div1, id_val+"_name");
+	var bonus_input = createInput('', 'text', 'protection_bonus[]', bonus, div2, id_val+"_bonus");
+	var notes_input = createInput('', 'text', 'protection_notes[]', notes, div3, id_val+"_notes");
+	var weight_input = createInput('wgt', 'text', 'protection_weight[]', weight, div4, id_val+"_weight");
+	createInput('', 'hidden', 'protection_ids[]', id, div4);
+	updateTotalWeight();
+
 	name_input.attr("readonly", true);
 	bonus_input.attr("readonly", true);
 	notes_input.attr("readonly", true);
 	weight_input.attr("readonly", true);
 	name_input.click(function(){
-		editProtection(name_val);
+		editProtection(id_val);
 	});
 	bonus_input.click(function(){
-		editProtection(name_val);
+		editProtection(id_val);
 	});
 	notes_input.click(function(){
-		editProtection(name_val);
+		editProtection(id_val);
 	});
 	weight_input.click(function(){
-		editProtection(name_val);
+		editProtection(id_val);
 	});
 
 	// add remove button
-	createElement('span', 'glyphicon glyphicon-remove', div5, name_val+"_remove");
-	$("#"+name_val+"_remove").on("click", function(){
-		var item = $("#"+name_val+"_name").val();
+	createElement('span', 'glyphicon glyphicon-remove', div5, id_val+"_remove");
+	$("#"+id_val+"_remove").on("click", function(){
+		var item = $("#"+id_val+"_name").val();
 		var conf = confirm("Remove item '"+item+"'?");
 		if (conf) {
-			$("#"+name_val).remove();
-			var index = itemNames.indexOf(name.toLowerCase());
+			$("#"+id_val).remove();
+			var index = itemNames.indexOf(name);
 			if (index !== -1) {
 			  itemNames.splice(index, 1);
 			}
@@ -1628,59 +1558,54 @@ function newHealing() {
 		$("#"+healing_id+"_weight").val(weight);
 		updateTotalWeight();
 	} else {
-		addHealingElements(name, quantity, effect, weight);
+		addHealingElements(name, quantity, effect, weight, '');
 	}
 }
 
 // create html elements for healing
-function addHealingElements(name, quantity, effect, weight) {
-	if (itemNames.includes(name.toLowerCase())) {
-		alert("Item name already in use");
-		return;
-	}
-	weight = weight == "" ? 0 : weight;
-	totalWeight += parseFloat(weight)*parseInt(quantity == "" ? 1 : quantity);
-	$("#total_weight").val(totalWeight);
-	itemNames.push(name.toLowerCase());
-	// replace all characters not allowed in id
-	var name_val = name.replace(/[^a-zA-Z0-9\-_:]+/g, "_");
+function addHealingElements(name, quantity, effect, weight, id) {
+	itemNames.push(name);
+	var id_val = id == "" ? uuid() : "healing_"+id;
 
-	var div = createElement('div', 'form-group item', '#healings', name_val);
+	var div = createElement('div', 'form-group item', '#healings', id_val);
 	var div1 = createElement('div', 'col-xs-3 no-pad-mobile', div);
 	var div2 = createElement('div', 'col-xs-2 no-pad-mobile', div);
 	var div3 = createElement('div', 'col-xs-5 no-pad-mobile', div);
 	var div4 = createElement('div', 'col-xs-1 no-pad-mobile', div);
 	var div5 = createElement('div', 'col-xs-1 no-pad-mobile center', div);
 
-	var name_input = createInput('', 'text', 'healings[]', name, div1, name_val+"_name");
-	var qty_input = createInput('qty', 'text', 'healing_quantity[]', quantity, div2, name_val+"_quantity");
-	var effect_input = createInput('', 'text', 'healing_effect[]', effect, div3, name_val+"_effect");
-	var weight_input = createInput('wgt', 'text', 'healing_weight[]', weight, div4, name_val+"_weight");
+	var name_input = createInput('', 'text', 'healings[]', name, div1, id_val+"_name");
+	var qty_input = createInput('qty', 'text', 'healing_quantity[]', quantity, div2, id_val+"_quantity");
+	var effect_input = createInput('', 'text', 'healing_effect[]', effect, div3, id_val+"_effect");
+	var weight_input = createInput('wgt', 'text', 'healing_weight[]', weight, div4, id_val+"_weight");
+	createInput('', 'hidden', 'healing_ids[]', id, div4);
+	updateTotalWeight();
+
 	name_input.attr("readonly", true);
 	qty_input.attr("readonly", true);
 	effect_input.attr("readonly", true);
 	weight_input.attr("readonly", true);
 	name_input.click(function(){
-		editHealing(name_val);
+		editHealing(id_val);
 	});
 	qty_input.click(function(){
-		editHealing(name_val);
+		editHealing(id_val);
 	});
 	effect_input.click(function(){
-		editHealing(name_val);
+		editHealing(id_val);
 	});
 	weight_input.click(function(){
-		editHealing(name_val);
+		editHealing(id_val);
 	});
 
 	// add remove button
-	createElement('span', 'glyphicon glyphicon-remove', div5, name_val+"_remove");
-	$("#"+name_val+"_remove").on("click", function(){
-		var item = $("#"+name_val+"_name").val();
+	createElement('span', 'glyphicon glyphicon-remove', div5, id_val+"_remove");
+	$("#"+id_val+"_remove").on("click", function(){
+		var item = $("#"+id_val+"_name").val();
 		var conf = confirm("Remove item '"+item+"'?");
 		if (conf) {
-			$("#"+name_val).remove();
-			var index = itemNames.indexOf(name.toLowerCase());
+			$("#"+id_val).remove();
+			var index = itemNames.indexOf(name);
 			if (index !== -1) {
 			  itemNames.splice(index, 1);
 			}
@@ -1725,59 +1650,54 @@ function newMisc() {
 		$("#"+misc_id+"_weight").val(weight);
 		updateTotalWeight();
 	} else {
-		addMiscElements(name, quantity, notes, weight);
+		addMiscElements(name, quantity, notes, weight, '');
 	}
 }
 
 // create html elements for misc item
-function addMiscElements(name, quantity, notes, weight) {
-	if (itemNames.includes(name.toLowerCase())) {
-		alert("Item name already in use");
-		return;
-	}
-	weight = weight == "" ? 0 : weight;
-	totalWeight += parseFloat(weight)*parseInt(quantity == "" ? 1 : quantity);
-	$("#total_weight").val(totalWeight);
-	itemNames.push(name.toLowerCase());
-	// replace all characters not allowed in id
-	var name_val = name.replace(/[^a-zA-Z0-9\-_:]+/g, "_");
+function addMiscElements(name, quantity, notes, weight, id) {
+	itemNames.push(name);
+	var id_val = id == "" ? uuid() : "misc_"+id;
 
-	var div = createElement('div', 'form-group item', '#misc', name_val);
+	var div = createElement('div', 'form-group item', '#misc', id_val);
 	var div1 = createElement('div', 'col-xs-3 no-pad-mobile', div);
 	var div2 = createElement('div', 'col-xs-2 no-pad-mobile', div);
 	var div3 = createElement('div', 'col-xs-5 no-pad-mobile', div);
 	var div4 = createElement('div', 'col-xs-1 no-pad-mobile', div);
 	var div5 = createElement('div', 'col-xs-1 no-pad-mobile center', div);
 
-	var name_input = createInput('', 'text', 'misc[]', name, div1, name_val+"_name");
-	var qty_input = createInput('qty', 'text', 'misc_quantity[]', quantity, div2, name_val+"_quantity");
-	var notes_input = createInput('', 'text', 'misc_notes[]', notes, div3, name_val+"_notes");
-	var weight_input = createInput('wgt', 'text', 'misc_weight[]', weight, div4, name_val+"_weight");
+	var name_input = createInput('', 'text', 'misc[]', name, div1, id_val+"_name");
+	var qty_input = createInput('qty', 'text', 'misc_quantity[]', quantity, div2, id_val+"_quantity");
+	var notes_input = createInput('', 'text', 'misc_notes[]', notes, div3, id_val+"_notes");
+	var weight_input = createInput('wgt', 'text', 'misc_weight[]', weight, div4, id_val+"_weight");
+	createInput('', 'hidden', 'misc_ids[]', id, div4);
+	updateTotalWeight();
+
 	name_input.attr("readonly", true);
 	qty_input.attr("readonly", true);
 	notes_input.attr("readonly", true);
 	weight_input.attr("readonly", true);
 	name_input.click(function(){
-		editMisc(name_val);
+		editMisc(id_val);
 	});
 	qty_input.click(function(){
-		editMisc(name_val);
+		editMisc(id_val);
 	});
 	notes_input.click(function(){
-		editMisc(name_val);
+		editMisc(id_val);
 	});
 	weight_input.click(function(){
-		editMisc(name_val);
+		editMisc(id_val);
 	});
 
 	// add remove button
-	createElement('span', 'glyphicon glyphicon-remove', div5, name_val+"_remove");
-	$("#"+name_val+"_remove").on("click", function(){
-		var item = $("#"+name_val+"_name").val();
+	createElement('span', 'glyphicon glyphicon-remove', div5, id_val+"_remove");
+	$("#"+id_val+"_remove").on("click", function(){
+		var item = $("#"+id_val+"_name").val();
 		var conf = confirm("Remove item '"+item+"'?");
 		if (conf) {
-			$("#"+name_val).remove();
-			var index = itemNames.indexOf(name.toLowerCase());
+			$("#"+id_val).remove();
+			var index = itemNames.indexOf(name);
 			if (index !== -1) {
 			  itemNames.splice(index, 1);
 			}
@@ -1808,12 +1728,12 @@ function updateTotalWeight() {
 		var qty = 1;
 		var wgt = 0;
 		$(this).find('.qty').each(function(){
-			qty = $(this).val() == "" ? 1 : $(this).val();
+			qty = $(this).val() == "" ? 1 : (isNaN($(this).val()) ? 1 : $(this).val());
 		});
 		$(this).find('.wgt').each(function(){
 			wgt = $(this).val() == "" ? 0 : $(this).val();
 		});
-		totalWeight += parseInt(qty) * parseInt(wgt);
+		totalWeight += parseFloat(qty) * parseFloat(wgt);
 	});
 	$("#total_weight").val(totalWeight);
 }
@@ -1896,4 +1816,10 @@ function createInput(additionalClass, type, name, value, appendTo, id=null) {
 	  	'value': value
 	}).appendTo(appendTo);
 	return input;
+}
+
+function uuid() {
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+  );
 }

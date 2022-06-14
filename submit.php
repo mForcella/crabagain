@@ -81,40 +81,84 @@
 
 	}
 
-	// remove any old feats
-	$sql = "DELETE FROM user_feat WHERE user_id = " . $user_id;
-	$db->query($sql);
-
 	// look for new feats
 	if (isset($_POST['feat_names'])) {
 		$feat_names = $_POST['feat_names'];
 		$feat_descriptions = $_POST['feat_descriptions'];
+		$ids = $_POST['feat_ids'];
+
+		// delete feats not in ID list
+		$sql = "DELETE FROM user_feat WHERE user_id = " . $user_id . " AND id NOT IN ('" . implode("','", $ids) . "')";
+		$db->query($sql);
+
 		for ($i = 0; $i < count($feat_names); $i++) {
-			$sql = "INSERT INTO user_feat (name, description, user_id) VALUES ('".addslashes($feat_names[$i])."', '".addslashes($feat_descriptions[$i])."', '".$user_id."')";
+			// update where ID not empty; insert new where ID empty
+			if ($ids[$i] == "") {
+				$sql = "INSERT INTO user_feat (name, description, user_id) VALUES ('".addslashes($feat_names[$i])."', '".addslashes($feat_descriptions[$i])."', '".$user_id."')";
+			} else {
+				$sql = "UPDATE user_feat SET name = '".addslashes($feat_names[$i])."', description = '".addslashes($feat_descriptions[$i])."' WHERE id = ".$ids[$i];
+			}
 			$db->query($sql);
 		}
+	} else {
+		// remove any old feats
+		$sql = "DELETE FROM user_feat WHERE user_id = " . $user_id;
+		$db->query($sql);
 	}
-
-	// remove any old trainings
-	$sql = "DELETE FROM user_training WHERE user_id = " . $user_id;
-	$db->query($sql);
 
 	// look for new trainings
 	if (isset($_POST['training'])) {
 		$training = $_POST['training'];
 		$training_val = $_POST['training_val'];
+		$ids = $_POST['training_ids'];
+
+		// delete trainings not in ID list
+		$sql = "DELETE FROM user_training WHERE user_id = " . $user_id . " AND id NOT IN ('" . implode("','", $ids) . "')";
+		$db->query($sql);
+
 		for ($i = 0; $i < count($training); $i++) {
 			$vals = explode(":", $training[$i]);
-			$sql = "INSERT INTO user_training (name, attribute_group, value, user_id) VALUES ('".addslashes($vals[0])."', '".$vals[1]."', '".$training_val[$i]."', '".$user_id."')";
+			// update where ID not empty; insert new where ID empty
+			if ($ids[$i] == "") {
+				$sql = "INSERT INTO user_training (name, attribute_group, value, user_id) VALUES ('".addslashes($vals[0])."', '".$vals[1]."', '".$training_val[$i]."', '".$user_id."')";
+			} else {
+				$sql = "UPDATE user_training SET name = '".addslashes($vals[0])."', attribute_group = '".$vals[1]."', value = ".$training_val[$i]." WHERE id = ".$ids[$i];
+			}
 			$db->query($sql);
 		}
+	} else {
+		// delete all trainings from user
+		$sql = "DELETE FROM user_training WHERE user_id = " . $user_id;
+		$db->query($sql);
 	}
 
-	// remove any old weapons
-	$sql = "DELETE FROM user_weapon WHERE user_id = " . $user_id;
-	$db->query($sql);
+	// look for notes
+	if (isset($_POST['notes'])) {
 
-	// look for new weapons
+		$titles = $_POST['titles'];
+		$notes = $_POST['notes'];
+		$ids = $_POST['note_ids'];
+
+		// delete notes not in ID list
+		$sql = "DELETE FROM user_note WHERE user_id = " . $user_id . " AND id NOT IN ('" . implode("','", $ids) . "')";
+		$db->query($sql);
+
+		for ($i = 0; $i < count($notes); $i++) {
+			// update where ID not empty; insert new where ID empty
+			if ($ids[$i] == "") {
+				$sql = "INSERT INTO user_note (title, note, user_id) VALUES ('".addslashes($titles[$i])."', '".addslashes($notes[$i])."', '".$user_id."')";
+			} else {
+				$sql = "UPDATE user_note SET title = '".addslashes($titles[$i])."', note = '".addslashes($notes[$i])."' WHERE id = ".$ids[$i];
+			}
+			$db->query($sql);
+		}
+	} else {
+		// delete all notes from user
+		$sql = "DELETE FROM user_note WHERE user_id = " . $user_id;
+		$db->query($sql);
+	}
+
+	// look for weapons
 	if (isset($_POST['weapons'])) {
 		$weapons = $_POST['weapons'];
 		$weapon_qty = $_POST['weapon_qty'];
@@ -126,19 +170,31 @@
 		$weapon_range = $_POST['weapon_range'];
 		$weapon_rof = $_POST['weapon_rof'];
 		$weapon_defend = $_POST['weapon_defend'];
+		$ids = $_POST['weapon_ids'];
+
+		// delete weapons not in ID list
+		$sql = "DELETE FROM user_weapon WHERE user_id = " . $user_id . " AND id NOT IN ('" . implode("','", $ids) . "')";
+		$db->query($sql);
+
 		for ($i = 0; $i < count($weapons); $i++) {
 			$weapon_damage[$i] = empty($weapon_damage[$i]) ? "NULL" : $weapon_damage[$i];
 			$weapon_max_damage[$i] = empty($weapon_max_damage[$i]) ? "NULL" : $weapon_max_damage[$i];
 			$weapon_range[$i] = empty($weapon_range[$i]) ? "NULL" : $weapon_range[$i];
 			$weapon_defend[$i] = empty($weapon_defend[$i]) ? "NULL" : $weapon_defend[$i];
-			$sql = "INSERT INTO user_weapon (name, type, quantity, damage, max_damage, range_, rof, defend, notes, weight, user_id) VALUES ('".addslashes($weapons[$i])."', '".$weapon_type[$i]."', '".addslashes($weapon_qty[$i])."', ".$weapon_damage[$i].", ".$weapon_max_damage[$i].", ".$weapon_range[$i].", '".addslashes($weapon_rof[$i])."', ".$weapon_defend[$i].", '".addslashes($weapon_notes[$i])."', ".$weapon_weight[$i].", '".$user_id."')";
+
+			// update where ID not empty; insert new where ID empty
+			if ($ids[$i] == "") {
+				$sql = "INSERT INTO user_weapon (name, type, quantity, damage, max_damage, range_, rof, defend, notes, weight, user_id) VALUES ('".addslashes($weapons[$i])."', '".$weapon_type[$i]."', '".addslashes($weapon_qty[$i])."', ".$weapon_damage[$i].", ".$weapon_max_damage[$i].", ".$weapon_range[$i].", '".addslashes($weapon_rof[$i])."', ".$weapon_defend[$i].", '".addslashes($weapon_notes[$i])."', ".$weapon_weight[$i].", '".$user_id."')";
+			} else {
+				$sql = "UPDATE user_weapon SET name = '".addslashes($weapons[$i])."', type = '".$weapon_type[$i]."', quantity = '".addslashes($weapon_qty[$i])."', damage = ".$weapon_damage[$i].", max_damage = ".$weapon_max_damage[$i].", range_ = ".$weapon_range[$i].", rof = '".addslashes($weapon_rof[$i])."', defend = ".$weapon_defend[$i].", notes = '".addslashes($weapon_notes[$i])."', weight = ".$weapon_weight[$i]." WHERE id = ".$ids[$i];
+			}
 			$db->query($sql);
 		}
+	} else {
+		// delete all weapons from user
+		$sql = "DELETE FROM user_weapon WHERE user_id = " . $user_id;
+		$db->query($sql);
 	}
-
-	// remove any old protections
-	$sql = "DELETE FROM user_protection WHERE user_id = " . $user_id;
-	$db->query($sql);
 
 	// look for new protections
 	if (isset($_POST['protections'])) {
@@ -146,31 +202,53 @@
 		$protection_bonus = $_POST['protection_bonus'];
 		$protection_notes = $_POST['protection_notes'];
 		$protection_weight = $_POST['protection_weight'];
+		$ids = $_POST['protection_ids'];
+
+		// delete protections not in ID list
+		$sql = "DELETE FROM user_protection WHERE user_id = " . $user_id . " AND id NOT IN ('" . implode("','", $ids) . "')";
+		$db->query($sql);
+
 		for ($i = 0; $i < count($protections); $i++) {
-			$sql = "INSERT INTO user_protection (name, bonus, notes, weight, user_id) VALUES ('".addslashes($protections[$i])."', '".addslashes($protection_bonus[$i])."', '".addslashes($protection_notes[$i])."', '".$protection_weight[$i]."', '".$user_id."')";
+			// update where ID not empty; insert new where ID empty
+			if ($ids[$i] == "") {
+				$sql = "INSERT INTO user_protection (name, bonus, notes, weight, user_id) VALUES ('".addslashes($protections[$i])."', '".addslashes($protection_bonus[$i])."', '".addslashes($protection_notes[$i])."', '".$protection_weight[$i]."', '".$user_id."')";
+			} else {
+				$sql = "UPDATE user_protection SET name = '".addslashes($protections[$i])."', bonus = ".addslashes($protection_bonus[$i]).", notes = '".addslashes($protection_notes[$i])."', weight = ".$protection_weight[$i]." WHERE id = ".$ids[$i];
+			}
 			$db->query($sql);
 		}
+	} else {
+		// delete all protections from user
+		$sql = "DELETE FROM user_protection WHERE user_id = " . $user_id;
+		$db->query($sql);
 	}
 
-	// remove any old healings
-	$sql = "DELETE FROM user_healing WHERE user_id = " . $user_id;
-	$db->query($sql);
-
-	// look for new protections
+	// look for new healings
 	if (isset($_POST['healings'])) {
 		$healings = $_POST['healings'];
 		$healing_quantity = $_POST['healing_quantity'];
 		$healing_effect = $_POST['healing_effect'];
 		$healing_weight = $_POST['healing_weight'];
+		$ids = $_POST['healing_ids'];
+
+		// delete healings not in ID list
+		$sql = "DELETE FROM user_healing WHERE user_id = " . $user_id . " AND id NOT IN ('" . implode("','", $ids) . "')";
+		$db->query($sql);
+
 		for ($i = 0; $i < count($healings); $i++) {
-			$sql = "INSERT INTO user_healing (name, quantity, effect, weight, user_id) VALUES ('".addslashes($healings[$i])."', '".addslashes($healing_quantity[$i])."', '".addslashes($healing_effect[$i])."', '".$healing_weight[$i]."', '".$user_id."')";
+			// update where ID not empty; insert new where ID empty
+			if ($ids[$i] == "") {
+				$sql = "INSERT INTO user_healing (name, quantity, effect, weight, user_id) VALUES ('".addslashes($healings[$i])."', '".addslashes($healing_quantity[$i])."', '".addslashes($healing_effect[$i])."', '".$healing_weight[$i]."', '".$user_id."')";
+			} else {
+				$sql = "UPDATE user_healing SET name = '".addslashes($healings[$i])."', quantity = '".addslashes($healing_quantity[$i])."', effect = '".addslashes($healing_effect[$i])."', weight = ".$healing_weight[$i]." WHERE id = ".$ids[$i];
+			}
 			$db->query($sql);
 		}
+	} else {
+		// delete all healings from user
+		$sql = "DELETE FROM user_healing WHERE user_id = " . $user_id;
+		$db->query($sql);
 	}
-
-	// remove any old misc items
-	$sql = "DELETE FROM user_misc WHERE user_id = " . $user_id;
-	$db->query($sql);
 
 	// look for new misc items
 	if (isset($_POST['misc'])) {
@@ -178,24 +256,25 @@
 		$misc_quantity = $_POST['misc_quantity'];
 		$misc_notes = $_POST['misc_notes'];
 		$misc_weight = $_POST['misc_weight'];
+		$ids = $_POST['misc_ids'];
+
+		// delete misc not in ID list
+		$sql = "DELETE FROM user_misc WHERE user_id = " . $user_id . " AND id NOT IN ('" . implode("','", $ids) . "')";
+		$db->query($sql);
+
 		for ($i = 0; $i < count($misc); $i++) {
-			$sql = "INSERT INTO user_misc (name, quantity, notes, weight, user_id) VALUES ('".addslashes($misc[$i])."', '".addslashes($misc_quantity[$i])."', '".addslashes($misc_notes[$i])."', '".$misc_weight[$i]."', '".$user_id."')";
+			// update where ID not empty; insert new where ID empty
+			if ($ids[$i] == "") {
+				$sql = "INSERT INTO user_misc (name, quantity, notes, weight, user_id) VALUES ('".addslashes($misc[$i])."', '".addslashes($misc_quantity[$i])."', '".addslashes($misc_notes[$i])."', '".$misc_weight[$i]."', '".$user_id."')";
+			} else {
+				$sql = "UPDATE user_misc SET name = '".addslashes($misc[$i])."', quantity = '".addslashes($misc_quantity[$i])."', notes = '".addslashes($misc_notes[$i])."', weight = ".$misc_weight[$i]." WHERE id = ".$ids[$i];
+			}
 			$db->query($sql);
 		}
-	}
-
-	// remove any old notes
-	$sql = "DELETE FROM user_note WHERE user_id = " . $user_id;
-	$db->query($sql);
-
-	// look for new notes
-	if (isset($_POST['notes'])) {
-		$titles = $_POST['titles'];
-		$notes = $_POST['notes'];
-		for ($i = 0; $i < count($notes); $i++) {
-			$sql = "INSERT INTO user_note (title, note, user_id) VALUES ('".addslashes($titles[$i])."', '".addslashes($notes[$i])."', '".$user_id."')";
-			$db->query($sql);
-		}
+	} else {
+		// delete all misc from user
+		$sql = "DELETE FROM user_misc WHERE user_id = " . $user_id;
+		$db->query($sql);
 	}
 
 	$db->close();

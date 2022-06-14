@@ -310,7 +310,7 @@
 				<!-- section: weapons -->
 				<div class="section form-horizontal">
 					<div class="form-group">
-						<div class="section-title" id="section_attack"><span>Attack</span> <i class="fa-solid icon-attack custom-icon"></i><!-- <i class="fa-solid fa-hand-fist"></i> --></div>
+						<div class="section-title" id="section_attack"><span>Attack</span> <i class="fa-solid icon-attack custom-icon"></i></div>
 						<div class="row">
 
 							<div class="col-sm-4">
@@ -490,7 +490,7 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2 col-xs-4" for="fear">Fear <!-- <i class="fa-solid fa-spider"></i> --></label>
+						<label class="control-label col-sm-2 col-xs-4" for="fear">Fear</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 							<input class="form-control" type="text" name="fear" id="fear_text" value="<?php echo isset($user) ? htmlspecialchars($user['fear']) : '' ?>">
 							<input class="form-control hidden-number" type="number" id="fear">
@@ -987,7 +987,7 @@
 									array_push($motivators, $user['motivator_3_pts'] == '' ? 0 : $user['motivator_3_pts']);
 									array_push($motivators, $user['motivator_4_pts'] == '' ? 0 : $user['motivator_4_pts']);
 									arsort($motivators);
-									$total_pts = intval($motivators[0]) + intval($motivators[1]);
+									$total_pts = intval($motivators[0]) + intval($motivators[1]) + intval($motivators[2]);
 									$bonuses = $total_pts >= 64 ? 5 : ($total_pts >= 32 ? 4 : ($total_pts >= 16 ? 3 : ($total_pts >= 8 ? 2 : ($total_pts >= 4 ? 1 : 0))));
 								} else {
 									$bonuses = 0;
@@ -1063,7 +1063,7 @@
 			<!-- section: weapons -->
 			<div class="col-md-12">
 				<div class="section form-horizontal">
-					<div class="section-title" id="section_items"><span>Weapons</span> <i class="fa-solid icon-sword custom-icon"></i><!-- <i class="fa-solid fa-hand-fist"></i> --></div>
+					<div class="section-title" id="section_items"><span>Weapons</span> <i class="fa-solid icon-sword custom-icon"></i></div>
 					<div class="form-group">
 						<label class="control-label col-xs-3 resize-mobile center" for="weapons[]">Item</label>
 						<label class="control-label col-xs-1 resize-mobile center" for="weapon_qty[]">Qty</label>
@@ -1082,7 +1082,7 @@
 			<div class="col-md-12">
 				<div class="section form-horizontal">
 					<!-- TODO add option to equip protection -->
-					<div class="section-title"><span>Protection</span> <i class="fa-solid icon-armor custom-icon"></i><!-- <i class="fa-solid fa-shield-halved"></i> --></div>
+					<div class="section-title"><span>Protection</span> <i class="fa-solid icon-armor custom-icon"></i></div>
 					<div class="form-group">
 						<label class="control-label col-xs-3 resize-mobile center" for="protections[]">Item</label>
 						<label class="control-label col-xs-2 resize-mobile center" for="protection_bonus[]">Bonus</label>
@@ -1116,7 +1116,7 @@
 			<!-- section: misc -->
 			<div class="col-md-12">
 				<div class="section form-horizontal">
-					<div class="section-title"><span>Misc & Special Items</span> <i class="fa-solid icon-misc custom-icon"></i><!-- <i class="fa-solid fa-wand-sparkles"></i> --></div>
+					<div class="section-title"><span>Misc & Special Items</span> <i class="fa-solid icon-misc custom-icon"></i></div>
 					<div class="form-group">
 						<label class="control-label col-xs-3 resize-mobile center" for="misc[]">Item</label>
 						<label class="control-label col-xs-2 resize-mobile center" for="misc_quantity[]">Qty</label>
@@ -1199,7 +1199,7 @@
 					</div>
 					<div class="form-group">
 						<div class="col-xs-12">
-							<textarea class="form-control" rows="6" name="background" maxlength="2000"><?php echo isset($user) ? htmlspecialchars($user['background']) : '' ?></textarea>
+							<textarea class="form-control" rows="6" name="background" id="background" maxlength="2000"><?php echo isset($user) ? htmlspecialchars($user['background']) : '' ?></textarea>
 						</div>
 					</div>
 				</div>
@@ -1305,7 +1305,7 @@
         <div class="modal-body">
         	<label class="control-label">Title</label>
         	<input class="form-control" type="text" id="note_title">
-        	<label class="control-label">Note*</label>
+        	<label class="control-label">Note</label>
         	<textarea class="form-control" id="note_content" rows="10" maxlength="2000"></textarea>
         	<input type="hidden" id="note_id">
         	<div class="button-bar">
@@ -1329,6 +1329,7 @@
         	<input class="form-control" type="text" id="feat_name">
         	<label class="control-label">Feat Description</label>
         	<textarea class="form-control" id="feat_description" rows="6" maxlength="255"></textarea>
+        	<input type="hidden" id="feat_id">
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newFeat()" id="feat_submit_btn">Ok</button>
@@ -1393,7 +1394,7 @@
         	<label class="control-label">Weapon Name*</label>
         	<input class="form-control" type="text" id="weapon_name">
         	<label class="control-label">Quantity</label>
-        	<input class="form-control" type="number" id="weapon_qty">
+        	<input class="form-control" type="text" id="weapon_qty">
         	<label class="control-label">Damage*</label>
         	<input class="form-control" type="number" id="weapon_damage">
         	<label class="control-label">Max Damage</label>
@@ -1455,7 +1456,7 @@
         	<label class="control-label">Item Name*</label>
         	<input class="form-control" type="text" id="healing_name">
         	<label class="control-label">Quantity</label>
-        	<input class="form-control" type="number" id="healing_quantity">
+        	<input class="form-control" type="text" id="healing_quantity">
         	<label class="control-label">Effect</label>
         	<input class="form-control" type="text" id="healing_effect">
         	<label class="control-label">Weight</label>
@@ -1481,7 +1482,7 @@
         	<label class="control-label">Item Name*</label>
         	<input class="form-control" type="text" id="misc_name">
         	<label class="control-label">Quantity</label>
-        	<input class="form-control" type="number" id="misc_quantity">
+        	<input class="form-control" type="text" id="misc_quantity">
         	<label class="control-label">Notes</label>
         	<input class="form-control" type="text" id="misc_notes">
         	<label class="control-label">Weight</label>
@@ -1602,6 +1603,7 @@
   </div>
 
 	<!-- forgot password modal -->
+	<!-- TODO enable resetting password... i guess... -->
   <div class="modal" id="forgot_password_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
       <div class="modal-content searching-prompt">
@@ -1624,7 +1626,7 @@
 	<script async src="https://www.google.com/recaptcha/api.js?render=6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
-	<script src="/assets/script_v22_06_12_1.js"></script>
+	<script src="/assets/script_v22_06_14.js"></script>
 	<script type="text/javascript">
 
 		var keys = <?php echo json_encode($keys); ?>;
@@ -1652,19 +1654,19 @@
 		// check for user feats
 		var feats = <?php echo json_encode($feats); ?>;
 		for (var i in feats) {
-			addFeatElements(feats[i]['name'], feats[i]['description']);
+			addFeatElements(feats[i]['name'], feats[i]['description'], feats[i]['id']);
 		}
 
 		// check for user trainings
 		var trainings = <?php echo json_encode($trainings); ?>;
 		for (var i in trainings) {
-			addTrainingElements(trainings[i]['name'], trainings[i]['attribute_group'], trainings[i]['value']);
+			addTrainingElements(trainings[i]['name'], trainings[i]['attribute_group'], trainings[i]['id'], trainings[i]['value']);
 		}
 
 		// check for user weapons
 		var weapons = <?php echo json_encode($weapons); ?>;
 		for (var i in weapons) {
-			addWeaponElements(weapons[i]['type'], weapons[i]['name'], weapons[i]['quantity'], weapons[i]['damage'], weapons[i]['max_damage'], weapons[i]['range_'], weapons[i]['rof'], weapons[i]['defend'], weapons[i]['notes'], weapons[i]['weight']);
+			addWeaponElements(weapons[i]['type'], weapons[i]['name'], weapons[i]['quantity'], weapons[i]['damage'], weapons[i]['max_damage'], weapons[i]['range_'], weapons[i]['rof'], weapons[i]['defend'], weapons[i]['notes'], weapons[i]['weight'], weapons[i]['id']);
 		}
 
 		// select weapons
@@ -1675,25 +1677,25 @@
 		// check for user protections
 		var protections = <?php echo json_encode($protections); ?>;
 		for (var i in protections) {
-			addProtectionElements(protections[i]['name'], protections[i]['bonus'], protections[i]['notes'], protections[i]['weight']);
+			addProtectionElements(protections[i]['name'], protections[i]['bonus'], protections[i]['notes'], protections[i]['weight'], protections[i]['id']);
 		}
 
 		// check for user healings
 		var healings = <?php echo json_encode($healings); ?>;
 		for (var i in healings) {
-			addHealingElements(healings[i]['name'], healings[i]['quantity'], healings[i]['effect'], healings[i]['weight']);
+			addHealingElements(healings[i]['name'], healings[i]['quantity'], healings[i]['effect'], healings[i]['weight'], healings[i]['id']);
 		}
 
 		// check for user misc items
 		var misc = <?php echo json_encode($misc); ?>;
 		for (var i in misc) {
-			addMiscElements(misc[i]['name'], misc[i]['quantity'], misc[i]['notes'], misc[i]['weight']);
+			addMiscElements(misc[i]['name'], misc[i]['quantity'], misc[i]['notes'], misc[i]['weight'], misc[i]['id']);
 		}
 
 		// check for user notes
 		var notes = <?php echo json_encode($notes); ?>;
 		for (var i in notes) {
-			addNoteElements(notes[i]['title'], notes[i]['note']);
+			addNoteElements(notes[i]['title'], notes[i]['note'], notes[i]['id']);
 		}
 
 	</script>
