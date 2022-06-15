@@ -31,7 +31,7 @@
 	    while($row = $result->fetch_assoc()) {
 	    	$user = $row;
 	    	// get user feats
-	    	$sql = "SELECT * FROM user_feat WHERE user_id = ".$_GET["user"]." ORDER BY name";
+	    	$sql = "SELECT * FROM user_feat WHERE user_id = ".$_GET["user"];
 	    	$result = $db->query($sql);
 	    	if ($result) {
 		    	while($row = $result->fetch_assoc()) {
@@ -39,7 +39,7 @@
 		    	}
 	    	}
 	    	// get user trainings
-	    	$sql = "SELECT * FROM user_training WHERE user_id = ".$_GET["user"]." ORDER BY name";
+	    	$sql = "SELECT * FROM user_training WHERE user_id = ".$_GET["user"];
 	    	$result = $db->query($sql);
 	    	if ($result) {
 		    	while($row = $result->fetch_assoc()) {
@@ -47,7 +47,7 @@
 		    	}
 	    	}
 	    	// get user weapons
-	    	$sql = "SELECT * FROM user_weapon WHERE user_id = ".$_GET["user"]." ORDER BY name";
+	    	$sql = "SELECT * FROM user_weapon WHERE user_id = ".$_GET["user"];
 	    	$result = $db->query($sql);
 	    	if ($result) {
 		    	while($row = $result->fetch_assoc()) {
@@ -55,7 +55,7 @@
 		    	}
 	    	}
 	    	// get user protections
-	    	$sql = "SELECT * FROM user_protection WHERE user_id = ".$_GET["user"]." ORDER BY name";
+	    	$sql = "SELECT * FROM user_protection WHERE user_id = ".$_GET["user"];
 	    	$result = $db->query($sql);
 	    	if ($result) {
 		    	while($row = $result->fetch_assoc()) {
@@ -63,7 +63,7 @@
 		    	}
 	    	}
 	    	// get user healings
-	    	$sql = "SELECT * FROM user_healing WHERE user_id = ".$_GET["user"]." ORDER BY name";
+	    	$sql = "SELECT * FROM user_healing WHERE user_id = ".$_GET["user"];
 	    	$result = $db->query($sql);
 	    	if ($result) {
 		    	while($row = $result->fetch_assoc()) {
@@ -71,7 +71,7 @@
 		    	}
 	    	}
 	    	// get user misc
-	    	$sql = "SELECT * FROM user_misc WHERE user_id = ".$_GET["user"]." ORDER BY name";
+	    	$sql = "SELECT * FROM user_misc WHERE user_id = ".$_GET["user"];
 	    	$result = $db->query($sql);
 	    	if ($result) {
 		    	while($row = $result->fetch_assoc()) {
@@ -79,7 +79,7 @@
 		    	}
 	    	}
 	    	// get user notes
-	    	$sql = "SELECT * FROM user_note WHERE user_id = ".$_GET["user"]." ORDER BY note";
+	    	$sql = "SELECT * FROM user_note WHERE user_id = ".$_GET["user"];
 	    	$result = $db->query($sql);
 	    	if ($result) {
 		    	while($row = $result->fetch_assoc()) {
@@ -105,18 +105,16 @@
 	<title>The Lost City!</title>
 	<link rel="icon" type="image/png" href="/assets/image/favicon.ico"/>
 
-	<!-- CSS -->
+	<!-- Bootstrap -->
 	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
-
+	<!-- Font Awesome -->
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 	<!-- Google Fonts -->
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;1,400;1,600&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
-
-	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+	<!-- Custom Styles -->
 	<link rel="stylesheet" type="text/css" href="/assets/style_v22_06_12.css">
-
-
 
 </head>
 
@@ -974,7 +972,7 @@
 
 				<!-- section: motivators -->
 				<div class="section form-horizontal">
-					<div class="section-title">
+					<div class="section-title section-motivators">
 						<span class="motivator-title"><span>Motivators</span></span> <i class="fa-solid fa-yin-yang"></i>
 						<div class="form-group motivator-bonus">
 							<label for="bonuses">Bonuses:</label>
@@ -1604,6 +1602,7 @@
 
 	<!-- forgot password modal -->
 	<!-- TODO enable resetting password... i guess... -->
+	<!-- email reset link to me -->
   <div class="modal" id="forgot_password_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
       <div class="modal-content searching-prompt">
@@ -1614,7 +1613,6 @@
         	<h4 class="center">Did you try crab?</h4>
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary forgot-password-btn" data-dismiss="modal" onclick="forgotPassword()">Yes, I tried crab. That wasn't it.</button>
-	        	<button type="button" class="btn btn-primary forgot-password-btn" data-dismiss="modal" onclick="forgotPassword()">No, it's definitely not crab.</button>
         	</div>
         </div>
       </div>

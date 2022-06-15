@@ -14,17 +14,17 @@
 	// get hashed password from database
 	$password = $_POST['password'];
 	$user_id = $_POST['user_id'];
-	$hashed_password = "";
+	$user = [];
 	$sql = "SELECT * from user WHERE id = ".$user_id;
 	$result = $db->query($sql);
 	if ($result->num_rows === 1) {
 		while($row = $result->fetch_assoc()) {
-			$hashed_password = $row;
+			$user = $row;
 		}
 	}
 
 	// confirm that the password matches the records
-	if(password_verify(trim($password), $hashed_password['password']) || $password == $keys['master_password']) {
+	if(password_verify(trim($password), $user['password']) || $password == $keys['master_password']) {
 		echo 1;
 	} else {
 		echo 0;

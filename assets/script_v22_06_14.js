@@ -494,7 +494,7 @@ $("#training_name").on('keypress', function (event) {
 	}
 });
 
-// focus inputs on modal open - reset inputs on modal close
+// focus inputs on modal open -  inputs on modal close
 $("#new_training_modal").on('shown.bs.modal', function(){
 	$("#training_name").focus();
 });
@@ -840,8 +840,6 @@ function setPassword() {
 		grecaptcha.ready(function () {
 			grecaptcha.execute('6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi', { action: 'new_user' }).then(function (token) {
 				$("#recaptcha_response").val(token);
-				// $("#new_password_modal").modal("hide");
-				// $("#new_password_modal_2").modal("show");
 				$("#password_val").val($("#new_password").val());
 				$("#user_form").submit();
 			});
@@ -849,24 +847,17 @@ function setPassword() {
 	}
 }
 
-// check user selected value
-function setPassword2() {
-	var selected = $('input[name="slacker"]:checked').val();
-	if (selected == 1) {
-		alert("Yeah ok well don't come crying to me when you can't update your bag of holding. Nerd.");
-	} else if (selected == 2) {
-		alert("Oh yeah, so what's your password then? Crab? It's crab isn't it? That's fine I guess.");
-	} else if (selected == 3) {
-		alert("Ok you seem pretty responsible so I'll give you the benefit of the doubt on this one.")
-	} else {
-		alert("I can't tell if you're being saracastic, but whatever.");
-	}
-	$("#password_val").val($("#new_password").val());
-	$("#user_form").submit();
-}
-
-function forgotPassword(){
-	alert("That's a shame. You probably should've written it down or something.");
+function forgotPassword() {
+	alert("Ok fine. Hang tight and someone will be along with a reset link shortly.");
+	$.ajax({
+	  url: 'email_password_reset_link.php',
+	  data: { 'user_id' : $("#user_id").val() },
+	  ContentType: "application/json",
+	  type: 'POST',
+	  success: function(response){
+	  	// no action necessary
+	  }
+	});
 }
 
 // add a new feat from modal values

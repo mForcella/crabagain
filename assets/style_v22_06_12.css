@@ -375,6 +375,7 @@ h1 {
 	float: right;
 	text-transform: none;
 	font-weight: 300;
+	margin-bottom: -1px;
 }
 .motivator-bonus label {
 	font-size: 0.9em;
@@ -502,6 +503,9 @@ select.form-control {
 	font-weight: bold;
 	text-transform: uppercase;
 	margin-bottom: 5px;
+}
+.section-motivators {
+	margin-bottom: 10px;
 }
 .section-title span {
 	text-decoration: underline;

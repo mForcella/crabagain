@@ -47,6 +47,7 @@
     motivator_2_pts int,
     motivator_3_pts int,
     motivator_4_pts int,
+    reset_token varchar(255),
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
   );
 
