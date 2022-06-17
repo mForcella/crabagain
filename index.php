@@ -1240,8 +1240,8 @@
 	        	</div>
         	</div>
         	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="setXP()">Ok</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
       </div>
@@ -1259,8 +1259,8 @@
         	<h4 class="control-label center">What's the secret word?</h4>
         	<input class="form-control" type="text" id="gm_password">
         	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="GMEditMode()">Ok</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
       </div>
@@ -1285,8 +1285,8 @@
         		<option value="Large" <?php echo $size == "Large" ? 'selected' : '' ?>>Large</option>
         	</select>
         	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="editSize()">Ok</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
       </div>
@@ -1307,8 +1307,8 @@
         	<textarea class="form-control" id="note_content" rows="10" maxlength="2000"></textarea>
         	<input type="hidden" id="note_id">
         	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newNote()">Ok</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
       </div>
@@ -1329,8 +1329,8 @@
         	<textarea class="form-control" id="feat_description" rows="6" maxlength="255"></textarea>
         	<input type="hidden" id="feat_id">
         	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newFeat()" id="feat_submit_btn">Ok</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
       </div>
@@ -1368,8 +1368,8 @@
         	</div>
         	<input type="hidden" id="attribute_type">
         	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newTraining()">Ok</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
       </div>
@@ -1409,8 +1409,8 @@
         	<input class="form-control" type="number" id="weapon_weight">
         	<input type="hidden" id="weapon_id">
         	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newWeapon()">Ok</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
       </div>
@@ -1435,8 +1435,8 @@
         	<input class="form-control" type="number" id="protection_weight">
         	<input type="hidden" id="protection_id">
         	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newProtection()">Ok</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
       </div>
@@ -1461,8 +1461,8 @@
         	<input class="form-control" type="number" id="healing_weight">
         	<input type="hidden" id="healing_id">
         	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newHealing()">Ok</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
       </div>
@@ -1487,8 +1487,8 @@
         	<input class="form-control" type="number" id="misc_weight">
         	<input type="hidden" id="misc_id">
         	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newMisc()">Ok</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
       </div>
@@ -1508,15 +1508,15 @@
         	<label class="control-label" for="password_conf">Confirm password</label>
         	<input class="form-control" type="password" id="password_conf" name="password_conf">
         	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 	        	<button type="button" class="btn btn-primary" id="password_btn" data-dismiss="modal" data-toggle="modal" data-target="#new_password_modal_2" disabled>Ok</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
       </div>
     </div>
   </div>
 
-	<!-- new password modal 2 -->
+	<!-- new password modal - bot test -->
   <div class="modal" id="new_password_modal_2" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
       <div class="modal-content searching-prompt">
@@ -1545,39 +1545,6 @@
     </div>
   </div>
 
-	<!-- new password modal 3 -->
-  <div class="modal" id="new_password_modal_3" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-      <div class="modal-content searching-prompt">
-        <div class="modal-header">
-          <h4 class="modal-title">New Character</h4>
-        </div>
-        <div class="modal-body">
-        	<h4 class="center">Did you write it down yet?</h4>
-        	<div class="form-check">
-	        	<input class="form-check-input" type="radio" name="slacker" id="1" value="1">
-	        	<label class="form-check-label" for="1">No, but I have really good memory.</label>
-        	</div>
-        	<div class="form-check">
-	        	<input class="form-check-input" type="radio" name="slacker" id="2" value="2">
-	        	<label class="form-check-label" for="2">No, but I made sure to pick something really easy to remember.</label>
-        	</div>
-        	<div class="form-check">
-	        	<input class="form-check-input" type="radio" name="slacker" id="3" value="3">
-	        	<label class="form-check-label" for="3">Not yet. I'm about to. Chill out.</label>
-        	</div>
-        	<div class="form-check">
-	        	<input class="form-check-input" type="radio" name="slacker" id="4" value="4">
-	        	<label class="form-check-label" for="4">Yeah, totally!</label>
-        	</div>
-        	<div class="button-bar">
-		        <button type="button" class="btn btn-primary" id="password_btn_2" data-dismiss="modal" onclick="setPassword2()" disabled>Ok</button>
-		      </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
 	<!-- password modal -->
   <div class="modal" id="password_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
@@ -1589,8 +1556,8 @@
         	<h4>Please enter your password to update your character</h4>
         	<input class="form-control" type="password" id="password">
         	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 	        	<button type="button" class="btn btn-primary" id="password_btn" onclick="validatePassword()">Ok</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary forgot-password-btn" data-dismiss="modal" data-toggle="modal" data-target="#forgot_password_modal">I Forgot My Password!</button>
@@ -1601,8 +1568,6 @@
   </div>
 
 	<!-- forgot password modal -->
-	<!-- TODO enable resetting password... i guess... -->
-	<!-- email reset link to me -->
   <div class="modal" id="forgot_password_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
       <div class="modal-content searching-prompt">
@@ -1624,7 +1589,7 @@
 	<script async src="https://www.google.com/recaptcha/api.js?render=6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
-	<script src="/assets/script_v22_06_14.js"></script>
+	<script src="/assets/script_v22_06_17.js"></script>
 	<script type="text/javascript">
 
 		var keys = <?php echo json_encode($keys); ?>;
@@ -1695,6 +1660,23 @@
 		for (var i in notes) {
 			addNoteElements(notes[i]['title'], notes[i]['note'], notes[i]['id']);
 		}
+
+		$(window).on("beforeunload", function(e) {
+			if (unsavedChanges) {
+		  	return "Unsaved changes will be lost."; // custom message will not be displayed; message is browser specific
+			}
+		});
+
+		$("input").on("change", function(){
+			unsavedChanges = true;
+		});
+		$("textarea").on("input propertychange", function(){
+			unsavedChanges = true;
+		});
+
+		$("#user_form").on("submit", function(){
+			unsavedChanges = false;
+		});
 
 	</script>
 

@@ -14,6 +14,8 @@ var trainingVals = [];
 var trainings = [];
 var feats = [];
 var notes = [];
+var unsavedChanges = false;
+// var navMenuOpen = false;
 
 var attributes = [
 	'strength',
@@ -29,6 +31,39 @@ var attributes = [
 	'intuition',
 	'vitality'
 ];
+
+// detect if we're on a touchscreen
+var is_mobile = $('#is_mobile').css('display')=='none';
+
+// enable size edit button
+if (!is_mobile) {
+	$("#size").hover(function () {
+		$(this).find(".hover-hide").show();
+	}, 
+	function () {
+		$(this).find(".hover-hide").hide();
+	});
+}
+
+// enable attribute edit btn hide / show on hover; don't hide on mobile
+if (is_mobile) {
+	$(".attribute-col").each(function(){
+		$(this).find('.hover-hide').hide();
+	});
+}
+
+// hide nav menu on click away
+$(document).mouseup(function(e) {
+  var container = $(".nav-menu");
+  if (!$(".glyphicon-menu-hamburger").is(e.target) &&!container.is(e.target) && container.has(e.target).length === 0) {
+  	if ($(".glyphicon-menu-hamburger").hasClass("active")) {
+  		$(".glyphicon-menu-hamburger").removeClass("active");
+  	}
+  	if ($(".nav-menu").hasClass("active")) {
+  		$(".nav-menu").removeClass("active");
+  	}
+  }
+});
 
 // resize background textarea to fit text
 $("#background").height( $("#background")[0].scrollHeight );
@@ -113,6 +148,7 @@ function setXP() {
 
 // show user menu
 function toggleMenu() {
+	// navMenuOpen = !navMenuOpen;
   $(".nav-menu").toggleClass("active");
   $(".glyphicon-menu-hamburger").toggleClass("active");
 }
@@ -157,7 +193,7 @@ function selectWeapon(id) {
 					if (max_damage != 0 && parseInt($("#weapon_damage_"+id).val())+damage_mod > weapons[i]['max_damage']) {
 						damage_mod = max_damage - damage;
 					}
-					$("#weapon_damage_"+id).val(damage+" (+"+damage_mod+")");
+					$("#weapon_damage_"+id).val(damage_mod != 0 ? damage+" (+"+damage_mod+")" : damage);
 				}
 			}
 		}
@@ -302,9 +338,6 @@ function endEditAttributes(accept) {
 	}
 }
 
-// detect if we're on a touchscreen
-var is_mobile = $('#is_mobile').css('display')=='none';
-
 // on motivator pt change, adjust bonuses
 $(".motivator-pts").on("change", function(){
 	var pts = [];
@@ -405,16 +438,6 @@ $("#damage").change(function(){
 		$("#wounds").val( parseInt($("#wounds").val())+1 >= 3 ? 3 : parseInt($("#wounds").val())+1 );
 	}
 });
-
-// enable size edit button
-if (!is_mobile) {
-	$("#size").hover(function () {
-		$(this).find(".hover-hide").show();
-	}, 
-	function () {
-		$(this).find(".hover-hide").hide();
-	});
-}
 
 function editSize() {
 	// set size text
@@ -643,6 +666,7 @@ function setMoraleEffect(morale) {
 
 // adjust attribute value
 function adjustAttribute(attribute, val) {
+	unsavedChanges = true;
 	var originalVal = parseInt($("#"+attribute+"_val").val());
 	var newVal = originalVal+parseInt(val);
 	// check if we are allocating attribute points
@@ -747,13 +771,6 @@ function adjustAttribute(attribute, val) {
 			$("#initiative").val(initiative);
 			break;
 	}
-}
-
-// enable attribute edit btn hide / show on hover; don't hide on mobile
-if (is_mobile) {
-	$(".attribute-col").each(function(){
-		$(this).find('.hover-hide').hide();
-	});
 }
 
 // show all icons for editing attribute values
@@ -942,6 +959,7 @@ function addFeatElements(featName, featDescription, id) {
     	// confirm delete
     	var conf = confirm("Remove feat '"+name.split(" : ")[0]+"'?");
     	if (conf) {
+    		unsavedChanges = true;
     		$("#"+id_val).remove();
 				var index = featNames.indexOf(featName);
 				if (index !== -1) {
@@ -1053,6 +1071,7 @@ function addTrainingElements(trainingName, attribute, id, value='') {
 	removeBtn.on("click", function(){
 		var conf = confirm("Remove training '"+trainingName+"'?");
 		if (conf) {
+			unsavedChanges = true;
 			// if allocating points, increase point count
 			if (allocatingAttributePts) {
 				var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
@@ -1163,7 +1182,7 @@ function addNoteElements(title, note, id) {
 	createInput('', 'hidden', 'note_ids[]', id, span);
 
 	// highlight on hover
-	li.hover(function(){
+	span.hover(function(){
 		$(this).addClass("highlight");
 	}, function(){
 		$(this).removeClass("highlight");
@@ -1177,7 +1196,10 @@ function addNoteElements(title, note, id) {
 	// enable remove button
 	remove.click(function(){
 		var conf = confirm("Delete note, " + (title == "" ? "[no title]" : title) + "?");
-		if (conf) { li.remove(); }
+		if (conf) {
+			li.remove();
+			unsavedChanges = true;
+		}
 	});
 }
 
@@ -1336,6 +1358,7 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 		var item = $("#"+id_val+"_name").val();
 		var conf = confirm("Remove item '"+item+"'?");
 		if (conf) {
+			unsavedChanges = true;
 			$("#"+id_val).remove();
 			var index = itemNames.indexOf(name);
 			if (index !== -1) {
@@ -1503,6 +1526,7 @@ function addProtectionElements(name, bonus, notes, weight, id) {
 		var item = $("#"+id_val+"_name").val();
 		var conf = confirm("Remove item '"+item+"'?");
 		if (conf) {
+			unsavedChanges = true;
 			$("#"+id_val).remove();
 			var index = itemNames.indexOf(name);
 			if (index !== -1) {
@@ -1595,6 +1619,7 @@ function addHealingElements(name, quantity, effect, weight, id) {
 		var item = $("#"+id_val+"_name").val();
 		var conf = confirm("Remove item '"+item+"'?");
 		if (conf) {
+			unsavedChanges = true;
 			$("#"+id_val).remove();
 			var index = itemNames.indexOf(name);
 			if (index !== -1) {
@@ -1687,6 +1712,7 @@ function addMiscElements(name, quantity, notes, weight, id) {
 		var item = $("#"+id_val+"_name").val();
 		var conf = confirm("Remove item '"+item+"'?");
 		if (conf) {
+			unsavedChanges = true;
 			$("#"+id_val).remove();
 			var index = itemNames.indexOf(name);
 			if (index !== -1) {
