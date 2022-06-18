@@ -1409,7 +1409,7 @@
         	<input class="form-control" type="number" id="weapon_weight">
         	<input type="hidden" id="weapon_id">
         	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newWeapon()">Ok</button>
+	        	<button type="button" class="btn btn-primary" onclick="newWeapon()">Ok</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
@@ -1435,7 +1435,7 @@
         	<input class="form-control" type="number" id="protection_weight">
         	<input type="hidden" id="protection_id">
         	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newProtection()">Ok</button>
+	        	<button type="button" class="btn btn-primary" onclick="newProtection()">Ok</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
@@ -1461,7 +1461,7 @@
         	<input class="form-control" type="number" id="healing_weight">
         	<input type="hidden" id="healing_id">
         	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newHealing()">Ok</button>
+	        	<button type="button" class="btn btn-primary" onclick="newHealing()">Ok</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
@@ -1487,7 +1487,7 @@
         	<input class="form-control" type="number" id="misc_weight">
         	<input type="hidden" id="misc_id">
         	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newMisc()">Ok</button>
+	        	<button type="button" class="btn btn-primary" onclick="newMisc()">Ok</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
@@ -1589,7 +1589,7 @@
 	<script async src="https://www.google.com/recaptcha/api.js?render=6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
-	<script src="/assets/script_v22_06_17.js"></script>
+	<script src="/assets/script_v22_06_18.js"></script>
 	<script type="text/javascript">
 
 		var keys = <?php echo json_encode($keys); ?>;
@@ -1598,7 +1598,7 @@
 		var user = <?php echo json_encode(isset($user) ? $user : []); ?>;
 		setAttributes(user);
 		if (user.length == 0) {
-			character_creation = true;
+			characterCreation = true;
 			// show new feat btn
 			$("#new_feat_btn").show();
 			// enable hover-hide on attribute edits
