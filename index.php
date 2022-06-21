@@ -114,7 +114,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;1,400;1,600&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
 	<!-- Custom Styles -->
-	<link rel="stylesheet" type="text/css" href="/assets/style_v22_06_12.css">
+	<link rel="stylesheet" type="text/css" href="/assets/style_v22_06_20.css">
 
 </head>
 
@@ -1040,14 +1040,13 @@
 					<div class="form-group">
 						<div class="col-sm-12">
 							<div id="feats">
-								<div class="feat" id="size">
+								<div class="feat" id="size" data-toggle="modal" data-target="#edit_size_modal">
 									<p class="feat-title">Size : </p>
 						    	<?php
 						    		$size = isset($user['size']) ? $user['size'] : 'Medium';
 						    	?>
 									<p id="character_size_text"><?php echo $size ?></p>
 									<input type="hidden" name="size" id="character_size_val" value="<?php echo $size ?>">
-									<span class="glyphicon glyphicon-edit hover-hide" data-toggle="modal" data-target="#edit_size_modal"></span>
 								</div>
 							</div>
 						</div>
@@ -1589,7 +1588,7 @@
 	<script async src="https://www.google.com/recaptcha/api.js?render=6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
-	<script src="/assets/script_v22_06_18.js"></script>
+	<script src="/assets/script_v22_06_20.js"></script>
 	<script type="text/javascript">
 
 		var keys = <?php echo json_encode($keys); ?>;

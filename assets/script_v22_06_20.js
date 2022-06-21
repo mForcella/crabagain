@@ -37,10 +37,10 @@ var is_mobile = $('#is_mobile').css('display')=='none';
 // enable size edit button
 if (!is_mobile) {
 	$("#size").hover(function () {
-		$(this).find(".hover-hide").show();
+		$(this).addClass("highlight");
 	}, 
 	function () {
-		$(this).find(".hover-hide").hide();
+		$(this).removeClass("highlight");
 	});
 }
 
@@ -89,7 +89,6 @@ function GMEditMode() {
 
 		// show hidden feat buttons and unbind hover functions
 		$("#feats").find(".glyphicon").show();
-		$(".feat").unbind("mouseenter mouseleave");
 
 		// enable edit attribute pts input, enable edit xp input
 		$("#attribute_pts").attr("readonly", false).attr("type", "number");
@@ -111,19 +110,9 @@ function endGMEdit(accept) {
 		// hide GM menu, show hamburger menu
 	  $(".gm-menu").toggleClass("active");
 		$(".glyphicon-menu-hamburger").show();
-		// hide icons and re-enable hover functions
+		// hide icons
 		$(".attribute-col").find(".hidden-icon").hide();
-		$("#feats").find(".hover-hide").hide();
-		if (!is_mobile) {
-			$("#feats").find(".feat").hover(function () {
-				$(this).find(".hover-hide.glyphicon-edit").show();
-			}, 
-			function () {
-				$(this).find(".hover-hide").hide();
-			});
-		} else {
-			$("#feats").find(".hover-hide.glyphicon-edit").show();
-		}
+		$(".feat").find(".hidden-icon").hide();
 		// disable edit attribute pts input, enable edit xp input
 		$("#attribute_pts").attr("readonly", true).removeAttr("type", "number");
 		$("#xp").attr("readonly", true).removeAttr("type", "number").attr("data-toggle", "modal");
@@ -243,14 +232,6 @@ function allocateAttributePts() {
   $(".attribute-count").html($("#attribute_pts").val()+" Points");
 	// show attribute point counter
   $(".attribute-pts").toggleClass("active");
-  // hide edit/remove feat buttons
-  $(".feat").unbind("mouseenter mouseleave");
-	if (is_mobile) {
-		$(".feat").each(function(){
-			$(this).find(".glyphicon-edit").hide();
-			$(this).find(".glyphicon-remove").hide();
-		});
-	}
   allocatingAttributePts = true;
   trainings = [];
   feats = [];
@@ -275,9 +256,9 @@ function endEditAttributes(accept) {
 	if (!characterCreation) {
 		$("#new_feat_btn").hide();
 	}
-	if (!is_mobile) {
-		if (characterCreation) {
-			// restore attribute-col hover functions
+	// restore attribute-col hover function for edit buttons
+	if (characterCreation) {
+		if (!is_mobile) {
 			$(".attribute-col").each(function(){
 				$(this).hover(function(){
 					$(this).find('.hover-hide').show();
@@ -286,23 +267,11 @@ function endEditAttributes(accept) {
 					$(this).find('.hover-hide').hide();
 				});
 			});
-		}
-		// restore feat hover functions
-	  $(".feat").hover(function () {
-			$(this).find(characterCreation ? ".hover-hide" : ".hover-hide.glyphicon-edit").show();
-		}, 
-		function () {
-			$(this).find(".hover-hide").hide();
-		});
-	} else {
-		if (characterCreation) {
+		} else {
 			$(".attribute-col").each(function(){
-				$(this).find(".glyphicon-edit").show();
+				$(this).find(".hover-hide").show();
 			});
 		}
-	  $(".feat").each(function () {
-			$(this).find(".hover-hide.glyphicon-edit").show();
-		});
 	}
 	if (accept) {
 		// update #attribute_pts input val from .attribute-count
@@ -320,7 +289,7 @@ function endEditAttributes(accept) {
 		}
 		// remove training names and remove training elements
 		for (var i in trainings) {
-			var index = trainingNames.indexOf(trainings[i].attr("id").split("_row")[0]);
+			var index = trainingNames.indexOf(trainings[i].text().split("+0")[0]);
 			if (index !== -1) {
 			  trainingNames.splice(index, 1);
 			}
@@ -328,9 +297,9 @@ function endEditAttributes(accept) {
 		}
 		// remove feat names and remove feat elements
 		for (var i in feats) {
-			var index = featNames.indexOf(feats[i].attr("id"));
+			var index = featNames.indexOf(feats[i].text().split(" : ")[0]);
 			if (index !== -1) {
-			  trainingNames.splice(index, 1);
+			  featNames.splice(index, 1);
 			}
 			feats[i].remove();
 		}
@@ -400,6 +369,7 @@ $("#xp").change(function(){
 				"Fart on a forklift!",
 				"Blammo!",
 				"Kapow!",
+				"Excelsior!",
 			];
 			var index = Math.floor(Math.random() * (exclamations.length));
 			alert(exclamations[index]+" You made it to level "+level+"!");
@@ -929,38 +899,30 @@ function addFeatElements(featName, featDescription, id) {
 			feats.push(feat_container);
 		}
 
+		var feat_title_descrip = createElement('div', '', feat_container);
+
     $('<p />', {
     	'id': id_val+"_name",
     	'class': 'feat-title',
     	'text': featName+" : "
-    }).appendTo(feat_container);
+    }).appendTo(feat_title_descrip);
 
-    // TODO prevent wrapping of last word in description...
-    // var lastWord = featDescription.split(" ")[featDescription.split(" ").length-1];
-    // featDescrip = featDescription.substring(0, featDescription.length - lastWord.length);
-    // var descrip = createElement('span', '', feat_container, id_val+"_descrip");
-    // var descrip1 = $('<p />', {
-    //   'text': featDescrip
-    // }).appendTo(descrip);
-    // var descrip2 = $('<p />', {
-    // 	'id': id_val+"_last_word",
-    // 	'class': 'nowrap',
-    //   'text': lastWord
-    // }).appendTo(descrip);
-
-    var descrip = $('<p />', {
+    var feat_descrip = $('<p />', {
     	'id': id_val+"_descrip",
       'text': featDescription
-    }).appendTo(feat_container);
+    }).appendTo(feat_title_descrip);
 
-		createElement('span', 'glyphicon glyphicon-edit hover-hide', feat_container, id_val+"_edit");
-		createElement('span', 'glyphicon glyphicon-remove hover-hide', feat_container, id_val+"_remove");
+		// if allocating points, make sure remove button is visible
+		var removeBtn = createElement('span', 'glyphicon glyphicon-remove hidden-icon', feat_container, id_val+"_remove");
+		if (allocatingAttributePts || adminEditMode || characterCreation) {
+			removeBtn.show();
+		}
 
     // add click function to edit button
-    $("#"+id_val+"_edit").on("click", function(){
+    feat_title_descrip.on("click", function(){
     	var name = $("#"+id_val+"_name").html();
     	$("#feat_name").val(name.split(" : ")[0]);
-    	$("#feat_description").val(descrip.html());
+    	$("#feat_description").val(feat_descrip.html());
     	$("#feat_id").val(id_val);
     	$("#feat_modal_title").html("Update Feat");
     	$("#new_feat_modal").modal("show");
@@ -990,30 +952,11 @@ function addFeatElements(featName, featDescription, id) {
     });
 
 		// highlight on hover
-		// feat_container.hover(function(){
-		// 	$(this).addClass("highlight");
-		// }, function(){
-		// 	$(this).removeClass("highlight");
-		// });
-
-    // show hidden icons on hover - don't enable on mobile
-    if (adminEditMode) {
-    	feat_container.find(".hover-hide").show();
-    } else {
-	    if (!is_mobile) {
-	    	feat_container.hover(function () {
-					$(this).find(allocatingAttributePts || characterCreation ? ".hover-hide" : ".hover-hide.glyphicon-edit").show();
-					// $(this).find('.nowrap').css({"margin-right":"-30px"});
-				}, 
-				function () {
-					$(this).find(".hover-hide").hide();
-					// $(this).find('.nowrap').css({"margin-right":"0"});
-				});
-	    } else {
-	    	// hide remove buttons on mobile
-	    	feat_container.find(".hover-hide.glyphicon-remove").hide();
-	    }
-    }
+		feat_container.hover(function(){
+			$(this).addClass("highlight");
+		}, function(){
+			$(this).removeClass("highlight");
+		});
 
 		// add hidden inputs
     createInput('', 'hidden', 'feat_names[]', featName, feat_container, id_val+"_name_val");
