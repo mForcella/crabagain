@@ -109,12 +109,14 @@
 	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
 	<!-- Font Awesome -->
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+	<!-- jQuery UI -->
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
 	<!-- Google Fonts -->
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;1,400;1,600&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
 	<!-- Custom Styles -->
-	<link rel="stylesheet" type="text/css" href="/assets/style_v22_06_20.css">
+	<link rel="stylesheet" type="text/css" href="/assets/style_v22_06_22.css">
 
 </head>
 
@@ -1344,25 +1346,24 @@
           <h4 class="modal-title" id="training_modal_title">New Skill Training</h4>
         </div>
         <div class="modal-body">
-        	<h4 class="control-label">Training Name</h4>
+        	<h4 class="control-label">Skill / Training Name</h4>
         	<input class="form-control" type="text" id="training_name">
         	<br>
-        	<!-- skill type: hidden unless allocating points -->
         	<div id="skill_type">
         		<h4 class="control-label">
-        			What type of skill training?
+        			Skill / Training Type
         		</h4>
 	        	<div class="form-check">
 		        	<input class="form-check-input" type="radio" name="skill_type" id="unique" value="4">
 		        	<label class="form-check-label" for="unique">Unique Skill (4 attribute pts)</label>
 	        	</div>
 	        	<div class="form-check">
-		        	<input class="form-check-input" type="radio" name="skill_type" id="advanced" value="2">
-		        	<label class="form-check-label" for="advanced">Advanced Skill (2 attribute pts)</label>
+		        	<input class="form-check-input" type="radio" name="skill_type" id="training" value="2">
+		        	<label class="form-check-label" for="training">Training (2 attribute pts)</label>
 	        	</div>
 	        	<div class="form-check">
-		        	<input class="form-check-input" type="radio" name="skill_type" id="standard_" value="1">
-		        	<label class="form-check-label" for="standard_">Standard Skill (1 attribute pt)</label>
+		        	<input class="form-check-input" type="radio" name="skill_type" id="focus" value="1">
+		        	<label class="form-check-label" for="focus">Focus (1 attribute pt)</label>
 	        	</div>
         	</div>
         	<input type="hidden" id="attribute_type">
@@ -1588,7 +1589,9 @@
 	<script async src="https://www.google.com/recaptcha/api.js?render=6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
-	<script src="/assets/script_v22_06_20.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+	<script src="/assets/feat_list_v22_06_22.js"></script>
+	<script src="/assets/script_v22_06_22.js"></script>
 	<script type="text/javascript">
 
 		var keys = <?php echo json_encode($keys); ?>;

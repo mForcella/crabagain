@@ -28,8 +28,118 @@ var attributes = [
 	'intellect',
 	'innovation',
 	'intuition',
-	'vitality'
+	'vitality',
 ];
+
+// set autocomplete list for feats
+var list = [];
+for (var i in feat_list) {
+	list.push(feat_list[i]['name']);
+}
+list.sort();
+$("#feat_name").autocomplete({
+	source: function(input, add) {
+		var suggestions = [];
+		$.each(list, function(i, feat_name){
+			if (feat_name.toLowerCase().includes(input['term'].toLowerCase())) {
+				var entry = new Object();
+				entry.value = feat_name;
+				// check if attribute requirements are satisfied
+				entry.satisfied = true;
+				$.each(feat_list, function(j, feat_vals) {
+					if (feat_vals['name'] == feat_name) {
+						var requirements = feat_vals['requirements'];
+						// requirements is an array of arrays
+						$.each(requirements, function(k, reqs) {
+							// reqs is an array of dictionary requirements
+							var satisfied = false;
+							$.each(reqs, function(l, req) {
+								// only one req needs to be satisfied
+								for (key in req) {
+									switch (key) {
+										case 'character_creation':
+										satisfied = satisfied ? true : characterCreation;
+										// hide feats only available during character creation
+										entry.hidden = !characterCreation;
+										break;
+										case 'feat':
+										satisfied = satisfied ? true : feats.includes(req[key]);
+										break;
+										case 'training':
+										satisfied = satisfied ? true : trainings.includes(req[key]);
+										break;
+										default:
+										satisfied = satisfied ? true : user[key] >= req[key];
+										break;
+									}
+								}
+							});
+							// set satisfied value to list entry
+							entry.satisfied = !entry.satisfied ? false : satisfied;
+						});
+					}
+ 				});
+				suggestions.push(entry);
+			}
+		});
+		add(suggestions);
+	},
+	create: function (event, ui) {
+		$(this).data("ui-autocomplete")._renderItem = function(ul, item) {
+			var listItem = $("<li></li>")
+			.data("item.autocomplete", item)
+			.append("<a>" + item.label + "</a>")
+			.appendTo(ul);
+
+			// adjust class based on whether requirements are satisfied or not
+			if (!item.satisfied) {
+				listItem.addClass("italic");
+			} else {
+				listItem.addClass("bold");
+			}
+			if (item.hidden) {
+				listItem.addClass("hidden");
+			}
+
+			return listItem;
+		};
+	},
+	select: function(event, ui) {
+		// build user message if requirements aren't satisfied
+		if (!ui.item.satisfied) {
+			var requirements = "";
+			for (var i in feat_list) {
+				if (feat_list[i]['name'] == ui.item.value) {
+					for (var j in feat_list[i]['requirements']) {
+						for (var k in feat_list[i]['requirements'][j]) {
+							for (var key in feat_list[i]['requirements'][j][k]) {
+								requirements += key == "character_creation" ? "*only available during character creation" : 
+								(key == "precision_" ? "precision" : key) + " : " + feat_list[i]['requirements'][j][k][key];
+							}
+							if (feat_list[i]['requirements'][j].length > 1 && k < feat_list[i]['requirements'][j].length-1) {
+								requirements += " OR ";
+							}
+						}
+						requirements += "\n";
+					}
+				}
+			}
+			alert("Requirements not met for selected feat:\n"+requirements);
+			$("#feat_name").val("");
+			return false;
+		} else {
+			// auto fill description on feat selection
+			var description = "";
+			for (var i in feat_list) {
+				if (feat_list[i]['name'] == ui.item.value) {
+					description = feat_list[i]['description'];
+				}
+			}
+			$("#feat_description").val(description);
+			// TODO check for specific feats and adjust attributes (quick and the dead, improved crit, etc)
+		}
+	}
+});
 
 // detect if we're on a touchscreen
 var is_mobile = $('#is_mobile').css('display')=='none';
@@ -253,6 +363,7 @@ function endEditAttributes(accept) {
 	$(".attribute-pts").toggleClass("active");
 	$(".glyphicon-menu-hamburger").show();
 	$(".attribute-col").find(".hidden-icon").hide();
+	$(".feat").find(".glyphicon-remove").hide();
 	if (!characterCreation) {
 		$("#new_feat_btn").hide();
 	}
@@ -571,11 +682,11 @@ $("#new_feat_modal").on('hidden.bs.modal', function(){
 });
 
 $("#new_training_modal").on('shown.bs.modal', function(){
-	if (allocatingAttributePts) {
-		$("#skill_type").show();
-	} else {
-		$("#skill_type").hide();
-	}
+	// if (allocatingAttributePts) {
+	// 	$("#skill_type").show();
+	// } else {
+	// 	$("#skill_type").hide();
+	// }
 });
 
 // enable / disable password submit btn
@@ -666,6 +777,7 @@ function adjustAttribute(attribute, val) {
 	}
 	$("#"+attribute+"_text").html(newVal >= 0 ? "+"+newVal : newVal);
 	$("#"+attribute+"_val").val(newVal);
+	user[attribute] = newVal;
 	// adjust stats based on attribute
 	switch(attribute) {
 		case 'strength':
@@ -864,7 +976,7 @@ function addFeatElements(featName, featDescription, id) {
 
 		// update feat name and description
 		$("#"+id+"_name").html(featName+" : ");
-		$("#"+id+"_descrip").html(featDescription);
+		$("#"+id+"_descrip").html(featDescription.length > 100 ? featDescription.substring(0,100)+"..." : featDescription);
 
 		// update hidden input values
 		$("#"+id+"_name_val").val(featName);
@@ -909,7 +1021,7 @@ function addFeatElements(featName, featDescription, id) {
 
     var feat_descrip = $('<p />', {
     	'id': id_val+"_descrip",
-      'text': featDescription
+      'text': featDescription.length > 100 ? featDescription.substring(0,100)+"..." : featDescription
     }).appendTo(feat_title_descrip);
 
 		// if allocating points, make sure remove button is visible
@@ -922,7 +1034,7 @@ function addFeatElements(featName, featDescription, id) {
     feat_title_descrip.on("click", function(){
     	var name = $("#"+id_val+"_name").html();
     	$("#feat_name").val(name.split(" : ")[0]);
-    	$("#feat_description").val(feat_descrip.html());
+    	$("#feat_description").val($("#"+id_val+"_descrip_val").val());
     	$("#feat_id").val(id_val);
     	$("#feat_modal_title").html("Update Feat");
     	$("#new_feat_modal").modal("show");
@@ -991,22 +1103,29 @@ function addTrainingElements(trainingName, attribute, id, value='') {
 		return;
 	}
 
+	// make sure skill type is selected - if adding a new training (value = '')
+	var skill_pts = $('input[name=skill_type]:checked').val();
+	if (skill_pts == undefined && value == '') {
+		alert("Please select a skill type");
+		return;
+	} else {
+		skill_pts = parseInt(skill_pts);
+		// if skill_pts = 1 (focus), skill starts at +1
+		if (skill_pts == 1) { value = 1; }
+	}
+
 	// allocating attribute points, make sure we have enough points
+	// TODO focus and training don't count towards level up feat/training limit?
 	if (allocatingAttributePts) {
 		if (feats.length > 0 || trainings.length > 0) {
 			alert("Only one new feat or training can be added per level.");
 			return;
 		}
 		var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
-		var skill_pts = $('input[name=skill_type]:checked').val();
-		if (skill_pts == undefined) {
-			alert("Please select a skill type");
-			return;
-		} else if (pts - skill_pts < 0) {
+		if (pts - skill_pts < 0) {
 			alert("Not enough attribute points to allocate for a new skill training.");
 			return;
 		}
-		skill_pts = parseInt(skill_pts);
 		// decrease attribute points
 		$(".attribute-count").html(pts - skill_pts +" Points");
 	}

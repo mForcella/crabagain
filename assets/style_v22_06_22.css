@@ -74,6 +74,11 @@
 	}
 }
 
+/* make sure autocomplete list is not hidden behind modal */
+.ui-front {
+    z-index: 9999;
+}
+
 /* detect touchscreen */
 @media (hover: none) {
   #is_mobile {
@@ -349,6 +354,12 @@ h1 {
 }
 .icon-path {
     background-image: url("image/path.svg");
+}
+.italic {
+	font-style: italic;
+}
+.bold {
+	font-weight: bold;
 }
 .left-col {
 	margin-left: 15px;
