@@ -1,20 +1,21 @@
-var originalFeatName = "";
+// arrays to make sure elements are not assigned redundant functions
 var hiddenEnabled = [];
 var highlightEnabled = [];
 var skipEnabled = [];
+// arrays to make sure we don't have feats/trainings/items with the same name
 var trainingNames = [];
 var featNames = [];
 var itemNames = [];
-var totalWeight = 0;
+// bools to determine rules and element visibility for various operating modes
 var allocatingAttributePts = false;
 var characterCreation = false;
 var adminEditMode = false;
+var unsavedChanges = false;
+// arrays used to restore attribute values, feats, and trainings on cancel allocate points
 var attributeVals = [];
 var trainingVals = [];
 var trainings = [];
 var feats = [];
-var notes = [];
-var unsavedChanges = false;
 
 var attributes = [
 	'strength',
@@ -59,14 +60,14 @@ $("#feat_name").autocomplete({
 									switch (key) {
 										case 'character_creation':
 										satisfied = satisfied ? true : characterCreation;
-										// hide feats only available during character creation
-										entry.hidden = !characterCreation;
+										// hide feats only available during character creation - don't hide any feats if in GM edit mode
+										entry.hidden = adminEditMode ? false : !characterCreation;
 										break;
 										case 'feat':
-										satisfied = satisfied ? true : feats.includes(req[key]);
+										satisfied = satisfied ? true : includesIgnoreCase(featNames, req[key]);
 										break;
 										case 'training':
-										satisfied = satisfied ? true : trainings.includes(req[key]);
+										satisfied = satisfied ? true : includesIgnoreCase(trainingNames, req[key]);
 										break;
 										default:
 										satisfied = satisfied ? true : user[key] >= req[key];
@@ -74,8 +75,8 @@ $("#feat_name").autocomplete({
 									}
 								}
 							});
-							// set satisfied value to list entry
-							entry.satisfied = !entry.satisfied ? false : satisfied;
+							// set satisfied value to list entry - satisfied always true in GM edit mode
+							entry.satisfied = adminEditMode ? true : (!entry.satisfied ? false : satisfied);
 						});
 					}
  				});
@@ -114,7 +115,7 @@ $("#feat_name").autocomplete({
 						for (var k in feat_list[i]['requirements'][j]) {
 							for (var key in feat_list[i]['requirements'][j][k]) {
 								requirements += key == "character_creation" ? "*only available during character creation" : 
-								(key == "precision_" ? "precision" : key) + " : " + feat_list[i]['requirements'][j][k][key];
+								(key == "precision_" ? "Precision" : capitalize(key)) + " : " + feat_list[i]['requirements'][j][k][key];
 							}
 							if (feat_list[i]['requirements'][j].length > 1 && k < feat_list[i]['requirements'][j].length-1) {
 								requirements += " OR ";
@@ -122,10 +123,14 @@ $("#feat_name").autocomplete({
 						}
 						requirements += "\n";
 					}
+					requirements += "\n";
+					requirements += feat_list[i]['name']+"\n";
+					requirements += feat_list[i]['description'];
 				}
 			}
-			alert("Requirements not met for selected feat:\n"+requirements);
-			$("#feat_name").val("");
+			alert("Requirements not met for "+ui.item.value+":\n\n"+requirements);
+			$("#feat_name").val("").removeClass("x onX");
+			$("#feat_description").val("");
 			return false;
 		} else {
 			// auto fill description on feat selection
@@ -135,11 +140,25 @@ $("#feat_name").autocomplete({
 					description = feat_list[i]['description'];
 				}
 			}
-			$("#feat_description").val(description);
+			$("#feat_description").val(description).height($("#feat_description")[0].scrollHeight);
 			// TODO check for specific feats and adjust attributes (quick and the dead, improved crit, etc)
 		}
 	}
 });
+
+function includesIgnoreCase(array, string) {
+	included = false;
+	for (var i in array) {
+		if (array[i].toLowerCase() == string.toLowerCase()) {
+			included = true;
+		}
+	}
+	return included;
+}
+
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 // detect if we're on a touchscreen
 var is_mobile = $('#is_mobile').css('display')=='none';
@@ -223,6 +242,7 @@ function endGMEdit(accept) {
 		// hide icons
 		$(".attribute-col").find(".hidden-icon").hide();
 		$(".feat").find(".hidden-icon").hide();
+		$("#new_feat_btn").hide();
 		// disable edit attribute pts input, enable edit xp input
 		$("#attribute_pts").attr("readonly", true).removeAttr("type", "number");
 		$("#xp").attr("readonly", true).removeAttr("type", "number").attr("data-toggle", "modal");
@@ -345,6 +365,8 @@ function allocateAttributePts() {
   allocatingAttributePts = true;
   trainings = [];
   feats = [];
+  attributeVals = [];
+  trainingVals = [];
   // save attribute values
 	for (var i in attributes) {
 		attributeVals.push($("#"+attributes[i]+"_val").val());
@@ -676,9 +698,9 @@ $("#new_feat_modal").on('shown.bs.modal', function(){
 });
 $("#new_feat_modal").on('hidden.bs.modal', function(){
 	$("#feat_modal_title").html("New Feat");
-		$("#feat_name").val("");
-		$("#feat_description").val("");
-		$("#feat_id").val("");
+	$("#feat_name").val("").removeClass("x onX");
+	$("#feat_description").val("").height("125px");
+	$("#feat_id").val("");
 });
 
 $("#new_training_modal").on('shown.bs.modal', function(){
@@ -1038,6 +1060,7 @@ function addFeatElements(featName, featDescription, id) {
     	$("#feat_id").val(id_val);
     	$("#feat_modal_title").html("Update Feat");
     	$("#new_feat_modal").modal("show");
+			$("#feat_description").height( $("#feat_description")[0].scrollHeight );
     });
 
     $("#"+id_val+"_remove").on("click", function(){
@@ -1159,6 +1182,10 @@ function addTrainingElements(trainingName, attribute, id, value='') {
 			if (allocatingAttributePts) {
 				var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
 				$(".attribute-count").html(pts + skill_pts +" Points");
+				var index = trainings.indexOf(row);
+				if (index !== -1) {
+				  trainings.splice(index, 1);
+				}
 			}
 			row.remove();
 			var index = trainingNames.indexOf(trainingName);

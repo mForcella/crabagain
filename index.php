@@ -1053,7 +1053,7 @@
 							</div>
 						</div>
 					</div>
-					<button type="button" class="btn btn-default" id="new_feat_btn"><span class="glyphicon glyphicon-plus-sign" data-toggle="modal" data-target="#new_feat_modal"></span></button>
+					<button type="button" class="btn btn-default hidden-icon" id="new_feat_btn"><span class="glyphicon glyphicon-plus-sign" data-toggle="modal" data-target="#new_feat_modal"></span></button>
 				</div>
 				<!-- end section: feats & traits -->
 				
@@ -1325,7 +1325,7 @@
         </div>
         <div class="modal-body">
         	<label class="control-label">Feat Name</label>
-        	<input class="form-control" type="text" id="feat_name">
+        	<input class="form-control clearable" type="text" id="feat_name">
         	<label class="control-label">Feat Description</label>
         	<textarea class="form-control" id="feat_description" rows="6" maxlength="255"></textarea>
         	<input type="hidden" id="feat_id">
@@ -1593,6 +1593,21 @@
 	<script src="/assets/feat_list_v22_06_22.js"></script>
 	<script src="/assets/script_v22_06_22.js"></script>
 	<script type="text/javascript">
+
+		// hover function for clearable inputs
+		function tog(v){ return v?'addClass':'removeClass'; }
+
+		// text input clear functions
+		$(document).on('input', '.clearable', function() {
+		    $(this)[tog(this.value)]('x');
+		}).on('mousemove', '.x', function(e) {
+		    $(this)[tog(this.offsetWidth-18 < e.clientX-this.getBoundingClientRect().left)]('onX');   
+		}).on('click', '.onX', function(){
+		    $(this).removeClass('x onX').val('');
+		    if (this.id == "feat_name") {
+		    	$("#feat_description").val("").height("125px");
+		    }
+		});
 
 		var keys = <?php echo json_encode($keys); ?>;
 

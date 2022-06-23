@@ -85,6 +85,7 @@
   	display: none;
   }
 }
+
 /* hide number spinners on hidden number inputs */
 .hidden-number::-webkit-outer-spin-button,
 .hidden-number::-webkit-inner-spin-button {
@@ -94,6 +95,20 @@
 .hidden-number[type=number] {
     -moz-appearance:textfield;
 }
+
+/* clear button for text fields */
+.clearable {
+    background: #fff url(/assets/image/icoX.gif) no-repeat right -10px center;
+    border: 1px solid #999;
+    padding: 3px 18px 3px 4px;
+    border-radius: 3px;
+    transition: background 0.4s;
+}
+.clearable.x { 
+    background-position: right 5px center;
+}
+.clearable.onX { cursor: pointer; }
+
 body {
 	font-family: "Merriweather";
 	background-color: #cccccc;
@@ -224,8 +239,6 @@ h1 {
 }
 .form-control[readonly] {
 	background-color: white;
-	/*background-color: #f2f2f2;*/
-	/*color: black;*/
 }
 .form-group .control-label {
 	text-align: left;
@@ -413,12 +426,6 @@ h1 {
 		margin-right: 0;
 	}
 }
-#new_feat_btn {
-	display: none;
-}
-/*.nowrap {
-	white-space: nowrap;
-}*/
 .no-pad {
 	padding-left: 0;
 	padding-right: 0;
@@ -489,7 +496,7 @@ select.form-control {
 .section {
 	position: relative;
 	border: 2px solid #999999;
-	/*border-radius: 3px;*/
+	border-radius: 5px;
 	border-style: groove;
 	padding: 10px 20px;
 	margin: 10px 20px;
@@ -497,7 +504,6 @@ select.form-control {
 }
 .section:before, .nav-menu:before, .attribute-count:before {
 	background-image: url('image/texture.jpeg');
-	/*background-size: auto;*/
 	background-size: cover;
 	content: ' ';
 	display: block;
