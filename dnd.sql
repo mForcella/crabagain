@@ -73,7 +73,7 @@
   CREATE TABLE user_feat (
     id int PRIMARY KEY AUTO_INCREMENT,
     name varchar(64),
-    description varchar(255),
+    description varchar(2000),
     user_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES user(id)

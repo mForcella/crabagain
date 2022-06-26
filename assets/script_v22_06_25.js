@@ -16,6 +16,7 @@ var attributeVals = [];
 var trainingVals = [];
 var trainings = [];
 var feats = [];
+var skills = [];
 
 var attributes = [
 	'strength',
@@ -141,24 +142,9 @@ $("#feat_name").autocomplete({
 				}
 			}
 			$("#feat_description").val(description).height($("#feat_description")[0].scrollHeight);
-			// TODO check for specific feats and adjust attributes (quick and the dead, improved crit, etc)
 		}
 	}
 });
-
-function includesIgnoreCase(array, string) {
-	included = false;
-	for (var i in array) {
-		if (array[i].toLowerCase() == string.toLowerCase()) {
-			included = true;
-		}
-	}
-	return included;
-}
-
-function capitalize(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
 
 // detect if we're on a touchscreen
 var is_mobile = $('#is_mobile').css('display')=='none';
@@ -283,7 +269,8 @@ function selectWeapon(id) {
 			duplicate = true;
 		}
 	});
-	// TODO don't clear inputs - undo selection instead - no way to get previous selection...?
+	// TODO don't clear inputs - undo selection instead - how to get previous selection?
+	// create an array to hold weapon select values? create separate inputs for weapon select values?
 	// if (duplicate) {
 	// 	return;
 	// }
@@ -292,8 +279,12 @@ function selectWeapon(id) {
 			if (weapons[i]['name'] == selected) {
 				var damage = weapons[i]['damage'];
 				$("#weapon_damage_"+id).val(damage);
-				// TODO look for crit modifiers - improved crit feat
-				$("#weapon_crit_"+id).val(6);
+				// look for crit modifiers - improved crit feat
+				var crit = 6;
+				if (includesIgnoreCase(featNames, "improved critical hit")) {
+					crit = 5;
+				}
+				$("#weapon_crit_"+id).val(crit);
 				$("#weapon_range_"+id).val(weapons[i]['range_'] == null || weapons[i]['range_'] == "" ? "-" : weapons[i]['range_']);
 				$("#weapon_rof_"+id).val(weapons[i]['rof'] == "" ? "-" : weapons[i]['rof']);
 				if (weapons[i]['type'] == "Melee") {
@@ -365,6 +356,7 @@ function allocateAttributePts() {
   allocatingAttributePts = true;
   trainings = [];
   feats = [];
+  skills = [];
   attributeVals = [];
   trainingVals = [];
   // save attribute values
@@ -427,6 +419,13 @@ function endEditAttributes(accept) {
 			  trainingNames.splice(index, 1);
 			}
 			trainings[i].remove();
+		}
+		for (var i in skills) {
+			var index = trainingNames.indexOf(skills[i].text().split("+0")[0]);
+			if (index !== -1) {
+			  trainingNames.splice(index, 1);
+			}
+			skills[i].remove();
 		}
 		// remove feat names and remove feat elements
 		for (var i in feats) {
@@ -527,7 +526,7 @@ $("#xp").change(function(){
 });
 
 // on morale change, set morale effect
-$("#morale").change(function(){
+$("#morale").change(function() {
 	setMoraleEffect(parseInt($(this).val()));
 });
 
@@ -544,12 +543,12 @@ $("#damage").change(function(){
 function editSize() {
 	// set size text
 	var size = $("#character_size_select").val();
-	$("#character_size_text").html(size);
+	var size_text = size == "Small" ? "Small; +2 Defend/Dodge/Stealth, -0.5 Move" : (size == "Large" ? "Large; -2 Defend/Dodge/Stealth, +0.5 Move" : size)
+	$("#character_size_text").html(size_text);
 	$("#character_size_val").val(size);
 	$("#move").val(size == "Small" ? 0.5 : (size == "Large" ? 1.5 : 1));
 	setDodge();
 	setDefend();
-	// TODO check if stealth training exists; +2?
 }
 
 function setDodge() {
@@ -747,6 +746,10 @@ function setAttributes(user) {
 	if (user['morale'] != null) {
 		setMoraleEffect(parseInt(user['morale']));
 	}
+	// set size text
+	editSize();
+	// set initiative
+	adjustInitiative();
 }
 
 function setMoraleEffect(morale) {
@@ -1004,6 +1007,8 @@ function addFeatElements(featName, featDescription, id) {
 		$("#"+id+"_name_val").val(featName);
 		$("#"+id+"_descrip_val").val(featDescription);
 
+		// TODO what if feat was changed to or from quick & dead / improved crit?
+
 	} else {
 		// make sure we're not adding a duplicate training name
 		if (featNames.includes(featName)) {
@@ -1013,9 +1018,9 @@ function addFeatElements(featName, featDescription, id) {
 
 		// if allocating attribute points, decrease points
 		if (allocatingAttributePts) {
-			// only one feat/training per level
-			if (feats.length > 0 || trainings.length > 0) {
-				alert("Only one new feat or training can be added per level.");
+			// only one feat/skill per level
+			if (feats.length > 0 || skills.length > 0) {
+				alert("Only one new feat or unique skill can be added per level.");
 				return;
 			}
 			// make sure we have enough points
@@ -1083,6 +1088,15 @@ function addFeatElements(featName, featDescription, id) {
 					  feats.splice(index, 1);
 					}
 	    	}
+	    	// check if we're removing feats that affect attributes
+				if (featName.toLowerCase() == "improved critical hit") {
+					selectWeapon(1);
+					selectWeapon(2);
+					selectWeapon(3);
+				}
+				if (featName.toLowerCase() == "quick and the dead") {
+					adjustInitiative();
+				}
     	}
     });
 
@@ -1099,6 +1113,31 @@ function addFeatElements(featName, featDescription, id) {
 		createInput('', 'hidden', 'feat_ids[]', id, feat_container);
 	}
 
+	// check for specific feats and adjust attributes (quick and the dead, improved crit, etc)
+	if (featName.toLowerCase() == "improved critical hit") {
+		// adjust weapon crit values
+		selectWeapon(1);
+		selectWeapon(2);
+		selectWeapon(3);
+	}
+	if (featName.toLowerCase() == "quick and the dead") {
+		// adjust initiative value
+		adjustInitiative();
+	}
+}
+
+function adjustInitiative() {
+	// check if speed is higher than awareness and awareness is >= 0
+	var speed = user['speed'] == null ? 0 : parseInt(user['speed']);
+	var awareness = user['awareness'] == null ? 0 : parseInt(user['awareness']);
+	var quick = includesIgnoreCase(featNames, "quick and the dead");
+	if (quick && speed > awareness && awareness >= 0) {
+		// set initiative based on speed value
+		var initiative = 10 - Math.floor(speed/2);
+	} else {
+		var initiative = awareness >= 0 ? 10 - Math.floor(awareness/2) : 10 - Math.ceil(awareness/3);
+	}
+	$("#initiative").val(initiative);
 }
 
 function newTrainingModal(attribute) {
@@ -1133,15 +1172,18 @@ function addTrainingElements(trainingName, attribute, id, value='') {
 		return;
 	} else {
 		skill_pts = parseInt(skill_pts);
-		// if skill_pts = 1 (focus), skill starts at +1
-		if (skill_pts == 1) { value = 1; }
+		// if skill_pts = 1 or 2 (focus or training), skill starts at +1
+		if (skill_pts == 1 || skill_pts == 2) { value = 1; }
 	}
 
 	// allocating attribute points, make sure we have enough points
-	// TODO focus and training don't count towards level up feat/training limit?
 	if (allocatingAttributePts) {
-		if (feats.length > 0 || trainings.length > 0) {
-			alert("Only one new feat or training can be added per level.");
+		if (skill_pts == 4 && (feats.length > 0 || skills.length > 0)) {
+			alert("Only one new feat or unique skill can be added per level.");
+			return;
+		}
+		if ((skill_pts == 1 || skill_pts == 2) && trainings.length > 0) {
+			alert("Only one new focus or training can be added per level.");
 			return;
 		}
 		var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
@@ -1158,7 +1200,11 @@ function addTrainingElements(trainingName, attribute, id, value='') {
 
 	var row = createElement('div', 'row training-row', '#'+attribute, id_val+"_row");
 	if (allocatingAttributePts) {
-		trainings.push(row);
+		if (skill_pts == 1 || skill_pts == 2) {
+			trainings.push(row);
+		} else {
+			skills.push(row);
+		}
 	}
 	var div_left = createElement('div', 'col-md-7 col-xs-8', row);
 
@@ -1182,9 +1228,16 @@ function addTrainingElements(trainingName, attribute, id, value='') {
 			if (allocatingAttributePts) {
 				var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
 				$(".attribute-count").html(pts + skill_pts +" Points");
-				var index = trainings.indexOf(row);
-				if (index !== -1) {
-				  trainings.splice(index, 1);
+				if (skill_pts == 1 || skill_pts == 2) {
+					var index = trainings.indexOf(row);
+					if (index !== -1) {
+					  trainings.splice(index, 1);
+					}
+				} else {
+					var index = skills.indexOf(row);
+					if (index !== -1) {
+					  skills.splice(index, 1);
+					}
 				}
 			}
 			row.remove();
@@ -1931,26 +1984,45 @@ function enableHiddenNumbers() {
 	});
 }
 
+// craete any element type with a class and id value
 function createElement(type, className, appendTo, id=null) {
 	return $('<'+type+' />', {
 		'id': id,
-	  	'class': className,
+	  'class': className,
 	}).appendTo(appendTo);
 }
 
+// create an input element
 function createInput(additionalClass, type, name, value, appendTo, id=null) {
 	var input = $('<input />', {
 		'id': id,
 		'class': 'form-control '+additionalClass,
 		'type': type,
-	  	'name': name,
-	  	'value': value
+  	'name': name,
+  	'value': value
 	}).appendTo(appendTo);
 	return input;
 }
 
+// generate a uuid
 function uuid() {
   return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
     (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
   );
+}
+
+// check an array for a string - non-case sensitive comparison
+function includesIgnoreCase(array, string) {
+	included = false;
+	for (var i in array) {
+		if (array[i].toLowerCase() == string.toLowerCase()) {
+			included = true;
+		}
+	}
+	return included;
+}
+
+// capitalize a string
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }

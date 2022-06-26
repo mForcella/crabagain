@@ -116,7 +116,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;1,400;1,600&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
 	<!-- Custom Styles -->
-	<link rel="stylesheet" type="text/css" href="/assets/style_v22_06_22.css">
+	<link rel="stylesheet" type="text/css" href="/assets/style_v22_06_25.css">
 
 </head>
 
@@ -618,7 +618,6 @@
 							?>
 							<input class="form-control" readonly name="move" id="move" value="<?php echo $move ?>">
 						</div>
-						<!-- TODO exception: the quick & the dead: can use speed/2 instead  -->
 						<label class="control-label col-sm-2 col-xs-4" for="initiative">Initiative</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 							<?php
@@ -1080,7 +1079,6 @@
 			<!-- section: protection -->
 			<div class="col-md-12">
 				<div class="section form-horizontal">
-					<!-- TODO add option to equip protection -->
 					<div class="section-title"><span>Protection</span> <i class="fa-solid icon-armor custom-icon"></i></div>
 					<div class="form-group">
 						<label class="control-label col-xs-3 resize-mobile center" for="protections[]">Item</label>
@@ -1327,7 +1325,7 @@
         	<label class="control-label">Feat Name</label>
         	<input class="form-control clearable" type="text" id="feat_name">
         	<label class="control-label">Feat Description</label>
-        	<textarea class="form-control" id="feat_description" rows="6" maxlength="255"></textarea>
+        	<textarea class="form-control" id="feat_description" rows="6" maxlength="2000"></textarea>
         	<input type="hidden" id="feat_id">
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newFeat()" id="feat_submit_btn">Ok</button>
@@ -1591,7 +1589,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 	<script src="/assets/feat_list_v22_06_22.js"></script>
-	<script src="/assets/script_v22_06_22.js"></script>
+	<script src="/assets/script_v22_06_25.js"></script>
 	<script type="text/javascript">
 
 		// hover function for clearable inputs
