@@ -2,10 +2,12 @@
 var hiddenEnabled = [];
 var highlightEnabled = [];
 var skipEnabled = [];
-// arrays to make sure we don't have feats/trainings/items with the same name
+// arrays for sorting feats
+var eligible_feats = [];
+var ineligible_feats = [];
+// arrays to make sure we don't have feats/trainings with the same name
 var trainingNames = [];
 var featNames = [];
-var itemNames = [];
 // bools to determine rules and element visibility for various operating modes
 var allocatingAttributePts = false;
 var characterCreation = false;
@@ -32,119 +34,6 @@ var attributes = [
 	'intuition',
 	'vitality',
 ];
-
-// set autocomplete list for feats
-var list = [];
-for (var i in feat_list) {
-	list.push(feat_list[i]['name']);
-}
-list.sort();
-$("#feat_name").autocomplete({
-	source: function(input, add) {
-		var suggestions = [];
-		$.each(list, function(i, feat_name){
-			if (feat_name.toLowerCase().includes(input['term'].toLowerCase())) {
-				var entry = new Object();
-				entry.value = feat_name;
-				// check if attribute requirements are satisfied
-				entry.satisfied = true;
-				$.each(feat_list, function(j, feat_vals) {
-					if (feat_vals['name'] == feat_name) {
-						var requirements = feat_vals['requirements'];
-						// requirements is an array of arrays
-						$.each(requirements, function(k, reqs) {
-							// reqs is an array of dictionary requirements
-							var satisfied = false;
-							$.each(reqs, function(l, req) {
-								// only one req needs to be satisfied
-								for (key in req) {
-									switch (key) {
-										case 'character_creation':
-										satisfied = satisfied ? true : characterCreation;
-										// hide feats only available during character creation - don't hide any feats if in GM edit mode
-										entry.hidden = adminEditMode ? false : !characterCreation;
-										break;
-										case 'feat':
-										satisfied = satisfied ? true : includesIgnoreCase(featNames, req[key]);
-										break;
-										case 'training':
-										satisfied = satisfied ? true : includesIgnoreCase(trainingNames, req[key]);
-										break;
-										default:
-										satisfied = satisfied ? true : user[key] >= req[key];
-										break;
-									}
-								}
-							});
-							// set satisfied value to list entry - satisfied always true in GM edit mode
-							entry.satisfied = adminEditMode ? true : (!entry.satisfied ? false : satisfied);
-						});
-					}
- 				});
-				suggestions.push(entry);
-			}
-		});
-		add(suggestions);
-	},
-	create: function (event, ui) {
-		$(this).data("ui-autocomplete")._renderItem = function(ul, item) {
-			var listItem = $("<li></li>")
-			.data("item.autocomplete", item)
-			.append("<a>" + item.label + "</a>")
-			.appendTo(ul);
-
-			// adjust class based on whether requirements are satisfied or not
-			if (!item.satisfied) {
-				listItem.addClass("italic");
-			} else {
-				listItem.addClass("bold");
-			}
-			if (item.hidden) {
-				listItem.addClass("hidden");
-			}
-
-			return listItem;
-		};
-	},
-	select: function(event, ui) {
-		// build user message if requirements aren't satisfied
-		if (!ui.item.satisfied) {
-			var requirements = "";
-			for (var i in feat_list) {
-				if (feat_list[i]['name'] == ui.item.value) {
-					for (var j in feat_list[i]['requirements']) {
-						for (var k in feat_list[i]['requirements'][j]) {
-							for (var key in feat_list[i]['requirements'][j][k]) {
-								requirements += key == "character_creation" ? "*only available during character creation" : 
-								(key == "precision_" ? "Precision" : capitalize(key)) + " : " + feat_list[i]['requirements'][j][k][key];
-							}
-							if (feat_list[i]['requirements'][j].length > 1 && k < feat_list[i]['requirements'][j].length-1) {
-								requirements += " OR ";
-							}
-						}
-						requirements += "\n";
-					}
-					requirements += "\n";
-					requirements += feat_list[i]['name']+"\n";
-					requirements += feat_list[i]['description'];
-				}
-			}
-			alert("Requirements not met for "+ui.item.value+":\n\n"+requirements);
-			$("#feat_name").val("").removeClass("x onX");
-			$("#feat_description").val("");
-			return false;
-		} else {
-			// auto fill description on feat selection
-			var description = "";
-			for (var i in feat_list) {
-				if (feat_list[i]['name'] == ui.item.value) {
-					description = feat_list[i]['description'];
-				}
-			}
-			$("#feat_description").val(description).height($("#feat_description")[0].scrollHeight);
-		}
-	}
-});
 
 // detect if we're on a touchscreen
 var is_mobile = $('#is_mobile').css('display')=='none';
@@ -181,6 +70,15 @@ $(document).mouseup(function(e) {
 
 // resize background textarea to fit text
 $("#background").height( $("#background")[0].scrollHeight );
+
+// highlight attributes
+if (!is_mobile) {
+	$(".attribute-col").hover(function(){
+		$(this).addClass("highlight");
+	}, function(){
+		$(this).removeClass("highlight");
+	});
+}
 
 // enter GM edit mode
 function GMEditMode() {
@@ -269,11 +167,6 @@ function selectWeapon(id) {
 			duplicate = true;
 		}
 	});
-	// TODO don't clear inputs - undo selection instead - how to get previous selection?
-	// create an array to hold weapon select values? create separate inputs for weapon select values?
-	// if (duplicate) {
-	// 	return;
-	// }
 	if (!duplicate && selected != "") {
 		for (var i in weapons) {
 			if (weapons[i]['name'] == selected) {
@@ -353,6 +246,7 @@ function allocateAttributePts() {
   $(".attribute-count").html($("#attribute_pts").val()+" Points");
 	// show attribute point counter
   $(".attribute-pts").toggleClass("active");
+  // reset arrays
   allocatingAttributePts = true;
   trainings = [];
   feats = [];
@@ -750,6 +644,141 @@ function setAttributes(user) {
 	editSize();
 	// set initiative
 	adjustInitiative();
+
+	// set autocomplete list for feats
+	$.each(feat_list, function(i, feat) {
+		var is_eligible = true;
+		// feat[requirements] is an array of arrays - each array must return true
+		$.each(feat['requirements'], function(j, requirements) {
+			var satisfied = false;
+			// requirements is an array of dictionaries (req) - one req within requirements needs to return true
+			$.each(requirements, function(k, req) {
+				for (key in req) {
+					switch (key) {
+						case 'feat':
+						satisfied = satisfied ? true : includesIgnoreCase(featNames, req[key]);
+						break;
+						case 'training':
+						satisfied = satisfied ? true : includesIgnoreCase(trainingNames, req[key]);
+						break;
+						default:
+						satisfied = satisfied ? true : user[key] >= req[key];
+						break;
+					}
+				}
+			});
+			// if a previous requirement wasn't satisfied, feat is not eligible
+			is_eligible = !is_eligible ? false : satisfied;
+		});
+		if (is_eligible && !eligible_feats.includes(feat)) {
+			feat['satisfied'] = true;
+			eligible_feats.push(feat);
+		} else if (!ineligible_feats.includes(feat)) {
+			feat['satisfied'] = false;
+			ineligible_feats.push(feat);
+		}
+	});
+
+	// sort and merge feat lists
+	var list1 = [];
+	for (var i in eligible_feats) {
+		list1.push(eligible_feats[i]['name']);
+	}
+	list1.sort();
+	var list2 = [];
+	for (var i in ineligible_feats) {
+		list2.push(ineligible_feats[i]['name']);
+	}
+	list2.sort();
+	var list = list1.concat(list2);
+	$("#feat_name").autocomplete({
+		source: function(input, add) {
+			var suggestions = [];
+			$.each(list, function(i, feat_name) {
+				if (feat_name.toLowerCase().includes(input['term'].toLowerCase())) {
+					var entry = new Object();
+					entry.value = feat_name;
+					// check if attribute requirements are satisfied
+					entry.satisfied = true;
+					$.each(feat_list, function(j, feat_vals) {
+						if (feat_vals['name'] == feat_name) {
+							$.each(feat_vals['requirements'], function(k, reqs) {
+								$.each(reqs, function(l, req) {
+									for (key in req) {
+										if (key == "character_creation") {
+											entry.hidden = adminEditMode ? false : !characterCreation;
+										}
+									}
+								});
+								// set satisfied value to list entry - satisfied always true in GM edit mode
+								entry.satisfied = adminEditMode ? true : feat_vals['satisfied'];
+							});
+						}
+	 				});
+					suggestions.push(entry);
+				}
+			});
+			add(suggestions);
+		},
+		create: function (event, ui) {
+			$(this).data("ui-autocomplete")._renderItem = function(ul, item) {
+				var listItem = $("<li></li>")
+				.data("item.autocomplete", item)
+				.append("<a>" + item.label + "</a>")
+				.appendTo(ul);
+
+				// adjust class based on whether requirements are satisfied or not
+				if (!item.satisfied) {
+					listItem.addClass("italic");
+				} else {
+					listItem.addClass("bold");
+				}
+				if (item.hidden) {
+					listItem.addClass("hidden");
+				}
+
+				return listItem;
+			};
+		},
+		select: function(event, ui) {
+			// build user message if requirements aren't satisfied
+			if (!ui.item.satisfied) {
+				var requirements = "";
+				for (var i in feat_list) {
+					if (feat_list[i]['name'] == ui.item.value) {
+						for (var j in feat_list[i]['requirements']) {
+							for (var k in feat_list[i]['requirements'][j]) {
+								for (var key in feat_list[i]['requirements'][j][k]) {
+									requirements += key == "character_creation" ? "*only available during character creation" : 
+									(key == "precision_" ? "Precision" : capitalize(key)) + " : " + feat_list[i]['requirements'][j][k][key];
+								}
+								if (feat_list[i]['requirements'][j].length > 1 && k < feat_list[i]['requirements'][j].length-1) {
+									requirements += " OR ";
+								}
+							}
+							requirements += "\n";
+						}
+						requirements += "\n";
+						requirements += feat_list[i]['name']+"\n";
+						requirements += feat_list[i]['description'];
+					}
+				}
+				alert("Requirements not met for "+ui.item.value+":\n\n"+requirements);
+				$("#feat_name").val("").removeClass("x onX");
+				$("#feat_description").val("");
+				return false;
+			} else {
+				// auto fill description on feat selection
+				var description = "";
+				for (var i in feat_list) {
+					if (feat_list[i]['name'] == ui.item.value) {
+						description = feat_list[i]['description'];
+					}
+				}
+				$("#feat_description").val(description).height($("#feat_description")[0].scrollHeight);
+			}
+		}
+	});
 }
 
 function setMoraleEffect(morale) {
@@ -1008,10 +1037,11 @@ function addFeatElements(featName, featDescription, id) {
 		$("#"+id+"_descrip_val").val(featDescription);
 
 		// TODO what if feat was changed to or from quick & dead / improved crit?
+		// TODO only allow description to be edited?
 
 	} else {
 		// make sure we're not adding a duplicate training name
-		if (featNames.includes(featName)) {
+		if (includesIgnoreCase(featNames, featName)) {
 			alert("Feat name already in use");
 			return;
 		}
@@ -1134,10 +1164,12 @@ function adjustInitiative() {
 	if (quick && speed > awareness && awareness >= 0) {
 		// set initiative based on speed value
 		var initiative = 10 - Math.floor(speed/2);
+		var secondary = 10 - Math.floor(awareness/2);
 	} else {
 		var initiative = awareness >= 0 ? 10 - Math.floor(awareness/2) : 10 - Math.ceil(awareness/3);
+		var secondary = speed >= 0 ? 10 - Math.floor(speed/2) : 10 - Math.ceil(speed/3);
 	}
-	$("#initiative").val(initiative);
+	$("#initiative").val(initiative+" / "+secondary+"");
 }
 
 function newTrainingModal(attribute) {
@@ -1160,7 +1192,7 @@ function newTraining() {
 // create html elements for training
 function addTrainingElements(trainingName, attribute, id, value='') {
 	// make sure we're not adding a duplicate training name
-	if (trainingNames.includes(trainingName)) {
+	if (includesIgnoreCase(trainingNames, trainingName)) {
 		alert("Training name already in use");
 		return;
 	}
@@ -1449,7 +1481,6 @@ function newWeapon() {
 
 // create html elements for weapon
 function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defend, notes, weight, id) {
-	itemNames.push(name);
 	var id_val = id == "" ? uuid() : "weapon_"+id;
 
 	var div = createElement('div', 'form-group item', '#weapons', id_val);
@@ -1503,6 +1534,7 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 	wgt_input.click(function(){
 		editWeapon(id_val);
 	});
+	// TODO why is this necessary? missing name value?
 	dmg_input.hover(function(){
 		$("#weapon_dmg_label").addClass("highlight");
 	},
@@ -1524,31 +1556,27 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 		if (conf) {
 			unsavedChanges = true;
 			$("#"+id_val).remove();
-			var index = itemNames.indexOf(name);
-			if (index !== -1) {
-			  itemNames.splice(index, 1);
-			  // update weapons array and select list
-			  for (var i in weapons) {
-			  	if (weapons[i]['name'] == name) {
-			  		weapons.splice(i, 1);
-			  		break;
+		  for (var i in weapons) {
+		  	if (weapons[i]['name'] == name) {
+		  		weapons.splice(i, 1);
+		  		break;
+		  	}
+		  }
+		  // clear inputs if weapon is selected
+		  $(".weapon-select").find("option").each(function(){
+		  	if ($(this).val() == name) {
+			  	if ($(this).is(":selected")) {
+			  		// clear inputs
+			  		var id = $(this).parent().attr("id").split("weapon_select_")[1];
+						$("#weapon_damage_"+id).val("");
+						$("#weapon_crit_"+id).val("");
+						$("#weapon_range_"+id).val("");
+						$("#weapon_rof_"+id).val("");
+						setDefend();
 			  	}
-			  }
-			  $(".weapon-select").find("option").each(function(){
-			  	if ($(this).val() == name) {
-				  	if ($(this).is(":selected")) {
-				  		// clear inputs
-				  		var id = $(this).parent().attr("id").split("weapon_select_")[1];
-							$("#weapon_damage_"+id).val("");
-							$("#weapon_crit_"+id).val("");
-							$("#weapon_range_"+id).val("");
-							$("#weapon_rof_"+id).val("");
-							setDefend();
-				  	}
-			  		$(this).remove();
-			  	}
-			  });
-			}
+		  		$(this).remove();
+		  	}
+		  });
 		}
 	});
 
@@ -1594,7 +1622,6 @@ function editWeapon(weapon_id) {
 	var range = $("#"+weapon_id+"_range").val();
 	var rof = $("#"+weapon_id+"_rof").val();
 	var defend = $("#"+weapon_id+"_defend").val();
-	var qty = $("#"+weapon_id+"_qty").val();
 	var notes = $("#"+weapon_id+"_notes").val();
 	notes = range != "" ? notes.slice(notes.indexOf("; ")+2) : notes;
 	notes = rof != "" ? notes.slice(notes.indexOf("; ")+2) : notes;
@@ -1608,7 +1635,7 @@ function editWeapon(weapon_id) {
 	$("#weapon_range").val(range);
 	$("#weapon_rof").val(rof);
 	$("#weapon_defend").val(defend);
-	$("#weapon_qty").val(qty);
+	$("#weapon_qty").val($("#"+weapon_id+"_qty").val());
 	$("#weapon_notes").val(notes);
 	$("#weapon_weight").val($("#"+weapon_id+"_weight").val());
 	$("#weapon_id").val(weapon_id);
@@ -1651,7 +1678,6 @@ function newProtection() {
 
 // create html elements for protection
 function addProtectionElements(name, bonus, notes, weight, id) {
-	itemNames.push(name);
 	var id_val = id == "" ? uuid() : "protection_"+id;
 
 	var div = createElement('div', 'form-group item', '#protections', id_val);
@@ -1693,10 +1719,6 @@ function addProtectionElements(name, bonus, notes, weight, id) {
 		if (conf) {
 			unsavedChanges = true;
 			$("#"+id_val).remove();
-			var index = itemNames.indexOf(name);
-			if (index !== -1) {
-			  itemNames.splice(index, 1);
-			}
 		}
 	});
 
@@ -1745,7 +1767,6 @@ function newHealing() {
 
 // create html elements for healing
 function addHealingElements(name, quantity, effect, weight, id) {
-	itemNames.push(name);
 	var id_val = id == "" ? uuid() : "healing_"+id;
 
 	var div = createElement('div', 'form-group item', '#healings', id_val);
@@ -1787,10 +1808,6 @@ function addHealingElements(name, quantity, effect, weight, id) {
 		if (conf) {
 			unsavedChanges = true;
 			$("#"+id_val).remove();
-			var index = itemNames.indexOf(name);
-			if (index !== -1) {
-			  itemNames.splice(index, 1);
-			}
 		}
 	});
 
@@ -1839,7 +1856,6 @@ function newMisc() {
 
 // create html elements for misc item
 function addMiscElements(name, quantity, notes, weight, id) {
-	itemNames.push(name);
 	var id_val = id == "" ? uuid() : "misc_"+id;
 
 	var div = createElement('div', 'form-group item', '#misc', id_val);
@@ -1881,10 +1897,6 @@ function addMiscElements(name, quantity, notes, weight, id) {
 		if (conf) {
 			unsavedChanges = true;
 			$("#"+id_val).remove();
-			var index = itemNames.indexOf(name);
-			if (index !== -1) {
-			  itemNames.splice(index, 1);
-			}
 		}
 	});
 
