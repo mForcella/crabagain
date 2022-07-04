@@ -5,13 +5,29 @@
 	include_once('keys.php');
 	$db = new mysqli($db_config['servername'], $db_config['username'], $db_config['password'], $db_config['dbname']);
 
+	// check for campaign parameter in url
+	if (!isset($_GET["campaign"])) {
+		// redirect to campaign select page
+		header('Location: /set_campaign.php');
+	}
+
 	// get user list for dropdown nav
 	$users = [];
-	$sql = "SELECT * from user ORDER BY character_name";
+	$sql = "SELECT * from user WHERE campaign_id = ".$_GET["campaign"]." ORDER BY character_name";
 	$result = $db->query($sql);
   if ($result) {
     while($row = $result->fetch_assoc()) {
     	array_push($users, $row);
+    }
+  }
+
+  // get campaign name
+  $sql = "SELECT * from campaign WHERE id = ".$_GET["campaign"];
+	$result = $db->query($sql);
+	$campaign = "";
+  if ($result) {
+    while($row = $result->fetch_assoc()) {
+    	$campaign = $row;
     }
   }
 
@@ -102,7 +118,7 @@
 	<meta name="viewport" content="width=device-width, height=device-height,  initial-scale=1.0, user-scalable=no, user-scalable=0"/>
 	<meta name="robots" content="noindex">
 	<meta property="og:image" content="https://crabagain.com/assets/image/treasure-header-desaturated.jpg">
-	<title>The Lost City!</title>
+	<title><?php echo $campaign['name'] ?>!</title>
 	<link rel="icon" type="image/png" href="/assets/image/favicon.ico"/>
 
 	<!-- Bootstrap -->
@@ -116,7 +132,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;1,400;1,600&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
 	<!-- Custom Styles -->
-	<link rel="stylesheet" type="text/css" href="/assets/style_v22_06_27.css">
+	<link rel="stylesheet" type="text/css" href="/assets/style_v22_07_03.css">
 
 </head>
 
@@ -143,6 +159,9 @@
 				   ';
 	    	}
 	    ?>
+	    <div class="nav-item">
+	       <span class="glyphicon" onclick="back()"><span class="nav-item-label"><i class="fa-solid fa-arrow-left nav-icon"></i> Change Campaign</span></span>
+	    </div>
 	  </div>
 
 	  <!-- attribute point menu -->
@@ -164,7 +183,7 @@
 	<div class="header">
 		<div class="row">
 			<div class="col-xs-4">
-				<h1>Welcome to...<br>The Lost City!</h1>
+				<h1>Welcome to...<br><?php echo $campaign['name'] ?>!</h1>
 			</div>
 		</div>
 	</div>
@@ -196,6 +215,8 @@
 
 	<form id="user_form" method="post" action="/submit.php" novalidate>
 		<input type="hidden" id="user_id" name="user_id" value="<?php echo isset($user) ? $user['id'] : '' ?>">
+		<input type="hidden" id="campaign_id" name="campaign_id" value="<?php echo $_GET["campaign"] ?>">
+		<input type="hidden" id="user_email" name="email" value="<?php echo isset($user) ? $user["email"] : '' ?>">
 		<div class="row">
 			<div class="col-md-6">
 
@@ -1206,7 +1227,6 @@
 		</div>
 		<input type="hidden" name="password" id="password_val">
 		<input type="hidden" name="recaptcha_response" id="recaptcha_response">
-		<input type="hidden" name="duckdacoy" id="duckdacoy">
 	</form>
 
 	<!-- xp modal -->
@@ -1501,10 +1521,13 @@
           <h4 class="modal-title">New Character</h4>
         </div>
         <div class="modal-body">
-        	<h4>Please set a password for your new character. Also, you should probably write it down or something.</h4>
+        	<h5>Please set a password for your new character. Also, you should probably write it down or something.</h5>
         	<input class="form-control" type="password" id="new_password">
         	<label class="control-label" for="password_conf">Confirm password</label>
-        	<input class="form-control" type="password" id="password_conf" name="password_conf">
+        	<input class="form-control" type="password" id="password_conf">
+        	<h5>In the unlikely event that a large bird crashes into your head and you suffer from temporary amnesia and can't remember your password, please provide us with your email address.</h5>
+        	<input class="form-control" type="email" id="email">
+        	<span class="tiny">Note: We reserve the right to sell your information to satanic cults, or the highest bidder.</span>
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" id="password_btn" data-dismiss="modal" data-toggle="modal" data-target="#new_password_modal_2" disabled>Ok</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
@@ -1522,7 +1545,7 @@
           <h4 class="modal-title">New Character</h4>
         </div>
         <div class="modal-body">
-        	<h4 class="center">Before we can let you pass, we just need to make sure you're not a robot. Please enter the most secret of secret codes.</h4>
+        	<h5 class="center">Before we can let you pass, we just need to make sure you're not a robot, or a Russki. Please enter the most secret of the secret codes.</h5>
         	<input class="form-control" type="text" name="nerd_test" id="nerd_test">
         	<div class="button-bar">
 		        <button type="button" class="btn btn-primary" id="password_btn_2" data-dismiss="modal" onclick="setPassword()">Ok</button>
@@ -1575,7 +1598,9 @@
         <div class="modal-body">
         	<h4 class="center">Did you try crab?</h4>
         	<div class="button-bar">
+	        	<button type="button" class="btn btn-primary forgot-password-btn" data-dismiss="modal">Oh dang. That was it. Thanks.</button>
 	        	<button type="button" class="btn btn-primary forgot-password-btn" data-dismiss="modal" onclick="forgotPassword()">Yes, I tried crab. That wasn't it.</button>
+	        	<button style="white-space: normal;" type="button" class="btn btn-primary forgot-password-btn" data-dismiss="modal" onclick="forgotPassword()">No, it's definitely not crab. It's something super secure. I just can't remember what it was. I guess I should've written it down, or something?</button>
         	</div>
         </div>
       </div>
@@ -1589,11 +1614,16 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 	<script src="/assets/feat_list_v22_06_22.js"></script>
-	<script src="/assets/script_v22_06_27.js"></script>
+	<script src="/assets/script_v22_07_03.js"></script>
 	<script type="text/javascript">
 
 		// hover function for clearable inputs
 		function tog(v){ return v?'addClass':'removeClass'; }
+
+		// back to select campaign page
+		function back() {
+			window.location.replace("/");
+		}
 
 		// text input clear functions
 		$(document).on('input', '.clearable', function() {
@@ -1611,6 +1641,7 @@
 
 		// check for user and set attributes
 		var user = <?php echo json_encode(isset($user) ? $user : []); ?>;
+		var campaign = <?php echo json_encode(isset($campaign) ? $campaign : []); ?>;
 		setAttributes(user);
 		if (user.length == 0) {
 			characterCreation = true;

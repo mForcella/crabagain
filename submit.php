@@ -12,7 +12,7 @@
 	  	die("Connection failed: " . $db->connect_error);
 	}
 
-	$user_columns = ['character_name', 'attribute_pts', 'xp', 'morale', 'race', 'height', 'weight', 'age', 'eyes', 'hair', 'gender', 'other', 'size', 'strength', 'fortitude', 'speed', 'agility', 'precision_', 'awareness', 'allure', 'deception', 'intellect', 'innovation', 'intuition', 'vitality', 'background', 'free', 'move_penalty', 'fear', 'poison', 'disease', 'damage', 'wounds', 'wound_penalty', 'weapon_1', 'weapon_2', 'weapon_3', 'motivator_1', 'motivator_2', 'motivator_3', 'motivator_4', 'motivator_1_pts', 'motivator_2_pts', 'motivator_3_pts', 'motivator_4_pts'];
+	$user_columns = ['campaign_id', 'email', 'character_name', 'attribute_pts', 'xp', 'morale', 'race', 'height', 'weight', 'age', 'eyes', 'hair', 'gender', 'other', 'size', 'strength', 'fortitude', 'speed', 'agility', 'precision_', 'awareness', 'allure', 'deception', 'intellect', 'innovation', 'intuition', 'vitality', 'background', 'free', 'move_penalty', 'fear', 'poison', 'disease', 'damage', 'wounds', 'wound_penalty', 'weapon_1', 'weapon_2', 'weapon_3', 'motivator_1', 'motivator_2', 'motivator_3', 'motivator_4', 'motivator_1_pts', 'motivator_2_pts', 'motivator_3_pts', 'motivator_4_pts'];
 
 	// new or existing character?
 	if ($_POST['user_id'] != null) {
@@ -278,5 +278,5 @@
 	}
 
 	$db->close();
-	header("Location: /?user=".$user_id,  true,  301 );  exit;
+	header("Location: /?campaign=".$_POST['campaign_id']."&user=".$user_id,  true,  301 );  exit;
 ?>

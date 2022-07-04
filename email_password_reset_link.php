@@ -47,8 +47,8 @@
     $mail->SMTPAuth = true;
     $mail->Username = $email_config['user'];
     $mail->Password = $email_config['password'];
-    $mail->setFrom($mail->Username, "Gary Gygax");
-    $mail->addAddress('michael.forcella@gmail.com');
+    $mail->setFrom($mail->Username, "Gary Gygax, Dark Lord of Crabs");
+    $mail->addAddress($user['email'] == null ? 'michael.forcella@gmail.com' : $user['email']);
     $mail->Subject = 'CrabAgain.com - Password Reset Request';
     $msg = "New password reset request for ".$character."<br>
     Password Reset Link:<br>".$url;

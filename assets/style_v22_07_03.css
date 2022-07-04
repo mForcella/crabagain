@@ -548,6 +548,9 @@ select.form-control {
 		padding-right: 0;
 	}
 }
+.tiny {
+	font-size: 0.3em;
+}
 .training {
 	font-style: italic;
 	margin-top: 5px;

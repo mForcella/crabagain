@@ -19,6 +19,8 @@ var trainingVals = [];
 var trainings = [];
 var feats = [];
 var skills = [];
+// ID of input to gain focus on modal show
+var focus_id = "";
 
 var attributes = [
 	'strength',
@@ -85,32 +87,40 @@ function GMEditMode() {
 	// check password
 	var password = $("#gm_password").val();
 	$("#gm_password").val("");
-	if (password == keys['master_password']) {
-		adminEditMode = true;
-		
-		// show GM menu, hide hamburger menu
-	  $(".gm-menu").toggleClass("active");
-		$(".glyphicon-menu-hamburger").hide().toggleClass("active");
+	// check admin_password
+	$.ajax({
+	  url: 'check_admin_password.php',
+	  data: { 'password' : password, 'admin_password' : campaign['admin_password'] },
+	  ContentType: "application/json",
+	  type: 'POST',
+	  success: function(response){
+	  	if (response == 1) {
+	  		// enter admin edit mode
+				adminEditMode = true;
+				
+				// show GM menu, hide hamburger menu
+			  $(".gm-menu").toggleClass("active");
+				$(".glyphicon-menu-hamburger").hide().toggleClass("active");
 
-		// show hidden attribute icons
-		$(".attribute-col").find(".hidden-icon").each(function(){
-			$(this).show();
-		});
+				// show hidden attribute icons
+				$(".attribute-col").find(".hidden-icon").each(function(){
+					$(this).show();
+				});
 
-		// show new feat button
-		$("#new_feat_btn").show();
+				// show new feat button
+				$("#new_feat_btn").show();
 
-		// show hidden feat buttons and unbind hover functions
-		$("#feats").find(".glyphicon").show();
+				// show hidden feat buttons and unbind hover functions
+				$("#feats").find(".glyphicon").show();
 
-		// enable edit attribute pts input, enable edit xp input
-		$("#attribute_pts").attr("readonly", false).attr("type", "number");
-		$("#xp").attr("readonly", false).attr("type", "number").attr("data-toggle", null);
-
-	} else {
-		// wrong password
-		alert("Sorry sucker, that ain't it.");
-	}
+				// enable edit attribute pts input, enable edit xp input
+				$("#attribute_pts").attr("readonly", false).attr("type", "number");
+				$("#xp").attr("readonly", false).attr("type", "number").attr("data-toggle", null);
+	  	} else {
+				alert("Sorry sucker, that ain't it.");
+	  	}
+	  }
+	});
 }
 
 // exit GM edit mode
@@ -333,7 +343,7 @@ function endEditAttributes(accept) {
 }
 
 // on motivator pt change, adjust bonuses
-$(".motivator-pts").on("change", function(){
+$(".motivator-pts").on("input", function(){
 	var pts = [];
 	var score = 0;
 	$(".motivator-pts").each(function(){
@@ -420,16 +430,16 @@ $("#xp").change(function(){
 });
 
 // on morale change, set morale effect
-$("#morale").change(function() {
+$("#morale").on("input", function() {
 	setMoraleEffect(parseInt($(this).val()));
 });
 
 // set max damage to resilience
 $("#damage").attr("max", $("#resilience").val());
 // on damage change, modify wounds
-$("#damage").change(function(){
-	if ($(this).val() == $(this).attr("max")) {
-		$(this).val(0);
+$("#damage").on("input", function(){
+	if ($(this).val() >= $(this).attr("max")) {
+		$(this).val($(this).val() - $(this).attr("max")).trigger("input");
 		$("#wounds").val( parseInt($("#wounds").val())+1 >= 3 ? 3 : parseInt($("#wounds").val())+1 );
 	}
 });
@@ -472,7 +482,7 @@ function setDefend() {
 }
 
 // penalty inputs - if val is zero, clear input
-$(".penalty-val").on("change", function(){
+$(".penalty-val").on("input", function(){
 	if ($(this).val() == 0) {
 		$(this).val("");
 	}
@@ -492,11 +502,9 @@ enableHiddenNumbers();
 // user navigation
 $("#user_select").on("change", function(){
 	if ($(this).val() == "") {
-		window.location.href = "/";
-		// window.location.href = "/lostcity/index.php";
+		window.location.href = "/?campaign="+$('#campaign_id').val();
 	} else {
-		window.location.href = "/?user="+$(this).val();
-		// window.location.href = "/lostcity/index.php?user="+$(this).val();
+		window.location.href = "/?campaign="+$('#campaign_id').val()+"&user="+$(this).val();
 	}
 });
 
@@ -517,7 +525,8 @@ $("#new_training_modal").on('shown.bs.modal', function(){
 	$("#training_name").focus();
 });
 $("#new_weapon_modal").on('shown.bs.modal', function(){
-	$("#weapon_name").focus();
+	$(focus_id == "" ? "#weapon_name" : focus_id).focus();
+	focus_id = "";
 });
 $("#new_weapon_modal").on('hidden.bs.modal', function(){
 	$("#weapon_modal_title").html("New Weapon");
@@ -532,7 +541,8 @@ $("#new_weapon_modal").on('hidden.bs.modal', function(){
 	$("#weapon_qty").val("");
 });
 $("#new_protection_modal").on('shown.bs.modal', function(){
-	$("#protection_name").focus();
+	$(focus_id == "" ? "#protection_name" : focus_id).focus();
+	focus_id = "";
 });
 $("#new_protection_modal").on('hidden.bs.modal', function(){
 	$("#protection_modal_title").html("New Protection");
@@ -542,7 +552,8 @@ $("#new_protection_modal").on('hidden.bs.modal', function(){
 	$("#protection_weight").val("");
 });
 $("#new_healing_modal").on('shown.bs.modal', function(){
-	$("#healing_name").focus();
+	$(focus_id == "" ? "#healing_name" : focus_id).focus();
+	focus_id = "";
 });
 $("#new_healing_modal").on('hidden.bs.modal', function(){
 	$("#healing_modal_title").html("New Healing/Potion/Drug");
@@ -552,7 +563,8 @@ $("#new_healing_modal").on('hidden.bs.modal', function(){
 	$("#healing_weight").val("");
 });
 $("#new_misc_modal").on('shown.bs.modal', function(){
-	$("#misc_name").focus();
+	$(focus_id == "" ? "#misc_name" : focus_id).focus();
+	focus_id = "";
 });
 $("#new_misc_modal").on('hidden.bs.modal', function(){
 	$("#misc_modal_title").html("New Miscellaneous Item");
@@ -606,14 +618,13 @@ $("#new_training_modal").on('shown.bs.modal', function(){
 
 // enable / disable password submit btn
 $("#new_password").on("keypress", function(){
-	$("#password_btn").attr("disabled", $("#new_password").val() == "" || $("#password_conf").val() == "");
+	$("#password_btn").attr("disabled", $("#new_password").val() == "" || $("#password_conf").val() == "" || $("#email").val() == "");
 });
 $("#password_conf").on("keypress", function(){
-	$("#password_btn").attr("disabled", $("#new_password").val() == "" || $("#password_conf").val() == "");
+	$("#password_btn").attr("disabled", $("#new_password").val() == "" || $("#password_conf").val() == "" || $("#email").val() == "");
 });
-
-$("input[name='slacker']").on("change", function(){
-	$("#password_btn_2").attr("disabled", false);
+$("#email").on("keypress", function(){
+	$("#password_btn").attr("disabled", $("#new_password").val() == "" || $("#password_conf").val() == "" || $("#email").val() == "");
 });
 
 // on weapon-name input focus, show other weapon inputs
@@ -957,7 +968,7 @@ function formSubmit() {
 function validatePassword() {
 	$.ajax({
 	  url: 'check_password.php',
-	  data: { 'password' : $("#password").val(), 'user_id' : $("#user_id").val() },
+	  data: { 'password' : $("#password").val(), 'user_id' : $("#user_id").val(), 'campaign_id' : $("#campaign_id").val() },
 	  ContentType: "application/json",
 	  type: 'POST',
 	  success: function(response){
@@ -976,16 +987,19 @@ function validatePassword() {
 
 // validate the form
 function setPassword() {
+  var regex = /\S+@\S+\.\S+/;
 	// make sure passwords match
 	if ($("#new_password").val() != $("#password_conf").val()) {
-		alert("Passwords must match");
-	// make sure decoy input hasn't been filled
-	} else if ($("#duckdacoy").val() != "") {
-		alert("You look more like a robot than a flesh sack");
+		alert("Passwords must match, nerd");
+	// make sure we have a valid email address
+	} else if (!regex.test($("#email").val())) {
 	// make sure human response is correct
+		alert("That doesn't look like a real email address, nerd");
 	} else if ($("#nerd_test").val().toLowerCase() != keys['nerd_test']) {
-		alert("You're either a robot or a sorry excuse for a nerd. Either way, bugger off.");
+		alert("That's not the secret word, nerd");
 	} else {
+		// set user email in form
+		$("#user_email").val($("#email").val());
 		// show submitting message
 		$("#submit_load_modal").modal("show");
 		// get recaptcha token before submit
@@ -1000,7 +1014,7 @@ function setPassword() {
 }
 
 function forgotPassword() {
-	alert("Ok fine. Hang tight and someone will be along with a reset link shortly.");
+	alert("Ok fine. Hang tight and we'll be along with a reset link shortly.");
 	$.ajax({
 	  url: 'email_password_reset_link.php',
 	  data: { 'user_id' : $("#user_id").val() },
@@ -1036,8 +1050,7 @@ function addFeatElements(featName, featDescription, id) {
 		$("#"+id+"_name_val").val(featName);
 		$("#"+id+"_descrip_val").val(featDescription);
 
-		// TODO what if feat was changed to or from quick & dead / improved crit?
-		// TODO only allow description to be edited?
+		// TODO what if feat was changed to or from quick & dead / improved crit? only allow description to be edited?
 
 	} else {
 		// make sure we're not adding a duplicate training name
@@ -1520,21 +1533,25 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 	note_input.attr("readonly", true);
 	wgt_input.attr("readonly", true);
 	name_input.click(function(){
-		editWeapon(id_val);
+		editWeapon(id_val, "name");
 	});
 	qty_input.click(function(){
-		editWeapon(id_val);
+		editWeapon(id_val, "qty");
 	});
 	dmg_input.click(function(){
-		editWeapon(id_val);
+		editWeapon(id_val, "damage");
 	});
 	note_input.click(function(){
-		editWeapon(id_val);
+		// look for range, rof, and defend values
+		var note_val = note_input.val();
+		var focus = note_val.includes("Range") ? "range" : 
+			(note_val.includes("RoF") ? "rof" : (note_val.includes("Defend") ? "defend" : "notes"));
+		editWeapon(id_val, focus);
 	});
 	wgt_input.click(function(){
-		editWeapon(id_val);
+		editWeapon(id_val, "weight");
 	});
-	// TODO why is this necessary? missing name value?
+	// TODO why is this necessary? no name value?
 	dmg_input.hover(function(){
 		$("#weapon_dmg_label").addClass("highlight");
 	},
@@ -1613,7 +1630,8 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 
 }
 
-function editWeapon(weapon_id) {
+function editWeapon(weapon_id, input_id) {
+	focus_id = "#weapon_"+input_id;
 	// separate damage from max damage
 	var damage = $("#"+weapon_id+"_damage").val();
 	var max_damage = $("#"+weapon_id+"_max_damage").val();
@@ -1699,16 +1717,16 @@ function addProtectionElements(name, bonus, notes, weight, id) {
 	notes_input.attr("readonly", true);
 	weight_input.attr("readonly", true);
 	name_input.click(function(){
-		editProtection(id_val);
+		editProtection(id_val, "name");
 	});
 	bonus_input.click(function(){
-		editProtection(id_val);
+		editProtection(id_val, "bonus");
 	});
 	notes_input.click(function(){
-		editProtection(id_val);
+		editProtection(id_val, "notes");
 	});
 	weight_input.click(function(){
-		editProtection(id_val);
+		editProtection(id_val, "weight");
 	});
 
 	// add remove button
@@ -1728,7 +1746,8 @@ function addProtectionElements(name, bonus, notes, weight, id) {
 
 }
 
-function editProtection(protection_id) {
+function editProtection(protection_id, input_id) {
+	focus_id = "#protection_"+input_id;
 	// set modal values and launch
 	$("#protection_modal_title").html("Edit Protection");
 	$("#protection_name").val($("#"+protection_id+"_name").val());
@@ -1788,16 +1807,16 @@ function addHealingElements(name, quantity, effect, weight, id) {
 	effect_input.attr("readonly", true);
 	weight_input.attr("readonly", true);
 	name_input.click(function(){
-		editHealing(id_val);
+		editHealing(id_val, "name");
 	});
 	qty_input.click(function(){
-		editHealing(id_val);
+		editHealing(id_val, "quantity");
 	});
 	effect_input.click(function(){
-		editHealing(id_val);
+		editHealing(id_val, "effect");
 	});
 	weight_input.click(function(){
-		editHealing(id_val);
+		editHealing(id_val, "weight");
 	});
 
 	// add remove button
@@ -1817,7 +1836,8 @@ function addHealingElements(name, quantity, effect, weight, id) {
 
 }
 
-function editHealing(healing_id) {
+function editHealing(healing_id, input_id) {
+	focus_id = "#healing_"+input_id;
 	// set modal values and launch
 	$("#healing_modal_title").html("Edit Healing/Potion/Drug");
 	$("#healing_name").val($("#"+healing_id+"_name").val());
@@ -1877,16 +1897,16 @@ function addMiscElements(name, quantity, notes, weight, id) {
 	notes_input.attr("readonly", true);
 	weight_input.attr("readonly", true);
 	name_input.click(function(){
-		editMisc(id_val);
+		editMisc(id_val, "name");
 	});
 	qty_input.click(function(){
-		editMisc(id_val);
+		editMisc(id_val, "quantity");
 	});
 	notes_input.click(function(){
-		editMisc(id_val);
+		editMisc(id_val, "notes");
 	});
 	weight_input.click(function(){
-		editMisc(id_val);
+		editMisc(id_val, "weight");
 	});
 
 	// add remove button
@@ -1906,7 +1926,8 @@ function addMiscElements(name, quantity, notes, weight, id) {
 
 }
 
-function editMisc(misc_id) {
+function editMisc(misc_id, input_id) {
+	focus_id = "#misc_"+input_id;
 	// set modal values and launch
 	$("#misc_modal_title").html("Edit Miscellaneous Item");
 	$("#misc_name").val($("#"+misc_id+"_name").val());
@@ -1931,7 +1952,7 @@ function updateTotalWeight() {
 		});
 		totalWeight += parseFloat(qty) * parseFloat(wgt);
 	});
-	$("#total_weight").val(totalWeight);
+	$("#total_weight").val(totalWeight.toFixed(1));
 }
 
 function enableHighlighting() {

@@ -1,5 +1,14 @@
+  CREATE TABLE campaign (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    name varchar(255),
+    admin_password varchar(255),
+    new_character_password varchar(255)
+  );
+
   CREATE TABLE user (
     id int PRIMARY KEY AUTO_INCREMENT,
+    campaign_id int,
+    email varchar(255),
     password varchar(255),
     character_name varchar(64),
     attribute_pts int,
@@ -48,7 +57,8 @@
     motivator_3_pts int,
     motivator_4_pts int,
     reset_token varchar(255),
-    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (campaign_id) REFERENCES campaign(id)
   );
 
   CREATE TABLE user_note (
