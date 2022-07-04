@@ -162,6 +162,9 @@
 	    <div class="nav-item">
 	       <span class="glyphicon" onclick="back()"><span class="nav-item-label"><i class="fa-solid fa-arrow-left nav-icon"></i> Change Campaign</span></span>
 	    </div>
+	    <div class="nav-item">
+	       <span class="glyphicon" data-toggle="modal" data-target="#help_modal"><span class="nav-item-label"><i class="fa-solid fa-circle-info nav-icon"></i> Help!</span></span>
+	    </div>
 	  </div>
 
 	  <!-- attribute point menu -->
@@ -1232,7 +1235,7 @@
 	<!-- xp modal -->
   <div class="modal" id="xp_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-      <div class="modal-content searching-prompt">
+      <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title">Experience Points</h4>
         </div>
@@ -1270,7 +1273,7 @@
   <!-- GM edit modal -->
   <div class="modal" id="gm_edit_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-      <div class="modal-content searching-prompt">
+      <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title">GM Edit Mode</h4>
         </div>
@@ -1289,7 +1292,7 @@
 	<!-- edit size modal -->
   <div class="modal" id="edit_size_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-      <div class="modal-content searching-prompt">
+      <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title">Character Size</h4>
         </div>
@@ -1315,7 +1318,7 @@
 	<!-- new note modal -->
   <div class="modal" id="new_note_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-md modal-dialog-centered" role="document">
-      <div class="modal-content searching-prompt">
+      <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title" id="note_modal_title">New Note</h4>
         </div>
@@ -1337,7 +1340,7 @@
 	<!-- new feat modal -->
   <div class="modal" id="new_feat_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-      <div class="modal-content searching-prompt">
+      <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title" id="feat_modal_title">New Feat</h4>
         </div>
@@ -1359,7 +1362,7 @@
 	<!-- new training modal -->
   <div class="modal" id="new_training_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-      <div class="modal-content searching-prompt">
+      <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title" id="training_modal_title">New Skill Training</h4>
         </div>
@@ -1397,7 +1400,7 @@
 	<!-- new weapon modal -->
   <div class="modal" id="new_weapon_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-      <div class="modal-content searching-prompt">
+      <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title" id="weapon_modal_title">New Weapon</h4>
         </div>
@@ -1438,7 +1441,7 @@
 	<!-- new protection modal -->
   <div class="modal" id="new_protection_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-      <div class="modal-content searching-prompt">
+      <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title" id="protection_modal_title">New Protection</h4>
         </div>
@@ -1464,7 +1467,7 @@
 	<!-- new healing modal -->
   <div class="modal" id="new_healing_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-      <div class="modal-content searching-prompt">
+      <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title" id="healing_modal_title">New Healing/Potion/Drug</h4>
         </div>
@@ -1490,7 +1493,7 @@
 	<!-- new miscellaneous modal -->
   <div class="modal" id="new_misc_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-      <div class="modal-content searching-prompt">
+      <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title" id="misc_modal_title">New Miscellaneous Item</h4>
         </div>
@@ -1516,7 +1519,7 @@
 	<!-- new password modal -->
   <div class="modal" id="new_password_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-      <div class="modal-content searching-prompt">
+      <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title">New Character</h4>
         </div>
@@ -1540,7 +1543,7 @@
 	<!-- new password modal - bot test -->
   <div class="modal" id="new_password_modal_2" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-      <div class="modal-content searching-prompt">
+      <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title">New Character</h4>
         </div>
@@ -1558,7 +1561,7 @@
 	<!-- submitting status modal -->
   <div class="modal" id="submit_load_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-      <div class="modal-content searching-prompt">
+      <div class="modal-content">
         <div class="modal-body center">
 					<span class="glyphicon glyphicon-refresh spinning"></span> Waiting for server response...
         </div>
@@ -1569,7 +1572,7 @@
 	<!-- password modal -->
   <div class="modal" id="password_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-      <div class="modal-content searching-prompt">
+      <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title">Update Character</h4>
         </div>
@@ -1591,7 +1594,7 @@
 	<!-- forgot password modal -->
   <div class="modal" id="forgot_password_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-      <div class="modal-content searching-prompt">
+      <div class="modal-content">
         <div class="modal-header">
           <h4 class="modal-title">Forgot My Password</h4>
         </div>
@@ -1607,6 +1610,28 @@
     </div>
   </div>
 
+	<!-- help modal -->
+  <div class="modal" id="help_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Magnets: How Do They Work?</h4>
+        </div>
+        <div class="modal-body">
+        	<h4>Character Creation</h4>
+					<p>When creating a new character you will start with a default of 12 Attribute Points. This value is 'unlocked' during character creation, and so can be adjusted based on any modifiers. Your 12 Attribute Points can be allocated by selecting the <i>Allocate Attribute Points</i> option from the menu. Points will be automatically deducted as you increase attributes, and as feats and trainings are added. Your attributes and feats are also 'unlocked' during character creation, allowing you to add additional starting feats/traits and skills as needed.</p>
+					<h4>Adding XP & Allocating Attribute Points</h4>
+					<p>As you add XP, your level will be automatically adjusted, and as you gain levels, Attribute Points will automatically be added. These Attribute Points can then be allocated via the <i>Allocate Attribute Points</i> option. Attributes can only be raised by one point per allocation, and only one unique skill or feat, as well as one focus or training, can be added per allocation. Attribute points will be automatically deducted. If additional modifications need to be made to attributes, skills or feats, this will need to be done through the <i>GM Edit Mode</i>.</p>
+					<h4>GM Edit Mode</h4>
+					<p>Using the admin password (set when creating the campaign), the GM can unlock and edit attribute points, XP, attribute values, skills, and feats. The GM can also use the admin password to save changes to any of the characters at any time.</p>
+        	<div class="button-bar">
+	        	<button type="button" class="btn btn-primary forgot-password-btn" data-dismiss="modal">Ok</button>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 	<!-- JavaScript -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script async src="https://www.google.com/recaptcha/api.js?render=6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi"></script>
@@ -1614,7 +1639,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 	<script src="/assets/feat_list_v22_06_22.js"></script>
-	<script src="/assets/script_v22_07_03.js"></script>
+	<script src="/assets/script_v22_07_04.js"></script>
 	<script type="text/javascript">
 
 		// hover function for clearable inputs

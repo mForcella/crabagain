@@ -1,8 +1,7 @@
   CREATE TABLE campaign (
     id int PRIMARY KEY AUTO_INCREMENT,
     name varchar(255),
-    admin_password varchar(255),
-    new_character_password varchar(255)
+    admin_password varchar(255)
   );
 
   CREATE TABLE user (

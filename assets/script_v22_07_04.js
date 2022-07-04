@@ -127,19 +127,25 @@ function GMEditMode() {
 function endGMEdit(accept) {
 	if (!accept) {
 		// reload page
+		unsavedChanges = false;
 		window.location.reload();
 	} else {
-		adminEditMode = false
-		// hide GM menu, show hamburger menu
-	  $(".gm-menu").toggleClass("active");
-		$(".glyphicon-menu-hamburger").show();
-		// hide icons
-		$(".attribute-col").find(".hidden-icon").hide();
-		$(".feat").find(".hidden-icon").hide();
-		$("#new_feat_btn").hide();
-		// disable edit attribute pts input, enable edit xp input
-		$("#attribute_pts").attr("readonly", true).removeAttr("type", "number");
-		$("#xp").attr("readonly", true).removeAttr("type", "number").attr("data-toggle", "modal");
+		// confirm and save
+		var conf = confirm("Save changes?");
+		if (conf) {
+			$("#user_form").submit();
+		}
+		// adminEditMode = false
+		// // hide GM menu, show hamburger menu
+	 //  $(".gm-menu").toggleClass("active");
+		// $(".glyphicon-menu-hamburger").show();
+		// // hide icons
+		// $(".attribute-col").find(".hidden-icon").hide();
+		// $(".feat").find(".hidden-icon").hide();
+		// $("#new_feat_btn").hide();
+		// // disable edit attribute pts input, enable edit xp input
+		// $("#attribute_pts").attr("readonly", true).removeAttr("type", "number");
+		// $("#xp").attr("readonly", true).removeAttr("type", "number").attr("data-toggle", "modal");
 	}
 }
 

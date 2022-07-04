@@ -120,10 +120,8 @@
 					<h4 class="modal-title">New Campaign</h4>
 				</div>
 				<div class="modal-body">
-					<label class="control-label">Please set an admin password for your campaign. This grants you GM privileges to edit andd save characters.</label>
+					<label class="control-label">Please set an admin password for your campaign. This grants you GM privileges to edit and save characters.</label>
 					<input class="form-control" type="text" id="admin_password">
-					<!-- <label class="control-label">Please set a new character password<br>(required by players when creating a new character)</label>
-					<input class="form-control" type="text" id="new_character_password"> -->
 					<h5><strong>Important! Make sure you retain this password for your records!</strong></h5>
 					<div class="button-bar">
 						<button type="button" class="btn btn-primary" data-dismiss="modal">Back</button>
