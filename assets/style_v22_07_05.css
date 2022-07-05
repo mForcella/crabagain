@@ -115,6 +115,11 @@ body {
 	background-color: #cccccc;
 	color: black;
 }
+button.btn-primary {
+	background-color: #8c8c8c !important;
+	border-color: #666666 !important;
+	text-transform: uppercase;
+}
 label {
 	font-weight: 300;
 }
@@ -194,7 +199,7 @@ h1 {
 	margin-top: 15px;
 }
 .button-bar .btn {
-	text-transform: uppercase;
+	/*text-transform: uppercase;*/
 }
 .center {
 	text-align: center !important;
@@ -265,6 +270,11 @@ h1 {
 		cursor: pointer;
 	}
 }
+@media (hover: hover) {
+	.glyphicon.svg:hover {
+		filter: drop-shadow( 0px 0px 3px #404040 );
+	}
+}
 .glyphicon-edit, .glyphicon-remove, .glyphicon-chevron-up, .glyphicon-chevron-down, .glyphicon-ok {
 	margin: 0 5px;
 }
@@ -295,6 +305,19 @@ h1 {
 .glyphicon.spinning {
     animation: spin 1s infinite linear;
     -webkit-animation: spin2 1s infinite linear;
+}
+.glyphicon-ban-circle {
+	font-size: 1.7em;
+	transform: translate(-4px, 5px);
+	color: darkred;
+}
+.glyphicon-ban-circle, .icon-armor {
+	position: absolute;
+}
+@media screen and (max-width:767px) {
+	.glyphicon-ban-circle, .icon-armor {
+		margin-left: -10px;
+	}
 }
 @keyframes spin {
     from { transform: scale(1) rotate(0deg); }
@@ -357,15 +380,18 @@ h1 {
     background-size: contain;
     background-repeat: no-repeat;
 }
-.icon-armor, .icon-misc {
+.icon-protection, .icon-misc, .icon-armor {
     font-size: 1.2em;
     transform: translateY(2px);
 }
 .icon-sword {
     background-image: url("image/sword.svg");
 }
-.icon-armor {
+.icon-protection {
     background-image: url("image/helmet.svg");
+}
+.icon-armor {
+    background-image: url("image/armor.svg");
 }
 .icon-misc {
     background-image: url("image/misc.svg");

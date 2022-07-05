@@ -132,7 +132,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;1,400;1,600&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
 	<!-- Custom Styles -->
-	<link rel="stylesheet" type="text/css" href="/assets/style_v22_07_03.css">
+	<link rel="stylesheet" type="text/css" href="/assets/style_v22_07_05.css">
 
 </head>
 
@@ -1103,10 +1103,11 @@
 			<!-- section: protection -->
 			<div class="col-md-12">
 				<div class="section form-horizontal">
-					<div class="section-title"><span>Protection</span> <i class="fa-solid icon-armor custom-icon"></i></div>
+					<div class="section-title"><span>Protection</span> <i class="fa-solid icon-protection custom-icon"></i></div>
 					<div class="form-group">
+						<label class="control-label col-xs-1 resize-mobile center" for="_eqip"></label>
 						<label class="control-label col-xs-3 resize-mobile center" for="protections[]">Item</label>
-						<label class="control-label col-xs-2 resize-mobile center" for="protection_bonus[]">Bonus</label>
+						<label class="control-label col-xs-1 resize-mobile center" for="protection_bonus[]">Bonus</label>
 						<label class="control-label col-xs-5 resize-mobile center" for="protection_notes[]">Notes</label>
 						<label class="control-label col-xs-1 resize-mobile center" for="protection_weight[]">Weight</label>
 						<label class="control-label col-xs-1 resize-mobile center" for=""></label>
@@ -1619,11 +1620,11 @@
         </div>
         <div class="modal-body">
         	<h4>Character Creation</h4>
-					<p>When creating a new character you will start with a default of 12 Attribute Points. This value is 'unlocked' during character creation, and so can be adjusted based on any modifiers. Your 12 Attribute Points can be allocated by selecting the <i>Allocate Attribute Points</i> option from the menu. Points will be automatically deducted as you increase attributes, and as feats and trainings are added. Your attributes and feats are also 'unlocked' during character creation, allowing you to add additional starting feats/traits and skills as needed.</p>
+					<p>When creating a new character you will start with a default of 12 Attribute Points. This value is 'unlocked' during character creation, and so can be adjusted based on any modifiers. Your 12 Attribute Points can be allocated by selecting the <i>Allocate Attribute Points</i> option from the menu. Points will be automatically deducted as you increase attributes, and as feats and trainings are added. Your attributes and feats are also 'unlocked' during character creation, allowing you to add additional starting feats/traits and skills as needed. In order to save a newly created character, you will need to know the 'secret code.' If you don't know what it is, ask your GM. If they don't know it...find a new GM? You will also need to set a personal password when creating a new character, which you will need to update your character in the future.</p>
 					<h4>Adding XP & Allocating Attribute Points</h4>
-					<p>As you add XP, your level will be automatically adjusted, and as you gain levels, Attribute Points will automatically be added. These Attribute Points can then be allocated via the <i>Allocate Attribute Points</i> option. Attributes can only be raised by one point per allocation, and only one unique skill or feat, as well as one focus or training, can be added per allocation. Attribute points will be automatically deducted. If additional modifications need to be made to attributes, skills or feats, this will need to be done through the <i>GM Edit Mode</i>.</p>
+					<p>Once your character has been saved, all of your attribute values, skills, and feats will be locked. The only way to modify your attributes is by accruing and allocating Attribute Points. As you add XP, your level will be automatically adjusted, and as you gain levels, Attribute Points will automatically be added. These Attribute Points can then be allocated via the <i>Allocate Attribute Points</i> option. Attributes can only be raised by one point per allocation, and only one unique skill or feat, as well as one focus or training, can be added per allocation. Attribute points will be automatically deducted. If additional modifications need to be made to attributes, skills or feats, this will need to be done through the <i>GM Edit Mode</i>.</p>
 					<h4>GM Edit Mode</h4>
-					<p>Using the admin password (set when creating the campaign), the GM can unlock and edit attribute points, XP, attribute values, skills, and feats. The GM can also use the admin password to save changes to any of the characters at any time.</p>
+					<p>Using the admin password (set when creating the campaign), the GM can unlock and edit attribute points, XP, attribute values, skills, and feats. The GM can also use the admin password to make and save changes to any of the characters at any time.</p>
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary forgot-password-btn" data-dismiss="modal">Ok</button>
         	</div>
@@ -1639,7 +1640,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 	<script src="/assets/feat_list_v22_06_22.js"></script>
-	<script src="/assets/script_v22_07_04.js"></script>
+	<script src="/assets/script_v22_07_05.js"></script>
 	<script type="text/javascript">
 
 		// hover function for clearable inputs
@@ -1709,10 +1710,16 @@
 		});
 
 		// check for user protections
-		var protections = <?php echo json_encode($protections); ?>;
+		protections = <?php echo json_encode($protections); ?>;
 		for (var i in protections) {
-			addProtectionElements(protections[i]['name'], protections[i]['bonus'], protections[i]['notes'], protections[i]['weight'], protections[i]['id']);
+			addProtectionElements(protections[i]['name'], protections[i]['bonus'], protections[i]['notes'], protections[i]['weight'], protections[i]['equipped'], protections[i]['id']);
+			// check if protection is equipped
+			if (protections[i]['equipped'] == 1) {
+				equipped.push(protections[i]['name']);
+				$("#protection_"+protections[i]['id']+"_equip_ban").toggle();
+			}
 		}
+		setDefend();
 
 		// check for user healings
 		var healings = <?php echo json_encode($healings); ?>;

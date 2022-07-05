@@ -202,6 +202,7 @@
 		$protection_bonus = $_POST['protection_bonus'];
 		$protection_notes = $_POST['protection_notes'];
 		$protection_weight = $_POST['protection_weight'];
+		$protection_equipped = $_POST['protection_equipped'];
 		$ids = $_POST['protection_ids'];
 
 		// delete protections not in ID list
@@ -211,11 +212,12 @@
 		for ($i = 0; $i < count($protections); $i++) {
 			// update where ID not empty; insert new where ID empty
 			if ($ids[$i] == "") {
-				$sql = "INSERT INTO user_protection (name, bonus, notes, weight, user_id) VALUES ('".addslashes($protections[$i])."', '".addslashes($protection_bonus[$i])."', '".addslashes($protection_notes[$i])."', '".$protection_weight[$i]."', '".$user_id."')";
+				$sql = "INSERT INTO user_protection (name, bonus, notes, weight, equipped, user_id) VALUES ('".addslashes($protections[$i])."', ".$protection_bonus[$i].", '".addslashes($protection_notes[$i])."', ".$protection_weight[$i].", ".$protection_equipped[$i].", '".$user_id."')";
 			} else {
-				$sql = "UPDATE user_protection SET name = '".addslashes($protections[$i])."', bonus = ".addslashes($protection_bonus[$i]).", notes = '".addslashes($protection_notes[$i])."', weight = ".$protection_weight[$i]." WHERE id = ".$ids[$i];
+				$sql = "UPDATE user_protection SET name = '".addslashes($protections[$i])."', bonus = ".$protection_bonus[$i].", notes = '".addslashes($protection_notes[$i])."', weight = ".$protection_weight[$i].", equipped = ".$protection_equipped[$i]." WHERE id = ".$ids[$i];
 			}
 			$db->query($sql);
+			// echo $db->error;
 		}
 	} else {
 		// delete all protections from user

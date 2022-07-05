@@ -111,10 +111,14 @@
     bonus varchar(64),
     notes varchar(255),
     weight float,
+    equipped bool,
     user_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES user(id)
   );
+
+alter table user_protection
+add column equipped bool;
 
   CREATE TABLE user_healing (
     id int PRIMARY KEY AUTO_INCREMENT,

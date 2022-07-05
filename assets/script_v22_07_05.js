@@ -21,6 +21,9 @@ var feats = [];
 var skills = [];
 // ID of input to gain focus on modal show
 var focus_id = "";
+// equipped protections
+var protections;
+var equipped = [];
 
 var attributes = [
 	'strength',
@@ -176,12 +179,19 @@ function selectWeapon(id) {
 	var selected = $("#weapon_select_"+id).val();
 	// make sure the weapon isn't already selected
 	var duplicate = false;
-	$(".weapon-select").each(function(){
-		// TODO if weapon quantity is > 1, allow two selections
-		if (this.id != "weapon_select_"+id && selected == $(this).val() && selected != "") {
-			$("#weapon_select_"+id).val("");
-			duplicate = true;
-		}
+	// if weapon quantity is > 1, allow multiple selections
+	$.each(weapons, function(i, weapon) {
+		var count = 0;
+		var qty = isNaN(weapon['quantity']) ? 1 : weapon['quantity'];
+		$(".weapon-select").each(function(){
+			if (this.id != "weapon_select_"+id && selected == $(this).val() && selected != "") {
+				count += 1;
+			}
+			if (count >= qty) {
+				$("#weapon_select_"+id).val("");
+				duplicate = true;
+			}
+		});
 	});
 	if (!duplicate && selected != "") {
 		for (var i in weapons) {
@@ -443,8 +453,8 @@ $("#morale").on("input", function() {
 // set max damage to resilience
 $("#damage").attr("max", $("#resilience").val());
 // on damage change, modify wounds
-$("#damage").on("input", function(){
-	if ($(this).val() >= $(this).attr("max")) {
+$("#damage").on("change", function() {
+	while (parseInt($(this).val()) >= parseInt($(this).attr("max"))) {
 		$(this).val($(this).val() - $(this).attr("max")).trigger("input");
 		$("#wounds").val( parseInt($("#wounds").val())+1 >= 3 ? 3 : parseInt($("#wounds").val())+1 );
 	}
@@ -484,6 +494,14 @@ function setDefend() {
 			}
 		}
 	});
+	// check for equipped protections
+	for (var i in equipped) {
+		for (var j in protections) {
+			if (equipped[i] == protections[j]['name']) {
+				defend += parseInt(protections[j]['bonus']);
+			}
+		}
+	}
 	$("#defend").val(defend);
 }
 
@@ -600,6 +618,9 @@ $("#password_modal").on('shown.bs.modal', function(){
 });
 $("#gm_edit_modal").on('shown.bs.modal', function(){
 	$("#gm_password").focus();
+	toggleMenu();
+});
+$("#help_modal").on('shown.bs.modal', function(){
 	toggleMenu();
 });
 
@@ -1056,8 +1077,6 @@ function addFeatElements(featName, featDescription, id) {
 		$("#"+id+"_name_val").val(featName);
 		$("#"+id+"_descrip_val").val(featDescription);
 
-		// TODO what if feat was changed to or from quick & dead / improved crit? only allow description to be edited?
-
 	} else {
 		// make sure we're not adding a duplicate training name
 		if (includesIgnoreCase(featNames, featName)) {
@@ -1473,11 +1492,12 @@ function newWeapon() {
 		// check if this weapon is selected - update stats
 		for (var i in weapons) {
 			if (weapons[i]['name'] == originalName) {
-				$(".weapon-select").each(function(){
+				$($(".weapon-select").get().reverse()).each(function(){
 					if ($(this).val() == originalName) {
 						weapons[i]['damage'] = damage;
 						weapons[i]['defend'] = defend;
 						weapons[i]['max_damage'] = max_damage;
+						weapons[i]['quantity'] = qty;
 						weapons[i]['name'] = name;
 						weapons[i]['range_'] = range;
 						weapons[i]['rof'] = rof;
@@ -1690,32 +1710,51 @@ function newProtection() {
 	if (editing) {
 		// update protection inputs
 		var protection_id = $("#protection_id").val();
+		var originalName = $("#"+protection_id+"_name").val();
 		$("#"+protection_id+"_name").val(name);
 		$("#"+protection_id+"_bonus").val(bonus);
 		$("#"+protection_id+"_notes").val(notes);
 		$("#"+protection_id+"_weight").val(weight);
+		// update protections array bonus value
+		for (var i in protections) {
+			if (protections[i]['name'] == originalName) {
+				protections[i]['bonus'] = bonus;
+				// track names changes
+				protections[i]['name'] = name;
+				var index = equipped.indexOf(originalName);
+				if (index !== -1) {
+				  equipped.splice(index, 1);
+				}
+				equipped.push(name);
+				setDefend();
+			}
+		}
 		updateTotalWeight();
 	} else {
-		addProtectionElements(name, bonus, notes, weight, '');
+		addProtectionElements(name, bonus, notes, weight, false, '');
+		// update protections array
+		var protection = {'name':name, 'bonus':bonus}
+		protections.push(protection);
 	}
 }
 
 // create html elements for protection
-function addProtectionElements(name, bonus, notes, weight, id) {
+function addProtectionElements(name, bonus, notes, weight, is_equipped, id) {
 	var id_val = id == "" ? uuid() : "protection_"+id;
 
 	var div = createElement('div', 'form-group item', '#protections', id_val);
+	var div3 = createElement('div', 'col-xs-1 no-pad-mobile center', div);
 	var div1 = createElement('div', 'col-xs-3 no-pad-mobile', div);
-	var div2 = createElement('div', 'col-xs-2 no-pad-mobile', div);
-	var div3 = createElement('div', 'col-xs-5 no-pad-mobile', div);
-	var div4 = createElement('div', 'col-xs-1 no-pad-mobile', div);
-	var div5 = createElement('div', 'col-xs-1 no-pad-mobile center', div);
+	var div2 = createElement('div', 'col-xs-1 no-pad-mobile', div);
+	var div4 = createElement('div', 'col-xs-5 no-pad-mobile', div);
+	var div5 = createElement('div', 'col-xs-1 no-pad-mobile', div);
+	var div6 = createElement('div', 'col-xs-1 no-pad-mobile center', div);
 
 	var name_input = createInput('', 'text', 'protections[]', name, div1, id_val+"_name");
 	var bonus_input = createInput('', 'text', 'protection_bonus[]', bonus, div2, id_val+"_bonus");
-	var notes_input = createInput('', 'text', 'protection_notes[]', notes, div3, id_val+"_notes");
-	var weight_input = createInput('wgt', 'text', 'protection_weight[]', weight, div4, id_val+"_weight");
-	createInput('', 'hidden', 'protection_ids[]', id, div4);
+	var notes_input = createInput('', 'text', 'protection_notes[]', notes, div4, id_val+"_notes");
+	var weight_input = createInput('wgt', 'text', 'protection_weight[]', weight, div5, id_val+"_weight");
+	createInput('', 'hidden', 'protection_ids[]', id, div6);
 	updateTotalWeight();
 
 	name_input.attr("readonly", true);
@@ -1735,8 +1774,33 @@ function addProtectionElements(name, bonus, notes, weight, id) {
 		editProtection(id_val, "weight");
 	});
 
+	// add equip button
+	createElement('span', 'glyphicon svg fa-solid icon-armor custom-icon', div3, id_val+"_equip");
+	createElement('span', 'glyphicon glyphicon-ban-circle', div3, id_val+"_equip_ban");
+	createInput('', 'hidden', 'protection_equipped[]', is_equipped == null ? false : is_equipped, div3, id_val+"_equipped");
+	$(div3).on("click", function(){
+		var item = $("#"+id_val+"_name").val();
+		var conf = confirm(($("#"+id_val+"_equip_ban").is(":visible") ? "Equip" : "Unequip")+" protection '"+item+"'?");
+		if (conf) {
+			$("#"+id_val+"_equip_ban").toggle();
+			if (!$("#"+id_val+"_equip_ban").is(":visible")) {
+				// add equipped protection
+				equipped.push(item);
+				$("#"+id_val+"_equipped").val(true);
+			} else {
+				// remove protection
+				var index = equipped.indexOf(item);
+				if (index !== -1) {
+				  equipped.splice(index, 1);
+				}
+				$("#"+id_val+"_equipped").val(false);
+			}
+			setDefend();
+		}
+	});
+
 	// add remove button
-	createElement('span', 'glyphicon glyphicon-remove', div5, id_val+"_remove");
+	createElement('span', 'glyphicon glyphicon-remove', div6, id_val+"_remove");
 	$("#"+id_val+"_remove").on("click", function(){
 		var item = $("#"+id_val+"_name").val();
 		var conf = confirm("Remove item '"+item+"'?");
