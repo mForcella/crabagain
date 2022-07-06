@@ -117,9 +117,6 @@
     FOREIGN KEY (user_id) REFERENCES user(id)
   );
 
-alter table user_protection
-add column equipped bool;
-
   CREATE TABLE user_healing (
     id int PRIMARY KEY AUTO_INCREMENT,
     name varchar(64),

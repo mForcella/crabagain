@@ -21,6 +21,13 @@
 	z-index: 999;
     padding: 1.5rem 2rem;
 }
+.help-menu {
+	margin-top: 20px;
+    font-size: 3.9rem;
+    display: block;
+    color: #f2f2f2;
+    -webkit-text-stroke: 2px black;
+}
 .attribute-pts {
 	padding: 1.5rem;
     top: 2rem;

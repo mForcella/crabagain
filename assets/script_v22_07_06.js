@@ -43,6 +43,42 @@ var attributes = [
 // detect if we're on a touchscreen
 var is_mobile = $('#is_mobile').css('display')=='none';
 
+// hover function for clearable inputs
+function tog(v){ return v?'addClass':'removeClass'; }
+
+// back to select campaign page
+function back() {
+	window.location.replace("/");
+}
+
+// text input clear functions
+$(document).on('input', '.clearable', function() {
+    $(this)[tog(this.value)]('x');
+}).on('mousemove', '.x', function(e) {
+    $(this)[tog(this.offsetWidth-18 < e.clientX-this.getBoundingClientRect().left)]('onX');   
+}).on('click', '.onX', function(){
+    $(this).removeClass('x onX').val('');
+    if (this.id == "feat_name") {
+    	$("#feat_description").val("").height("125px");
+    }
+});
+
+// trigger 'unsaved changes' alert when leaving the page
+$("input").on("change", function(){
+	unsavedChanges = true;
+});
+$("textarea").on("input propertychange", function(){
+	unsavedChanges = true;
+});
+$("#user_form").on("submit", function(){
+	unsavedChanges = false;
+});
+$(window).on("beforeunload", function(e) {
+	if (unsavedChanges) {
+  	return "Unsaved changes will be lost."; // custom message will not be displayed; message is browser specific
+	}
+});
+
 // enable size edit button
 if (!is_mobile) {
 	$("#size").hover(function () {
@@ -138,17 +174,6 @@ function endGMEdit(accept) {
 		if (conf) {
 			$("#user_form").submit();
 		}
-		// adminEditMode = false
-		// // hide GM menu, show hamburger menu
-	 //  $(".gm-menu").toggleClass("active");
-		// $(".glyphicon-menu-hamburger").show();
-		// // hide icons
-		// $(".attribute-col").find(".hidden-icon").hide();
-		// $(".feat").find(".hidden-icon").hide();
-		// $("#new_feat_btn").hide();
-		// // disable edit attribute pts input, enable edit xp input
-		// $("#attribute_pts").attr("readonly", true).removeAttr("type", "number");
-		// $("#xp").attr("readonly", true).removeAttr("type", "number").attr("data-toggle", "modal");
 	}
 }
 
@@ -169,7 +194,6 @@ function setXP() {
 
 // show user menu
 function toggleMenu() {
-	// navMenuOpen = !navMenuOpen;
   $(".nav-menu").toggleClass("active");
   $(".glyphicon-menu-hamburger").toggleClass("active");
 }
@@ -494,15 +518,22 @@ function setDefend() {
 			}
 		}
 	});
-	// check for equipped protections
+	$("#defend").val(defend);
+}
+
+function setToughness() {
+	// get base toughness value from strength
+	var strength = user['strength'] == undefined ? 0 : user['strength'];
+	var toughness = strength > 0 ? Math.floor(strength/2) : Math.ceil(strength/3);
+	var bonus = 0;
 	for (var i in equipped) {
 		for (var j in protections) {
 			if (equipped[i] == protections[j]['name']) {
-				defend += parseInt(protections[j]['bonus']);
+				bonus += parseInt(protections[j]['bonus']);
 			}
 		}
 	}
-	$("#defend").val(defend);
+	$("#toughness").val(toughness + bonus);
 }
 
 // penalty inputs - if val is zero, clear input
@@ -621,7 +652,7 @@ $("#gm_edit_modal").on('shown.bs.modal', function(){
 	toggleMenu();
 });
 $("#help_modal").on('shown.bs.modal', function(){
-	toggleMenu();
+	// toggleMenu();
 });
 
 // on modal shown, update modal title and clear inputs
@@ -1793,11 +1824,19 @@ function addProtectionElements(name, bonus, notes, weight, is_equipped, id) {
 				if (index !== -1) {
 				  equipped.splice(index, 1);
 				}
-				$("#"+id_val+"_equipped").val(false);
+				$("#"+id_val+
+					"_equipped").val(false);
 			}
-			setDefend();
+			setToughness();
 		}
 	});
+	// TODO toggle icon on hover?
+	// $(div3).hover(function(){
+	// 	$("#"+id_val+"_equip_ban").toggle();
+	// },
+	// function(){
+	// 	$("#"+id_val+"_equip_ban").toggle();
+	// });
 
 	// add remove button
 	createElement('span', 'glyphicon glyphicon-remove', div6, id_val+"_remove");
@@ -1807,6 +1846,12 @@ function addProtectionElements(name, bonus, notes, weight, is_equipped, id) {
 		if (conf) {
 			unsavedChanges = true;
 			$("#"+id_val).remove();
+			// check if protection was equipped
+			var index = equipped.indexOf(item);
+			if (index !== -1) {
+			  equipped.splice(index, 1);
+			  setToughness();
+			}
 		}
 	});
 

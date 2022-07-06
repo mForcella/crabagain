@@ -40,7 +40,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;1,400;1,600&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
 	<!-- Custom Styles -->
-	<link rel="stylesheet" type="text/css" href="/assets/style_v22_07_03.css">
+	<link rel="stylesheet" type="text/css" href="/assets/style_v22_07_06.css">
 </head>
 
 <style type="text/css">
@@ -124,7 +124,7 @@
 					<input class="form-control" type="text" id="admin_password">
 					<h5><strong>Important! Make sure you retain this password for your records!</strong></h5>
 					<div class="button-bar">
-						<button type="button" class="btn btn-primary" data-dismiss="modal">Back</button>
+						<button type="button" class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#new_campaign_modal">Back</button>
 						<button type="button" class="btn btn-primary" data-dismiss="modal" disabled id="next_btn_2" data-toggle="modal" data-target="#confirm_nerd_modal">Next</button>
 					</div>
 				</div>
