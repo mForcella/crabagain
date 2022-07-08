@@ -271,10 +271,17 @@ h1 {
 .glyphicon {
 	line-height: 0.5;
 }
+.glyphicon.disabled {
+	color: #999999;
+	cursor: default !important;
+}
 @media (hover: hover) {
 	.glyphicon:hover {
 		text-shadow: 0px 0px 3px #404040;
 		cursor: pointer;
+	}
+	.glyphicon.disabled:hover {
+		text-shadow: none;
 	}
 }
 @media (hover: hover) {

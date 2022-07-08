@@ -109,8 +109,16 @@ $(document).mouseup(function(e) {
   }
 });
 
-// resize background textarea to fit text
+// resize character background textarea to fit text
 $("#background").height( $("#background")[0].scrollHeight );
+
+$("#attribute_pts").on("input", function(){
+	if (parseInt($(this).val()) == 0) {
+		$("#attribute_pts_span").addClass("disabled");
+	} else {
+		$("#attribute_pts_span").removeClass("disabled");
+	}
+});
 
 // highlight attributes
 if (!is_mobile) {
@@ -261,7 +269,12 @@ function selectWeapon(id) {
 }
 
 // start point allocation mode
-function allocateAttributePts() {
+function allocateAttributePts(e) {
+	// return if button is disabled
+	if ($(e).hasClass("disabled")) {
+		return;
+	}
+
 	// check if we have points to allocate
 	if ($("#attribute_pts").val() == "" || parseInt($("#attribute_pts").val()) == 0) {
 		alert("No attribute points to allocate.");
@@ -345,6 +358,9 @@ function endEditAttributes(accept) {
 	if (accept) {
 		// update #attribute_pts input val from .attribute-count
 		$("#attribute_pts").val($(".attribute-count").html().split(" Points")[0]);
+		if (parseInt($("#attribute_pts").val()) == 0) {
+			$("#attribute_pts_span").addClass("disabled");
+		}
 	} else {
 		// restore attribute values
 		for (var i in attributes) {
@@ -455,6 +471,7 @@ $("#xp").change(function(){
 			var attribute_pts = $("#attribute_pts").val() == undefined || $("#attribute_pts").val() == "" ? 
 				0 : parseInt($("#attribute_pts").val());
 			$("#attribute_pts").val(attribute_pts+12+innovation_mod);
+			$("#attribute_pts_span").removeClass("disabled");
 			// update next_level in xp modal
 			var current_xp = $(this).val();
 			var next_level = 0;
@@ -1858,6 +1875,20 @@ function addProtectionElements(name, bonus, notes, weight, is_equipped, id) {
 	// enable label highlighting
 	enableHighlighting();
 	enableHiddenNumbers();
+
+	// prompt user to equip new protection
+	if (id == "") {
+		var conf = confirm("Do you want to equip your new protection, "+name+"?");
+		if (conf) {
+			// equip item
+			$("#"+id_val+"_equip_ban").toggle();
+			equipped.push(name);
+			$("#"+id_val+"_equipped").val(true);
+			var protection = {'name':name, 'bonus':bonus}
+			protections.push(protection);
+			setToughness();
+		}
+	}
 
 }
 

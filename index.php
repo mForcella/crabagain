@@ -8,7 +8,7 @@
 	// check for campaign parameter in url
 	if (!isset($_GET["campaign"])) {
 		// redirect to campaign select page
-		header('Location: /set_campaign.php');
+		header('Location: /select_campaign.php');
 	}
 
 	// get user list for dropdown nav
@@ -132,7 +132,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;1,400;1,600&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
 	<!-- Custom Styles -->
-	<link rel="stylesheet" type="text/css" href="/assets/style_v22_07_06.css">
+	<link rel="stylesheet" type="text/css" href="/assets/style_v22_07_08.css">
 
 </head>
 
@@ -149,7 +149,7 @@
 	       <span class="glyphicon" onclick="formSubmit()"><span class="nav-item-label"><i class="fa-solid fa-floppy-disk nav-icon"></i> Save Character Data</span></span>
 	    </div>
 	    <div class="nav-item">
-	       <span class="glyphicon" onclick="allocateAttributePts()"><span class="nav-item-label"><i class="fa-solid fa-shield-heart nav-icon"></i> Allocate Attribute Points</span></span>
+	       <span id="attribute_pts_span" class="glyphicon <?php echo isset($user) && $user['attribute_pts'] == 0 ? 'disabled' : ''; ?>" onclick="allocateAttributePts(this)"><span class="nav-item-label"><i class="fa-solid fa-shield-heart nav-icon"></i> Allocate Attribute Points</span></span>
 	    </div>
 	    <?php
 	    	if (isset($user)) {
@@ -241,7 +241,7 @@
 						<!-- readonly, unless new character -->
 						<label class="control-label col-sm-4 col-xs-4 smaller" for="attribute_pts">Attribute Pts</label>
 						<div class="col-sm-2 col-xs-8">
-							<input class="form-control" <?php echo isset($user) ? 'readonly' : 'type="number"' ?> id="attribute_pts" name="attribute_pts" value="<?php echo isset($user) ? htmlspecialchars($user['attribute_pts']) : 12 ?>">
+							<input class="form-control" <?php echo isset($user) ? 'readonly' : 'type="number"' ?> min="0" id="attribute_pts" name="attribute_pts" value="<?php echo isset($user) ? htmlspecialchars($user['attribute_pts']) : 12 ?>">
 						</div>
 					</div>
 					<div class="form-group">
@@ -1424,19 +1424,19 @@
         	<label class="control-label">Quantity</label>
         	<input class="form-control" type="text" id="weapon_qty">
         	<label class="control-label">Damage*</label>
-        	<input class="form-control" type="number" id="weapon_damage">
+        	<input class="form-control" type="number" min="0" id="weapon_damage">
         	<label class="control-label">Max Damage</label>
-        	<input class="form-control" type="number" id="weapon_max_damage">
+        	<input class="form-control" type="number" min="0" id="weapon_max_damage">
         	<label class="control-label">Range</label>
-        	<input class="form-control" type="number" id="weapon_range">
+        	<input class="form-control" type="number" min="0" id="weapon_range">
         	<label class="control-label">Rate of Fire</label>
         	<input class="form-control" type="text" id="weapon_rof">
         	<label class="control-label">Defend Bonus</label>
-        	<input class="form-control" type="number" id="weapon_defend">
+        	<input class="form-control" type="number" min="0" id="weapon_defend">
         	<label class="control-label">Other Notes</label>
         	<input class="form-control" type="text" id="weapon_notes">
         	<label class="control-label">Weight</label>
-        	<input class="form-control" type="number" id="weapon_weight">
+        	<input class="form-control" type="number" min="0" id="weapon_weight">
         	<input type="hidden" id="weapon_id">
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" onclick="newWeapon()">Ok</button>
@@ -1458,11 +1458,11 @@
         	<label class="control-label">Protection Name*</label>
         	<input class="form-control" type="text" id="protection_name">
         	<label class="control-label">Bonus</label>
-        	<input class="form-control" type="number" id="protection_bonus">
+        	<input class="form-control" type="number" min="0" id="protection_bonus">
         	<label class="control-label">Notes</label>
         	<input class="form-control" type="text" id="protection_notes">
         	<label class="control-label">Weight</label>
-        	<input class="form-control" type="number" id="protection_weight">
+        	<input class="form-control" type="number" min="0" id="protection_weight">
         	<input type="hidden" id="protection_id">
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" onclick="newProtection()">Ok</button>
@@ -1488,7 +1488,7 @@
         	<label class="control-label">Effect</label>
         	<input class="form-control" type="text" id="healing_effect">
         	<label class="control-label">Weight</label>
-        	<input class="form-control" type="number" id="healing_weight">
+        	<input class="form-control" type="number" min="0" id="healing_weight">
         	<input type="hidden" id="healing_id">
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" onclick="newHealing()">Ok</button>
@@ -1514,7 +1514,7 @@
         	<label class="control-label">Notes</label>
         	<input class="form-control" type="text" id="misc_notes">
         	<label class="control-label">Weight</label>
-        	<input class="form-control" type="number" id="misc_weight">
+        	<input class="form-control" type="number" min="0" id="misc_weight">
         	<input type="hidden" id="misc_id">
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" onclick="newMisc()">Ok</button>
@@ -1648,15 +1648,17 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 	<script src="/assets/feat_list_v22_06_22.js"></script>
-	<script src="/assets/script_v22_07_06.js"></script>
+	<script src="/assets/script_v22_07_08.js"></script>
 	<script type="text/javascript">
 
 		var keys = <?php echo json_encode($keys); ?>;
 
 		// check for user and set attributes
-		var user = <?php echo json_encode(isset($user) ? $user : []); ?>;
 		var campaign = <?php echo json_encode(isset($campaign) ? $campaign : []); ?>;
+		var user = <?php echo json_encode(isset($user) ? $user : []); ?>;
 		setAttributes(user);
+		
+		// character creation mode
 		if (user.length == 0) {
 			characterCreation = true;
 			// show new feat btn
