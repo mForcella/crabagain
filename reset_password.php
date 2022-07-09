@@ -28,7 +28,7 @@
 	<meta name="robots" content="noindex">
 	<meta property="og:image" content="https://crabagain.com/assets/image/treasure-header-desaturated.jpg">
 	<title>The Lost Password!</title>
-	<link rel="icon" type="image/png" href="/assets/image/favicon.ico"/>
+	<link rel="icon" type="image/png" href="/assets/image/favicon-pentacle.ico"/>
 
 	<!-- Bootstrap -->
 	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">

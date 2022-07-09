@@ -119,7 +119,7 @@
 	<meta name="robots" content="noindex">
 	<meta property="og:image" content="https://crabagain.com/assets/image/treasure-header-desaturated.jpg">
 	<title><?php echo $campaign['name'] ?>!</title>
-	<link rel="icon" type="image/png" href="/assets/image/favicon.ico"/>
+	<link rel="icon" type="image/png" href="/assets/image/favicon-pentacle.ico"/>
 
 	<!-- Bootstrap -->
 	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -1628,7 +1628,7 @@
         </div>
         <div class="modal-body">
         	<h4>Character Creation</h4>
-					<p>When creating a new character you will start with a default of 12 Attribute Points. This value is 'unlocked' during character creation, and can be adjusted based on any modifiers. Your Attribute Points can be allocated by selecting the <i>Allocate Attribute Points</i> option from the menu. Points will be automatically deducted as you increase attributes, and as feats and trainings are added. Your attributes and feats are also 'unlocked' during character creation, allowing you to add additional starting feats/traits and skills as needed. In order to save a newly created character, you will need to know the 'secret code.' If you don't know what it is, ask your GM. If they don't know it...find a new GM? You will also need to set a personal password when creating a new character, which you will need when updating your character in the future.</p>
+					<p>When creating a new character you will start with a default of 12 Attribute Points. This value is 'unlocked' during character creation, and can be adjusted based on any modifiers. Your Attribute Points can be allocated by selecting the <i>Allocate Attribute Points</i> option from the menu. Points will be automatically adjusted as you increase or decrease attributes, and as feats and trainings are added. Your attributes and feats are also 'unlocked' during character creation, allowing you to add additional starting feats/traits and skills as needed. In order to save a newly created character, you will need to know the 'secret code.' If you don't know what it is, ask your GM. If they don't know it...find a new GM? You will also need to set a personal password when creating a new character, which you will need when updating your character in the future.</p>
 					<h4>Adding XP & Allocating Attribute Points</h4>
 					<p>Once your character has been saved, all of your attribute values, skills, and feats will be locked. The only way to modify your attributes is by accruing and allocating Attribute Points. As you add XP, your level will be automatically adjusted, and as you gain levels, Attribute Points will automatically be added. These Attribute Points can then be allocated via the <i>Allocate Attribute Points</i> option. Attributes can only be raised by one point per allocation, and only one unique skill or feat, as well as one focus or training, can be added per allocation. Attribute points will be automatically deducted. If additional modifications need to be made to attributes, skills or feats, this will need to be done through the <i>GM Edit Mode</i>.</p>
 					<h4>GM Edit Mode</h4>

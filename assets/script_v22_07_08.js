@@ -275,12 +275,6 @@ function allocateAttributePts(e) {
 		return;
 	}
 
-	// check if we have points to allocate
-	if ($("#attribute_pts").val() == "" || parseInt($("#attribute_pts").val()) == 0) {
-		alert("No attribute points to allocate.");
-		return;
-	}
-
 	// show hidden attribute icons
 	$(".attribute-col").find(".hidden-icon").each(function(){
 		// don't show remove buttons
@@ -415,7 +409,8 @@ $(".motivator-pts").on("input", function(){
 });
 
 // on xp change, adjust level
-$("#xp").change(function(){
+$("#xp").change(function() {
+	// TODO check for possibility of gaining multiple levels?
 	var levels = [];
 	var xp_total = 0;
 	for (var i = 1; i <= 25; i++) {
