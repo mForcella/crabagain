@@ -347,7 +347,7 @@
 
 							<div class="col-sm-4">
 								<div class="form-group">
-									<label class="control-label col-md-12 center full-width" for="weapon_1">Weapon 1<span class="glyphicon glyphicon-chevron-down" id="weapon_1" onclick="toggleWeapon('weapon_1', this)"></span></label>
+									<label class="control-label col-md-12 center full-width" for="weapon_1">Weapon 1<span class="glyphicon glyphicon-chevron-down" id="weapon_1" onclick="toggleWeapon(this.id, this)"></span></label>
 									<div class="col-md-12">
 										<select class="form-control weapon-select" id="weapon_select_1" name="weapon_1" onchange="selectWeapon(1)">
 											<option></option>
@@ -389,7 +389,7 @@
 
 							<div class="col-sm-4">
 								<div class="form-group">
-									<label class="control-label col-md-12 center full-width" for="weapon_2">Weapon 2<span class="glyphicon glyphicon-chevron-down" id="weapon_2" onclick="toggleWeapon('weapon_2', this)"></span></label>
+									<label class="control-label col-md-12 center full-width" for="weapon_2">Weapon 2<span class="glyphicon glyphicon-chevron-down" id="weapon_2" onclick="toggleWeapon(this.id, this)"></span></label>
 									<div class="col-md-12">
 										<select class="form-control weapon-select" id="weapon_select_2" name="weapon_2" onchange="selectWeapon(2)">
 											<option></option>
@@ -431,7 +431,7 @@
 
 							<div class="col-sm-4">
 								<div class="form-group">
-									<label class="control-label col-md-12 center full-width" for="weapon_3">Weapon 3<span class="glyphicon glyphicon-chevron-down" id="weapon_3" onclick="toggleWeapon('weapon_3', this)"></span></label>
+									<label class="control-label col-md-12 center full-width" for="weapon_3">Weapon 3<span class="glyphicon glyphicon-chevron-down" id="weapon_3" onclick="toggleWeapon(this.id, this)"></span></label>
 									<div class="col-md-12">
 										<select class="form-control weapon-select" id="weapon_select_3" name="weapon_3" onchange="selectWeapon(3)">
 											<option></option>
@@ -1648,7 +1648,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 	<script src="/assets/feat_list_v22_06_22.js"></script>
-	<script src="/assets/script_v22_07_08.js"></script>
+	<script src="/assets/script_v22_07_11.js"></script>
 	<script type="text/javascript">
 
 		var keys = <?php echo json_encode($keys); ?>;
@@ -1695,7 +1695,18 @@
 		}
 		// trigger select weapon functions to update inputs and defend value
 		$(".weapon-select").each(function(){
-			$(this).trigger("change");
+			if ($(this).val() != '') {
+				$(this).trigger("change");
+				var name_val = $(this).attr("name");
+				// if weapon is selected, expand hidden elements (mobile only)
+				if (is_mobile) {
+					$(".glyphicon-chevron-down").each(function() {
+						if (this.id == name_val) {
+							toggleWeapon(this.id,this);
+						}
+					});
+				}
+			}
 		});
 
 		// check for user protections

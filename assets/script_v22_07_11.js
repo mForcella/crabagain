@@ -410,7 +410,6 @@ $(".motivator-pts").on("input", function(){
 
 // on xp change, adjust level
 $("#xp").change(function() {
-	// TODO check for possibility of gaining multiple levels?
 	var levels = [];
 	var xp_total = 0;
 	for (var i = 1; i <= 25; i++) {
@@ -465,7 +464,7 @@ $("#xp").change(function() {
 			var innovation_mod = innovation_val > 0 ? Math.floor(innovation_val/2) : 0;
 			var attribute_pts = $("#attribute_pts").val() == undefined || $("#attribute_pts").val() == "" ? 
 				0 : parseInt($("#attribute_pts").val());
-			$("#attribute_pts").val(attribute_pts+12+innovation_mod);
+			$("#attribute_pts").val(attribute_pts + ( (12 + innovation_mod) * (level - current) ));
 			$("#attribute_pts_span").removeClass("disabled");
 			// update next_level in xp modal
 			var current_xp = $(this).val();
@@ -956,6 +955,7 @@ function adjustAttribute(attribute, val) {
 			$("#standard").val(standard);
 			var quick = newVal >= 0 ? (Math.floor(newVal/2) % 2 == 0 ? 0 : 1) : (Math.ceil(newVal/3) % 2 == 0 ? 0 : 1);
 			$("#quick").val(quick);
+			adjustInitiative();
 			break;
 		case 'agility':
 			// adjust dodge and defend
@@ -985,6 +985,7 @@ function adjustAttribute(attribute, val) {
 			// adjust initiative
 			var initiative = newVal >= 0 ? 10 - Math.floor(newVal/2) : 10 - Math.ceil(newVal/3);
 			$("#initiative").val(initiative);
+			adjustInitiative();
 			break;
 	}
 }
@@ -1842,7 +1843,7 @@ function addProtectionElements(name, bonus, notes, weight, is_equipped, id) {
 			setToughness();
 		}
 	});
-	// TODO toggle icon on hover?
+	// to toggle ban icon on hover...
 	// $(div3).hover(function(){
 	// 	$("#"+id_val+"_equip_ban").toggle();
 	// },
