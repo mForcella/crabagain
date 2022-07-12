@@ -24,6 +24,8 @@ var focus_id = "";
 // equipped protections
 var protections;
 var equipped = [];
+// user feat list - determines which feats are shown in the autocomplete list
+var user_feats = [];
 
 var attributes = [
 	'strength',
@@ -705,26 +707,10 @@ $(".weapon-name").each(function(){
 	});
 });
 
-// set attribute values on page load
-function setAttributes(user) {
-	for (var i in attributes) {
-		if (user[attributes[i]] != undefined) {
-			$("#"+attributes[i]+"_text").html(user[attributes[i]] >= 0 ? "+"+user[attributes[i]] : user[attributes[i]]);
-			$("#"+attributes[i]+"_val").val(user[[attributes[i]]]);
-		} else {
-			$("#"+attributes[i]+"_text").html("+0");
-			$("#"+attributes[i]+"_val").val(0);
-		}
-	}
-	// set morale effect from morale
-	if (user['morale'] != null) {
-		setMoraleEffect(parseInt(user['morale']));
-	}
-	// set size text
-	editSize();
-	// set initiative
-	adjustInitiative();
-
+// set feats as eligible/ineligible and set autocomplete list
+function setFeatList() {
+	eligible_feats = [];
+	ineligible_feats = [];
 	// set autocomplete list for feats
 	$.each(feat_list, function(i, feat) {
 		var is_eligible = true;
@@ -771,6 +757,7 @@ function setAttributes(user) {
 	}
 	list2.sort();
 	var list = list1.concat(list2);
+
 	$("#feat_name").autocomplete({
 		source: function(input, add) {
 			var suggestions = [];
@@ -795,7 +782,17 @@ function setAttributes(user) {
 							});
 						}
 	 				});
-					suggestions.push(entry);
+	 				// check if user is already trained in the feat
+	 				var found = false;
+	 				for (var i in user_feats) {
+	 					if (user_feats[i]['name'] == entry['value']) {
+	 						found = true;
+	 						break;
+	 					}
+	 				}
+	 				if (!found) {
+						suggestions.push(entry);
+	 				}
 				}
 			});
 			add(suggestions);
@@ -859,6 +856,29 @@ function setAttributes(user) {
 			}
 		}
 	});
+}
+
+// set attribute values on page load
+function setAttributes(user) {
+	for (var i in attributes) {
+		if (user[attributes[i]] != undefined) {
+			$("#"+attributes[i]+"_text").html(user[attributes[i]] >= 0 ? "+"+user[attributes[i]] : user[attributes[i]]);
+			$("#"+attributes[i]+"_val").val(user[[attributes[i]]]);
+		} else {
+			$("#"+attributes[i]+"_text").html("+0");
+			$("#"+attributes[i]+"_val").val(0);
+		}
+	}
+	// set morale effect from morale
+	if (user['morale'] != null) {
+		setMoraleEffect(parseInt(user['morale']));
+	}
+	// set size text
+	editSize();
+	// set initiative
+	adjustInitiative();
+	// set feat list
+	setFeatList();
 }
 
 function setMoraleEffect(morale) {
@@ -988,6 +1008,8 @@ function adjustAttribute(attribute, val) {
 			adjustInitiative();
 			break;
 	}
+	// adjust eligibility of feat list
+	setFeatList();
 }
 
 // show all icons for editing attribute values
@@ -1145,6 +1167,7 @@ function addFeatElements(featName, featDescription, id) {
 		}
 
 		featNames.push(featName);
+		user_feats.push({"name":featName});
 		var feat_container = createElement('div', 'feat', '#feats', id_val);
 		if (allocatingAttributePts) {
 			feats.push(feat_container);
@@ -1190,6 +1213,12 @@ function addFeatElements(featName, featDescription, id) {
 				var index = featNames.indexOf(featName);
 				if (index !== -1) {
 				  featNames.splice(index, 1);
+				}
+				for (var i in user_feats) {
+					if (user_feats[i]['name'] == featName) {
+					  user_feats.splice(i, 1);
+					  break;
+					}
 				}
 	    	// if allocating attribute points, increase points
 	    	if (allocatingAttributePts) {

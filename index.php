@@ -1648,7 +1648,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 	<script src="/assets/feat_list_v22_06_22.js"></script>
-	<script src="/assets/script_v22_07_11.js"></script>
+	<script src="/assets/script_v22_07_12.js"></script>
 	<script type="text/javascript">
 
 		var keys = <?php echo json_encode($keys); ?>;
@@ -1677,9 +1677,9 @@
 		}
 
 		// check for user feats
-		var feats = <?php echo json_encode($feats); ?>;
-		for (var i in feats) {
-			addFeatElements(feats[i]['name'], feats[i]['description'], feats[i]['id']);
+		user_feats = <?php echo json_encode($feats); ?>;
+		for (var i in user_feats) {
+			addFeatElements(user_feats[i]['name'], user_feats[i]['description'], user_feats[i]['id']);
 		}
 
 		// check for user trainings
