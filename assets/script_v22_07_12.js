@@ -785,7 +785,7 @@ function setFeatList() {
 	 				// check if user is already trained in the feat
 	 				var found = false;
 	 				for (var i in user_feats) {
-	 					if (user_feats[i]['name'] == entry['value']) {
+	 					if (user_feats[i]['name'].toLowerCase() == entry['value'].toLowerCase()) {
 	 						found = true;
 	 						break;
 	 					}
@@ -2185,6 +2185,26 @@ function enableHiddenNumbers() {
 				$(this).attr("type", "number");
 			});
 		}
+	});
+}
+
+function submitSuggestion() {
+	// check nerd word value
+	if ($("#nerd_word").val().toLowerCase() != keys['nerd_test']) {
+		alert("That's not the secret word, nerd");
+		return;
+	}
+	// submit suggestion
+	$.ajax({
+	  url: 'submit_suggestion.php',
+	  data: { 'message' : $("#suggestion").val() },
+	  ContentType: "application/json",
+	  type: 'POST',
+	  success: function(response){
+	  	if (response == 'ok') {
+	  		alert("Thanks for your suggestion! I'm sure someone is hard at work to address your concern.");
+	  	}
+	  }
 	});
 }
 

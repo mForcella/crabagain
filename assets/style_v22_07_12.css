@@ -268,6 +268,33 @@ h1 {
 .full-width {
 	width: 100%;
 }
+.footer {
+	padding: 0 5%;
+	margin-top: 30px;
+	display: flex;
+	justify-content: space-between;
+	background-color: #8c8c8c;
+	color: white;
+}
+.footer p {
+	display: inline-block;
+	padding: 10px 30px;
+	padding-bottom: 0;
+	text-align: center;
+}
+.footer .link {
+	cursor: pointer;
+}
+@media screen and (max-width:767px) {
+	.footer {
+		padding: 0;
+	}
+	.footer p {
+		padding: 10px 5px;
+		padding-bottom: 5px;
+		font-size: 0.9em;
+	}
+}
 .glyphicon {
 	line-height: 0.5;
 }

@@ -132,7 +132,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;1,400;1,600&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
 	<!-- Custom Styles -->
-	<link rel="stylesheet" type="text/css" href="/assets/style_v22_07_08.css">
+	<link rel="stylesheet" type="text/css" href="/assets/style_v22_07_12.css">
 
 </head>
 
@@ -1619,6 +1619,44 @@
     </div>
   </div>
 
+	<!-- suggestion modal -->
+  <div class="modal" id="suggestion_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">The Suggestion Box</h4>
+        </div>
+        <div class="modal-body">
+        	<h5 class="center">Got a suggestion for us? Something we can do better? Something not working right? Let us know!</h5>
+        	<textarea class="form-control" id="suggestion" rows="6"></textarea>
+        	<div class="button-bar">
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#suggestion_modal2">Next</button>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+	<!-- suggestion modal 2 -->
+  <div class="modal" id="suggestion_modal2" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">The Suggestion Box</h4>
+        </div>
+        <div class="modal-body">
+        	<h5 class="center">What's the secret nerd word?</h5>
+        	<input class="form-control" type="text" id="nerd_word">
+        	<div class="button-bar">
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="submitSuggestion()">Submit</button>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 	<!-- help modal -->
   <div class="modal" id="help_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-md modal-dialog-centered" role="document">
@@ -1639,6 +1677,13 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- footer -->
+  <div class="footer row">
+  	<p class="link col-md-4" data-toggle="modal" data-target="#help_modal"><span class="glyphicon glyphicon-info-sign"></span> Guide</p>
+  	<p class="link col-md-4" data-toggle="modal" data-target="#suggestion_modal"><span class="glyphicon glyphicon-envelope"></span> Suggestion Box</p>
+  	<p class=" col-md-4">© <?php echo date("Y"); ?> CrabAgain.com</p>
   </div>
 
 	<!-- JavaScript -->
