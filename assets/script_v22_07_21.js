@@ -500,12 +500,13 @@ $("#damage").on("change", function() {
 function editSize() {
 	// set size text
 	var size = $("#character_size_select").val();
+	user['size'] = size;
 	var size_text = size == "Small" ? "Small; +2 Defend/Dodge/Stealth, -0.5 Move" : (size == "Large" ? "Large; -2 Defend/Dodge/Stealth, +0.5 Move" : size)
 	$("#character_size_text").html(size_text);
 	$("#character_size_val").val(size);
-	$("#move").val(size == "Small" ? 0.5 : (size == "Large" ? 1.5 : 1));
 	setDodge();
 	setDefend();
+	updateTotalWeight();
 }
 
 function setDodge() {
@@ -2124,6 +2125,43 @@ function updateTotalWeight() {
 		totalWeight += parseFloat(qty) * parseFloat(wgt);
 	});
 	$("#total_weight").val(totalWeight.toFixed(1));
+
+	// highlight weight capacity and get base action/move values
+	var capacity = $("#overburdened").val();
+	$("#overburdened").removeClass("selected");
+	$("#burdened").removeClass("selected");
+	$("#encumbered").removeClass("selected");
+	$("#unhindered").removeClass("selected");
+	var speed = user['speed'] == undefined ? 0 : user['speed'];
+	var standard = speed >= 0 ? (1 + Math.floor(speed/4)) : (1 + Math.round(speed/6));
+	var quick = speed >= 0 ? (speed/2 % 2 == 0 ? 0 : 1) : (Math.ceil(speed/3) % 2 == 0 ? 0 : 1);
+	var move = user['size'] == undefined ? 1 : (user['size'] == "Small" ? 0.5 : (user['size'] == "Large" ? 1.5 : 1));
+
+	// adjust action/move values
+	if (parseInt(totalWeight) < capacity/4) {
+		// unhindered, no modification to actions
+		$("#unhindered").addClass("selected");
+	} else if (parseInt(totalWeight) < capacity/2) {
+		// encumbered, -1 QA
+		$("#encumbered").addClass("selected");
+		standard = quick == 0 ? standard - 1 : standard;
+		quick = quick == 0 ? 1 : 0;
+	} else if (parseInt(totalWeight) < capacity/4*3) {
+		// burdened, -1 QA, -0.5 Move
+		$("#burdened").addClass("selected");
+		standard = quick == 0 ? standard - 1 : standard;
+		quick = quick == 0 ? 1 : 0;
+		move = move >= 0.5 ? move - 0.5 : 0;
+	} else {
+		// overburdened, -1 QA, -1 Move
+		$("#overburdened").addClass("selected");
+		standard = quick == 0 ? standard - 1 : standard;
+		quick = quick == 0 ? 1 : 0;
+		move = move >= 1 ? move - 1 : 0;
+	}
+	$("#standard").val(standard);
+	$("#quick").val(quick);
+	$("#move").val(move);
 }
 
 function enableHighlighting() {

@@ -615,8 +615,20 @@ select.form-control {
 		padding-right: 0;
 	}
 }
+.selected {
+	border: 2px solid red;
+	box-shadow: 0px 0px 3px red;
+}
 .tiny {
 	font-size: 0.3em;
+}
+@media screen and (max-width:767px) {
+	.col-xs-2.total-weight {
+		width: 25%;
+	}
+	.col-xs-10.total-weight {
+		width: 75%;
+	}
 }
 .training {
 	font-style: italic;

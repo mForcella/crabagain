@@ -132,7 +132,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;1,400;1,600&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
 	<!-- Custom Styles -->
-	<link rel="stylesheet" type="text/css" href="/assets/style_v22_07_12.css">
+	<link rel="stylesheet" type="text/css" href="/assets/style_v22_07_21.css">
 
 </head>
 
@@ -1164,8 +1164,8 @@
 			<div class="col-md-12">
 				<div class="section form-horizontal">
 					<div class="form-group">
-						<label class="control-label col-xs-10 align-right" for="total_weight">Total Weight</label>
-						<div class="col-xs-2">
+						<label class="control-label col-xs-10 total-weight align-right" for="total_weight">Total Weight</label>
+						<div class="col-xs-2 total-weight">
 							<input class="form-control" readonly id="total_weight" name="total_weight" value="0">
 						</div>
 					</div>
@@ -1693,7 +1693,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 	<script src="/assets/feat_list_v22_06_22.js"></script>
-	<script src="/assets/script_v22_07_12.js"></script>
+	<script src="/assets/script_v22_07_21.js"></script>
 	<script type="text/javascript">
 
 		var keys = <?php echo json_encode($keys); ?>;
