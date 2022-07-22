@@ -26,6 +26,8 @@ var protections;
 var equipped = [];
 // user feat list - determines which feats are shown in the autocomplete list
 var user_feats = [];
+// show encumbered alert
+var alertShown = false;
 
 var attributes = [
 	'strength',
@@ -972,11 +974,12 @@ function adjustAttribute(attribute, val) {
 			break;
 		case 'speed':
 			// adjust standard and quick actions
-			var standard = newVal >=0 ? 1 + Math.floor(newVal/4) : 1 - Math.round(-1*newVal/6);
-			$("#standard").val(standard);
-			var quick = newVal >= 0 ? (Math.floor(newVal/2) % 2 == 0 ? 0 : 1) : (Math.ceil(newVal/3) % 2 == 0 ? 0 : 1);
-			$("#quick").val(quick);
+			// var standard = newVal >=0 ? 1 + Math.floor(newVal/4) : 1 - Math.round(-1*newVal/6);
+			// $("#standard").val(standard);
+			// var quick = newVal >= 0 ? (Math.floor(newVal/2) % 2 == 0 ? 0 : 1) : (Math.ceil(newVal/3) % 2 == 0 ? 0 : 1);
+			// $("#quick").val(quick);
 			adjustInitiative();
+			updateTotalWeight();
 			break;
 		case 'agility':
 			// adjust dodge and defend
@@ -1562,7 +1565,7 @@ function newWeapon() {
 		$("#"+weapon_id+"_rof").val(rof);
 		$("#"+weapon_id+"_defend").val(defend);
 		$("#"+weapon_id+"_qty").val(qty);
-		updateTotalWeight();
+		updateTotalWeight(true);
 		// check if this weapon is selected - update stats
 		for (var i in weapons) {
 			if (weapons[i]['name'] == originalName) {
@@ -1624,7 +1627,7 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 	createInput('', 'hidden', 'weapon_rof[]', rof, div5, id_val+"_rof");
 	createInput('', 'hidden', 'weapon_defend[]', defend, div5, id_val+"_defend");
 	createInput('', 'hidden', 'weapon_ids[]', id, div5);
-	updateTotalWeight();
+	updateTotalWeight(true);
 
 	// add click and hover functions
 	name_input.attr("readonly", true);
@@ -1803,7 +1806,7 @@ function newProtection() {
 				setDefend();
 			}
 		}
-		updateTotalWeight();
+		updateTotalWeight(true);
 	} else {
 		addProtectionElements(name, bonus, notes, weight, false, '');
 		// update protections array
@@ -1829,7 +1832,7 @@ function addProtectionElements(name, bonus, notes, weight, is_equipped, id) {
 	var notes_input = createInput('', 'text', 'protection_notes[]', notes, div4, id_val+"_notes");
 	var weight_input = createInput('wgt', 'text', 'protection_weight[]', weight, div5, id_val+"_weight");
 	createInput('', 'hidden', 'protection_ids[]', id, div6);
-	updateTotalWeight();
+	updateTotalWeight(true);
 
 	name_input.attr("readonly", true);
 	bonus_input.attr("readonly", true);
@@ -1950,7 +1953,7 @@ function newHealing() {
 		$("#"+healing_id+"_quantity").val(quantity);
 		$("#"+healing_id+"_effect").val(effect);
 		$("#"+healing_id+"_weight").val(weight);
-		updateTotalWeight();
+		updateTotalWeight(true);
 	} else {
 		addHealingElements(name, quantity, effect, weight, '');
 	}
@@ -1972,7 +1975,7 @@ function addHealingElements(name, quantity, effect, weight, id) {
 	var effect_input = createInput('', 'text', 'healing_effect[]', effect, div3, id_val+"_effect");
 	var weight_input = createInput('wgt', 'text', 'healing_weight[]', weight, div4, id_val+"_weight");
 	createInput('', 'hidden', 'healing_ids[]', id, div4);
-	updateTotalWeight();
+	updateTotalWeight(true);
 
 	name_input.attr("readonly", true);
 	qty_input.attr("readonly", true);
@@ -2040,7 +2043,7 @@ function newMisc() {
 		$("#"+misc_id+"_quantity").val(quantity);
 		$("#"+misc_id+"_notes").val(notes);
 		$("#"+misc_id+"_weight").val(weight);
-		updateTotalWeight();
+		updateTotalWeight(true);
 	} else {
 		addMiscElements(name, quantity, notes, weight, '');
 	}
@@ -2062,7 +2065,7 @@ function addMiscElements(name, quantity, notes, weight, id) {
 	var notes_input = createInput('', 'text', 'misc_notes[]', notes, div3, id_val+"_notes");
 	var weight_input = createInput('wgt', 'text', 'misc_weight[]', weight, div4, id_val+"_weight");
 	createInput('', 'hidden', 'misc_ids[]', id, div4);
-	updateTotalWeight();
+	updateTotalWeight(true);
 
 	name_input.attr("readonly", true);
 	qty_input.attr("readonly", true);
@@ -2110,7 +2113,7 @@ function editMisc(misc_id, input_id) {
 	$("#new_misc_modal").modal("show");
 }
 
-function updateTotalWeight() {
+function updateTotalWeight(showMsg = false) {
 	var totalWeight = 0
 	// find all wgt inputs
 	$(".item").each(function(){
@@ -2133,11 +2136,12 @@ function updateTotalWeight() {
 	$("#encumbered").removeClass("selected");
 	$("#unhindered").removeClass("selected");
 	var speed = user['speed'] == undefined ? 0 : user['speed'];
-	var standard = speed >= 0 ? (1 + Math.floor(speed/4)) : (1 + Math.round(speed/6));
-	var quick = speed >= 0 ? (speed/2 % 2 == 0 ? 0 : 1) : (Math.ceil(speed/3) % 2 == 0 ? 0 : 1);
+	var standard = speed >=0 ? 1 + Math.floor(speed/4) : 1 - Math.round(-1*speed/6);
+	var quick = speed >= 0 ? (Math.floor(speed/2) % 2 == 0 ? 0 : 1) : (Math.ceil(speed/3) % 2 == 0 ? 0 : 1);
 	var move = user['size'] == undefined ? 1 : (user['size'] == "Small" ? 0.5 : (user['size'] == "Large" ? 1.5 : 1));
 
 	// adjust action/move values
+	var encumbered = false;
 	if (parseInt(totalWeight) < capacity/4) {
 		// unhindered, no modification to actions
 		$("#unhindered").addClass("selected");
@@ -2146,22 +2150,36 @@ function updateTotalWeight() {
 		$("#encumbered").addClass("selected");
 		standard = quick == 0 ? standard - 1 : standard;
 		quick = quick == 0 ? 1 : 0;
+		var msg = "You are encumbered (-1 QA). Reduce item weight to remove penalty.";
+		encumbered = true;
 	} else if (parseInt(totalWeight) < capacity/4*3) {
 		// burdened, -1 QA, -0.5 Move
 		$("#burdened").addClass("selected");
 		standard = quick == 0 ? standard - 1 : standard;
 		quick = quick == 0 ? 1 : 0;
 		move = move >= 0.5 ? move - 0.5 : 0;
+		var msg = "You are burdened (-1 QA, -0.5 Move). Reduce item weight to remove penalty.";
+		encumbered = true;
 	} else {
 		// overburdened, -1 QA, -1 Move
 		$("#overburdened").addClass("selected");
 		standard = quick == 0 ? standard - 1 : standard;
 		quick = quick == 0 ? 1 : 0;
 		move = move >= 1 ? move - 1 : 0;
+		var msg = "You are overburdened (-1 QA, -1 Move). Reduce item weight to remove penalty.";
+		encumbered = true;
 	}
 	$("#standard").val(standard);
 	$("#quick").val(quick);
 	$("#move").val(move);
+
+	// if we are adding or editing items, show alert if character is encumbered
+	if (showMsg && encumbered && !alertShown) {
+		alert(msg);
+		alertShown = true;
+	} else if (!encumbered) {
+		alertShown = false;
+	}
 }
 
 function enableHighlighting() {
