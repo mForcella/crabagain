@@ -98,6 +98,7 @@
     range_ float,
     rof varchar(64),
     defend int,
+    crit int,
     notes varchar(255),
     weight float,
     user_id int,

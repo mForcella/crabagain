@@ -27,7 +27,8 @@ var equipped = [];
 // user feat list - determines which feats are shown in the autocomplete list
 var user_feats = [];
 // show encumbered alert
-var alertShown = false;
+var loadingItems = false;
+var suppressAlerts = false;
 
 var attributes = [
 	'strength',
@@ -234,10 +235,13 @@ function selectWeapon(id) {
 			if (weapons[i]['name'] == selected) {
 				var damage = weapons[i]['damage'];
 				$("#weapon_damage_"+id).val(damage);
-				// look for crit modifiers - improved crit feat
+				// look for crit modifiers
 				var crit = 6;
+				if (weapons[i]['crit'] != null && weapons[i]['crit'] != '') {
+					crit -= parseInt(weapons[i]['crit']);
+				}
 				if (includesIgnoreCase(featNames, "improved critical hit")) {
-					crit = 5;
+					crit -= 1;
 				}
 				$("#weapon_crit_"+id).val(crit);
 				$("#weapon_range_"+id).val(weapons[i]['range_'] == null || weapons[i]['range_'] == "" ? "-" : weapons[i]['range_']);
@@ -607,6 +611,7 @@ $("#new_weapon_modal").on('hidden.bs.modal', function(){
 	$("#weapon_range").val("");
 	$("#weapon_rof").val("");
 	$("#weapon_defend").val("");
+	$("#weapon_crit").val("");
 	$("#weapon_notes").val("");
 	$("#weapon_weight").val("");
 	$("#weapon_qty").val("");
@@ -688,6 +693,13 @@ $("#new_training_modal").on('shown.bs.modal', function(){
 	// } else {
 	// 	$("#skill_type").hide();
 	// }
+});
+
+$("#encumbered_modal").on('hidden.bs.modal', function(){
+	// check if we should suppress encumbered alerts
+	if ($("#suppress_alert").is(":checked")) {
+		suppressAlerts = true;
+	}
 });
 
 // enable / disable password submit btn
@@ -973,11 +985,6 @@ function adjustAttribute(attribute, val) {
 			$("#damage").attr("max", resilience);
 			break;
 		case 'speed':
-			// adjust standard and quick actions
-			// var standard = newVal >=0 ? 1 + Math.floor(newVal/4) : 1 - Math.round(-1*newVal/6);
-			// $("#standard").val(standard);
-			// var quick = newVal >= 0 ? (Math.floor(newVal/2) % 2 == 0 ? 0 : 1) : (Math.ceil(newVal/3) % 2 == 0 ? 0 : 1);
-			// $("#quick").val(quick);
 			adjustInitiative();
 			updateTotalWeight();
 			break;
@@ -1533,6 +1540,7 @@ function newWeapon() {
 	var range = $("#weapon_range").val();
 	var rof = $("#weapon_rof").val();
 	var defend = $("#weapon_defend").val();
+	var crit = $("#weapon_crit").val();
 	var notes = $("#weapon_notes").val();
 	var weight = $("#weapon_weight").val() == "" ? 0 : $("#weapon_weight").val();
 	var qty = $("#weapon_qty").val() == "" ? 1 : $("#weapon_qty").val();
@@ -1559,11 +1567,13 @@ function newWeapon() {
 		noteMod += range != "" ? "Range: "+range+"; " : "";
 		noteMod += rof != "" ? "RoF: "+rof+"; " : "";
 		noteMod += defend != "" ? "+"+defend+" Defend; " : "";
+		noteMod += crit != "" ? "+"+crit+" Critical Threat Range; " : "";
 		$("#"+weapon_id+"_notes").val(noteMod+notes);
 		$("#"+weapon_id+"_notes_val").val(notes);
 		$("#"+weapon_id+"_range").val(range);
 		$("#"+weapon_id+"_rof").val(rof);
 		$("#"+weapon_id+"_defend").val(defend);
+		$("#"+weapon_id+"_crit").val(crit);
 		$("#"+weapon_id+"_qty").val(qty);
 		updateTotalWeight(true);
 		// check if this weapon is selected - update stats
@@ -1573,6 +1583,7 @@ function newWeapon() {
 					if ($(this).val() == originalName) {
 						weapons[i]['damage'] = damage;
 						weapons[i]['defend'] = defend;
+						weapons[i]['crit'] = crit;
 						weapons[i]['max_damage'] = max_damage;
 						weapons[i]['quantity'] = qty;
 						weapons[i]['name'] = name;
@@ -1591,12 +1602,12 @@ function newWeapon() {
 			}
 		}
 	} else {
-		addWeaponElements(type, name, 1, damage, max_damage, range, rof, defend, notes, weight, '');
+		addWeaponElements(type, name, 1, damage, max_damage, range, rof, defend, crit, notes, weight, '');
 	}
 }
 
 // create html elements for weapon
-function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defend, notes, weight, id) {
+function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defend, crit, notes, weight, id) {
 	var id_val = id == "" ? uuid() : "weapon_"+id;
 
 	var div = createElement('div', 'form-group item', '#weapons', id_val);
@@ -1617,6 +1628,7 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 	noteMod += range != null && range != "" ? "Range: "+range+"; " : "";
 	noteMod += rof != null && rof != "" ? "RoF: "+rof+"; " : "";
 	noteMod += defend != null && defend != "" ? "+"+defend+" Defend; " : "";
+	noteMod += crit != null && crit != "" ? "+"+crit+" Critical Threat Range; " : "";
 	var note_input = createInput('', 'text', '', noteMod+notes, div4, id_val+"_notes");
 	var wgt_input = createInput('wgt', 'text', 'weapon_weight[]', weight, div5, id_val+"_weight");
 	createInput('', 'hidden', 'weapon_damage[]', damage, div5, id_val+"_damage_val");
@@ -1626,6 +1638,7 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 	createInput('', 'hidden', 'weapon_range[]', range, div5, id_val+"_range");
 	createInput('', 'hidden', 'weapon_rof[]', rof, div5, id_val+"_rof");
 	createInput('', 'hidden', 'weapon_defend[]', defend, div5, id_val+"_defend");
+	createInput('', 'hidden', 'weapon_crit[]', crit, div5, id_val+"_crit");
 	createInput('', 'hidden', 'weapon_ids[]', id, div5);
 	updateTotalWeight(true);
 
@@ -1645,10 +1658,10 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 		editWeapon(id_val, "damage");
 	});
 	note_input.click(function(){
-		// look for range, rof, and defend values
+		// look for range, rof, defend, and crit values
 		var note_val = note_input.val();
 		var focus = note_val.includes("Range") ? "range" : 
-			(note_val.includes("RoF") ? "rof" : (note_val.includes("Defend") ? "defend" : "notes"));
+			(note_val.includes("RoF") ? "rof" : (note_val.includes("Defend") ? "defend" : (note_val.includes("Critical") ? "crit" : "notes")));
 		editWeapon(id_val, focus);
 	});
 	wgt_input.click(function(){
@@ -1743,10 +1756,12 @@ function editWeapon(weapon_id, input_id) {
 	var range = $("#"+weapon_id+"_range").val();
 	var rof = $("#"+weapon_id+"_rof").val();
 	var defend = $("#"+weapon_id+"_defend").val();
+	var crit = $("#"+weapon_id+"_crit").val();
 	var notes = $("#"+weapon_id+"_notes").val();
 	notes = range != "" ? notes.slice(notes.indexOf("; ")+2) : notes;
 	notes = rof != "" ? notes.slice(notes.indexOf("; ")+2) : notes;
 	notes = defend != "" ? notes.slice(notes.indexOf("; ")+2) : notes;
+	notes = crit != "" ? notes.slice(notes.indexOf("; ")+2) : notes;
 	// set modal values and launch
 	$("#weapon_modal_title").html("Edit Weapon");
 	$("#weapon_type").val($("#"+weapon_id+"_type").val());
@@ -1756,6 +1771,7 @@ function editWeapon(weapon_id, input_id) {
 	$("#weapon_range").val(range);
 	$("#weapon_rof").val(rof);
 	$("#weapon_defend").val(defend);
+	$("#weapon_crit").val(crit);
 	$("#weapon_qty").val($("#"+weapon_id+"_qty").val());
 	$("#weapon_notes").val(notes);
 	$("#weapon_weight").val($("#"+weapon_id+"_weight").val());
@@ -1820,8 +1836,8 @@ function addProtectionElements(name, bonus, notes, weight, is_equipped, id) {
 	var id_val = id == "" ? uuid() : "protection_"+id;
 
 	var div = createElement('div', 'form-group item', '#protections', id_val);
-	var div3 = createElement('div', 'col-xs-1 no-pad-mobile center', div);
-	var div1 = createElement('div', 'col-xs-3 no-pad-mobile', div);
+	var div3 = createElement('div', 'col-xs-1 no-pad-mobile col-icon', div);
+	var div1 = createElement('div', 'col-xs-3 no-pad-mobile col-icon-right', div);
 	var div2 = createElement('div', 'col-xs-1 no-pad-mobile', div);
 	var div4 = createElement('div', 'col-xs-5 no-pad-mobile', div);
 	var div5 = createElement('div', 'col-xs-1 no-pad-mobile', div);
@@ -1964,8 +1980,8 @@ function addHealingElements(name, quantity, effect, weight, id) {
 	var id_val = id == "" ? uuid() : "healing_"+id;
 
 	var div = createElement('div', 'form-group item', '#healings', id_val);
-	var div1 = createElement('div', 'col-xs-3 no-pad-mobile', div);
-	var div2 = createElement('div', 'col-xs-2 no-pad-mobile', div);
+	var div1 = createElement('div', 'col-xs-4 no-pad-mobile', div);
+	var div2 = createElement('div', 'col-xs-1 no-pad-mobile', div);
 	var div3 = createElement('div', 'col-xs-5 no-pad-mobile', div);
 	var div4 = createElement('div', 'col-xs-1 no-pad-mobile', div);
 	var div5 = createElement('div', 'col-xs-1 no-pad-mobile center', div);
@@ -2054,8 +2070,8 @@ function addMiscElements(name, quantity, notes, weight, id) {
 	var id_val = id == "" ? uuid() : "misc_"+id;
 
 	var div = createElement('div', 'form-group item', '#misc', id_val);
-	var div1 = createElement('div', 'col-xs-3 no-pad-mobile', div);
-	var div2 = createElement('div', 'col-xs-2 no-pad-mobile', div);
+	var div1 = createElement('div', 'col-xs-4 no-pad-mobile', div);
+	var div2 = createElement('div', 'col-xs-1 no-pad-mobile', div);
 	var div3 = createElement('div', 'col-xs-5 no-pad-mobile', div);
 	var div4 = createElement('div', 'col-xs-1 no-pad-mobile', div);
 	var div5 = createElement('div', 'col-xs-1 no-pad-mobile center', div);
@@ -2141,44 +2157,40 @@ function updateTotalWeight(showMsg = false) {
 	var move = user['size'] == undefined ? 1 : (user['size'] == "Small" ? 0.5 : (user['size'] == "Large" ? 1.5 : 1));
 
 	// adjust action/move values
-	var encumbered = false;
-	if (parseInt(totalWeight) < capacity/4) {
+	var msg = "";
+	if (parseInt(totalWeight) <= capacity/4) {
 		// unhindered, no modification to actions
 		$("#unhindered").addClass("selected");
-	} else if (parseInt(totalWeight) < capacity/2) {
+	} else if (parseInt(totalWeight) <= capacity/2) {
 		// encumbered, -1 QA
 		$("#encumbered").addClass("selected");
 		standard = quick == 0 ? standard - 1 : standard;
 		quick = quick == 0 ? 1 : 0;
-		var msg = "You are encumbered (-1 QA). Reduce item weight to remove penalty.";
-		encumbered = true;
-	} else if (parseInt(totalWeight) < capacity/4*3) {
+		msg = "You are encumbered (-1 QA).<br>Reduce item weight to remove penalty.";
+	} else if (parseInt(totalWeight) <= capacity/4*3) {
 		// burdened, -1 QA, -0.5 Move
 		$("#burdened").addClass("selected");
 		standard = quick == 0 ? standard - 1 : standard;
 		quick = quick == 0 ? 1 : 0;
 		move = move >= 0.5 ? move - 0.5 : 0;
-		var msg = "You are burdened (-1 QA, -0.5 Move). Reduce item weight to remove penalty.";
-		encumbered = true;
+		msg = "You are burdened (-1 QA, -0.5 Move).<br>Reduce item weight to remove penalty.";
 	} else {
 		// overburdened, -1 QA, -1 Move
 		$("#overburdened").addClass("selected");
 		standard = quick == 0 ? standard - 1 : standard;
 		quick = quick == 0 ? 1 : 0;
 		move = move >= 1 ? move - 1 : 0;
-		var msg = "You are overburdened (-1 QA, -1 Move). Reduce item weight to remove penalty.";
-		encumbered = true;
+		msg = "You are overburdened (-1 QA, -1 Move).<br>Reduce item weight to remove penalty.";
 	}
 	$("#standard").val(standard);
 	$("#quick").val(quick);
 	$("#move").val(move);
 
 	// if we are adding or editing items, show alert if character is encumbered
-	if (showMsg && encumbered && !alertShown) {
-		alert(msg);
-		alertShown = true;
-	} else if (!encumbered) {
-		alertShown = false;
+	var encumbered = parseInt(totalWeight) > capacity/4;
+	if (showMsg && encumbered && !loadingItems && !suppressAlerts) {
+		$("#encumbered_msg").html(msg);
+		$("#encumbered_modal").modal("show");
 	}
 }
 

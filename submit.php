@@ -170,6 +170,7 @@
 		$weapon_range = $_POST['weapon_range'];
 		$weapon_rof = $_POST['weapon_rof'];
 		$weapon_defend = $_POST['weapon_defend'];
+		$weapon_crit = $_POST['weapon_crit'];
 		$ids = $_POST['weapon_ids'];
 
 		// delete weapons not in ID list
@@ -181,12 +182,13 @@
 			$weapon_max_damage[$i] = empty($weapon_max_damage[$i]) ? "NULL" : $weapon_max_damage[$i];
 			$weapon_range[$i] = empty($weapon_range[$i]) ? "NULL" : $weapon_range[$i];
 			$weapon_defend[$i] = empty($weapon_defend[$i]) ? "NULL" : $weapon_defend[$i];
+			$weapon_crit[$i] = empty($weapon_crit[$i]) ? "NULL" : $weapon_crit[$i];
 
 			// update where ID not empty; insert new where ID empty
 			if ($ids[$i] == "") {
-				$sql = "INSERT INTO user_weapon (name, type, quantity, damage, max_damage, range_, rof, defend, notes, weight, user_id) VALUES ('".addslashes($weapons[$i])."', '".$weapon_type[$i]."', '".addslashes($weapon_qty[$i])."', ".$weapon_damage[$i].", ".$weapon_max_damage[$i].", ".$weapon_range[$i].", '".addslashes($weapon_rof[$i])."', ".$weapon_defend[$i].", '".addslashes($weapon_notes[$i])."', ".$weapon_weight[$i].", '".$user_id."')";
+				$sql = "INSERT INTO user_weapon (name, type, quantity, damage, max_damage, range_, rof, defend, crit, notes, weight, user_id) VALUES ('".addslashes($weapons[$i])."', '".$weapon_type[$i]."', '".addslashes($weapon_qty[$i])."', ".$weapon_damage[$i].", ".$weapon_max_damage[$i].", ".$weapon_range[$i].", '".addslashes($weapon_rof[$i])."', ".$weapon_defend[$i].", ".$weapon_crit[$i].", '".addslashes($weapon_notes[$i])."', ".$weapon_weight[$i].", '".$user_id."')";
 			} else {
-				$sql = "UPDATE user_weapon SET name = '".addslashes($weapons[$i])."', type = '".$weapon_type[$i]."', quantity = '".addslashes($weapon_qty[$i])."', damage = ".$weapon_damage[$i].", max_damage = ".$weapon_max_damage[$i].", range_ = ".$weapon_range[$i].", rof = '".addslashes($weapon_rof[$i])."', defend = ".$weapon_defend[$i].", notes = '".addslashes($weapon_notes[$i])."', weight = ".$weapon_weight[$i]." WHERE id = ".$ids[$i];
+				$sql = "UPDATE user_weapon SET name = '".addslashes($weapons[$i])."', type = '".$weapon_type[$i]."', quantity = '".addslashes($weapon_qty[$i])."', damage = ".$weapon_damage[$i].", max_damage = ".$weapon_max_damage[$i].", range_ = ".$weapon_range[$i].", rof = '".addslashes($weapon_rof[$i])."', defend = ".$weapon_defend[$i].", crit = ".$weapon_crit[$i].", notes = '".addslashes($weapon_notes[$i])."', weight = ".$weapon_weight[$i]." WHERE id = ".$ids[$i];
 			}
 			$db->query($sql);
 		}

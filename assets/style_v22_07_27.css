@@ -219,6 +219,12 @@ h1 {
 		padding-left: 15px;
 	}
 }
+.col-icon {
+	width: 4%;
+}
+.col-icon-right {
+	width: 29.3%;
+}
 .col-md-5.col-xs-4, .col-md-4.col-xs-4 {
 	padding: 0;
 }
@@ -519,7 +525,7 @@ h1 {
 		margin-right: 0 !important;
 	}
 }
-@media screen and (max-width:767px) {
+@media screen and (max-width:991px) {
 	.no-pad-mobile {
 		padding: 0 1px;
 	}
@@ -528,6 +534,9 @@ h1 {
 	}
 	.pad-left-mobile {
 		padding-left: 5px;
+	}
+	.item {
+		padding-left: 10px;
 	}
 }
 #notes li {
@@ -615,7 +624,19 @@ select.form-control {
 		padding-right: 0;
 	}
 }
-.selected {
+#unhindered.selected {
+	border: 2px solid green;
+	box-shadow: 0px 0px 3px green;
+}
+#encumbered.selected {
+	border: 2px solid yellow;
+	box-shadow: 0px 0px 3px yellow;
+}
+#burdened.selected {
+	border: 2px solid orange;
+	box-shadow: 0px 0px 3px orange;
+}
+#overburdened.selected {
 	border: 2px solid red;
 	box-shadow: 0px 0px 3px red;
 }

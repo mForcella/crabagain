@@ -132,7 +132,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;1,400;1,600&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
 	<!-- Custom Styles -->
-	<link rel="stylesheet" type="text/css" href="/assets/style_v22_07_21.css">
+	<link rel="stylesheet" type="text/css" href="/assets/style_v22_07_27.css">
 
 </head>
 
@@ -1113,8 +1113,8 @@
 				<div class="section form-horizontal">
 					<div class="section-title"><span>Protection</span> <i class="fa-solid icon-protection custom-icon"></i></div>
 					<div class="form-group">
-						<label class="control-label col-xs-1 resize-mobile center" for="_eqip"></label>
-						<label class="control-label col-xs-3 resize-mobile center" for="protections[]">Item</label>
+						<label class="control-label col-xs-1 col-icon resize-mobile" for="_eqip"></label>
+						<label class="control-label col-xs-3 col-icon-right resize-mobile center" for="protections[]">Item</label>
 						<label class="control-label col-xs-1 resize-mobile center" for="protection_bonus[]">Bonus</label>
 						<label class="control-label col-xs-5 resize-mobile center" for="protection_notes[]">Notes</label>
 						<label class="control-label col-xs-1 resize-mobile center" for="protection_weight[]">Weight</label>
@@ -1131,8 +1131,8 @@
 				<div class="section form-horizontal">
 					<div class="section-title"><span>Healings, Potions, & Drugs</span> <i class="fa-solid fa-flask"></i></div>
 					<div class="form-group">
-						<label class="control-label col-xs-3 resize-mobile center" for="healings[]">Item</label>
-						<label class="control-label col-xs-2 resize-mobile center" for="healing_quantity[]">Qty</label>
+						<label class="control-label col-xs-4 resize-mobile center" for="healings[]">Item</label>
+						<label class="control-label col-xs-1 resize-mobile center" for="healing_quantity[]">Qty</label>
 						<label class="control-label col-xs-5 resize-mobile center" for="healing_effect[]">Effect</label>
 						<label class="control-label col-xs-1 resize-mobile center" for="healing_weight[]">Weight</label>
 						<label class="control-label col-xs-1 resize-mobile center" for=""></label>
@@ -1148,8 +1148,8 @@
 				<div class="section form-horizontal">
 					<div class="section-title"><span>Misc & Special Items</span> <i class="fa-solid icon-misc custom-icon"></i></div>
 					<div class="form-group">
-						<label class="control-label col-xs-3 resize-mobile center" for="misc[]">Item</label>
-						<label class="control-label col-xs-2 resize-mobile center" for="misc_quantity[]">Qty</label>
+						<label class="control-label col-xs-4 resize-mobile center" for="misc[]">Item</label>
+						<label class="control-label col-xs-1 resize-mobile center" for="misc_quantity[]">Qty</label>
 						<label class="control-label col-xs-5 resize-mobile center" for="misc_notes[]">Notes</label>
 						<label class="control-label col-xs-1 resize-mobile center" for="misc_weight[]">Weight</label>
 						<label class="control-label col-xs-1 resize-mobile center" for=""></label>
@@ -1433,6 +1433,8 @@
         	<input class="form-control" type="text" id="weapon_rof">
         	<label class="control-label">Defend Bonus</label>
         	<input class="form-control" type="number" min="0" id="weapon_defend">
+        	<label class="control-label">Critical Threat Range Bonus</label>
+        	<input class="form-control" type="number" min="0" id="weapon_crit">
         	<label class="control-label">Other Notes</label>
         	<input class="form-control" type="text" id="weapon_notes">
         	<label class="control-label">Weight</label>
@@ -1657,6 +1659,24 @@
     </div>
   </div>
 
+	<!-- encumbered alert modal -->
+  <div class="modal" id="encumbered_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+        	<h5 class="center" id="encumbered_msg"></h5>
+        	<div class="center">
+	        	<label for="suppress_alert" class="control-label">Yeah, I know, quit bugging me.</label>
+	        	<input type="checkbox" id="suppress_alert">
+        	</div>
+        	<div class="button-bar">
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 	<!-- help modal -->
   <div class="modal" id="help_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-md modal-dialog-centered" role="document">
@@ -1693,7 +1713,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 	<script src="/assets/feat_list_v22_06_22.js"></script>
-	<script src="/assets/script_v22_07_21.js"></script>
+	<script src="/assets/script_v22_07_27.js"></script>
 	<script type="text/javascript">
 
 		var keys = <?php echo json_encode($keys); ?>;
@@ -1734,9 +1754,10 @@
 		}
 
 		// check for user weapons
+		loadingItems = true;
 		var weapons = <?php echo json_encode($weapons); ?>;
 		for (var i in weapons) {
-			addWeaponElements(weapons[i]['type'], weapons[i]['name'], weapons[i]['quantity'], weapons[i]['damage'], weapons[i]['max_damage'], weapons[i]['range_'], weapons[i]['rof'], weapons[i]['defend'], weapons[i]['notes'], weapons[i]['weight'], weapons[i]['id']);
+			addWeaponElements(weapons[i]['type'], weapons[i]['name'], weapons[i]['quantity'], weapons[i]['damage'], weapons[i]['max_damage'], weapons[i]['range_'], weapons[i]['rof'], weapons[i]['defend'], weapons[i]['crit'], weapons[i]['notes'], weapons[i]['weight'], weapons[i]['id']);
 		}
 		// trigger select weapon functions to update inputs and defend value
 		$(".weapon-select").each(function(){
@@ -1778,6 +1799,9 @@
 		for (var i in misc) {
 			addMiscElements(misc[i]['name'], misc[i]['quantity'], misc[i]['notes'], misc[i]['weight'], misc[i]['id']);
 		}
+		// show encumbered alert after all items are loaded
+		loadingItems = false;
+		updateTotalWeight(true);
 
 		// check for user notes
 		var notes = <?php echo json_encode($notes); ?>;
