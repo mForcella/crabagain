@@ -152,7 +152,7 @@
 	       <span id="attribute_pts_span" class="glyphicon <?php echo isset($user) && $user['attribute_pts'] == 0 ? 'disabled' : ''; ?>" onclick="allocateAttributePts(this)"><span class="nav-item-label"><i class="fa-solid fa-shield-heart nav-icon"></i> Allocate Attribute Points</span></span>
 	    </div>
 	    <?php
-	    	if (isset($user)) {
+	    	if (isset($user) && $user['xp'] != 0) {
 	    		echo '
 				    <div class="nav-item">
 				       <span class="glyphicon" data-toggle="modal" data-target="#gm_edit_modal"><span class="nav-item-label"><i class="fa-solid fa-dice-d20 nav-icon"></i> GM Edit Mode</span></span>
@@ -183,7 +183,7 @@
 
 	  <!-- user help menu - visible only on character creation -->
 	    <?php
-	    	if (!isset($user)) {
+	    	if (!isset($user) || $user['xp'] == 0) {
 	    		echo '
 	  				<span class="glyphicon glyphicon-info-sign help-menu" data-toggle="modal" data-target="#help_modal"></span>
 	    		';
@@ -241,7 +241,7 @@
 						<!-- readonly, unless new character -->
 						<label class="control-label col-sm-4 col-xs-4 smaller" for="attribute_pts">Attribute Pts</label>
 						<div class="col-sm-2 col-xs-8">
-							<input class="form-control" <?php echo isset($user) ? 'readonly' : 'type="number"' ?> min="0" id="attribute_pts" name="attribute_pts" value="<?php echo isset($user) ? htmlspecialchars($user['attribute_pts']) : 12 ?>">
+							<input class="form-control" <?php echo isset($user) && $user['xp'] != 0 ? 'readonly' : 'type="number"' ?> min="0" id="attribute_pts" name="attribute_pts" value="<?php echo isset($user) ? htmlspecialchars($user['attribute_pts']) : 12 ?>">
 						</div>
 					</div>
 					<div class="form-group">
@@ -676,7 +676,7 @@
 
 					<div class="form-group">
 						<div class="col-sm-6 attribute-col" id="col_strength">
-							<div class="row">
+							<div class="row attribute-row">
 								<label class="control-label col-md-7 col-xs-8" for="strength"><span class="attribute-name">Strength</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_strength" onclick="toggleHidden('col_strength')"></label>
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
@@ -702,7 +702,7 @@
 						</div>
 
 						<div class="col-sm-6 attribute-col" id="col_fortitude">
-							<div class="row">
+							<div class="row attribute-row">
 								<label class="control-label col-md-7 col-xs-8" for="fortitude"><span class="attribute-name">Fortitude</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_fortitude" onclick="toggleHidden('col_fortitude')"></label>
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
@@ -730,7 +730,7 @@
 
 					<div class="form-group">
 						<div class="col-sm-6 attribute-col" id="col_speed">
-							<div class="row">
+							<div class="row attribute-row">
 								<label class="control-label col-md-7 col-xs-8" for="speed"><span class="attribute-name">Speed</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_speed" onclick="toggleHidden('col_speed')"></label>
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
@@ -756,7 +756,7 @@
 						</div>
 
 						<div class="col-sm-6 attribute-col" id="col_agility">
-							<div class="row">
+							<div class="row attribute-row">
 								<label class="control-label col-md-7 col-xs-8" for="agility"><span class="attribute-name">Agility</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_agility" onclick="toggleHidden('col_agility')"></label>
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
@@ -784,7 +784,7 @@
 
 					<div class="form-group">
 						<div class="col-sm-6 attribute-col" id="col_precision">
-							<div class="row">
+							<div class="row attribute-row">
 								<label class="control-label col-md-7 col-xs-8" for="precision_"><span class="attribute-name">Precision</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_precision" onclick="toggleHidden('col_precision')"></label>
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
@@ -810,7 +810,7 @@
 						</div>
 
 						<div class="col-sm-6 attribute-col" id="col_awareness">
-							<div class="row">
+							<div class="row attribute-row">
 								<label class="control-label col-md-7 col-xs-8" for="awareness"><span class="attribute-name">Awareness</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_awareness" onclick="toggleHidden('col_awareness')"></label>
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
@@ -838,7 +838,7 @@
 
 					<div class="form-group">
 						<div class="col-sm-6 attribute-col" id="col_allure">
-							<div class="row">
+							<div class="row attribute-row">
 								<label class="control-label col-md-7 col-xs-8" for="allure"><span class="attribute-name">Allure</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_allure" onclick="toggleHidden('col_allure')"></label>
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
@@ -864,7 +864,7 @@
 						</div>
 
 						<div class="col-sm-6 attribute-col" id="col_deception">
-							<div class="row">
+							<div class="row attribute-row">
 								<label class="control-label col-md-7 col-xs-8" for="deception"><span class="attribute-name">Deception</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_deception" onclick="toggleHidden('col_deception')"></label>
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
@@ -892,7 +892,7 @@
 
 					<div class="form-group">
 						<div class="col-sm-6 attribute-col" id="col_intellect">
-							<div class="row">
+							<div class="row attribute-row">
 								<label class="control-label col-md-7 col-xs-8" for="intellect"><span class="attribute-name">Intellect</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_intellect" onclick="toggleHidden('col_intellect')"></label>
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
@@ -918,7 +918,7 @@
 						</div>
 
 						<div class="col-sm-6 attribute-col" id="col_innovation">
-							<div class="row">
+							<div class="row attribute-row">
 								<label class="control-label col-md-7 col-xs-8" for="innovation"><span class="attribute-name">Innovation</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_innovation" onclick="toggleHidden('col_innovation')"></label>
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
@@ -946,7 +946,7 @@
 
 					<div class="form-group">
 						<div class="col-sm-6 attribute-col" id="col_intuition">
-							<div class="row">
+							<div class="row attribute-row">
 								<label class="control-label col-md-7 col-xs-8" for="intuition"><span class="attribute-name">Intution</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_intuition" onclick="toggleHidden('col_intuition')"></label>
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
@@ -972,7 +972,7 @@
 						</div>
 
 						<div class="col-sm-6 attribute-col" id="col_vitality">
-							<div class="row">
+							<div class="row attribute-row">
 								<label class="control-label col-md-7 col-xs-8" for="vitality"><span class="attribute-name">Vitality</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_vitality" onclick="toggleHidden('col_vitality')"></label>
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
@@ -1351,12 +1351,42 @@
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title" id="feat_modal_title">New Feat</h4>
+          <h4 class="modal-title" id="feat_modal_title">New Feat/Trait</h4>
         </div>
         <div class="modal-body">
-        	<label class="control-label">Feat Name</label>
-        	<input class="form-control clearable" type="text" id="feat_name">
-        	<label class="control-label">Feat Description</label>
+        	<!-- show dropdown only during character creation -->
+        	<label class="control-label <?php echo isset($user) && $user['xp'] != 0 ? 'hidden' : ''; ?>">Type</label>
+        	<select class="form-control <?php echo isset($user) && $user['xp'] != 0 ? 'hidden' : ''; ?>" id="select_feat_type">
+        		<option value="feat_name">Standard Feat</option>
+        		<option value="social_trait_name">Social Trait</option>
+        		<option value="physical_trait_pos_name">Physical Trait (Positive)</option>
+        		<option value="physical_trait_neg_name">Physical Trait (Negative)</option>
+        		<option value="morale_trait_name">Morale Trait</option>
+        		<option value="compelling_action_name">Compelling Action</option>
+        		<option value="profession_name">Profession</option>
+        	</select>
+        	<label class="control-label">Name</label>
+        	<input type="hidden" id="feat_name_val">
+        	<input class="form-control clearable feat-type" type="text" id="feat_name">
+        	<select class="form-control feat-type feat-select hidden" id="social_trait_name">
+        		<option></option>
+        	</select>
+        	<select class="form-control feat-type feat-select hidden" id="physical_trait_pos_name">
+        		<option></option>
+        	</select>
+        	<select class="form-control feat-type feat-select hidden" id="physical_trait_neg_name">
+        		<option></option>
+        	</select>
+        	<select class="form-control feat-type feat-select hidden" id="compelling_action_name">
+        		<option></option>
+        	</select>
+        	<select class="form-control feat-type feat-select hidden" id="profession_name">
+        		<option></option>
+        	</select>
+        	<select class="form-control feat-type feat-select hidden" id="morale_trait_name">
+        		<option></option>
+        	</select>
+        	<label class="control-label">Description</label>
         	<textarea class="form-control" id="feat_description" rows="6" maxlength="2000"></textarea>
         	<input type="hidden" id="feat_id">
         	<div class="button-bar">
@@ -1559,7 +1589,7 @@
           <h4 class="modal-title">New Character</h4>
         </div>
         <div class="modal-body">
-        	<h5 class="center">Before we can let you pass, we just need to make sure you're not a robot, or a Russki. Please enter the most secret of the secret codes.</h5>
+        	<h5 class="center">Before we can let you pass, we just need to make sure you're not a robot, or a Russki, or both. Please enter the most secret of the secret codes.</h5>
         	<input class="form-control" type="text" name="nerd_test" id="nerd_test">
         	<div class="button-bar">
 		        <button type="button" class="btn btn-primary" id="password_btn_2" data-dismiss="modal" onclick="setPassword()">Ok</button>
@@ -1664,7 +1694,7 @@
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-body">
-        	<h5 class="center" id="encumbered_msg"></h5>
+        	<h4 class="center" id="encumbered_msg"></h4><br>
         	<div class="center">
 	        	<label for="suppress_alert" class="control-label">Yeah, I know, quit bugging me.</label>
 	        	<input type="checkbox" id="suppress_alert">
@@ -1688,7 +1718,7 @@
         	<h4>Character Creation</h4>
 					<p>When creating a new character you will start with a default of 12 Attribute Points. This value is 'unlocked' during character creation, and can be adjusted based on any modifiers. Your Attribute Points can be allocated by selecting the <i>Allocate Attribute Points</i> option from the menu. Points will be automatically adjusted as you increase or decrease attributes, and as feats and trainings are added. Your attributes and feats are also 'unlocked' during character creation, allowing you to add additional starting feats/traits and skills as needed. In order to save a newly created character, you will need to know the 'secret code.' If you don't know what it is, ask your GM. If they don't know it...find a new GM? You will also need to set a personal password when creating a new character, which you will need when updating your character in the future.</p>
 					<h4>Adding XP & Allocating Attribute Points</h4>
-					<p>Once your character has been saved, all of your attribute values, skills, and feats will be locked. The only way to modify your attributes is by accruing and allocating Attribute Points. As you add XP, your level will be automatically adjusted, and as you gain levels, Attribute Points will automatically be added. These Attribute Points can then be allocated via the <i>Allocate Attribute Points</i> option. Attributes can only be raised by one point per allocation, and only one unique skill or feat, as well as one focus or training, can be added per allocation. Attribute points will be automatically deducted. If additional modifications need to be made to attributes, skills or feats, this will need to be done through the <i>GM Edit Mode</i>.</p>
+					<p>Once your character has begun collecting XP, all of your attribute values, skills, and feats will be locked. The only way to modify your attributes is by accruing and allocating Attribute Points. As you add XP, your level will be automatically adjusted, and as you gain levels, Attribute Points will automatically be added. These Attribute Points can then be allocated via the <i>Allocate Attribute Points</i> option. Attributes can only be raised by one point per allocation, and only one unique skill or feat, as well as one focus or training, can be added per allocation. Attribute points will be automatically deducted. If additional modifications need to be made to attributes, skills or feats, this will need to be done through the <i>GM Edit Mode</i>.</p>
 					<h4>GM Edit Mode</h4>
 					<p>Using the admin password (set when creating the campaign), the GM can unlock and edit attribute points, XP, attribute values, skills, and feats. The GM can also use the admin password to make and save changes to any of the characters at any time.</p>
         	<div class="button-bar">
@@ -1712,8 +1742,8 @@
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-	<script src="/assets/feat_list_v22_06_22.js"></script>
-	<script src="/assets/script_v22_07_27.js"></script>
+	<script src="/assets/feat_list_v22_07_31.js"></script>
+	<script src="/assets/script_v22_07_31.js"></script>
 	<script type="text/javascript">
 
 		var keys = <?php echo json_encode($keys); ?>;
@@ -1722,9 +1752,10 @@
 		var campaign = <?php echo json_encode(isset($campaign) ? $campaign : []); ?>;
 		var user = <?php echo json_encode(isset($user) ? $user : []); ?>;
 		setAttributes(user);
+		setTraits();
 		
 		// character creation mode
-		if (user.length == 0) {
+		if (user.length == 0 || user['xp'] == 0) {
 			characterCreation = true;
 			// show new feat btn
 			$("#new_feat_btn").show();

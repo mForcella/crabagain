@@ -2,9 +2,6 @@
 var hiddenEnabled = [];
 var highlightEnabled = [];
 var skipEnabled = [];
-// arrays for sorting feats
-var eligible_feats = [];
-var ineligible_feats = [];
 // arrays to make sure we don't have feats/trainings with the same name
 var trainingNames = [];
 var featNames = [];
@@ -125,9 +122,14 @@ $("#attribute_pts").on("input", function(){
 	}
 });
 
+$("#select_feat_type").on("change", function(){
+	$(".feat-type").addClass("hidden");
+	$("#"+$(this).val()).removeClass("hidden").trigger("change");
+});
+
 // highlight attributes
 if (!is_mobile) {
-	$(".attribute-col").hover(function(){
+	$(".attribute-row").hover(function(){
 		$(this).addClass("highlight");
 	}, function(){
 		$(this).removeClass("highlight");
@@ -682,9 +684,17 @@ $("#new_feat_modal").on('shown.bs.modal', function(){
 });
 $("#new_feat_modal").on('hidden.bs.modal', function(){
 	$("#feat_modal_title").html("New Feat");
-	$("#feat_name").val("").removeClass("x onX");
+	$("#feat_name").val("").removeClass("x onX").attr("disabled", false);
 	$("#feat_description").val("").height("125px");
 	$("#feat_id").val("");
+	// reset all dropdowns
+	$("#select_feat_type").val("feat_name").trigger("change");
+	$("#social_trait_name").val("").attr("disabled", false);
+	$("#physical_trait_pos_name").val("").attr("disabled", false);
+	$("#physical_trait_neg_name").val("").attr("disabled", false);
+	$("#compelling_action_name").val("").attr("disabled", false);
+	$("#profession_name").val("").attr("disabled", false);
+	$("#morale_trait_name").val("").attr("disabled", false);
 });
 
 $("#new_training_modal").on('shown.bs.modal', function(){
@@ -722,41 +732,118 @@ $(".weapon-name").each(function(){
 	});
 });
 
-// set feats as eligible/ineligible and set autocomplete list
-function setFeatList() {
-	eligible_feats = [];
-	ineligible_feats = [];
+// set traits, professions, and compelling actions
+function setTraits() {
+	var social_traits = [];
+	var physical_traits = [];
+	var morale_traits = [];
+	var professions = [];
+	var compelling_actions = [];
 	// set autocomplete list for feats
 	$.each(feat_list, function(i, feat) {
-		var is_eligible = true;
-		// feat[requirements] is an array of arrays - each array must return true
-		$.each(feat['requirements'], function(j, requirements) {
-			var satisfied = false;
-			// requirements is an array of dictionaries (req) - one req within requirements needs to return true
-			$.each(requirements, function(k, req) {
-				for (key in req) {
-					switch (key) {
-						case 'feat':
-						satisfied = satisfied ? true : includesIgnoreCase(featNames, req[key]);
-						break;
-						case 'training':
-						satisfied = satisfied ? true : includesIgnoreCase(trainingNames, req[key]);
-						break;
-						default:
-						satisfied = satisfied ? true : user[key] >= req[key];
-						break;
-					}
+		if (feat['type'] == 'social_trait') {
+			social_traits.push(feat);
+		} else if (feat['type'] == 'physical_trait') {
+			physical_traits.push(feat);
+		} else if (feat['type'] == 'morale_trait') {
+			morale_traits.push(feat);
+		} else if (feat['type'] == 'profession') {
+			professions.push(feat);
+		} else if (feat['type'] == 'compelling_action') {
+			compelling_actions.push(feat);
+		}
+	});
+
+	for (var i in social_traits) {
+		$('<option />', {
+		  'value': social_traits[i]['name'],
+		  'text': social_traits[i]['name'],
+		}).appendTo($("#social_trait_name"));
+	}
+
+	for (var i in physical_traits) {
+		$('<option />', {
+		  'value': physical_traits[i]['name'],
+		  'text': physical_traits[i]['name'],
+		}).appendTo(physical_traits[i]['cost'] > 0 ? $("#physical_trait_pos_name") : $("#physical_trait_neg_name"));
+	}
+
+	for (var i in compelling_actions) {
+		$('<option />', {
+		  'value': compelling_actions[i]['name'],
+		  'text': compelling_actions[i]['name'],
+		}).appendTo($("#compelling_action_name"));
+	}
+
+	for (var i in professions) {
+		$('<option />', {
+		  'value': professions[i]['name'],
+		  'text': professions[i]['name'],
+		}).appendTo($("#profession_name"));
+	}
+
+	for (var i in morale_traits) {
+		$('<option />', {
+		  'value': morale_traits[i]['name'],
+		  'text': morale_traits[i]['name'],
+		}).appendTo($("#morale_trait_name"));
+	}
+
+	$(".feat-select").on("change", function(){
+		var description = "";
+		var cost = "";
+		for (var i in feat_list) {
+			if (feat_list[i]['name'] == $(this).val()) {
+				description = feat_list[i]['description'];
+				// if physical trait, also show attribute point cost/bonus
+				if (feat_list[i]['type'] == "physical_trait") {
+					cost = feat_list[i]['cost'];
 				}
+			}
+		}
+		description += cost == "" ? "" : "\n\n"+(cost > 0 ? "Attribute Point Cost: "+cost : "Attribute Point Bonus: "+(cost*-1));
+		$("#feat_description").val(description);
+		$("#feat_name_val").val($(this).val());
+	});
+}
+
+// set feats as eligible/ineligible and set autocomplete list
+function setFeatList() {
+	var eligible_feats = [];
+	var ineligible_feats = [];
+	// set autocomplete list for feats
+	$.each(feat_list, function(i, feat) {
+		if (feat['type'] == 'feat') {
+			var is_eligible = true;
+			// feat[requirements] is an array of arrays - each array must return true
+			$.each(feat['requirements'], function(j, requirements) {
+				var satisfied = false;
+				// requirements is an array of dictionaries (req) - one req within requirements needs to return true
+				$.each(requirements, function(k, req) {
+					for (key in req) {
+						switch (key) {
+							case 'feat':
+							satisfied = satisfied ? true : includesIgnoreCase(featNames, req[key]);
+							break;
+							case 'training':
+							satisfied = satisfied ? true : includesIgnoreCase(trainingNames, req[key]);
+							break;
+							default:
+							satisfied = satisfied ? true : user[key] >= req[key];
+							break;
+						}
+					}
+				});
+				// if a previous requirement wasn't satisfied, feat is not eligible
+				is_eligible = !is_eligible ? false : satisfied;
 			});
-			// if a previous requirement wasn't satisfied, feat is not eligible
-			is_eligible = !is_eligible ? false : satisfied;
-		});
-		if (is_eligible && !eligible_feats.includes(feat)) {
-			feat['satisfied'] = true;
-			eligible_feats.push(feat);
-		} else if (!ineligible_feats.includes(feat)) {
-			feat['satisfied'] = false;
-			ineligible_feats.push(feat);
+			if (is_eligible && !eligible_feats.includes(feat)) {
+				feat['satisfied'] = true;
+				eligible_feats.push(feat);
+			} else if (!ineligible_feats.includes(feat)) {
+				feat['satisfied'] = false;
+				ineligible_feats.push(feat);
+			}
 		}
 	});
 
@@ -867,6 +954,7 @@ function setFeatList() {
 						description = feat_list[i]['description'];
 					}
 				}
+				$("#feat_name_val").val(ui.item.value);
 				$("#feat_description").val(description).height($("#feat_description")[0].scrollHeight);
 			}
 		}
@@ -1132,7 +1220,7 @@ function forgotPassword() {
 
 // add a new feat from modal values
 function newFeat() {
-	var featName = $("#feat_name").val();
+	var featName = $("#feat_name_val").val();
 	var featDescription = $("#feat_description").val();
 	if (featName != "" && featDescription != " ") {
 		addFeatElements(featName, featDescription.trim(), $("#feat_id").val());
@@ -1142,6 +1230,7 @@ function newFeat() {
 // create html elements for feat
 function addFeatElements(featName, featDescription, id) {
 	var id_val = id == "" ? uuid() : "training_"+id;
+	var featDescription = featDescription.split("\n\n")[0]; // remove extraneous text from feat descriptions
 
 	// new or updating?
 	if ($("#feat_modal_title").html() == "Update Feat") {
@@ -1161,24 +1250,72 @@ function addFeatElements(featName, featDescription, id) {
 			return;
 		}
 
+		// only allow one profession, one compelling action, one social trait, one morale trait
+		var featType = "";
+		var cost = 0;
+		for (var i in feat_list) {
+			if (feat_list[i]['name'].toLowerCase() == featName.toLowerCase()) {
+				featType = feat_list[i]['type'];
+				cost = feat_list[i]['cost'] == undefined ? 0 : feat_list[i]['cost'];
+
+				if (featType == "profession") {
+					for (var j in user_feats) {
+						if (user_feats[j]['type'] == "profession") {
+							alert("Only one Profession can be chosen");
+							return;
+						}
+					}
+				}
+				if (featType == "compelling_action") {
+					for (var j in user_feats) {
+						if (user_feats[j]['type'] == "compelling_action") {
+							alert("Only one Compelling Action can be chosen");
+							return;
+						}
+					}
+				}
+				if (featType == "social_trait") {
+					for (var j in user_feats) {
+						if (user_feats[j]['type'] == "social_trait") {
+							alert("Only one Social Trait can be chosen");
+							return;
+						}
+					}
+				}
+				if (featType == "morale_trait") {
+					for (var j in user_feats) {
+						if (user_feats[j]['type'] == "morale_trait") {
+							alert("Only one Morale Trait can be chosen");
+							return;
+						}
+					}
+				}
+			}
+		}
+
 		// if allocating attribute points, decrease points
 		if (allocatingAttributePts) {
+			// get attribute point cost
+			var points = featType == "feat" ? 4 : cost;
+
 			// only one feat/skill per level
-			if (feats.length > 0 || skills.length > 0) {
+			if (!characterCreation && feats.length > 0 || skills.length > 0) {
 				alert("Only one new feat or unique skill can be added per level.");
 				return;
 			}
+
 			// make sure we have enough points
-			if (parseInt($(".attribute-count").html().split(" Points")[0]) - 4 < 0) {
-				alert("Not enough attribute points to allocate for a new feat.");
+			if (parseInt($(".attribute-count").html().split(" Points")[0]) - points < 0) {
+				alert("Not enough attribute points to allocate for a new feat/trait.");
 				return;
 			}
+
 			var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
-			$(".attribute-count").html(pts - 4+" Points");
+			$(".attribute-count").html(pts - points+" Points");
 		}
 
 		featNames.push(featName);
-		user_feats.push({"name":featName});
+		user_feats.push({"name":featName, "type":featType});
 		var feat_container = createElement('div', 'feat', '#feats', id_val);
 		if (allocatingAttributePts) {
 			feats.push(feat_container);
@@ -1205,9 +1342,27 @@ function addFeatElements(featName, featDescription, id) {
 
     // add click function to edit button
     feat_title_descrip.on("click", function(){
-    	var name = $("#"+id_val+"_name").html();
-    	$("#feat_name").val(name.split(" : ")[0]);
-    	$("#feat_description").val($("#"+id_val+"_descrip_val").val());
+    	var name = $("#"+id_val+"_name").html().split(" : ")[0];
+    	// figure out what type of feat we are editing
+    	var featType = "";
+    	var cost = 0;
+    	for (var i in feat_list) {
+    		if (feat_list[i]['name'].toLowerCase() == name.toLowerCase()) {
+    			featType = feat_list[i]['type'];
+    			// get cost for physical traits
+    			cost = featType == "physical_trait" ? feat_list[i]['cost'] : 0;
+    			featType = featType == "physical_trait" ? (feat_list[i]['cost'] > 0 ? "physical_trait_pos" : "physical_trait_neg") : featType;
+    			$("#select_feat_type").val(featType+"_name").trigger("change");
+    			$("#"+featType+"_name").val(feat_list[i]['name']).attr("disabled", !characterCreation && !adminEditMode);
+    		}
+    	}
+    	$("#feat_name").val(name);
+    	var description = $("#"+id_val+"_descrip_val").val();
+    	// feat is physical trait, add cost/bonus to description
+    	if (featType == "physical_trait_pos" || featType == "physical_trait_neg") {
+				description += cost == 0 ? "" : "\n\n"+(cost > 0 ? "Attribute Point Cost: "+cost : "Attribute Point Bonus: "+(cost*-1));
+    	}
+    	$("#feat_description").val(description);
     	$("#feat_id").val(id_val);
     	$("#feat_modal_title").html("Update Feat");
     	$("#new_feat_modal").modal("show");
@@ -1219,6 +1374,32 @@ function addFeatElements(featName, featDescription, id) {
     	// confirm delete
     	var conf = confirm("Remove feat '"+name.split(" : ")[0]+"'?");
     	if (conf) {
+
+	    	// if allocating attribute points, increase points
+	    	if (allocatingAttributePts) {
+	    		// get attribute point cost based on feat name
+					var cost = 0;
+					for (var i in feat_list) {
+						if (feat_list[i]['name'].toLowerCase() == featName.toLowerCase()) {
+							cost = feat_list[i]['cost'] == undefined ? 0 : feat_list[i]['cost'];
+						}
+					}
+
+					var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
+					// if removing a negative trait, make sure we have enough points
+					if (cost < 0 && pts + cost < 0) {
+						alert("Not enough attribute points to remove trait, "+featName);
+						return;
+					}
+
+					$(".attribute-count").html(pts + cost +" Points");
+					var index = feats.indexOf(feat_container);
+					if (index !== -1) {
+					  feats.splice(index, 1);
+					}
+	    	}
+
+    		// remove elements and update arrays
     		unsavedChanges = true;
     		$("#"+id_val).remove();
 				var index = featNames.indexOf(featName);
@@ -1231,15 +1412,7 @@ function addFeatElements(featName, featDescription, id) {
 					  break;
 					}
 				}
-	    	// if allocating attribute points, increase points
-	    	if (allocatingAttributePts) {
-					var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
-					$(".attribute-count").html(pts + 4+" Points");
-					var index = feats.indexOf(feat_container);
-					if (index !== -1) {
-					  feats.splice(index, 1);
-					}
-	    	}
+
 	    	// check if we're removing feats that affect attributes
 				if (featName.toLowerCase() == "improved critical hit") {
 					selectWeapon(1);
@@ -1367,6 +1540,15 @@ function addTrainingElements(trainingName, attribute, id, value='') {
 	  'for': id_val,
 	  'text': trainingName,
 	}).appendTo(div_left);
+
+	// highlight training on hover
+	if (!is_mobile) {
+		row.hover(function(){
+			$(this).addClass("highlight");
+		}, function(){
+			$(this).removeClass("highlight");
+		});
+	}
 
 	// add remove button
 	// if allocating points, make sure remove button is visible
@@ -2166,21 +2348,21 @@ function updateTotalWeight(showMsg = false) {
 		$("#encumbered").addClass("selected");
 		standard = quick == 0 ? standard - 1 : standard;
 		quick = quick == 0 ? 1 : 0;
-		msg = "You are encumbered (-1 QA).<br>Reduce item weight to remove penalty.";
+		msg = "You are encumbered (-1 QA).<br>Reduce your item weight to remove the penalty.";
 	} else if (parseInt(totalWeight) <= capacity/4*3) {
 		// burdened, -1 QA, -0.5 Move
 		$("#burdened").addClass("selected");
 		standard = quick == 0 ? standard - 1 : standard;
 		quick = quick == 0 ? 1 : 0;
 		move = move >= 0.5 ? move - 0.5 : 0;
-		msg = "You are burdened (-1 QA, -0.5 Move).<br>Reduce item weight to remove penalty.";
+		msg = "You are burdened (-1 QA, -0.5 Move).<br>Reduce your item weight to remove the penalty.";
 	} else {
 		// overburdened, -1 QA, -1 Move
 		$("#overburdened").addClass("selected");
 		standard = quick == 0 ? standard - 1 : standard;
 		quick = quick == 0 ? 1 : 0;
 		move = move >= 1 ? move - 1 : 0;
-		msg = "You are overburdened (-1 QA, -1 Move).<br>Reduce item weight to remove penalty.";
+		msg = "You are overburdened (-1 QA, -1 Move).<br>Reduce your item weight to remove the penalty.";
 	}
 	$("#standard").val(standard);
 	$("#quick").val(quick);
@@ -2191,6 +2373,8 @@ function updateTotalWeight(showMsg = false) {
 	if (showMsg && encumbered && !loadingItems && !suppressAlerts) {
 		$("#encumbered_msg").html(msg);
 		$("#encumbered_modal").modal("show");
+		// scroll to item weight?
+		// $('html,body').animate({scrollTop: $("#section_weight").offset().top},'slow');
 	}
 }
 
