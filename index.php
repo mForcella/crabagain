@@ -13,16 +13,36 @@
 
 	// get user list for dropdown nav
 	$users = [];
-	$sql = "SELECT * from user WHERE campaign_id = ".$_GET["campaign"]." ORDER BY character_name";
+	$sql = "SELECT * FROM user WHERE campaign_id = ".$_GET["campaign"]." ORDER BY character_name";
 	$result = $db->query($sql);
   if ($result) {
     while($row = $result->fetch_assoc()) {
     	array_push($users, $row);
     }
   }
+  
+  // get feat list
+	$feat_list = [];
+	$sql = "SELECT * FROM feat_or_trait";
+	$result = $db->query($sql);
+  if ($result) {
+    while($row = $result->fetch_assoc()) {
+    	array_push($feat_list, $row);
+    }
+  }
+
+  // get feat requirements
+  $feat_reqs = [];
+	$sql = "SELECT feat_id, req_set_id, type, value FROM feat_or_trait_req_set JOIN feat_or_trait_req ON feat_or_trait_req_set.id = feat_or_trait_req.req_set_id";
+	$result = $db->query($sql);
+  if ($result) {
+    while($row = $result->fetch_assoc()) {
+    	array_push($feat_reqs, $row);
+    }
+  }
 
   // get campaign name
-  $sql = "SELECT * from campaign WHERE id = ".$_GET["campaign"];
+  $sql = "SELECT * FROM campaign WHERE id = ".$_GET["campaign"];
 	$result = $db->query($sql);
 	$campaign = "";
   if ($result) {
@@ -1355,7 +1375,7 @@
         </div>
         <div class="modal-body">
         	<!-- show dropdown only during character creation -->
-        	<label class="control-label <?php echo isset($user) && $user['xp'] != 0 ? 'hidden' : ''; ?>">Type</label>
+        	<label class="control-label <?php echo isset($user) && $user['xp'] != 0 ? 'hidden' : ''; ?>" id="select_feat_type_label">Type</label>
         	<select class="form-control <?php echo isset($user) && $user['xp'] != 0 ? 'hidden' : ''; ?>" id="select_feat_type">
         		<option value="feat_name">Standard Feat</option>
         		<option value="social_trait_name">Social Trait</option>
@@ -1370,21 +1390,63 @@
         	<input class="form-control clearable feat-type" type="text" id="feat_name">
         	<select class="form-control feat-type feat-select hidden" id="social_trait_name">
         		<option></option>
+        		<?php
+        			foreach ($feat_list as $feat) {
+        				if ($feat['type'] == 'social_trait') {
+        					echo "<option value='".$feat['name']."'>".$feat['name']."</option>";
+        				}
+        			}
+        		?>
         	</select>
         	<select class="form-control feat-type feat-select hidden" id="physical_trait_pos_name">
         		<option></option>
+        		<?php
+        			foreach ($feat_list as $feat) {
+        				if ($feat['type'] == 'physical_trait' && $feat['cost'] > 0) {
+        					echo "<option value='".$feat['name']."'>".$feat['name']."</option>";
+        				}
+        			}
+        		?>
         	</select>
         	<select class="form-control feat-type feat-select hidden" id="physical_trait_neg_name">
         		<option></option>
+        		<?php
+        			foreach ($feat_list as $feat) {
+        				if ($feat['type'] == 'physical_trait' && $feat['cost'] < 0) {
+        					echo "<option value='".$feat['name']."'>".$feat['name']."</option>";
+        				}
+        			}
+        		?>
         	</select>
         	<select class="form-control feat-type feat-select hidden" id="compelling_action_name">
         		<option></option>
+        		<?php
+        			foreach ($feat_list as $feat) {
+        				if ($feat['type'] == 'compelling_action') {
+        					echo "<option value='".$feat['name']."'>".$feat['name']."</option>";
+        				}
+        			}
+        		?>
         	</select>
         	<select class="form-control feat-type feat-select hidden" id="profession_name">
         		<option></option>
+        		<?php
+        			foreach ($feat_list as $feat) {
+        				if ($feat['type'] == 'profession') {
+        					echo "<option value='".$feat['name']."'>".$feat['name']."</option>";
+        				}
+        			}
+        		?>
         	</select>
         	<select class="form-control feat-type feat-select hidden" id="morale_trait_name">
         		<option></option>
+        		<?php
+        			foreach ($feat_list as $feat) {
+        				if ($feat['type'] == 'morale_trait') {
+        					echo "<option value='".$feat['name']."'>".$feat['name']."</option>";
+        				}
+        			}
+        		?>
         	</select>
         	<label class="control-label">Description</label>
         	<textarea class="form-control" id="feat_description" rows="6" maxlength="2000"></textarea>
@@ -1742,17 +1804,48 @@
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-	<script src="/assets/feat_list_v22_07_31.js"></script>
 	<script src="/assets/script_v22_07_31.js"></script>
 	<script type="text/javascript">
 
 		var keys = <?php echo json_encode($keys); ?>;
 
-		// check for user and set attributes
+		// check for user and campaign values
 		var campaign = <?php echo json_encode(isset($campaign) ? $campaign : []); ?>;
 		var user = <?php echo json_encode(isset($user) ? $user : []); ?>;
 		setAttributes(user);
-		setTraits();
+
+		// get feat list and requirements
+		var feat_list = <?php echo json_encode($feat_list); ?>;
+		var feat_reqs = <?php echo json_encode($feat_reqs); ?>;
+		var feat_sets = {};
+		var req_sets = [];
+		// sort requirements into sets
+		for (var i in feat_reqs) {
+			if (feat_sets[feat_reqs[i]['feat_id']] == null) {
+				feat_sets[feat_reqs[i]['feat_id']] = [];
+			}
+			if (req_sets[feat_reqs[i]['req_set_id']] == null) {
+				req_sets[feat_reqs[i]['req_set_id']] = [];
+			}
+			var req = {};
+			req[feat_reqs[i]['type']] = feat_reqs[i]['value'];
+			req_sets[feat_reqs[i]['req_set_id']].push(req);
+			if (req_sets[feat_reqs[i]['req_set_id']].length > 1) {
+				continue;
+			} else {
+				feat_sets[feat_reqs[i]['feat_id']].push(req_sets[feat_reqs[i]['req_set_id']]);
+			}
+		}
+		// add requirements to feat list
+		for (var i in feat_list) {
+			for (var j in feat_sets) {
+				if (feat_list[i]['id'] == j) {
+					feat_list[i]['requirements'] = feat_sets[j];
+				}
+			}
+		}
+		// set feat list
+		setFeatList();
 		
 		// character creation mode
 		if (user.length == 0 || user['xp'] == 0) {

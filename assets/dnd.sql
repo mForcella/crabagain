@@ -1,7 +1,34 @@
+
+  CREATE TABLE feat_or_trait (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    name varchar(255),
+    description varchar(2000),
+    type varchar(255),
+    cost int DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+  );
+
+  CREATE TABLE feat_or_trait_req_set (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    feat_id int,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (feat_id) REFERENCES feat_or_trait(id)
+  );
+
+  CREATE TABLE feat_or_trait_req (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    req_set_id int,
+    type varchar(255),
+    value varchar(255),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (req_set_id) REFERENCES feat_or_trait_req_set(id)
+  );
+
   CREATE TABLE campaign (
     id int PRIMARY KEY AUTO_INCREMENT,
     name varchar(255),
-    admin_password varchar(255)
+    admin_password varchar(255),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
   );
 
   CREATE TABLE user (

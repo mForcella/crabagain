@@ -681,6 +681,14 @@ $("#help_modal").on('shown.bs.modal', function(){
 // on modal shown, update modal title and clear inputs
 $("#new_feat_modal").on('shown.bs.modal', function(){
 	$("#feat_name").focus();
+	// gm edit mode - unhide select feat type elements
+	if (adminEditMode || characterCreation) {
+		$("#select_feat_type").removeClass("hidden");
+		$("#select_feat_type_label").removeClass("hidden");
+	} else {
+		$("#select_feat_type").addClass("hidden");
+		$("#select_feat_type_label").addClass("hidden");
+	}
 });
 $("#new_feat_modal").on('hidden.bs.modal', function(){
 	$("#feat_modal_title").html("New Feat");
@@ -732,80 +740,27 @@ $(".weapon-name").each(function(){
 	});
 });
 
-// set traits, professions, and compelling actions
-function setTraits() {
-	var social_traits = [];
-	var physical_traits = [];
-	var morale_traits = [];
-	var professions = [];
-	var compelling_actions = [];
-	// set autocomplete list for feats
-	$.each(feat_list, function(i, feat) {
-		if (feat['type'] == 'social_trait') {
-			social_traits.push(feat);
-		} else if (feat['type'] == 'physical_trait') {
-			physical_traits.push(feat);
-		} else if (feat['type'] == 'morale_trait') {
-			morale_traits.push(feat);
-		} else if (feat['type'] == 'profession') {
-			professions.push(feat);
-		} else if (feat['type'] == 'compelling_action') {
-			compelling_actions.push(feat);
-		}
-	});
-
-	for (var i in social_traits) {
-		$('<option />', {
-		  'value': social_traits[i]['name'],
-		  'text': social_traits[i]['name'],
-		}).appendTo($("#social_trait_name"));
-	}
-
-	for (var i in physical_traits) {
-		$('<option />', {
-		  'value': physical_traits[i]['name'],
-		  'text': physical_traits[i]['name'],
-		}).appendTo(physical_traits[i]['cost'] > 0 ? $("#physical_trait_pos_name") : $("#physical_trait_neg_name"));
-	}
-
-	for (var i in compelling_actions) {
-		$('<option />', {
-		  'value': compelling_actions[i]['name'],
-		  'text': compelling_actions[i]['name'],
-		}).appendTo($("#compelling_action_name"));
-	}
-
-	for (var i in professions) {
-		$('<option />', {
-		  'value': professions[i]['name'],
-		  'text': professions[i]['name'],
-		}).appendTo($("#profession_name"));
-	}
-
-	for (var i in morale_traits) {
-		$('<option />', {
-		  'value': morale_traits[i]['name'],
-		  'text': morale_traits[i]['name'],
-		}).appendTo($("#morale_trait_name"));
-	}
-
-	$(".feat-select").on("change", function(){
-		var description = "";
-		var cost = "";
-		for (var i in feat_list) {
-			if (feat_list[i]['name'] == $(this).val()) {
-				description = feat_list[i]['description'];
-				// if physical trait, also show attribute point cost/bonus
-				if (feat_list[i]['type'] == "physical_trait") {
-					cost = feat_list[i]['cost'];
-				}
+// autofill feat description on option select
+$(".feat-select").on("change", function(){
+	var description = "";
+	var cost = "";
+	for (var i in feat_list) {
+		if (feat_list[i]['name'] == $(this).val()) {
+			description = feat_list[i]['description'];
+			// if physical trait, also show attribute point cost/bonus
+			if (feat_list[i]['type'] == "physical_trait") {
+				cost = feat_list[i]['cost'];
+			}
+			// if morale trait, add \n between positive/negative states
+			if (feat_list[i]['type'] == "morale_trait") {
+				description = description.replace('; ', '.\n');
 			}
 		}
-		description += cost == "" ? "" : "\n\n"+(cost > 0 ? "Attribute Point Cost: "+cost : "Attribute Point Bonus: "+(cost*-1));
-		$("#feat_description").val(description);
-		$("#feat_name_val").val($(this).val());
-	});
-}
+	}
+	description += cost == "" ? "" : "\n\n"+(cost > 0 ? "Attribute Point Cost: "+cost : "Attribute Point Bonus: "+(cost*-1));
+	$("#feat_description").val(description);
+	$("#feat_name_val").val($(this).val());
+});
 
 // set feats as eligible/ineligible and set autocomplete list
 function setFeatList() {
@@ -980,8 +935,6 @@ function setAttributes(user) {
 	editSize();
 	// set initiative
 	adjustInitiative();
-	// set feat list
-	setFeatList();
 }
 
 function setMoraleEffect(morale) {
@@ -1256,7 +1209,7 @@ function addFeatElements(featName, featDescription, id) {
 		for (var i in feat_list) {
 			if (feat_list[i]['name'].toLowerCase() == featName.toLowerCase()) {
 				featType = feat_list[i]['type'];
-				cost = feat_list[i]['cost'] == undefined ? 0 : feat_list[i]['cost'];
+				cost = parseInt(feat_list[i]['cost']);
 
 				if (featType == "profession") {
 					for (var j in user_feats) {
@@ -1295,8 +1248,6 @@ function addFeatElements(featName, featDescription, id) {
 
 		// if allocating attribute points, decrease points
 		if (allocatingAttributePts) {
-			// get attribute point cost
-			var points = featType == "feat" ? 4 : cost;
 
 			// only one feat/skill per level
 			if (!characterCreation && feats.length > 0 || skills.length > 0) {
@@ -1305,13 +1256,13 @@ function addFeatElements(featName, featDescription, id) {
 			}
 
 			// make sure we have enough points
-			if (parseInt($(".attribute-count").html().split(" Points")[0]) - points < 0) {
+			if (parseInt($(".attribute-count").html().split(" Points")[0]) - cost < 0) {
 				alert("Not enough attribute points to allocate for a new feat/trait.");
 				return;
 			}
 
 			var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
-			$(".attribute-count").html(pts - points+" Points");
+			$(".attribute-count").html(pts - cost+" Points");
 		}
 
 		featNames.push(featName);
@@ -1345,13 +1296,10 @@ function addFeatElements(featName, featDescription, id) {
     	var name = $("#"+id_val+"_name").html().split(" : ")[0];
     	// figure out what type of feat we are editing
     	var featType = "";
-    	var cost = 0;
     	for (var i in feat_list) {
     		if (feat_list[i]['name'].toLowerCase() == name.toLowerCase()) {
     			featType = feat_list[i]['type'];
-    			// get cost for physical traits
-    			cost = featType == "physical_trait" ? feat_list[i]['cost'] : 0;
-    			featType = featType == "physical_trait" ? (feat_list[i]['cost'] > 0 ? "physical_trait_pos" : "physical_trait_neg") : featType;
+    			featType = featType == "physical_trait" ? (cost > 0 ? "physical_trait_pos" : "physical_trait_neg") : featType;
     			$("#select_feat_type").val(featType+"_name").trigger("change");
     			$("#"+featType+"_name").val(feat_list[i]['name']).attr("disabled", !characterCreation && !adminEditMode);
     		}
@@ -1360,7 +1308,7 @@ function addFeatElements(featName, featDescription, id) {
     	var description = $("#"+id_val+"_descrip_val").val();
     	// feat is physical trait, add cost/bonus to description
     	if (featType == "physical_trait_pos" || featType == "physical_trait_neg") {
-				description += cost == 0 ? "" : "\n\n"+(cost > 0 ? "Attribute Point Cost: "+cost : "Attribute Point Bonus: "+(cost*-1));
+				description += "\n\n"+(cost > 0 ? "Attribute Point Cost: "+cost : "Attribute Point Bonus: "+(cost*-1));
     	}
     	$("#feat_description").val(description);
     	$("#feat_id").val(id_val);
@@ -1372,19 +1320,11 @@ function addFeatElements(featName, featDescription, id) {
     $("#"+id_val+"_remove").on("click", function(){
     	var name = $("#"+id_val+"_name").html();
     	// confirm delete
-    	var conf = confirm("Remove feat '"+name.split(" : ")[0]+"'?");
+    	var conf = confirm("Remove feat, '"+name.split(" : ")[0]+"'?");
     	if (conf) {
 
 	    	// if allocating attribute points, increase points
 	    	if (allocatingAttributePts) {
-	    		// get attribute point cost based on feat name
-					var cost = 0;
-					for (var i in feat_list) {
-						if (feat_list[i]['name'].toLowerCase() == featName.toLowerCase()) {
-							cost = feat_list[i]['cost'] == undefined ? 0 : feat_list[i]['cost'];
-						}
-					}
-
 					var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
 					// if removing a negative trait, make sure we have enough points
 					if (cost < 0 && pts + cost < 0) {

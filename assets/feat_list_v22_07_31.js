@@ -1,4 +1,4 @@
-var feat_list = [
+var featList = [
 
 	// *** Standard Feats *** //
 	{
@@ -495,6 +495,68 @@ var feat_list = [
 		'cost':-2
 	},
 
+	// *** Morale Traits *** //
+	{
+		'name':'Celebrity',
+		'description':'Positive State:\nYou gained 2 Renown last Session.\nNegative State:\nYou didn’t gain any Renown last Session.',
+		'type':'morale_trait',
+	},
+	{
+		'name':'Extrovert',
+		'description':'Positive State:\nA new NPC really likes you.\nNegative State:\nYou didn’t hang out with any NPC friends.',
+		'type':'morale_trait',
+	},
+	{
+		'name':'Fancypants',
+		'description':'Positive State:\nYou had a new luxury experience this Session.\nNegative State:\nNo luxury experience last Session.',
+		'type':'morale_trait',
+	},
+	{
+		'name':'Gamer',
+		'description':'Positive State:\nYou won some kind of game this Session.\nNegative State:\nYou lost a game last Session.',
+		'type':'morale_trait',
+	},
+	{
+		'name':'Glutton',
+		'description':'Positive State:\nAll of your meals were excessive.\nNegative State:\nNone of your meals were decent last Session.',
+		'type':'morale_trait',
+	},
+	{
+		'name':'Merrymaker',
+		'description':'Positive State:\nYou got drunk this Session.\nNegative State:\nYou didn’t have any drinks last Session.',
+		'type':'morale_trait',
+	},
+	{
+		'name':'Miracle',
+		'description':'Positive State:\nYou used no Alignment Bonuses last Session.\nNegative State:\nYou used all Alignment Bonuses last Session.',
+		'type':'morale_trait',
+	},
+	{
+		'name':'Pennypincher',
+		'description':'Positive State:\nYou have more than 800 credits/8 Gold/$40.\nNegative State:\nYou have less than 400 credits/4 Gold/$20.',
+		'type':'morale_trait',
+	},
+	{
+		'name':'Philanderer',
+		'description':'Positive State:\nYou had 1 new sexual encounter this Session.\nNegative State:\nNo new encounters last Session.',
+		'type':'morale_trait',
+	},
+	{
+		'name':'Rover',
+		'description':'Positive State:\nYou went to a new planet/region this Session.\nNegative State:\nYou stayed in one place last Session.',
+		'type':'morale_trait',
+	},
+	{
+		'name':'Spendthrift',
+		'description':'Positive State:\nYou have less than 20 credits/4 Silver/$1.\nNegative State:\nYou have more than 200 credits/2 Gold/$10.',
+		'type':'morale_trait',
+	},
+	{
+		'name':'Wunderkind',
+		'description':'Positive State:\nYou succeeded all rolls last Session.\nNegative State:\nYou failed 2 or more rolls last Session.',
+		'type':'morale_trait',
+	},
+
 	// *** Professions *** //
 	{
 		'name':'Archaeologist',
@@ -648,67 +710,5 @@ var feat_list = [
 		'a minimum Vitality roll DL 10 is necessary.',
 		'type':'compelling_action',
 		'cost':-2
-	},
-
-	// *** Morale Traits *** //
-	{
-		'name':'Celebrity',
-		'description':'Positive State:\nYou gained 2 Renown last Session.\nNegative State:\nYou didn’t gain any Renown last Session.',
-		'type':'morale_trait',
-	},
-	{
-		'name':'Extrovert',
-		'description':'Positive State:\nA new NPC really likes you.\nNegative State:\nYou didn’t hang out with any NPC friends.',
-		'type':'morale_trait',
-	},
-	{
-		'name':'Fancypants',
-		'description':'Positive State:\nYou had a new luxury experience this Session.\nNegative State:\nNo luxury experience last Session.',
-		'type':'morale_trait',
-	},
-	{
-		'name':'Gamer',
-		'description':'Positive State:\nYou won some kind of game this Session.\nNegative State:\nYou lost a game last Session.',
-		'type':'morale_trait',
-	},
-	{
-		'name':'Glutton',
-		'description':'Positive State:\nAll of your meals were excessive.\nNegative State:\nNone of your meals were decent last Session.',
-		'type':'morale_trait',
-	},
-	{
-		'name':'Merrymaker',
-		'description':'Positive State:\nYou got drunk this Session.\nNegative State:\nYou didn’t have any drinks last Session.',
-		'type':'morale_trait',
-	},
-	{
-		'name':'Miracle',
-		'description':'Positive State:\nYou used no Alignment Bonuses last Session.\nNegative State:\nYou used all Alignment Bonuses last Session.',
-		'type':'morale_trait',
-	},
-	{
-		'name':'Pennypincher',
-		'description':'Positive State:\nYou have more than 800 credits/8 Gold/$40.\nNegative State:\nYou have less than 400 credits/4 Gold/$20.',
-		'type':'morale_trait',
-	},
-	{
-		'name':'Philanderer',
-		'description':'Positive State:\nYou had 1 new sexual encounter this Session.\nNegative State:\nNo new encounters last Session.',
-		'type':'morale_trait',
-	},
-	{
-		'name':'Rover',
-		'description':'Positive State:\nYou went to a new planet/region this Session.\nNegative State:\nYou stayed in one place last Session.',
-		'type':'morale_trait',
-	},
-	{
-		'name':'Spendthrift',
-		'description':'Positive State:\nYou have less than 20 credits/4 Silver/$1.\nNegative State:\nYou have more than 200 credits/2 Gold/$10.',
-		'type':'morale_trait',
-	},
-	{
-		'name':'Wunderkind',
-		'description':'Positive State:\nYou succeeded all rolls last Session.\nNegative State:\nYou failed 2 or more rolls last Session.',
-		'type':'morale_trait',
 	},
 ];
