@@ -436,20 +436,43 @@ function endEditAttributes(accept) {
 	}
 }
 
+// save motivator point value on focus
+$('.motivator-pts').on('focusin', function(){
+    $(this).data('val', $(this).val());
+});
 // on motivator pt change, adjust bonuses
 $(".motivator-pts").on("input", function(){
 	var pts = [];
+	var pts_prev = [];
 	var score = 0;
 	$(".motivator-pts").each(function(){
 		pts.push($(this).val() == "" ? 0 : parseInt($(this).val()));
+		pts_prev.push($(this).data('val') != undefined ? parseInt($(this).data('val')) : parseInt($(this).val()));
 	});
 	// add the highest 3 pt values
 	pts.sort(function(a, b) {
 	  return b - a;
 	});
+	pts_prev.sort(function(a, b) {
+	  return b - a;
+	});
 	score = pts[0] + pts[1] + pts[2];
 	var bonuses = score >= 64 ? 5 : (score >= 32 ? 4 : (score >= 16 ? 3 : (score >= 8 ? 2 : (score >= 4 ? 1 : 0))));
 	$("#bonuses").val(bonuses);
+
+	// adjust xp
+	var current = $(this).val();
+	var prev = $(this).data('val');
+	$(this).data('val', current);
+	var up = current > prev;
+	// increasing - add xp if least value is less than current
+	if (up && pts[3] < current) {
+		$("#xp").val(parseInt($("#xp").val()) + parseInt($("#level").val())).trigger("change");
+	}
+	// decreasing - subtract xp if prev is greater than least of the prev vals
+	if (!up && prev > pts_prev[3]) {
+		$("#xp").val(parseInt($("#xp").val()) - parseInt($("#level").val())).trigger("change");
+	}
 });
 
 // on xp change, adjust level
