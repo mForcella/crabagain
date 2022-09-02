@@ -8,7 +8,7 @@ INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (2, 'Acroba
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (3, 2);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (3, 'strength', 0);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (4, 2);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (4, 'fortitude', 2);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (4, 'agility', 2);
 
 INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (3, 'Keen Senses', 'You no longer receive Passive penalties to Awareness, and the penalties for sleeping are reduced to -2. You can never be caught Unaware, unless you are sleeping. If you would be normally caught Unaware, you are considered Surprised. Additionally, you can never suffer an Epic Failure on an Awareness roll. If you would, you may re-roll the Fate Die until it comes up higher than a 1.', 'feat', 4);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (5, 3);

@@ -175,11 +175,14 @@
 	    	if (isset($user) && $user['xp'] != 0) {
 	    		echo '
 				    <div class="nav-item">
-				       <span class="glyphicon" data-toggle="modal" data-target="#gm_edit_modal"><span class="nav-item-label"><i class="fa-solid fa-dice-d20 nav-icon"></i> GM Edit Mode</span></span>
+				       <span class="glyphicon" data-toggle="modal" data-target="#gm_modal"><span class="nav-item-label"><i class="fa-solid fa-dice-d20 nav-icon"></i> GM Edit Mode</span></span>
 				    </div>
 				   ';
 	    	}
 	    ?>
+	    <div class="nav-item">
+	       <span class="glyphicon" onclick="settings()"><span class="nav-item-label"><i class="fa-solid fa-gear nav-icon"></i> Admin Settings</span></span>
+	    </div>
 	    <div class="nav-item">
 	       <span class="glyphicon" onclick="back()"><span class="nav-item-label"><i class="fa-solid fa-arrow-left nav-icon"></i> Change Campaign</span></span>
 	    </div>
@@ -1269,7 +1272,7 @@
           <h4 class="modal-title">Experience Points</h4>
         </div>
         <div class="modal-body">
-        	<h3 class="center">Current XP: <span id="xp_text"><?php echo isset($user) ? $user['xp'] : 0 ?></span></h3>
+        	<!-- <h3 class="center">Current XP: <span id="xp_text"><?php echo isset($user) ? $user['xp'] : 0 ?></span></h3> -->
         	<!-- get xp to next level -->
 					<?php
 						$current_xp = isset($user) ? $user['xp'] : 0;
@@ -1281,18 +1284,18 @@
 							}
 						}
 					?>
-        	<h3 class="center">Next Level: <span id="next_level"><?php echo $next_level ?></span></h3>
+        	<h3 class="center">Next Level: <span id="next_level"><?php echo $next_level ?></span> xp</h3>
         	<!-- input for adding xp -->
-        	<div class="add-xp">
+        	<!-- <div class="add-xp">
 	        	<h3 class="center">Add XP:</h3>
 	        	<input class="form-control" type="number" id="add_xp">
 	        	<div class="button-bar">
 	        		<button type="button" class="btn btn-primary" onclick="addXP()"><span class="glyphicon glyphicon-plus-sign"></span></button>
 	        	</div>
-        	</div>
+        	</div> -->
         	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="setXP()">Ok</button>
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+	        	<!-- <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="setXP()">Ok</button> -->
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
         	</div>
         </div>
       </div>
@@ -1300,17 +1303,17 @@
   </div>
 
   <!-- GM edit modal -->
-  <div class="modal" id="gm_edit_modal" tabindex="-1" role="dialog">
+  <div class="modal" id="gm_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title">GM Edit Mode</h4>
+          <h4 class="modal-title" id="gm_title">GM Edit Mode</h4>
         </div>
         <div class="modal-body">
         	<h4 class="control-label center">What's the secret word?</h4>
         	<input class="form-control" type="text" id="gm_password">
         	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="GMEditMode()">Ok</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="GMModalClose()">Ok</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
@@ -1393,7 +1396,7 @@
         		<?php
         			foreach ($feat_list as $feat) {
         				if ($feat['type'] == 'social_trait') {
-        					echo "<option value='".$feat['name']."'>".$feat['name']."</option>";
+        					echo "<option value='".str_replace('\'','',$feat['name'])."'>".$feat['name']."</option>";
         				}
         			}
         		?>
@@ -1403,7 +1406,7 @@
         		<?php
         			foreach ($feat_list as $feat) {
         				if ($feat['type'] == 'physical_trait' && $feat['cost'] > 0) {
-        					echo "<option value='".$feat['name']."'>".$feat['name']."</option>";
+        					echo "<option value='".str_replace('\'','',$feat['name'])."'>".$feat['name']."</option>";
         				}
         			}
         		?>
@@ -1413,7 +1416,7 @@
         		<?php
         			foreach ($feat_list as $feat) {
         				if ($feat['type'] == 'physical_trait' && $feat['cost'] < 0) {
-        					echo "<option value='".$feat['name']."'>".$feat['name']."</option>";
+        					echo "<option value='".str_replace('\'','',$feat['name'])."'>".$feat['name']."</option>";
         				}
         			}
         		?>
@@ -1423,7 +1426,7 @@
         		<?php
         			foreach ($feat_list as $feat) {
         				if ($feat['type'] == 'compelling_action') {
-        					echo "<option value='".$feat['name']."'>".$feat['name']."</option>";
+        					echo "<option value='".str_replace('\'','',$feat['name'])."'>".$feat['name']."</option>";
         				}
         			}
         		?>
@@ -1433,7 +1436,7 @@
         		<?php
         			foreach ($feat_list as $feat) {
         				if ($feat['type'] == 'profession') {
-        					echo "<option value='".$feat['name']."'>".$feat['name']."</option>";
+        					echo "<option value='".str_replace('\'','',$feat['name'])."'>".$feat['name']."</option>";
         				}
         			}
         		?>
@@ -1443,7 +1446,7 @@
         		<?php
         			foreach ($feat_list as $feat) {
         				if ($feat['type'] == 'morale_trait') {
-        					echo "<option value='".$feat['name']."'>".$feat['name']."</option>";
+        					echo "<option value='".str_replace('\'','',$feat['name'])."'>".$feat['name']."</option>";
         				}
         			}
         		?>
@@ -1804,7 +1807,7 @@
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-	<script src="/assets/script_v22_07_31.js"></script>
+	<script src="/assets/script_v22_09_02.js"></script>
 	<script type="text/javascript">
 
 		var keys = <?php echo json_encode($keys); ?>;

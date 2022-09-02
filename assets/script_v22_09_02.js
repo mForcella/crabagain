@@ -125,6 +125,11 @@ $("#attribute_pts").on("input", function(){
 $("#select_feat_type").on("change", function(){
 	$(".feat-type").addClass("hidden");
 	$("#"+$(this).val()).removeClass("hidden").trigger("change");
+	if ($(this).val() == "feat_name") {
+		$("#feat_name").val("").removeClass("x onX");
+		$("#feat_name_val").val("");
+		$("#feat_description").val("");
+	}
 });
 
 // highlight attributes
@@ -133,6 +138,35 @@ if (!is_mobile) {
 		$(this).addClass("highlight");
 	}, function(){
 		$(this).removeClass("highlight");
+	});
+}
+
+// launch GM modal
+function settings() {
+	// set modal title
+	$("#gm_title").html("Admin Settings");
+	$("#gm_modal").modal("show");
+}
+
+// check admin password for settings page
+function adminSettings() {
+	// check password
+	var password = $("#gm_password").val();
+	$("#gm_password").val("");
+	// check admin_password
+	$.ajax({
+	  url: 'check_admin_password.php',
+	  data: { 'password' : password, 'admin_password' : campaign['admin_password'] },
+	  ContentType: "application/json",
+	  type: 'POST',
+	  success: function(response){
+	  	if (response == 1) {
+	  		// launch settings page
+				window.location.href = "/admin.php?campaign="+$('#campaign_id').val();
+	  	} else {
+				alert("Sorry sucker, that ain't it.");
+	  	}
+	  }
 	});
 }
 
@@ -193,19 +227,19 @@ function endGMEdit(accept) {
 }
 
 // function for 'add' button in xp modal
-function addXP() {
-	if ($("#add_xp").val() != "") {
-		var current = parseInt($("#xp_text").html());
-		$("#xp_text").html(current + parseInt($("#add_xp").val()));
-		$("#add_xp").val("");
-	}
-}
+// function addXP() {
+// 	if ($("#add_xp").val() != "") {
+// 		var current = parseInt($("#xp_text").html());
+// 		$("#xp_text").html(current + parseInt($("#add_xp").val()));
+// 		$("#add_xp").val("");
+// 	}
+// }
 
 // function for 'ok' button in xp modal
-function setXP() {
-	var current = parseInt($("#xp_text").html());
-	$("#xp").val(current).trigger("change");
-}
+// function setXP() {
+// 	var current = parseInt($("#xp_text").html());
+// 	$("#xp").val(current).trigger("change");
+// }
 
 // show user menu
 function toggleMenu() {
@@ -579,9 +613,9 @@ enableHiddenNumbers();
 // user navigation
 $("#user_select").on("change", function(){
 	if ($(this).val() == "") {
-		window.location.href = "/?campaign="+$('#campaign_id').val();
+		window.location.replace("/?campaign="+$('#campaign_id').val());
 	} else {
-		window.location.href = "/?campaign="+$('#campaign_id').val()+"&user="+$(this).val();
+		window.location.replace("/?campaign="+$('#campaign_id').val()+"&user="+$(this).val());
 	}
 });
 
@@ -670,10 +704,21 @@ $("#password_modal").on('shown.bs.modal', function(){
 	$("#password").focus();
 	toggleMenu();
 });
-$("#gm_edit_modal").on('shown.bs.modal', function(){
+$("#gm_modal").on('shown.bs.modal', function(){
 	$("#gm_password").focus();
 	toggleMenu();
 });
+$("#gm_modal").on('hidden.bs.modal', function(){
+	$("#gm_title").html("GM Edit Mode")
+});
+function GMModalClose() {
+	// check title value
+	if ($("#gm_title").html() == "GM Edit Mode") {
+		GMEditMode();
+	} else {
+		adminSettings();
+	}
+}
 $("#help_modal").on('shown.bs.modal', function(){
 	// toggleMenu();
 });
@@ -745,7 +790,7 @@ $(".feat-select").on("change", function(){
 	var description = "";
 	var cost = "";
 	for (var i in feat_list) {
-		if (feat_list[i]['name'] == $(this).val()) {
+		if (feat_list[i]['name'].replaceAll("'","") == $(this).val()) {
 			description = feat_list[i]['description'];
 			// if physical trait, also show attribute point cost/bonus
 			if (feat_list[i]['type'] == "physical_trait") {
@@ -935,6 +980,28 @@ function setAttributes(user) {
 	editSize();
 	// set initiative
 	adjustInitiative();
+	// check for pending xp award
+	if (user['xp_awarded'] != undefined && user['xp_awarded'] != 0) {
+		$("#xp").val(parseInt(user['xp'])+parseInt(user['xp_awarded'])).trigger("change");
+		// update character xp and award in database
+		var users = [];
+		var xp = [];
+		var awards = [];
+		var attribute_pts = [];
+		users.push(user['id']);
+		awards.push(0);
+		xp.push($("#xp").val());
+		attribute_pts.push(parseInt($("#attribute_pts").val()));
+		$.ajax({
+		  url: 'update_xp.php',
+		  data: { 'users' : users, 'xp' : xp, 'awards' : awards, 'attribute_pts' : attribute_pts },
+		  ContentType: "application/json",
+		  type: 'POST',
+		  success: function(response){
+		  	// no action
+		  }
+		});	
+	}
 }
 
 function setMoraleEffect(morale) {
@@ -1173,7 +1240,7 @@ function forgotPassword() {
 
 // add a new feat from modal values
 function newFeat() {
-	var featName = $("#feat_name_val").val();
+	var featName = $("#feat_name_val").val() == "" ? $("#feat_name").val() : $("#feat_name_val").val();
 	var featDescription = $("#feat_description").val();
 	if (featName != "" && featDescription != " ") {
 		addFeatElements(featName, featDescription.trim(), $("#feat_id").val());
@@ -1832,6 +1899,8 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 		  		$(this).remove();
 		  	}
 		  });
+		  // update total weight
+		  updateTotalWeight(false);
 		}
 	});
 
@@ -2036,6 +2105,8 @@ function addProtectionElements(name, bonus, notes, weight, is_equipped, id) {
 			  equipped.splice(index, 1);
 			  setToughness();
 			}
+		  // update total weight
+		  updateTotalWeight(false);
 		}
 	});
 
@@ -2140,6 +2211,8 @@ function addHealingElements(name, quantity, effect, weight, id) {
 		if (conf) {
 			unsavedChanges = true;
 			$("#"+id_val).remove();
+		  // update total weight
+		  updateTotalWeight(false);
 		}
 	});
 
@@ -2230,6 +2303,8 @@ function addMiscElements(name, quantity, notes, weight, id) {
 		if (conf) {
 			unsavedChanges = true;
 			$("#"+id_val).remove();
+		  // update total weight
+		  updateTotalWeight(false);
 		}
 	});
 
@@ -2280,16 +2355,16 @@ function updateTotalWeight(showMsg = false) {
 
 	// adjust action/move values
 	var msg = "";
-	if (parseInt(totalWeight) <= capacity/4) {
+	if (parseFloat(totalWeight) <= capacity/4) {
 		// unhindered, no modification to actions
 		$("#unhindered").addClass("selected");
-	} else if (parseInt(totalWeight) <= capacity/2) {
+	} else if (parseFloat(totalWeight) <= capacity/2) {
 		// encumbered, -1 QA
 		$("#encumbered").addClass("selected");
 		standard = quick == 0 ? standard - 1 : standard;
 		quick = quick == 0 ? 1 : 0;
 		msg = "You are encumbered (-1 QA).<br>Reduce your item weight to remove the penalty.";
-	} else if (parseInt(totalWeight) <= capacity/4*3) {
+	} else if (parseFloat(totalWeight) <= capacity/4*3) {
 		// burdened, -1 QA, -0.5 Move
 		$("#burdened").addClass("selected");
 		standard = quick == 0 ? standard - 1 : standard;
@@ -2309,7 +2384,7 @@ function updateTotalWeight(showMsg = false) {
 	$("#move").val(move);
 
 	// if we are adding or editing items, show alert if character is encumbered
-	var encumbered = parseInt(totalWeight) > capacity/4;
+	var encumbered = parseFloat(totalWeight) > capacity/4;
 	if (showMsg && encumbered && !loadingItems && !suppressAlerts) {
 		$("#encumbered_msg").html(msg);
 		$("#encumbered_modal").modal("show");

@@ -172,7 +172,7 @@
 
 	// on campaign select - redirect to campaign page
 	function setCampaign(e) {
-		window.location.replace("/?campaign="+$(e).val());
+		window.location.href = "/?campaign="+$(e).val();
 	}
 
 	function createCampaign() {
@@ -190,7 +190,7 @@
 			  success: function(response) {
 			  	if (response != 0) {
 					// redirect to new campaign page
-					window.location.replace("/?campaign="+response);
+					window.location.href = "/?campaign="+response;
 			  	} else {
 			  		// handle error?
 			  	}

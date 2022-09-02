@@ -39,6 +39,7 @@
     character_name varchar(64),
     attribute_pts int,
     xp int,
+    xp_awarded int DEFAULT 0,
     morale int,
     race varchar(64),
     height varchar(64),
