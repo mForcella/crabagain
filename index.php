@@ -1313,7 +1313,7 @@
         	<h4 class="control-label center">What's the secret word?</h4>
         	<input class="form-control" type="text" id="gm_password">
         	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="GMModalClose()">Ok</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="GMEditMode()">Ok</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
@@ -1807,7 +1807,7 @@
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-	<script src="/assets/script_v22_09_02.js"></script>
+	<script src="/assets/script_v22_09_06.js"></script>
 	<script type="text/javascript">
 
 		var keys = <?php echo json_encode($keys); ?>;

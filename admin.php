@@ -180,7 +180,7 @@
 	th {
 		white-space:nowrap;
 	}
-	.container {
+	.container, .footer {
 		min-width: 750px;
 	}
 	.glyphicon-plus-sign {
@@ -229,6 +229,7 @@
 	.toggle-switchy {
 		margin-left: 20px;
 		margin-bottom: 5px;
+		display: none;
 	}
 	.title {
 		text-align: center;
@@ -240,12 +241,6 @@
 	}
 	table.center th {
 		text-align: center;
-	}
-	.user-table {
-		/*background-color: transparent;*/
-	}
-	.user-table td {
-		/*border-top: none !important;*/
 	}
 	a {
 		color: black !important;
@@ -308,6 +303,9 @@
 <body>
 	<div class="container">
 
+		<input type="hidden" id="campaign_id" value="<?php echo $campaign['id'] ?>">
+		<input type="hidden" id="admin_password" value="<?php echo isset($_GET['auth']) ? $_GET['auth'] : '' ?>">
+
 		<!-- button - scroll to top of page -->
 		<button id="scroll_top" class="no-vis"><span class="glyphicon glyphicon-arrow-up" onclick="scrollToTop()"></span></button>
 
@@ -327,97 +325,96 @@
 		</select>
 
 		<!-- character stats overview -->
-		<!-- <h4 class="table-heading" id="">Characters</h4> -->
-		<div class="panel panel-default">
-		<table class="table user-table center">
-			<tr>
-				<th></th>
-				<th>XP</th>
-				<th>Lvl</th>
-				<th>Res</th>
-				<th>Wnd</th>
-				<th>Tgh</th>
-				<th>Dfd</th>
-				<th>Ddg</th>
-				<th>Awr</th>
-				<th>Vit</th>
-			</tr>
-			<?php
-				foreach($users as $user) {
+		<div class="panel panel-default" <?php if(count($users) == 0) { echo 'hidden'; } ?>>
+			<table class="table user-table center">
+				<tr>
+					<th></th>
+					<th>XP</th>
+					<th>Lvl</th>
+					<th>Res</th>
+					<th>Wnd</th>
+					<th>Tgh</th>
+					<th>Dfd</th>
+					<th>Ddg</th>
+					<th>Awr</th>
+					<th>Vit</th>
+				</tr>
+				<?php
+					foreach($users as $user) {
 
-					// get level
-					$levels = [];
-					$xp_total = 0;
-					foreach (range(1,25) as $number) {
-						$xp_total += 20 * $number;
-						array_push($levels, $xp_total);
-					}
-					$level = 1;
-					$i = 2;
-					foreach ($levels as $lvl) {
-						if ($user['xp'] >= $lvl) {
-							$level = $i++;
+						// get level
+						$levels = [];
+						$xp_total = 0;
+						foreach (range(1,25) as $number) {
+							$xp_total += 20 * $number;
+							array_push($levels, $xp_total);
 						}
+						$level = 1;
+						$i = 2;
+						foreach ($levels as $lvl) {
+							if ($user['xp'] >= $lvl) {
+								$level = $i++;
+							}
+						}
+
+						// get resilience
+						$resilience = $user['fortitude'] >= 0 ? 
+								3 + floor($user['fortitude']/2) :
+								3 + ceil($user['fortitude']/3);
+
+						// get size modifier
+						$size_modifier = $user['size'] == "Small" ? 2 : ($user['size'] == "Large" ? -2 : 0);
+
+						// get dodge
+						$dodge = $user['agility'] >= 0 ?
+								floor($user['agility']/2) :
+								(ceil($user['agility']/3) == 0 ? 0 : ceil($user['agility']/3));
+						$dodge += $size_modifier;
+
+						// get toughness
+						$toughness = $user['strength'] >= 0 ?
+								floor($user['strength']/2) :
+								(ceil($user['strength']/3) == 0 ? 0 : ceil($user['strength']/3));
+						$toughness += $user['toughness_bonus'];
+
+						// get defend
+						$defend = isset($user) ? 10 + $user['agility'] : 10;
+						$defend += $size_modifier;
+						$defend += $user['defend_bonus'];
+
+						echo 
+						"<tr class='table-row'>
+							<td class='name-row'><a href='/?campaign=".$campaign['id']."&user=".$user['id']."'><strong>".$user['character_name']."</strong></a></td>
+							<td id='xp_".$user['id']."'>".$user['xp'].($user['xp_awarded'] == 0 ? '' : ($user['xp_awarded'] > 0 ? ' (+'.$user['xp_awarded'].')' : ' ('.$user['xp_awarded'].')'))."</td>
+							<td id='level_".$user['id']."'>".$level."</td>
+							<td><input class='short-input' id='damage_".$user['id']."' min='0' type='number' value='".$user['damage']."'> / ".$resilience."</td>
+							<td><input class='short-input' id='wounds_".$user['id']."' max='3' min='0' type='number' value='".$user['wounds']."'> / 3</td>
+							<td>".$toughness."</td>
+							<td>".$defend."</td>
+							<td>".$dodge."</td>
+							<td>".$user['awareness']."</td>
+							<td>".$user['vitality']."</td>
+						</tr>";
 					}
-
-					// get resilience
-					$resilience = $user['fortitude'] >= 0 ? 
-							3 + floor($user['fortitude']/2) :
-							3 + ceil($user['fortitude']/3);
-
-					// get size modifier
-					$size_modifier = $user['size'] == "Small" ? 2 : ($user['size'] == "Large" ? -2 : 0);
-
-					// get dodge
-					$dodge = $user['agility'] >= 0 ?
-							floor($user['agility']/2) :
-							(ceil($user['agility']/3) == 0 ? 0 : ceil($user['agility']/3));
-					$dodge += $size_modifier;
-
-					// get toughness
-					$toughness = $user['strength'] >= 0 ?
-							floor($user['strength']/2) :
-							(ceil($user['strength']/3) == 0 ? 0 : ceil($user['strength']/3));
-					$toughness += $user['toughness_bonus'];
-
-					// get defend
-					$defend = isset($user) ? 10 + $user['agility'] : 10;
-					$defend += $size_modifier;
-					$defend += $user['defend_bonus'];
-
-					echo 
-					"<tr class='table-row'>
-						<td class='name-row'><a href='/?campaign=".$campaign['id']."&user=".$user['id']."'><strong>".$user['character_name']."</strong></a></td>
-						<td id='xp_".$user['id']."'>".$user['xp'].($user['xp_awarded'] == 0 ? '' : ($user['xp_awarded'] > 0 ? ' (+'.$user['xp_awarded'].')' : ' ('.$user['xp_awarded'].')'))."</td>
-						<td id='level_".$user['id']."'>".$level."</td>
-						<td><input class='short-input' id='damage_".$user['id']."' min='0' type='number' value='".$user['damage']."'> / ".$resilience."</td>
-						<td><input class='short-input' id='wounds_".$user['id']."' max='3' min='0' type='number' value='".$user['wounds']."'> / 3</td>
-						<td>".$toughness."</td>
-						<td>".$defend."</td>
-						<td>".$dodge."</td>
-						<td>".$user['awareness']."</td>
-						<td>".$user['vitality']."</td>
-					</tr>";
-				}
-			?>
-		</table>
+				?>
+			</table>
 		</div>
 
 		<!-- distrubute xp modal -->
-		<div class="btn-wrapper">
+		<div class="btn-wrapper" <?php if(count($users) == 0) { echo 'hidden'; } ?>>
 			<button id="xp_btn" data-toggle="modal" data-target="#xp_modal">Award XP</button>
 		</div>
 
 		<h4 class="table-heading" id="section_feat">Standard Feats</h4>
-		<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('feat')"></span> -->
+		<span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('feat')"></span>
 		<div class="panel panel-default">
 			<table class="table">
 				<tr>
 					<th>Name</th>
 					<th>Description</th>
 					<th>Requirements</th>
-					<!-- <th>Edit</th>
-					<th>Available</th> -->
+					<!-- <th>Edit</th> -->
+					<!-- <th>Available</th> -->
 				</tr>
 				<?php
 					foreach($feat_list as $feat) {
@@ -427,7 +424,7 @@
 							foreach($feat['requirements'] as $req_set) {
 								for($i = 0; $i < count($req_set); $i++) {
 									foreach($req_set[$i] as $key => $value) {
-										$reqs .= $i > 0 ? "OR " : "";
+										$reqs .= $i > 0 ? "OR " : "&#8226;";
 										if ($key == "character_creation") {
 											$reqs .= "Character Creation Only"."<br>";
 										} else {
@@ -441,9 +438,9 @@
 								<td>".$feat['name']."</td>
 								<td>".$feat['description']."</td>
 								<td>".$reqs."</td>
+								<td hidden><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
+								<td class='center' hidden><input type='checkbox' checked></td>
 							</tr>";
-								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
-								// <td class='center'><input type='checkbox' checked></td>
 						}
 					}
 				?>
@@ -452,22 +449,22 @@
 
 		<div class="title">
 			<h4 class="table-heading" id="section_physical_trait_pos">Physical Traits (Positive)</h4>
-			<!-- <label class="toggle-switchy" for="physical-trait-pos-toggle" data-size="sm" data-text="false">
+			<label class="toggle-switchy" for="physical-trait-pos-toggle" data-size="sm" data-text="false">
 				<input checked type="checkbox" id="physical-trait-pos-toggle" checked onclick="enable(this, 'physical-trait-pos-check')">
 				<span class="toggle">
 					<span class="switch"></span>
 				</span>
-			</label> -->
+			</label>
 		</div>
-		<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('physical_trait_pos')"></span> -->
+		<span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('physical_trait_pos')"></span>
 		<div class="panel panel-default">
 			<table class="table">
 				<tr>
 					<th>Name</th>
 					<th>Description</th>
 					<th class="center">Cost</th>
-					<!-- <th>Edit</th>
-					<th>Available <input type='checkbox' class="physical-trait-pos-check" checked onclick="checkAll(this, 'physical-trait-pos-check')"></th> -->
+					<!-- <th>Edit</th> -->
+					<!-- <th>Available <input type='checkbox' class="physical-trait-pos-check" checked onclick="checkAll(this, 'physical-trait-pos-check')"></th> -->
 				</tr>
 				<?php
 					foreach($feat_list as $feat) {
@@ -477,9 +474,9 @@
 								<td>".$feat['name']."</td>
 								<td>".$feat['description']."</td>
 								<td class='center'>".$feat['cost']."</td>
+								<td hidden><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
+								<td class='center' hidden><input class='physical-trait-pos-check' type='checkbox' checked></td>
 							</tr>";
-								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
-								// <td class='center'><input class='physical-trait-pos-check' type='checkbox' checked></td>
 						}
 					}
 				?>
@@ -488,22 +485,22 @@
 
 		<div class="title">
 			<h4 class="table-heading" id="section_physical_trait_neg">Physical Traits (Negative)</h4>
-			<!-- <label class="toggle-switchy" for="physical-trait-neg-toggle" data-size="sm" data-text="false">
+			<label class="toggle-switchy" for="physical-trait-neg-toggle" data-size="sm" data-text="false">
 				<input checked type="checkbox" id="physical-trait-neg-toggle" checked onclick="enable(this, 'physical-trait-neg-check')">
 				<span class="toggle">
 					<span class="switch"></span>
 				</span>
-			</label> -->
+			</label>
 		</div>
-		<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('physical_trait_neg')"></span> -->
+		<span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('physical_trait_neg')"></span>
 		<div class="panel panel-default">
 			<table class="table">
 				<tr>
 					<th>Name</th>
 					<th>Description</th>
 					<th class="center">Bonus</th>
-					<!-- <th>Edit</th>
-					<th>Available <input type='checkbox' class="physical-trait-neg-check" checked onclick="checkAll(this, 'physical-trait-neg-check')"></th> -->
+					<!-- <th>Edit</th> -->
+					<!-- <th>Available <input type='checkbox' class="physical-trait-neg-check" checked onclick="checkAll(this, 'physical-trait-neg-check')"></th> -->
 				</tr>
 				<?php
 					foreach($feat_list as $feat) {
@@ -513,9 +510,9 @@
 								<td>".$feat['name']."</td>
 								<td>".$feat['description']."</td>
 								<td class='center'>".(intval($feat['cost'])*-1)."</td>
+								<td hidden><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
+								<td class='center' hidden><input class='physical-trait-neg-check' type='checkbox' checked></td>
 							</tr>";
-								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
-								// <td class='center'><input class='physical-trait-neg-check' type='checkbox' checked></td>
 						}
 					}
 				?>
@@ -524,21 +521,21 @@
 
 		<div class="title">
 			<h4 class="table-heading" id="section_social_trait">Social Traits</h4>
-			<!-- <label class="toggle-switchy" for="social-trait-toggle" data-size="sm" data-text="false">
+			<label class="toggle-switchy" for="social-trait-toggle" data-size="sm" data-text="false">
 				<input checked type="checkbox" id="social-trait-toggle" checked onclick="enable(this, 'social-trait-check')">
 				<span class="toggle">
 					<span class="switch"></span>
 				</span>
-			</label> -->
+			</label>
 		</div>
-		<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('social_trait')"></span> -->
+		<span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('social_trait')"></span>
 		<div class="panel panel-default">
 			<table class="table">
 				<tr>
 					<th>Name</th>
 					<th>Description</th>
-					<!-- <th>Edit</th>
-					<th>Available <input type='checkbox' class="social-trait-check" checked onclick="checkAll(this, 'social-trait-check')"></th> -->
+					<!-- <th>Edit</th> -->
+					<!-- <th>Available <input type='checkbox' class="social-trait-check" checked onclick="checkAll(this, 'social-trait-check')"></th> -->
 				</tr>
 				<?php
 					foreach($feat_list as $feat) {
@@ -547,9 +544,9 @@
 							"<tr class='table-row'>
 								<td>".$feat['name']."</td>
 								<td>".$feat['description']."</td>
+								<td hidden><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
+								<td class='center' hidden><input class='social-trait-check' type='checkbox' checked></td>
 							</tr>";
-								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
-								// <td class='center'><input class='social-trait-check' type='checkbox' checked></td>
 						}
 					}
 				?>
@@ -558,22 +555,22 @@
 
 		<div class="title">
 			<h4 class="table-heading" id="section_morale_trait">Morale Traits</h4>
-			<!-- <label class="toggle-switchy" for="morale-trait-toggle" data-size="sm" data-text="false">
+			<label class="toggle-switchy" for="morale-trait-toggle" data-size="sm" data-text="false">
 				<input checked type="checkbox" id="morale-trait-toggle" checked onclick="enable(this, 'morale-trait-check')">
 				<span class="toggle">
 					<span class="switch"></span>
 				</span>
-			</label> -->
+			</label>
 		</div>
-		<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('morale_trait')"></span> -->
+		<span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('morale_trait')"></span>
 		<div class="panel panel-default">
 			<table class="table">
 				<tr>
 					<th>Name</th>
 					<th>Positive State</th>
 					<th>Negative State</th>
-					<!-- <th>Edit</th>
-					<th>Available <input type='checkbox' class="morale-trait-check" checked onclick="checkAll(this, 'morale-trait-check')"></th> -->
+					<!-- <th>Edit</th> -->
+					<!-- <th>Available <input type='checkbox' class="morale-trait-check" checked onclick="checkAll(this, 'morale-trait-check')"></th> -->
 				</tr>
 				<?php
 					foreach($feat_list as $feat) {
@@ -586,9 +583,9 @@
 								<td>".$feat['name']."</td>
 								<td>".$pos_state."</td>
 								<td>".$neg_state."</td>
+								<td hidden><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
+								<td class='center' hidden><input class='morale-trait-check' type='checkbox' checked></td>
 							</tr>";
-								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
-								// <td class='center'><input class='morale-trait-check' type='checkbox' checked></td>
 						}
 					}
 				?>
@@ -597,21 +594,21 @@
 
 		<div class="title">
 			<h4 class="table-heading" id="section_compelling_action">Compelling Actions</h4>
-			<!-- <label class="toggle-switchy" for="compelling-action-toggle" data-size="sm" data-text="false">
+			<label class="toggle-switchy" for="compelling-action-toggle" data-size="sm" data-text="false">
 				<input checked type="checkbox" id="compelling-action-toggle" checked onclick="enable(this, 'compelling-action-check')">
 				<span class="toggle">
 					<span class="switch"></span>
 				</span>
-			</label> -->
+			</label>
 		</div>
-		<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('compelling_action')"></span> -->
+		<span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('compelling_action')"></span>
 		<div class="panel panel-default">
 			<table class="table">
 				<tr>
 					<th>Name</th>
 					<th>Description</th>
-					<!-- <th>Edit</th>
-					<th>Available <input type='checkbox' class="compelling-action-check" checked onclick="checkAll(this, 'compelling-action-check')"></th> -->
+					<!-- <th>Edit</th> -->
+					<!-- <th>Available <input type='checkbox' class="compelling-action-check" checked onclick="checkAll(this, 'compelling-action-check')"></th> -->
 				</tr>
 				<?php
 					foreach($feat_list as $feat) {
@@ -620,9 +617,9 @@
 							"<tr class='table-row'>
 								<td>".$feat['name']."</td>
 								<td>".$feat['description']."</td>
+								<td hidden><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
+								<td class='center' hidden><input class='compelling-action-check' type='checkbox' checked></td>
 							</tr>";
-								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
-								// <td class='center'><input class='compelling-action-check' type='checkbox' checked></td>
 						}
 					}
 				?>
@@ -631,21 +628,21 @@
 
 		<div class="title">
 			<h4 class="table-heading" id="section_profession">Professions</h4>
-			<!-- <label class="toggle-switchy" for="profession-toggle" data-size="sm" data-text="false">
+			<label class="toggle-switchy" for="profession-toggle" data-size="sm" data-text="false">
 				<input checked type="checkbox" id="profession-toggle" checked onclick="enable(this, 'profession-check')">
 				<span class="toggle">
 					<span class="switch"></span>
 				</span>
-			</label> -->
+			</label>
 		</div>
-		<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('profession')"></span> -->
+		<span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('profession')"></span>
 		<div class="panel panel-default">
 			<table class="table">
 				<tr>
 					<th>Name</th>
 					<th>Description</th>
-					<!-- <th>Edit</th>
-					<th>Available <input type='checkbox' class="profession-check" checked onclick="checkAll(this, 'profession-check')"></th> -->
+					<!-- <th>Edit</th> -->
+					<!-- <th>Available <input type='checkbox' class="profession-check" checked onclick="checkAll(this, 'profession-check')"></th> -->
 				</tr>
 				<?php
 					foreach($feat_list as $feat) {
@@ -654,16 +651,36 @@
 							"<tr class='table-row'>
 								<td>".$feat['name']."</td>
 								<td>".$feat['description']."</td>
+								<td hidden><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
+								<td class='center' hidden><input class='profession-check' type='checkbox' checked></td>
 							</tr>";
-
-								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
-								// <td class='center'><input class='profession-check' type='checkbox' checked></td>
 						}
 					}
 				?>
 			</table>
 		</div>
 
+	</div>
+
+	<!-- welcome modal -->
+	<div class="modal" id="welcome_modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">Settings</h4>
+				</div>
+				<div class="modal-body">
+					Welcome to your campaign settings page! From here you can:<br><br>
+					<p>- See an overview of your players' stats</p>
+					<p>- Distribute XP to your players</p>
+					<p>- Adjust which feats/traits are available to your players, or you can disable specific trait categories entirely (note, anything other than Standard Feats are only available to players during initial character creation)</p>
+					<p>- Create new feats/traits</p>
+					<div class="button-bar">
+						<button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 
 	<!-- award xp modal -->
@@ -713,40 +730,42 @@
 					<h4 class="modal-title" id="new_feat_modal_title">New Feat</h4>
 				</div>
 				<div class="modal-body">
-					<input type="hidden" id="feat_id">
-					<input type="hidden" id="feat_type_val">
-					<label class="control-label">Name</label>
-					<input class="form-control" type="text" id="feat_name_val">
-					<div class="new-feat-element" id="feat_description">
-						<label class="control-label">Description</label>
-						<textarea class="form-control" type="text" id="feat_description_val"></textarea>
-					</div>
-					<div class="new-feat-element" id="feat_pos_state">
-						<label class="control-label">Positive State</label>
-						<textarea class="form-control" type="text" id="feat_pos_state_val"></textarea>
-					</div>
-					<div class="new-feat-element" id="feat_neg_state">
-						<label class="control-label">Negative State</label>
-						<textarea class="form-control" type="text" id="feat_neg_state_val"></textarea>
-					</div>
-					<div class="new-feat-element" id="feat_cost">
-						<label class="control-label">Cost</label>
-						<input class="form-control" type="number" id="feat_cost_val">
-					</div>
-					<div class="new-feat-element" id="feat_bonus">
-						<label class="control-label">Bonus</label>
-						<input class="form-control" type="number" id="feat_bonus_val">
-					</div>
-					<div class="new-feat-element" id="feat_requirements">
-						<label class="control-label">Requirements</label>
-						<div id="requirement_container"></div>
-						<span class="glyphicon glyphicon-plus-sign" data-toggle="modal" data-target="#new_req_modal"></span>
-					</div>
-					<label class="control-label new-feat-element" for="character_create_only" id="character_create">Feat only available during character creation <input type="checkbox" id="character_create_only"></label>
-					<div class="button-bar">
-						<button type="button" class="btn btn-primary" onclick="newFeat()" id="update_feat_btn">Ok</button>
-						<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-					</div>
+					<form id="new_feat_form">
+						<input type="hidden" id="feat_id" name="feat_id">
+						<input type="hidden" id="feat_type_val" name="feat_type">
+						<label class="control-label">Name</label>
+						<input class="form-control" type="text" id="feat_name_val" name="feat_name">
+						<div class="new-feat-element" id="feat_description">
+							<label class="control-label">Description</label>
+							<textarea class="form-control" type="text" id="feat_description_val" name="feat_descrip"></textarea>
+						</div>
+						<div class="new-feat-element" id="feat_pos_state">
+							<label class="control-label">Positive State</label>
+							<textarea class="form-control" type="text" id="feat_pos_state_val" name="feat_pos_state"></textarea>
+						</div>
+						<div class="new-feat-element" id="feat_neg_state">
+							<label class="control-label">Negative State</label>
+							<textarea class="form-control" type="text" id="feat_neg_state_val" name="feat_neg_state"></textarea>
+						</div>
+						<div class="new-feat-element" id="feat_cost">
+							<label class="control-label">Cost</label>
+							<input class="form-control" type="number" min="0" id="feat_cost_val" name="feat_cost">
+						</div>
+						<div class="new-feat-element" id="feat_bonus">
+							<label class="control-label">Bonus</label>
+							<input class="form-control" type="number" min="0" id="feat_bonus_val" name="feat_bonus">
+						</div>
+						<div class="new-feat-element" id="feat_requirements">
+							<label class="control-label">Requirements</label>
+							<div id="requirement_container"></div>
+							<span class="glyphicon glyphicon-plus-sign" data-toggle="modal" data-target="#new_req_modal"></span>
+						</div>
+						<label class="control-label new-feat-element" for="character_create_only" id="character_create">Feat only available during character creation <input type="checkbox" id="character_create_only" name="feat_character_create"></label>
+						<div class="button-bar">
+							<button type="button" class="btn btn-primary" onclick="newFeat()" id="update_feat_btn">Ok</button>
+							<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+						</div>
+					</form>
 				</div>
 			</div>
 		</div>
@@ -847,6 +866,70 @@
 		</div>
 	</div>
 
+	<!-- suggestion modal -->
+	<div class="modal" id="suggestion_modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+		  <div class="modal-content">
+		    <div class="modal-header">
+		      <h4 class="modal-title">The Suggestion Box</h4>
+		    </div>
+		    <div class="modal-body">
+		    	<h5 class="center">Got a suggestion for us? Something we can do better? Something not working right? Let us know!</h5>
+		    	<textarea class="form-control" id="suggestion" rows="6"></textarea>
+		    	<div class="button-bar">
+		        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+		        	<button type="button" class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#suggestion_modal2">Next</button>
+		    	</div>
+		    </div>
+		  </div>
+		</div>
+	</div>
+
+	<!-- suggestion modal 2 -->
+	<div class="modal" id="suggestion_modal2" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+		  <div class="modal-content">
+		    <div class="modal-header">
+		      <h4 class="modal-title">The Suggestion Box</h4>
+		    </div>
+		    <div class="modal-body">
+		    	<h5 class="center">What's the secret nerd word?</h5>
+		    	<input class="form-control" type="text" id="nerd_word">
+		    	<div class="button-bar">
+		        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+		        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="submitSuggestion()">Submit</button>
+		    	</div>
+		    </div>
+		  </div>
+		</div>
+	</div>
+
+	<!-- GM edit modal -->
+	<div class="modal" id="gm_modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+		  <div class="modal-content">
+		    <div class="modal-header">
+		      <h4 class="modal-title">Admin Settings</h4>
+		    </div>
+		    <div class="modal-body">
+		    	<h4 class="control-label center">What's the secret word?</h4>
+		    	<input class="form-control" type="text" id="gm_password">
+		    	<div class="button-bar">
+		        	<button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+		        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+		    	</div>
+		    </div>
+		  </div>
+		</div>
+	</div>
+
+	<!-- footer -->
+	<div class="footer row">
+		<p class="link col-md-4" data-toggle="modal" data-target="#welcome_modal"><span class="glyphicon glyphicon-info-sign"></span> Guide</p>
+		<p class="link col-md-4" data-toggle="modal" data-target="#suggestion_modal"><span class="glyphicon glyphicon-envelope"></span> Suggestion Box</p>
+		<p class=" col-md-4">© <?php echo date("Y"); ?> CrabAgain.com</p>
+	</div>
+
 </body>
 
 <!-- JavaScript -->
@@ -888,6 +971,9 @@
 	$("#select_all").on("change", function(){
 		$(".xp-checkbox").prop("checked", this.checked);
 	});
+
+	var users = <?php echo json_encode($users); ?>;
+	var campaign = <?php echo json_encode($campaign); ?>;
 
 	// get feat list and requirements
 	var feat_list = <?php echo json_encode($feat_list); ?>;
@@ -978,6 +1064,12 @@
 		$("#xp_val").val("");
 		$(".xp-checkbox").prop("checked", false);
 	});
+	$("#gm_modal").on('shown.bs.modal', function(){
+		$("#gm_password").focus();
+	});
+	$("#gm_modal").on('hidden.bs.modal', function(){
+		GMModalClose();
+	});
 
 	// add a new feat requirement
 	function newRequirement() {
@@ -1063,6 +1155,12 @@
 	    	'class': 'feat-requirement-label',
 	    	'text': value
 	    }).appendTo(span);
+	    $('<input />', {
+	    	'type': 'hidden',
+	    	'value': value,
+	    	'name': 'feat_reqs[]',
+	    	'class': 'feat-req-val'
+	    }).appendTo(span);
 		var removeBtn = $('<span />', {
 		  'class': 'glyphicon glyphicon-remove',
 		}).appendTo(span);
@@ -1129,20 +1227,76 @@
 
 	// create/update feat from modal values
 	function newFeat() {
-		// TODO make sure name, description, and reqs aren't empty
+		var error = "";
+		if ($("#feat_name_val").val() == "") {
+			error = "Name is required";
+		}
+		switch ($("#feat_type_val").val()) {
+			case "feat":
+				if ($("#feat_description_val").val() == "") {
+					error = "Description is required";
+				}
+				break;
+			case "morale_trait":
+				if ($("#feat_pos_state_val").val() == "") {
+					error = "Positive state is required";
+				}
+				if ($("#feat_neg_state_val").val() == "") {
+					error = "Negative state is required";
+				}
+				break;
+			case "physical_trait_pos":
+				if ($("#feat_description_val").val() == "") {
+					error = "Description is required";
+				}
+				if ($("#feat_cost_val").val() == "") {
+					error = "Cost is required";
+				}
+				break;
+			case "physical_trait_neg":
+				if ($("#feat_description_val").val() == "") {
+					error = "Description is required";
+				}
+				if ($("#feat_bonus_val").val() == "") {
+					error = "Bonus is required";
+				}
+				break;
+			case "social_trait":
+			case "compelling_action":
+			case "profession":
+				if ($("#feat_description_val").val() == "") {
+					error = "Description is required";
+				}
+				break;
+		}
+		if (error != "") {
+			alert(error);
+			return;
+		}
 
 		// check if we are editing or creating a new feat
-		var editing = $("#feat_id").val() != undefined && $("#feat_id").val() != "";
-		if (editing) {
-			var conf = confirm("Are you sure you want to update this feat?");
-			if (conf) {
-
-			}
-		} else {
-			var conf = confirm("Are you sure you want to create a new feat?");
-			if (conf) {
-
-			}
+		var conf = ($("#feat_id").val() != undefined && $("#feat_id").val() != "") ?
+			confirm("Are you sure you want to update this feat?") : confirm("Are you sure you want to create a new feat?");
+		if (conf) {
+			// append admin password to form
+		    $('<input />', {
+		    	'type': 'hidden',
+		    	'value': campaign['admin_password'],
+		    	'name': 'admin_password'
+		    }).appendTo($("#new_feat_form"));
+			// submit form via ajax
+			$.ajax({
+                url: 'feat_submit.php',
+                type: 'POST',
+                data: $("#new_feat_form").serialize(),
+                success:function(result){
+                	// TODO can also get auth value from admin_password.val?
+                	if (result != "") {
+                		// reload page
+                		window.location.replace("/admin.php?campaign="+$('#campaign_id').val()+"&auth="+result);
+                	}
+                }
+            });
 		}
 	}
 
@@ -1197,6 +1351,41 @@
 		}
 	}
 
+	// check admin password for settings page
+	function GMModalClose() {
+		// check password
+		var password =  $("#gm_password").val();
+		var hashed_password = $("#admin_password").val();
+		$("#gm_password").val("");
+		// no password entered - return home
+		if (hashed_password == "" && password == "") {
+			window.location.href = "/?campaign="+$('#campaign_id').val();
+			return;
+		}
+		// check admin_password
+		$.ajax({
+		  url: 'check_admin_password.php',
+		  data: { 'password' : password.toLowerCase().trim(), 'admin_password' : campaign['admin_password'], 'hashed_password' : hashed_password },
+		  ContentType: "application/json",
+		  type: 'POST',
+		  success: function(response){
+		  	if (response != 1) {
+		  		// bad password - return home
+				window.location.href = "/?campaign="+$('#campaign_id').val();
+		  	} else {
+		  		// set url auth value
+		  		if ($("#admin_password").val() == "") {
+		  			window.location.replace("/admin.php?campaign="+$('#campaign_id').val()+"&auth="+campaign['admin_password']);
+		  		}
+				// new campaign - show information dialog
+				if (users.length == 0) {
+					$("#welcome_modal").modal("show");
+				}
+		  	}
+		  }
+		});
+	}
+
 	function enable(e, type) {
 		$("."+type).attr("disabled", !e.checked);
 	}
@@ -1220,5 +1409,16 @@
 			$("#scroll_top").addClass("no-vis");
 		}
 	};
+
+	$(document).ready(function() {
+		if ($("#admin_password").val() == "") {
+			$("#gm_modal").modal("show");
+		} else {
+			GMModalClose();
+		}
+	});
+	$(window).bind("unload", function() {
+		// make sure admin password modal shows when page loads
+	});
 
 </script>

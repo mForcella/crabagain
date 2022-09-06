@@ -189,8 +189,8 @@
 			  type: 'POST',
 			  success: function(response) {
 			  	if (response != 0) {
-					// redirect to new campaign page
-					window.location.href = "/?campaign="+response;
+					// redirect to campaign admin page
+					window.location.href = "/admin.php?campaign="+response;
 			  	} else {
 			  		// handle error?
 			  	}

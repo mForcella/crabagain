@@ -67,7 +67,9 @@ $(document).on('input', '.clearable', function() {
 
 // trigger 'unsaved changes' alert when leaving the page
 $("input").on("change", function(){
-	unsavedChanges = true;
+	if (this.id != "gm_password") {
+		unsavedChanges = true;
+	}
 });
 $("textarea").on("input propertychange", function(){
 	unsavedChanges = true;
@@ -143,31 +145,8 @@ if (!is_mobile) {
 
 // launch GM modal
 function settings() {
-	// set modal title
-	$("#gm_title").html("Admin Settings");
-	$("#gm_modal").modal("show");
-}
-
-// check admin password for settings page
-function adminSettings() {
-	// check password
-	var password = $("#gm_password").val();
-	$("#gm_password").val("");
-	// check admin_password
-	$.ajax({
-	  url: 'check_admin_password.php',
-	  data: { 'password' : password, 'admin_password' : campaign['admin_password'] },
-	  ContentType: "application/json",
-	  type: 'POST',
-	  success: function(response){
-	  	if (response == 1) {
-	  		// launch settings page
-				window.location.href = "/admin.php?campaign="+$('#campaign_id').val();
-	  	} else {
-				alert("Sorry sucker, that ain't it.");
-	  	}
-	  }
-	});
+	toggleMenu();
+	window.location.href = "/admin.php?campaign="+$('#campaign_id').val();
 }
 
 // enter GM edit mode
@@ -184,28 +163,28 @@ function GMEditMode() {
 	  success: function(response){
 	  	if (response == 1) {
 	  		// enter admin edit mode
-				adminEditMode = true;
-				
-				// show GM menu, hide hamburger menu
-			  $(".gm-menu").toggleClass("active");
-				$(".glyphicon-menu-hamburger").hide().toggleClass("active");
+			adminEditMode = true;
+			
+			// show GM menu, hide hamburger menu
+		  	$(".gm-menu").toggleClass("active");
+			$(".glyphicon-menu-hamburger").hide().toggleClass("active");
 
-				// show hidden attribute icons
-				$(".attribute-col").find(".hidden-icon").each(function(){
-					$(this).show();
-				});
+			// show hidden attribute icons
+			$(".attribute-col").find(".hidden-icon").each(function(){
+				$(this).show();
+			});
 
-				// show new feat button
-				$("#new_feat_btn").show();
+			// show new feat button
+			$("#new_feat_btn").show();
 
-				// show hidden feat buttons and unbind hover functions
-				$("#feats").find(".glyphicon").show();
+			// show hidden feat buttons and unbind hover functions
+			$("#feats").find(".glyphicon").show();
 
-				// enable edit attribute pts input, enable edit xp input
-				$("#attribute_pts").attr("readonly", false).attr("type", "number");
-				$("#xp").attr("readonly", false).attr("type", "number").attr("data-toggle", null);
+			// enable edit attribute pts input, enable edit xp input
+			$("#attribute_pts").attr("readonly", false).attr("type", "number");
+			$("#xp").attr("readonly", false).attr("type", "number").attr("data-toggle", null);
 	  	} else {
-				alert("Sorry sucker, that ain't it.");
+			alert("Sorry sucker, that ain't it.");
 	  	}
 	  }
 	});
@@ -734,14 +713,6 @@ $("#gm_modal").on('shown.bs.modal', function(){
 $("#gm_modal").on('hidden.bs.modal', function(){
 	$("#gm_title").html("GM Edit Mode")
 });
-function GMModalClose() {
-	// check title value
-	if ($("#gm_title").html() == "GM Edit Mode") {
-		GMEditMode();
-	} else {
-		adminSettings();
-	}
-}
 $("#help_modal").on('shown.bs.modal', function(){
 	// toggleMenu();
 });
