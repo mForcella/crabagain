@@ -31,6 +31,15 @@
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
   );
 
+  CREATE TABLE campaign_feat (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    campaign_id int,
+    feat_id int,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (campaign_id) REFERENCES campaign(id),
+    FOREIGN KEY (feat_id) REFERENCES feat_or_trait(id)
+  );
+
   CREATE TABLE user (
     id int PRIMARY KEY AUTO_INCREMENT,
     campaign_id int,

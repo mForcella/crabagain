@@ -20,10 +20,68 @@
     	array_push($users, $row);
     }
   }
+
+  // get feat_id list
+  $feat_ids = [];
+	$sql = "SELECT feat_id FROM campaign_feat WHERE campaign_id = ".$_GET["campaign"];
+	$result = $db->query($sql);
+  if ($result) {
+    while($row = $result->fetch_assoc()) {
+    	array_push($feat_ids, $row['feat_id']);
+    }
+  }
+
+	// get active counts for each feat type
+	$counts = [];
+	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'physical_trait' AND cost > 0";
+	$result = $db->query($sql);
+	if ($result) {
+		while($row = $result->fetch_assoc()) {
+			$counts['physical_pos_count'] = $row['count'];
+		}
+	}
+	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'physical_trait' AND cost < 0";
+	$result = $db->query($sql);
+	if ($result) {
+		while($row = $result->fetch_assoc()) {
+			$counts['physical_neg_count'] = $row['count'];
+		}
+	}
+	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'social_trait'";
+	$result = $db->query($sql);
+	if ($result) {
+		while($row = $result->fetch_assoc()) {
+			$counts['social_count'] = $row['count'];
+		}
+	}
+	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'morale_trait'";
+	$result = $db->query($sql);
+	if ($result) {
+		while($row = $result->fetch_assoc()) {
+			$counts['morale_count'] = $row['count'];
+		}
+	}
+	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'compelling_action'";
+	$result = $db->query($sql);
+	if ($result) {
+		while($row = $result->fetch_assoc()) {
+			$counts['compelling_count'] = $row['count'];
+		}
+	}
+	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'profession'";
+	$result = $db->query($sql);
+	if ($result) {
+		while($row = $result->fetch_assoc()) {
+			$counts['profession_count'] = $row['count'];
+		}
+	}
   
   // get feat list
 	$feat_list = [];
 	$sql = "SELECT * FROM feat_or_trait";
+	if (count($feat_ids) > 0) {
+		$sql .= " WHERE id IN (".implode(",",$feat_ids).")";
+	}
 	$result = $db->query($sql);
   if ($result) {
     while($row = $result->fetch_assoc()) {
@@ -1381,12 +1439,13 @@
         	<label class="control-label <?php echo isset($user) && $user['xp'] != 0 ? 'hidden' : ''; ?>" id="select_feat_type_label">Type</label>
         	<select class="form-control <?php echo isset($user) && $user['xp'] != 0 ? 'hidden' : ''; ?>" id="select_feat_type">
         		<option value="feat_name">Standard Feat</option>
-        		<option value="social_trait_name">Social Trait</option>
-        		<option value="physical_trait_pos_name">Physical Trait (Positive)</option>
-        		<option value="physical_trait_neg_name">Physical Trait (Negative)</option>
-        		<option value="morale_trait_name">Morale Trait</option>
-        		<option value="compelling_action_name">Compelling Action</option>
-        		<option value="profession_name">Profession</option>
+        		<!-- hide options if their counts are zero -->
+        		<option value="social_trait_name" <?php echo count($feat_ids) > 0 && $counts['social_count'] == 0 ? 'hidden' : '' ?>>Social Trait</option>
+        		<option value="physical_trait_pos_name" <?php echo count($feat_ids) > 0 && $counts['physical_pos_count'] == 0 ? 'hidden' : '' ?>>Physical Trait (Positive)</option>
+        		<option value="physical_trait_neg_name" <?php echo count($feat_ids) > 0 && $counts['physical_neg_count'] == 0 ? 'hidden' : '' ?>>Physical Trait (Negative)</option>
+        		<option value="morale_trait_name" <?php echo count($feat_ids) > 0 && $counts['morale_count'] == 0 ? 'hidden' : '' ?>>Morale Trait</option>
+        		<option value="compelling_action_name" <?php echo count($feat_ids) > 0 && $counts['compelling_count'] == 0 ? 'hidden' : '' ?>>Compelling Action</option>
+        		<option value="profession_name" <?php echo count($feat_ids) > 0 && $counts['profession_count'] == 0 ? 'hidden' : '' ?>>Profession</option>
         	</select>
         	<label class="control-label">Name</label>
         	<input type="hidden" id="feat_name_val">

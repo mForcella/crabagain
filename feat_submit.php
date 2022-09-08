@@ -39,8 +39,8 @@
 	$db->query($sql);
 	
 	// get insert ID and add reqs for standard feats
+	$feat_id = $db->insert_id;
 	if ($type == "feat") {
-		$feat_id = $db->insert_id;
 		$reqs = $_POST['feat_reqs'];
 		foreach ($reqs as $req) {
 			$sql = "INSERT INTO feat_or_trait_req_set (feat_id) VALUES (".$feat_id.")";
@@ -65,8 +65,20 @@
 		}
 	}
 
-	// return admin password for page reload
-	echo $_POST['admin_password'];
+	// if campaign has campign_feat entries, create new campign_feat entry
+	$sql = "SELECT count(*) as count FROM campaign_feat WHERE campaign_id = ".$_POST['campaign_id'];
+	$result = $db->query($sql);
+	if ($result) {
+		while($row = $result->fetch_assoc()) {
+			if ($row['count'] > 0) {
+				$sql = "INSERT INTO campaign_feat (feat_id, campaign_id) VALUES (".$feat_id.", ".$_POST['campaign_id'].")";
+				$db->query($sql);
+			}
+		}
+	}
+
+	// return feat_id
+	echo $feat_id;
 
 	$db->close();
 
