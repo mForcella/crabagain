@@ -69,9 +69,31 @@
 			}
 			$user['defend_bonus'] = $defend_bonus;
 
+			// get primary / secondary initiative
+			$user['primary'] = $user['awareness'] >= 0 ? 10 - floor($user['awareness']/2) : 10 - ceil($user['awareness']/3);
+			$user['secondary'] = $user['speed'] >= 0 ? 10 - floor($user['speed']/2) : 10 - ceil($user['speed']/3);
+
+			// if character has 'quick and the dead' as feat, primary and secondary can be switched
+			$sql = "SELECT count(*) as count FROM user_feat WHERE user_id = ".$user["id"]." AND LOWER(name) LIKE '%quick %dead'";
+			$result = $db->query($sql);
+			if ($result) {
+				while($row = $result->fetch_assoc()) {
+					if ($row['count'] > 0 && $user['secondary'] < $user['primary'] && $user['awareness'] >= 0) {
+						$hold = $user['primary'];
+						$user['primary'] = $user['secondary'];
+						$user['secondary'] = $hold;
+					}
+				}
+			}
+
 			array_push($users, $user);
 		}
 	}
+
+	// sort users by initiative
+	$primary = array_column($users, 'primary');
+	$secondary = array_column($users, 'secondary');
+	array_multisort($primary, SORT_ASC, $secondary, SORT_ASC, $users);
   
 	// get feat list
 	$feats = [];

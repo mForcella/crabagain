@@ -157,7 +157,7 @@ function GMEditMode() {
 	// check admin_password
 	$.ajax({
 	  url: 'check_admin_password.php',
-	  data: { 'password' : password, 'admin_password' : campaign['admin_password'] },
+	  data: { 'password' : password, 'admin_password' : campaign['admin_password'], 'hashed_password': "" },
 	  ContentType: "application/json",
 	  type: 'POST',
 	  success: function(response){
