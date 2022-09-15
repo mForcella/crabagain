@@ -80,7 +80,7 @@
 	$feat_list = [];
 	$sql = "SELECT * FROM feat_or_trait";
 	if (count($feat_ids) > 0) {
-		$sql .= " WHERE id IN (".implode(",",$feat_ids).")";
+		$sql .= " WHERE id IN (".implode(',',$feat_ids).")";
 	}
 	$result = $db->query($sql);
   if ($result) {
@@ -239,7 +239,7 @@
 	    	}
 	    ?>
 	    <div class="nav-item">
-	       <span class="glyphicon" onclick="settings()"><span class="nav-item-label"><i class="fa-solid fa-gear nav-icon"></i> Admin Settings</span></span>
+	       <span class="glyphicon" onclick="settings()"><span class="nav-item-label"><i class="fa-solid fa-gear nav-icon"></i> Campaign Admin</span></span>
 	    </div>
 	    <div class="nav-item">
 	       <span class="glyphicon" onclick="back()"><span class="nav-item-label"><i class="fa-solid fa-arrow-left nav-icon"></i> Change Campaign</span></span>

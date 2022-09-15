@@ -11,6 +11,19 @@
 	  	die("Connection failed: " . $db->connect_error);
 	}
 
+	// make sure feat name isn't duplicate
+	$sql = "SELECT count(*) as count FROM feat_or_trait WHERE LOWER(name) LIKE LOWER('".addslashes(trim($_POST['feat_name']))."')";
+	$result = $db->query($sql);
+	if ($result) {
+		while($row = $result->fetch_assoc()) {
+			if ($row['count'] > 0) {
+				echo 'Feat name already in use';
+				$db->close();
+				return;
+			}
+		}
+	}
+
 	$type = $_POST['feat_type'];
 	$sql = "";
 	switch($type) {
@@ -65,17 +78,17 @@
 		}
 	}
 
-	// if campaign has campign_feat entries, create new campign_feat entry
-	$sql = "SELECT count(*) as count FROM campaign_feat WHERE campaign_id = ".$_POST['campaign_id'];
-	$result = $db->query($sql);
-	if ($result) {
-		while($row = $result->fetch_assoc()) {
-			if ($row['count'] > 0) {
-				$sql = "INSERT INTO campaign_feat (feat_id, campaign_id) VALUES (".$feat_id.", ".$_POST['campaign_id'].")";
-				$db->query($sql);
-			}
-		}
-	}
+	// if campaign has campign_feat entries for current feat type, create new campign_feat entry
+	// $sql = "SELECT count(*) as count FROM campaign_feat JOIN feat_or_trait ON campaign_feat.feat_id = feat_or_trait.id WHERE campaign_id = ".$_POST['campaign_id']." AND type = .".$_POST['feat_type']."'";
+	// $result = $db->query($sql);
+	// if ($result) {
+	// 	while($row = $result->fetch_assoc()) {
+	// 		if ($row['count'] > 0) {
+	// 			$sql = "INSERT INTO campaign_feat (feat_id, campaign_id) VALUES (".$feat_id.", ".$_POST['campaign_id'].")";
+	// 			$db->query($sql);
+	// 		}
+	// 	}
+	// }
 
 	// return feat_id
 	echo $feat_id;

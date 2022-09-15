@@ -33,18 +33,18 @@ INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Unmistakable'
 INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Weak Metabolism', '-2 Fortitude vs. Poisons, Drugs and Alcohol.', 'physical_trait', -2);
 
 -- MORALE TRAITS
-INSERT INTO feat_or_trait (name, description, type) VALUES ('Celebrity', 'Positive State: You gained 2 Renown last Session; Negative State: You didn’t gain any Renown last Session.', 'morale_trait');
-INSERT INTO feat_or_trait (name, description, type) VALUES ('Extrovert', 'Positive State: A new NPC really likes you; Negative State: You didn’t hang out with any NPC friends.', 'morale_trait');
-INSERT INTO feat_or_trait (name, description, type) VALUES ('Fancypants', 'Positive State: You had a new luxury experience this Session; Negative State: No luxury experience last Session.', 'morale_trait');
-INSERT INTO feat_or_trait (name, description, type) VALUES ('Gamer', 'Positive State: You won some kind of game this Session; Negative State: You lost a game last Session.', 'morale_trait');
-INSERT INTO feat_or_trait (name, description, type) VALUES ('Glutton', 'Positive State: All of your meals were excessive; Negative State: None of your meals were decent last Session.', 'morale_trait');
-INSERT INTO feat_or_trait (name, description, type) VALUES ('Merrymaker', 'Positive State: You got drunk this Session; Negative State: You didn’t have any drinks last Session.', 'morale_trait');
-INSERT INTO feat_or_trait (name, description, type) VALUES ('Miracle', 'Positive State: You used no Alignment Bonuses last Session; Negative State: You used all Alignment Bonuses last Session.', 'morale_trait');
-INSERT INTO feat_or_trait (name, description, type) VALUES ('Pennypincher', 'Positive State: You have more than 800 credits/8 Gold/$40; Negative State: You have less than 400 credits/4 Gold/$20.', 'morale_trait');
-INSERT INTO feat_or_trait (name, description, type) VALUES ('Philanderer', 'Positive State: You had 1 new sexual encounter this Session; Negative State: No new encounters last Session.', 'morale_trait');
-INSERT INTO feat_or_trait (name, description, type) VALUES ('Rover', 'Positive State: You went to a new planet/region this Session; Negative State: You stayed in one place last Session.', 'morale_trait');
-INSERT INTO feat_or_trait (name, description, type) VALUES ('Spendthrift', 'Positive State: You have less than 20 credits/4 Silver/$1; Negative State: You have more than 200 credits/2 Gold/$10.', 'morale_trait');
-INSERT INTO feat_or_trait (name, description, type) VALUES ('Wunderkind', 'Positive State: You succeeded all rolls last Session; Negative State: You failed 2 or more rolls last Session.', 'morale_trait');
+INSERT INTO feat_or_trait (name, description, type) VALUES ('Celebrity', 'Positive State: You gained 2 Renown last Session; Negative State: You didn’t gain any Renown last Session', 'morale_trait');
+INSERT INTO feat_or_trait (name, description, type) VALUES ('Extrovert', 'Positive State: A new NPC really likes you; Negative State: You didn’t hang out with any NPC friends', 'morale_trait');
+INSERT INTO feat_or_trait (name, description, type) VALUES ('Fancypants', 'Positive State: You had a new luxury experience this Session; Negative State: No luxury experience last Session', 'morale_trait');
+INSERT INTO feat_or_trait (name, description, type) VALUES ('Gamer', 'Positive State: You won some kind of game this Session; Negative State: You lost a game last Session', 'morale_trait');
+INSERT INTO feat_or_trait (name, description, type) VALUES ('Glutton', 'Positive State: All of your meals were excessive; Negative State: None of your meals were decent last Session', 'morale_trait');
+INSERT INTO feat_or_trait (name, description, type) VALUES ('Merrymaker', 'Positive State: You got drunk this Session; Negative State: You didn’t have any drinks last Session', 'morale_trait');
+INSERT INTO feat_or_trait (name, description, type) VALUES ('Miracle', 'Positive State: You used no Alignment Bonuses last Session; Negative State: You used all Alignment Bonuses last Session', 'morale_trait');
+INSERT INTO feat_or_trait (name, description, type) VALUES ('Pennypincher', 'Positive State: You have more than 800 credits/8 Gold/$40; Negative State: You have less than 400 credits/4 Gold/$20', 'morale_trait');
+INSERT INTO feat_or_trait (name, description, type) VALUES ('Philanderer', 'Positive State: You had 1 new sexual encounter this Session; Negative State: No new encounters last Session', 'morale_trait');
+INSERT INTO feat_or_trait (name, description, type) VALUES ('Rover', 'Positive State: You went to a new planet/region this Session; Negative State: You stayed in one place last Session', 'morale_trait');
+INSERT INTO feat_or_trait (name, description, type) VALUES ('Spendthrift', 'Positive State: You have less than 20 credits/4 Silver/$1; Negative State: You have more than 200 credits/2 Gold/$10', 'morale_trait');
+INSERT INTO feat_or_trait (name, description, type) VALUES ('Wunderkind', 'Positive State: You succeeded all rolls last Session; Negative State: You failed 2 or more rolls last Session', 'morale_trait');
 
 -- PROFESSIONS
 INSERT INTO feat_or_trait (name, description, type) VALUES ('Archaeologist', 'You have studied and taught ancient civilizations and cultures of South America at world renowned Universities and are one of the best in your field. You can identify artifacts and structures of all known societies in South America and can make educated guesses about the purpose and nature of unknown ones. You can translate ancient writing from all known past civilizations in South American and may attempt translation of unknown ones. Archaeology must be learned under Intellect.', 'profession');
