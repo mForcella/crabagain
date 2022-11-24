@@ -567,16 +567,17 @@ function setDefend() {
 	var agility = parseInt($("#agility_val").val());
 	var defend = 10 + agility + (size == "Small" ? 2 : (size == "Large" ? -2 : 0));
 	// check for weapon defend mofifier
+	var bonus = 0;
 	$(".weapon-select").each(function(){
 		if ($(this).val() != "") {
 			for (var i in weapons) {
 				if ($(this).val() == weapons[i]['name'] && weapons[i]['defend'] != ''&& weapons[i]['defend'] != undefined) {
-					defend += parseInt(weapons[i]['defend']);
+					bonus += parseInt(weapons[i]['defend']);
 				}
 			}
 		}
 	});
-	$("#defend").val(defend);
+	$("#defend").val(bonus > 0 ? defend + " (+"+bonus+")" : defend);
 }
 
 function setToughness() {
@@ -591,7 +592,7 @@ function setToughness() {
 			}
 		}
 	}
-	$("#toughness").val(toughness + bonus);
+	$("#toughness").val(bonus > 0 ? toughness + " (+"+bonus+")" : toughness);
 }
 
 // penalty inputs - if val is zero, clear input
@@ -817,14 +818,14 @@ function setFeatList() {
 					for (key in req) {
 						switch (key) {
 							case 'feat':
-							satisfied = satisfied ? true : includesIgnoreCase(featNames, req[key]);
-							break;
+								satisfied = satisfied ? true : includesIgnoreCase(featNames, req[key]);
+								break;
 							case 'training':
-							satisfied = satisfied ? true : includesIgnoreCase(trainingNames, req[key]);
-							break;
-							default:
-							satisfied = satisfied ? true : user[key] >= req[key];
-							break;
+								satisfied = satisfied ? true : includesIgnoreCase(trainingNames, req[key]);
+								break;
+							default: // skill
+								satisfied = satisfied ? true : user[key] >= req[key];
+								break;
 						}
 					}
 				});
@@ -974,27 +975,24 @@ function setAttributes(user) {
 	editSize();
 	// set initiative
 	adjustInitiative();
-	// check for pending xp award
-	if (user['xp_awarded'] != undefined && user['xp_awarded'] != 0) {
-		$("#xp").val(parseInt(user['xp'])+parseInt(user['xp_awarded'])).trigger("change");
-		// update character xp and award in database
-		var users = [];
-		var xp = [];
-		var awards = [];
-		var attribute_pts = [];
-		users.push(user['id']);
-		awards.push(0);
-		xp.push($("#xp").val());
-		attribute_pts.push(parseInt($("#attribute_pts").val()));
+
+	// check for pending xp awards
+	if (xp_awards.length > 0) {
+		var award = 0;
+		for (var i in xp_awards) {
+			award += parseInt(xp_awards[i]['xp_award']);
+		}
+		$("#xp").val(parseInt(user['xp'])+award).trigger("change");
+		// update character xp, awards, and attribute points in database
 		$.ajax({
-		  url: 'update_xp.php',
-		  data: { 'users' : users, 'xp' : xp, 'awards' : awards, 'attribute_pts' : attribute_pts },
-		  ContentType: "application/json",
-		  type: 'POST',
-		  success: function(response){
-		  	// no action
-		  }
-		});	
+			url: 'update_xp.php',
+			data: { 'user' : user['id'], 'xp' : $("#xp").val(), 'attribute_pts' : parseInt($("#attribute_pts").val()) },
+			ContentType: "application/json",
+			type: 'POST',
+			success: function(response) {
+				// no action
+			}
+		});
 	}
 }
 

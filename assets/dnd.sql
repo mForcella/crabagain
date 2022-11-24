@@ -48,7 +48,7 @@
     character_name varchar(64),
     attribute_pts int,
     xp int,
-    xp_awarded int DEFAULT 0,
+    -- xp_awarded int DEFAULT 0,
     morale int,
     race varchar(64),
     height varchar(64),
@@ -172,6 +172,14 @@
     quantity varchar(64),
     notes varchar(255),
     weight float,
+    user_id int,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (user_id) REFERENCES user(id)
+  );
+
+  CREATE TABLE user_xp_award (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    xp_award int,
     user_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES user(id)

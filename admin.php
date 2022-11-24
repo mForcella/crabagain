@@ -27,6 +27,17 @@
 		while($row_u = $result_u->fetch_assoc()) {
 			$user = $row_u;
 
+			// get xp awards
+			$xp_award = 0;
+			$sql = "SELECT xp_award FROM user_xp_award WHERE user_id = ".$user["id"];
+			$result_xp = $db->query($sql);
+			if ($result_xp) {
+				while($row_xp = $result_xp->fetch_assoc()) {
+					$xp_award += $row_xp['xp_award'];
+				}
+			}
+			$user['xp_award'] = $xp_award;
+
 			// get toughness bonus from equipped protections
 			$toughness_bonus = 0;
 			$sql = "SELECT bonus FROM user_protection WHERE user_id = ".$user["id"]." AND equipped = 1";
@@ -258,6 +269,8 @@
 	}
 	.panel {
 		border: 1px solid black;
+		display: table;
+		margin: 0 auto;
 	}
 	.table {
 		background-color: #e6e6e6;
@@ -272,13 +285,77 @@
 	.container, .footer {
 		min-width: 750px;
 	}
+	.footer {
+		margin-top: 30px;
+	}
+	@media (min-width: 768px) {
+		.container {
+			width: auto;
+		}
+	}
 	.glyphicon-plus-sign {
 		width: 100%;
 		text-align: center;
 		margin-bottom: 20px;
 	}
+	#xp_modal {
+		width: 750px;
+		position: absolute;
+	}
+	#xp_modal .modal-content {
+		background-color: #cccccc;
+	}
+	#xp_modal .note {
+		max-width: 500px;
+		margin: 0 auto;
+		margin-top: 15px;
+	}
+	.small {
+		font-size: 75%;
+	}
+	th input {
+		margin-top: -3px !important;
+	}
+	@media (max-width: 868px) {
+		#xp_modal {
+			top: 30px;
+		}
+		#xp_modal .modal-dialog {
+			width: 595px;
+			margin: 0 auto;
+		}
+	}
+	@media (max-width: 767px) {
+		#xp_modal .table>tbody>tr>td, #xp_modal .table>tbody>tr>th {
+			padding: 5px;
+			font-size: 12px;
+		}
+		th input {
+			margin-top: -6px !important;
+		}
+		#xp_modal .modal-dialog {
+			width: 415px;
+		}
+		#xp_modal .note {
+			max-width: 300px;
+		}
+		#xp_modal .small {
+			font-size: 63%;
+		}
+	}
 	.modal label {
 		margin-top: 15px;
+	}
+	.modal-open {
+		overflow: visible;
+	}
+	.modal {
+		margin: 0 auto;
+	}
+	@media (min-width: 768px) {
+		.modal-dialog {
+			width: 100%;
+		}
 	}
 	#feat_description_val {
 		height: 100px;
@@ -333,6 +410,10 @@
 	}
 	table.center th {
 		text-align: center;
+		padding-top: 10px !important;
+	}
+	table.center td input {
+/*		margin-top: 7px !important;*/
 	}
 	a {
 		color: black !important;
@@ -363,10 +444,21 @@
 	}
 	#xp_btn {
 		margin-bottom: 15px;
+		margin-top: 20px;
+		font-size: 20px;
+		font-weight: bold;
+		padding: 5px 10px;
+	}
+	#xp_btn .fa-solid {
+		font-size: 16px;
+		transform: translateY(-2px);
 	}
 	.xp-label {
 		margin-left: 10px;
 		max-width: 190px;
+	}
+	.modal label {
+		margin-top: 0;
 	}
 	.xp-input {
 		margin-top: 12px;
@@ -379,13 +471,34 @@
 	.short-input {
 		width: 50px;
 	}
-	.award {
-		float: right;
-		margin-top: 10px;
+	.table input {
 		width: 50px;
+		margin: 0 auto;
+		display: inline;
 	}
 	.name-row {
-		max-width: 200px;
+		max-width: 164px;
+	}
+	.mobile-name-row {
+		display: none;
+		border-bottom: none;
+	}
+	.mobile-name-row, .mobile-name-row strong {
+		text-decoration: underline;
+	}
+	td .min, td.min {
+		min-width: 150px;
+	}
+	@media (max-width: 868px) {
+		.name-row {
+			display: none;
+		}
+		.mobile-name-row {
+			display: table-row;
+		}
+		.table-row td {
+			border-top: none !important;
+		}
 	}
 	.pointer {
 		cursor: pointer;
@@ -432,11 +545,12 @@
 		<div class="panel panel-default" <?php if(count($users) == 0) { echo 'hidden'; } ?>>
 			<table class="table user-table center">
 				<tr>
-					<th></th>
+					<th class="name-row"></th>
 					<th>XP</th>
 					<th>Lvl</th>
-					<th>Res</th>
-					<th>Wnd</th>
+					<th>Resil</th>
+					<th>Wnds</th>
+					<th>Init</th>
 					<th>Tgh</th>
 					<th>Dfd</th>
 					<th>Ddg</th>
@@ -479,22 +593,31 @@
 						$toughness = $user['strength'] >= 0 ?
 								floor($user['strength']/2) :
 								(ceil($user['strength']/3) == 0 ? 0 : ceil($user['strength']/3));
-						$toughness += $user['toughness_bonus'];
 
 						// get defend
 						$defend = isset($user) ? 10 + $user['agility'] : 10;
 						$defend += $size_modifier;
-						$defend += $user['defend_bonus'];
 
 						echo 
-						"<tr class='table-row'>
+						"<tr class='mobile-name-row'>
+							<td colspan='10'><a href='/?campaign=".$campaign['id']."&user=".$user['id']."'><strong>".$user['character_name']."</strong></a></td>
+						</tr>
+						<tr class='table-row'>
 							<td class='name-row'><a href='/?campaign=".$campaign['id']."&user=".$user['id']."'><strong>".$user['character_name']."</strong></a></td>
-							<td id='xp_".$user['id']."'>".$user['xp'].($user['xp_awarded'] == 0 ? '' : ($user['xp_awarded'] > 0 ? ' (+'.$user['xp_awarded'].')' : ' ('.$user['xp_awarded'].')'))."</td>
+							<td id='xp_".$user['id']."'>"
+							.$user['xp']
+							.($user['xp_award'] == 0 ? 
+								'' 
+								: ($user['xp_award'] > 0 ? 
+									' (+'.$user['xp_award'].')' 
+									: ' ('.$user['xp_award'].')'))
+							."</td>
 							<td id='level_".$user['id']."'>".$level."</td>
 							<td><input class='short-input' id='damage_".$user['id']."' min='0' type='number' value='".$user['damage']."'> / ".$resilience."</td>
 							<td><input class='short-input' id='wounds_".$user['id']."' max='3' min='0' type='number' value='".$user['wounds']."'> / 3</td>
-							<td>".$toughness."</td>
-							<td>".$defend."</td>
+							<td>".$user['primary']."/".$user['secondary']."</td>
+							<td>".$toughness.($user['toughness_bonus'] > 0 ? ' (+'.$user['toughness_bonus'].')' : '')."</td>
+							<td>".$defend.($user['defend_bonus'] > 0 ? ' (+'.$user['defend_bonus'].')' : '')."</td>
 							<td>".$dodge."</td>
 							<td>".$user['awareness']."</td>
 							<td>".$user['vitality']."</td>
@@ -506,7 +629,7 @@
 
 		<!-- open xp modal -->
 		<div class="btn-wrapper" <?php if(count($users) == 0) { echo 'hidden'; } ?>>
-			<button id="xp_btn" data-toggle="modal" data-target="#xp_modal">Award XP</button>
+			<button id="xp_btn" data-toggle="modal" data-target="#xp_modal"><i class="fa-solid fa-award"></i> Award XP</button>
 		</div>
 
 		<form id="campaign_form">
@@ -769,24 +892,6 @@
 
 	</div>
 
-	<!-- save modal -->
-	<!-- <div class="modal" id="save_modal" tabindex="-1" role="dialog">
-		<div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h4 class="modal-title">Save Changes</h4>
-				</div>
-				<div class="modal-body">
-					Update your campaign settings?
-					<div class="button-bar">
-						<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="saveCampaignSettings()">Yes</button>
-						<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div> -->
-
 	<!-- welcome modal -->
 	<div class="modal" id="welcome_modal" tabindex="-1" role="dialog">
 		<div class="modal-dialog modal-sm modal-dialog-centered" role="document">
@@ -812,36 +917,66 @@
 	</div>
 
 	<!-- award xp modal -->
+
 	<div class="modal" id="xp_modal" tabindex="-1" role="dialog">
-		<div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+		<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
 					<h4 class="modal-title">Award XP</h4>
 				</div>
 				<div class="modal-body">
-					<input type="checkbox" class="xp-checkbox" id="select_all"><label class="xp-label" for="select_all"><strong>SELECT ALL</strong></label>
-					<?php
-						foreach($users as $user) {
-							echo 
-							"<div>
-							<input class='xp-checkbox' type='checkbox' id='".$user['id']."'>
-							<label class='xp-label' for='".$user['id']."'>".$user['character_name']."</label>
-							<input type='number' value='0' class='award' id='award_".$user['id']."'>
-							</div>";
-						}
-					?>
-					<div class="row">
-						<div class="col-xs-2 no-pad">
-							<label class="control-label">XP:</label>
-						</div>
-						<div class="col-xs-3 no-pad">
-							<input class="form-control xp-input" type="number" id="xp_val">
-						</div>
-						<div class="col-xs-7 no-pad">
-							<button class="xp-btn" onclick="awardXP()">+ TO SELECTED</button>
-						</div>
+
+					<div class="panel">
+						<table class="table xp-table center">
+							<tr>
+								<th><input type="checkbox" class="xp-checkbox form" id="select_all" checked></th>
+								<th class="name-row">Character</th>
+								<!-- <th>Level</th> -->
+								<th>Base Award <input type="number" class="form-control" id="base_award" value="0"></th>
+								<th>Costume?</th>
+								<th>Chips</th>
+								<th>Total</th>
+							</tr>
+							<?php
+								foreach($users as $user) {
+
+									// get level
+									$levels = [];
+									$xp_total = 0;
+									foreach (range(1,25) as $number) {
+										$xp_total += 20 * $number;
+										array_push($levels, $xp_total);
+									}
+									$level = 1;
+									$i = 2;
+									foreach ($levels as $lvl) {
+										if ($user['xp'] >= $lvl) {
+											$level = $i++;
+										}
+									}
+
+									echo 
+									"<tr class='mobile-name-row'>
+										<td colspan='6'><label for='select_".$user['id']."'><strong>".$user['character_name']."</strong></label></td>
+									<tr>
+									<tr class='xp-row table-row' id='".$user['id']."'>
+										<td><input class='xp-checkbox' type='checkbox' id='select_".$user['id']."' checked></td>
+										<td class='name-row'><label for='select_".$user['id']."' class='xp-label min'><strong>".$user['character_name']."</strong></label></td>
+										<!-- <td><label class='xp-label' id='level_".$user['id']."'>".$level."</label></td> -->
+										<td><input type='number' value='0' class='award form-control' id='award_".$user['id']."' readonly></td>
+										<td><input type='checkbox' class='costume-chk' id='costume_".$user['id']."'></td>
+										<td><input type='number' value='0' min='0' class='form-control chips' id='chips_".$user['id']."'></td>
+										<td><input type='number' value='0' class='form-control total' readonly id='total_".$user['id']."'></td>
+									</tr>";
+								}
+							?>
+						</table>
 					</div>
-					<i class="small">Note: XP that has been awarded to characters will be added to their total the next time that player loads/saves their character.</i>
+
+					<div class="center note">
+						<i class="small">Note: XP that has been awarded to characters will be added to their total the next time that player loads/saves their character.</i>
+					</div>
+
 					<div class="button-bar">
 						<button type="button" class="btn btn-primary" onclick="updateXP()">Award XP</button>
 						<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
@@ -1103,6 +1238,48 @@
 		$(".xp-checkbox").prop("checked", this.checked);
 	});
 
+	// xp award table input functions
+	$("#base_award").on("input", function(){
+		// get number value
+		var num = parseInt($(this).val());
+		if (isNaN(num) && $(this).val() != "") {
+			num = 0;
+		}
+		$(this).val(num);
+		$(".award").val(isNaN(num) ? 0 : num);
+		adjustTotals();
+	});
+
+	$(".costume-chk").on("change", function(){
+		adjustTotals();
+	});
+
+	$(".xp-checkbox").on("change", function(){
+		adjustTotals();
+	});
+
+	$(".chips").on("input", function(){
+		// get number value
+		var num = parseInt($(this).val());
+		if (isNaN(num)) {
+			num = 0;
+		}
+		$(this).val(num);
+		adjustTotals();
+	});
+
+	function adjustTotals() {
+		// select_id
+		$(".xp-row").each(function(){
+			var selected = $("#select_"+this.id).is(":checked");
+			var level = parseInt($("#level_"+this.id).html());
+			var base = parseInt($("#award_"+this.id).val());
+			var costume = $("#costume_"+this.id).is(":checked");
+			var chips = parseInt($("#chips_"+this.id).val());
+			$("#total_"+this.id).val( selected ? base + (costume ? level : 0) + (chips * level) : 0 );
+		});
+	}
+
 	var users = <?php echo json_encode($users); ?>;
 	var campaign = <?php echo json_encode($campaign); ?>;
 
@@ -1217,8 +1394,11 @@
 	});
 	$("#xp_modal").on('hidden.bs.modal', function(){
 		$(".award").val("0");
-		$("#xp_val").val("");
-		$(".xp-checkbox").prop("checked", false);
+		$(".chips").val("0");
+		$(".total").val("0");
+		$("#base_award").val("0");
+		$(".xp-checkbox").prop("checked", true);
+		$(".costume-chk").prop("checked", false);
 	});
 	$("#gm_modal").on('shown.bs.modal', function(){
 		$("#gm_password").focus();
@@ -1689,32 +1869,34 @@
 		var conf = confirm("Award XP to characters?");
 		if (conf) {
 			var users = [];
-			var xp = [];
 			var awards = [];
 			$(".xp-checkbox").each(function(){
-				if (!isNaN(this.id)) {
+				var id = this.id.split("select_")[1];
+				if (!isNaN(id)) {
 					// get award value for user
-					var award = parseInt($("#award_"+this.id).val());
-					var text_val = $("#xp_"+this.id).html();
-					var parts = text_val.split(" (");
-					var xp_val = parts.length > 1 ? parseInt(parts[0]) : parseInt(text_val);
-					award += parts.length > 1 ? parseInt(parts[1]) : 0;
-					// update table display
-					$("#xp_"+this.id).html(award == 0 ? xp_val : xp_val + (award > 0 ? " (+"+award+")" : " ("+award+")"));
-					users.push(this.id);
-					xp.push(xp_val)
-					awards.push(award)
+					var award = parseInt($("#total_"+id).val());
+					if (award != 0) {
+						users.push(id);
+						awards.push(award)
+						// update table display
+						var xp_text_val = $("#xp_"+id).html();
+						var text_parts = xp_text_val.split(" (");
+						var xp_val = text_parts.length > 1 ? parseInt(text_parts[0]) : parseInt(text_val);
+						var award_val = text_parts.length > 1 ? award + parseInt(text_parts[1]) : award;
+						$("#xp_"+id).html(xp_val + (award_val > 0 ? " (+"+award_val+")" : " ("+award_val+")"));
+					}
 				}
 			});
 			$("#xp_modal").modal("hide");
-			// write new xp values to database
+
+			// add xp awards to database
 			$.ajax({
-			  url: 'update_xp.php',
-			  data: { 'users' : users, 'xp' : xp, 'awards' : awards, 'attribute_pts' : [] },
+			  url: 'set_xp_awards.php',
+			  data: { 'users' : users, 'awards' : awards },
 			  ContentType: "application/json",
 			  type: 'POST',
-			  success: function(response){
-			  	// no action
+			  success: function(response) {
+			  	// do nothing
 			  }
 			});
 		}

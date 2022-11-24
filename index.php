@@ -116,6 +116,7 @@
 	$healings = [];
 	$misc = [];
 	$notes = [];
+	$awards = [];
 
 	// check for user parameter in url
 	if (isset($_GET["user"])) {
@@ -124,6 +125,14 @@
     if ($result->num_rows === 1) {
 	    while($row = $result->fetch_assoc()) {
 	    	$user = $row;
+	    	// get user awards
+	    	$sql = "SELECT * FROM user_xp_award WHERE user_id = ".$_GET["user"];
+	    	$result = $db->query($sql);
+	    	if ($result) {
+		    	while($row = $result->fetch_assoc()) {
+		    		array_push($awards, $row);
+		    	}
+	    	}
 	    	// get user feats
 	    	$sql = "SELECT * FROM user_feat WHERE user_id = ".$_GET["user"];
 	    	$result = $db->query($sql);
@@ -1866,7 +1875,7 @@
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-	<script src="/assets/script_v22_09_06.js"></script>
+	<script src="/assets/script_v22_11_22.js"></script>
 	<script type="text/javascript">
 
 		var keys = <?php echo json_encode($keys); ?>;
@@ -1874,6 +1883,7 @@
 		// check for user and campaign values
 		var campaign = <?php echo json_encode(isset($campaign) ? $campaign : []); ?>;
 		var user = <?php echo json_encode(isset($user) ? $user : []); ?>;
+		var xp_awards = <?php echo json_encode(isset($awards) ? $awards : []); ?>;
 		setAttributes(user);
 
 		// get feat list and requirements
@@ -1906,6 +1916,13 @@
 				}
 			}
 		}
+
+		// check for user feats
+		user_feats = <?php echo json_encode($feats); ?>;
+		for (var i in user_feats) {
+			addFeatElements(user_feats[i]['name'], user_feats[i]['description'], user_feats[i]['id']);
+		}
+
 		// set feat list
 		setFeatList();
 		
@@ -1925,12 +1942,6 @@
 					$(this).find(".hover-hide").hide();
 				});
 			}
-		}
-
-		// check for user feats
-		user_feats = <?php echo json_encode($feats); ?>;
-		for (var i in user_feats) {
-			addFeatElements(user_feats[i]['name'], user_feats[i]['description'], user_feats[i]['id']);
 		}
 
 		// check for user trainings
