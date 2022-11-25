@@ -298,6 +298,7 @@
 		text-align: center;
 		margin-bottom: 20px;
 	}
+	/* TODO disable vertical scroll on xp modal */
 	#xp_modal {
 		width: 750px;
 		position: absolute;
@@ -309,39 +310,13 @@
 		max-width: 500px;
 		margin: 0 auto;
 		margin-top: 15px;
+		cursor: default;
 	}
 	.small {
 		font-size: 75%;
 	}
 	th input {
 		margin-top: -3px !important;
-	}
-	@media (max-width: 868px) {
-		#xp_modal {
-			top: 30px;
-		}
-		#xp_modal .modal-dialog {
-			width: 595px;
-			margin: 0 auto;
-		}
-	}
-	@media (max-width: 767px) {
-		#xp_modal .table>tbody>tr>td, #xp_modal .table>tbody>tr>th {
-			padding: 5px;
-			font-size: 12px;
-		}
-		th input {
-			margin-top: -6px !important;
-		}
-		#xp_modal .modal-dialog {
-			width: 415px;
-		}
-		#xp_modal .note {
-			max-width: 300px;
-		}
-		#xp_modal .small {
-			font-size: 63%;
-		}
 	}
 	.modal label {
 		margin-top: 15px;
@@ -385,6 +360,8 @@
 		border-radius: 10px;
 		border: 1px solid black;
 		transition-duration: 500ms;
+		background-color: #cccccc;
+		z-index: 999;
 	}
 	#scroll_top.no-vis {
 		bottom: -50px;
@@ -489,8 +466,15 @@
 	td .min, td.min {
 		min-width: 150px;
 	}
+	.pointer {
+		cursor: pointer;
+	}
+	.btn.btn-primary.btn-danger {
+		background-color: red !important;
+	}
+
 	@media (max-width: 868px) {
-		.name-row {
+		.name-row, .select-row {
 			display: none;
 		}
 		.mobile-name-row {
@@ -500,11 +484,38 @@
 			border-top: none !important;
 		}
 	}
-	.pointer {
-		cursor: pointer;
+	@media (max-width: 868px) {
+		#xp_modal {
+			height: 200vh;
+		}
+		#xp_modal .modal-dialog {
+			width: 525px;
+			margin: 30px auto;
+		}
+		#xp_modal input[type=checkbox] {
+		    transform: scale(1.3);
+		    -ms-transform: scale(1.3);
+		    -webkit-transform: scale(1.3);
+		}
+		#xp_modal .note {
+			max-width: 300px;
+		}
 	}
-	.btn.btn-primary.btn-danger {
-		background-color: red !important;
+	/* extra small for mobile? */
+	@media (max-width: 767px) {
+		#xp_modal .table>tbody>tr>th, #xp_modal .table>tbody>tr>td {
+/*			padding: 5px;*/
+/*			font-size: 13px;*/
+		}
+		th input {
+/*			margin-top: -6px !important;*/
+		}
+		#xp_modal .modal-dialog {
+/*			width: 465px;*/
+		}
+		#xp_modal .small {
+/*			font-size: 63%;*/
+		}
 	}
 </style>
 
@@ -929,7 +940,7 @@
 					<div class="panel">
 						<table class="table xp-table center">
 							<tr>
-								<th><input type="checkbox" class="xp-checkbox form" id="select_all" checked></th>
+								<th class="select-row"><input type="checkbox" class="xp-checkbox form" id="select_all" checked></th>
 								<th class="name-row">Character</th>
 								<!-- <th>Level</th> -->
 								<th>Base Award <input type="number" class="form-control" id="base_award" value="0"></th>
@@ -957,10 +968,10 @@
 
 									echo 
 									"<tr class='mobile-name-row'>
-										<td colspan='6'><label for='select_".$user['id']."'><strong>".$user['character_name']."</strong></label></td>
+										<td colspan='6'><label for='mobile_select_".$user['id']."'><strong>".$user['character_name']."</strong></label> <input class='xp-checkbox' type='checkbox' id='mobile_select_".$user['id']."' checked></td>
 									<tr>
 									<tr class='xp-row table-row' id='".$user['id']."'>
-										<td><input class='xp-checkbox' type='checkbox' id='select_".$user['id']."' checked></td>
+										<td class='select-row'><input class='xp-checkbox' type='checkbox' id='select_".$user['id']."' checked></td>
 										<td class='name-row'><label for='select_".$user['id']."' class='xp-label min'><strong>".$user['character_name']."</strong></label></td>
 										<!-- <td><label class='xp-label' id='level_".$user['id']."'>".$level."</label></td> -->
 										<td><input type='number' value='0' class='award form-control' id='award_".$user['id']."' readonly></td>
@@ -1405,6 +1416,9 @@
 	});
 	$("#gm_modal").on('hidden.bs.modal', function(){
 		GMModalClose();
+	});
+	$("#xp_modal").on('shown.bs.modal', function(){
+		scrollToTop();
 	});
 
 	// add a new feat requirement
