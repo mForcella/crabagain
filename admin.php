@@ -298,7 +298,14 @@
 		text-align: center;
 		margin-bottom: 20px;
 	}
-	/* TODO disable vertical scroll on xp modal */
+	#base_award {
+		display: inline;
+		width: 100px;
+		margin-bottom: 20px;
+	}
+	.base-award-label {
+		font-size: 16px;
+	}
 	#xp_modal {
 		width: 750px;
 		position: absolute;
@@ -311,6 +318,17 @@
 		margin: 0 auto;
 		margin-top: 15px;
 		cursor: default;
+	}
+	#xp_modal .toggle-switchy {
+		transform: scale(0.7);
+	}
+	#xp_modal input {
+		padding-left: 12px !important;
+	}
+	@media (pointer: coarse) and (hover: none) {
+		#xp_modal input {
+			padding-left: 0 !important;
+		}
 	}
 	.small {
 		font-size: 75%;
@@ -624,8 +642,8 @@
 									: ' ('.$user['xp_award'].')'))
 							."</td>
 							<td id='level_".$user['id']."'>".$level."</td>
-							<td><input class='short-input' id='damage_".$user['id']."' min='0' type='number' value='".$user['damage']."'> / ".$resilience."</td>
-							<td><input class='short-input' id='wounds_".$user['id']."' max='3' min='0' type='number' value='".$user['wounds']."'> / 3</td>
+							<td><input class='short-input form-control' id='damage_".$user['id']."' min='0' type='number' value='".$user['damage']."'> / ".$resilience."</td>
+							<td><input class='short-input form-control' id='wounds_".$user['id']."' max='3' min='0' type='number' value='".$user['wounds']."'> / 3</td>
 							<td>".$user['primary']."/".$user['secondary']."</td>
 							<td>".$toughness.($user['toughness_bonus'] > 0 ? ' (+'.$user['toughness_bonus'].')' : '')."</td>
 							<td>".$defend.($user['defend_bonus'] > 0 ? ' (+'.$user['defend_bonus'].')' : '')."</td>
@@ -937,13 +955,24 @@
 				</div>
 				<div class="modal-body">
 
+					<div class="row center">
+						<label class="control-label base-award-label">Base XP Award:</label>
+						<input type="number" class="form-control" id="base_award" value="0">
+					</div>
+
 					<div class="panel">
 						<table class="table xp-table center">
 							<tr>
-								<th class="select-row"><input type="checkbox" class="xp-checkbox form" id="select_all" checked></th>
+								<th class="select-row">
+									<label class="toggle-switchy" for="select_all" data-size="sm" data-text="false">
+										<input checked type="checkbox" id="select_all" checked>
+										<span class="toggle">
+											<span class="switch"></span>
+										</span>
+									</label>
+								</th>
 								<th class="name-row">Character</th>
-								<!-- <th>Level</th> -->
-								<th>Base Award <input type="number" class="form-control" id="base_award" value="0"></th>
+								<th>Base Award</th>
 								<th>Costume?</th>
 								<th>Chips</th>
 								<th>Total</th>
@@ -968,16 +997,30 @@
 
 									echo 
 									"<tr class='mobile-name-row'>
-										<td colspan='6'><label for='mobile_select_".$user['id']."'><strong>".$user['character_name']."</strong></label> <input class='xp-checkbox' type='checkbox' id='mobile_select_".$user['id']."' checked></td>
+										<td colspan='4'>
+										<label><strong>".$user['character_name']."</strong></label>
+										<label class='toggle-switchy' for='mobile_select_".$user['id']."' data-size='sm' data-text='false'>
+											<input class='xp-checkbox' checked type='checkbox' id='mobile_select_".$user['id']."' checked>
+											<span class='toggle'>
+												<span class='switch'></span>
+											</span>
+										</label>
+										</td>
 									<tr>
 									<tr class='xp-row table-row' id='".$user['id']."'>
-										<td class='select-row'><input class='xp-checkbox' type='checkbox' id='select_".$user['id']."' checked></td>
+										<td class='select-row'>
+										<label class='toggle-switchy' for='select_".$user['id']."' data-size='sm' data-text='false'>
+											<input class='xp-checkbox' checked type='checkbox' id='select_".$user['id']."' checked>
+											<span class='toggle'>
+												<span class='switch'></span>
+											</span>
+										</label>
+										</td>
 										<td class='name-row'><label for='select_".$user['id']."' class='xp-label min'><strong>".$user['character_name']."</strong></label></td>
-										<!-- <td><label class='xp-label' id='level_".$user['id']."'>".$level."</label></td> -->
-										<td><input type='number' value='0' class='award form-control' id='award_".$user['id']."' readonly></td>
+										<td><input type='number' value='0' class='award form-control' id='award_".$user['id']."' disabled></td>
 										<td><input type='checkbox' class='costume-chk' id='costume_".$user['id']."'></td>
 										<td><input type='number' value='0' min='0' class='form-control chips' id='chips_".$user['id']."'></td>
-										<td><input type='number' value='0' class='form-control total' readonly id='total_".$user['id']."'></td>
+										<td><input type='number' value='0' class='form-control total' disabled id='total_".$user['id']."'></td>
 									</tr>";
 								}
 							?>
@@ -1247,6 +1290,7 @@
 
 	$("#select_all").on("change", function(){
 		$(".xp-checkbox").prop("checked", this.checked);
+		adjustTotals();
 	});
 
 	// xp award table input functions
@@ -1282,7 +1326,8 @@
 	function adjustTotals() {
 		// select_id
 		$(".xp-row").each(function(){
-			var selected = $("#select_"+this.id).is(":checked");
+			var is_mobile = $("#select_"+this.id).is(":hidden");
+			var selected = is_mobile ? $("#mobile_select_"+this.id).is(":checked") : $("#select_"+this.id).is(":checked");
 			var level = parseInt($("#level_"+this.id).html());
 			var base = parseInt($("#award_"+this.id).val());
 			var costume = $("#costume_"+this.id).is(":checked");
@@ -1410,6 +1455,7 @@
 		$("#base_award").val("0");
 		$(".xp-checkbox").prop("checked", true);
 		$(".costume-chk").prop("checked", false);
+		$("#select_all").prop("checked", true);
 	});
 	$("#gm_modal").on('shown.bs.modal', function(){
 		$("#gm_password").focus();
