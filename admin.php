@@ -451,6 +451,7 @@
 	.xp-label {
 		margin-left: 10px;
 		max-width: 190px;
+		cursor: pointer;
 	}
 	.modal label {
 		margin-top: 0;
@@ -1000,7 +1001,7 @@
 										<td colspan='4'>
 										<label><strong>".$user['character_name']."</strong></label>
 										<label class='toggle-switchy' for='mobile_select_".$user['id']."' data-size='sm' data-text='false'>
-											<input class='xp-checkbox' checked type='checkbox' id='mobile_select_".$user['id']."' checked>
+											<input class='xp-checkbox-mobile' checked type='checkbox' id='mobile_select_".$user['id']."' checked>
 											<span class='toggle'>
 												<span class='switch'></span>
 											</span>
@@ -1017,10 +1018,14 @@
 										</label>
 										</td>
 										<td class='name-row'><label for='select_".$user['id']."' class='xp-label min'><strong>".$user['character_name']."</strong></label></td>
-										<td><input type='number' value='0' class='award form-control' id='award_".$user['id']."' disabled></td>
+										<td>
+											<span class='award' id='award_".$user['id']."'>0</span>
+										</td>
 										<td><input type='checkbox' class='costume-chk' id='costume_".$user['id']."'></td>
 										<td><input type='number' value='0' min='0' class='form-control chips' id='chips_".$user['id']."'></td>
-										<td><input type='number' value='0' class='form-control total' disabled id='total_".$user['id']."'></td>
+										<td>
+											<strong><span class='total' id='total_".$user['id']."'>0</span></strong>
+											</td>
 									</tr>";
 								}
 							?>
@@ -1259,7 +1264,7 @@
 <script src="bootstrap/js/bootstrap.min.js"></script>
 <script type="text/javascript">
 
-	$(".table-row").hover(function(){
+	$(".xp-label").hover(function(){
 		$(this).addClass("highlight");
 	}, function(){
 		$(this).removeClass("highlight");
@@ -1290,6 +1295,7 @@
 
 	$("#select_all").on("change", function(){
 		$(".xp-checkbox").prop("checked", this.checked);
+		$(".xp-checkbox-mobile").prop("checked", this.checked);
 		adjustTotals();
 	});
 
@@ -1301,7 +1307,7 @@
 			num = 0;
 		}
 		$(this).val(num);
-		$(".award").val(isNaN(num) ? 0 : num);
+		$(".award").html(isNaN(num) ? 0 : num);
 		adjustTotals();
 	});
 
@@ -1311,7 +1317,15 @@
 
 	$(".xp-checkbox").on("change", function(){
 		adjustTotals();
+		var id = this.id.split("select_")[1];
+		$("#mobile_select_"+id).prop("checked", $(this).is(":checked"));
 	});
+
+	$(".xp-checkbox-mobile").on("change", function(){
+		var id = this.id.split("mobile_select_")[1];
+		$("#select_"+id).trigger("click");
+	});
+
 
 	$(".chips").on("input", function(){
 		// get number value
@@ -1329,10 +1343,10 @@
 			var is_mobile = $("#select_"+this.id).is(":hidden");
 			var selected = is_mobile ? $("#mobile_select_"+this.id).is(":checked") : $("#select_"+this.id).is(":checked");
 			var level = parseInt($("#level_"+this.id).html());
-			var base = parseInt($("#award_"+this.id).val());
+			var base = parseInt($("#award_"+this.id).html());
 			var costume = $("#costume_"+this.id).is(":checked");
 			var chips = parseInt($("#chips_"+this.id).val());
-			$("#total_"+this.id).val( selected ? base + (costume ? level : 0) + (chips * level) : 0 );
+			$("#total_"+this.id).html( selected ? base + (costume ? level : 0) + (chips * level) : 0 );
 		});
 	}
 
@@ -1449,11 +1463,12 @@
 		$("#feat_val2").val("");
 	});
 	$("#xp_modal").on('hidden.bs.modal', function(){
-		$(".award").val("0");
+		$(".award").html("0");
 		$(".chips").val("0");
-		$(".total").val("0");
+		$(".total").html("0");
 		$("#base_award").val("0");
 		$(".xp-checkbox").prop("checked", true);
+		$(".xp-checkbox-mobile").prop("checked", true);
 		$(".costume-chk").prop("checked", false);
 		$("#select_all").prop("checked", true);
 	});
@@ -1918,8 +1933,8 @@
 		$(".xp-checkbox").each(function(){
 			if (!isNaN(this.id) && $(this).is(":checked")) {
 				// get current award value
-				var current = $("#award_"+this.id).val();
-				$("#award_"+this.id).val(parseInt(current) + parseInt(xp));
+				var current = $("#award_"+this.id).html();
+				$("#award_"+this.id).html(parseInt(current) + parseInt(xp));
 			}
 		});
 	}
@@ -1930,18 +1945,19 @@
 		if (conf) {
 			var users = [];
 			var awards = [];
+			// TODO two xp-checkboxes per character...
 			$(".xp-checkbox").each(function(){
 				var id = this.id.split("select_")[1];
 				if (!isNaN(id)) {
 					// get award value for user
-					var award = parseInt($("#total_"+id).val());
+					var award = parseInt($("#total_"+id).html());
 					if (award != 0) {
 						users.push(id);
 						awards.push(award)
 						// update table display
 						var xp_text_val = $("#xp_"+id).html();
 						var text_parts = xp_text_val.split(" (");
-						var xp_val = text_parts.length > 1 ? parseInt(text_parts[0]) : parseInt(text_val);
+						var xp_val = text_parts.length > 1 ? parseInt(text_parts[0]) : parseInt(xp_text_val);
 						var award_val = text_parts.length > 1 ? award + parseInt(text_parts[1]) : award;
 						$("#xp_"+id).html(xp_val + (award_val > 0 ? " (+"+award_val+")" : " ("+award_val+")"));
 					}
