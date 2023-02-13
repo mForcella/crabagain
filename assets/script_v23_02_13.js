@@ -1639,7 +1639,8 @@ function newNote() {
 		} else {
 			$("#"+note_id+"_title").html(title+": ");
 		}
-		$("#"+note_id+"_content").html(note.length > 90 ? note.substring(0,90)+"..." : note);
+		// $("#"+note_id+"_content").html(note.length > 90 ? note.substring(0,90)+"..." : note);
+		$("#"+note_id+"_content").html(note);
 		$("#"+note_id+"_title_val").val(title);
 		$("#"+note_id+"_content_val").val(note);
 	} else {
@@ -1668,7 +1669,8 @@ function addNoteElements(title, note, id) {
 
 	$('<span />', {
 		'id': id_val+"_content",
-		'html': note.length > 90 ? note.substring(0,90)+"..." : note,
+		// 'html': note.length > 90 ? note.substring(0,90)+"..." : note,
+		'html': note,
 	  'class': 'note-content',
 	}).appendTo(span);
 

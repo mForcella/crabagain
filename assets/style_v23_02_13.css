@@ -22,6 +22,7 @@
     padding: 1.5rem 2rem;
 }
 .help-menu {
+	text-align: center;
 	margin-top: 14px;
     font-size: 3.6rem;
     display: block;
@@ -57,6 +58,7 @@
 .nav-icon {
 	margin-right: 10px;
 	margin-left: -10px;
+    width: 20px;
 }
 .glyphicon-menu-hamburger {
     font-size: 3.9rem;
@@ -545,6 +547,12 @@ h1 {
 .note {
 	cursor: pointer;
 	font-size: 1.1em;
+    width: calc(94vw - 110px);
+    max-width: 1042px;
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    margin-bottom: -9px;
 }
 .note-title {
 	font-weight: bold;
@@ -717,4 +725,10 @@ select.form-control {
 	.with-hidden {
 		padding-right: 23px;
 	}
+}
+
+.narrow {
+	display: block;
+	margin: 0 15px;
+	font-size: 0.9em;
 }

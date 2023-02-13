@@ -249,7 +249,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;1,400;1,600&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
 	<!-- Custom Styles -->
-	<link rel="stylesheet" type="text/css" href="/assets/style_v22_07_27.css">
+	<link rel="stylesheet" type="text/css" href="/assets/style_v23_02_13.css">
 	<link rel="stylesheet" type="text/css" href="/assets/toggle-switchy.css">
 </head>
 
@@ -1294,9 +1294,7 @@
 	});
 
 	$("#select_all").on("change", function(){
-		$(".xp-checkbox").prop("checked", this.checked);
-		$(".xp-checkbox-mobile").prop("checked", this.checked);
-		adjustTotals();
+		$(".xp-checkbox").prop("checked", this.checked).trigger("change");
 	});
 
 	// xp award table input functions
@@ -1319,6 +1317,8 @@
 		adjustTotals();
 		var id = this.id.split("select_")[1];
 		$("#mobile_select_"+id).prop("checked", $(this).is(":checked"));
+		$("#chips_"+id).attr("disabled", !$(this).is(":checked"));
+		$("#costume_"+id).attr("disabled", !$(this).is(":checked"));
 	});
 
 	$(".xp-checkbox-mobile").on("change", function(){
