@@ -219,7 +219,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;1,400;1,600&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
 	<!-- Custom Styles -->
-	<link rel="stylesheet" type="text/css" href="/assets/style_v23_02_13.css">
+	<link rel="stylesheet" type="text/css" href="/assets/style_v23_03_15.css">
 
 </head>
 
@@ -382,7 +382,7 @@
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="race">Race</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">
-							<input class="form-control" type="text" name="race" value="<?php echo isset($user) ? htmlspecialchars($user['race']) : '' ?>">
+							<input class="form-control" type="text" id="race" name="race" value="<?php echo isset($user) ? htmlspecialchars($user['race']) : '' ?>">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="age">Age</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">
@@ -391,7 +391,7 @@
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="gender">Gender</label>
 						<div class="col-sm-2 col-xs-8 desktop-no-pad-left">
-							<input class="form-control" type="text" name="gender" value="<?php echo isset($user) ? htmlspecialchars($user['gender']) : '' ?>">
+							<input class="form-control" type="text" id="gender" name="gender" value="<?php echo isset($user) ? htmlspecialchars($user['gender']) : '' ?>">
 						</div>
 					</div>
 					<div class="form-group">
@@ -407,17 +407,17 @@
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="eyes">Eyes</label>
 						<div class="col-sm-2 col-xs-8 desktop-no-pad-left">
-							<input class="form-control" type="text" name="eyes" value="<?php echo isset($user) ? htmlspecialchars($user['eyes']) : '' ?>">
+							<input class="form-control" type="text" id="eyes" name="eyes" value="<?php echo isset($user) ? htmlspecialchars($user['eyes']) : '' ?>">
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="hair">Hair</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">
-							<input class="form-control" type="text" name="hair" value="<?php echo isset($user) ? htmlspecialchars($user['hair']) : '' ?>">
+							<input class="form-control" type="text" id="hair" name="hair" value="<?php echo isset($user) ? htmlspecialchars($user['hair']) : '' ?>">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="other">Other</label>
 						<div class="col-sm-6 col-xs-8 desktop-no-pad-left">
-							<input class="form-control" type="text" name="other" value="<?php echo isset($user) ? htmlspecialchars($user['other']) : '' ?>">
+							<input class="form-control" type="text" id="other" name="other" value="<?php echo isset($user) ? htmlspecialchars($user['other']) : '' ?>">
 						</div>
 					</div>
 				</div>
@@ -1880,7 +1880,7 @@
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-	<script src="/assets/script_v23_02_13.js"></script>
+	<script src="/assets/script_v23_03_15.js"></script>
 	<script type="text/javascript">
 
 		var keys = <?php echo json_encode($keys); ?>;

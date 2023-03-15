@@ -249,7 +249,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;1,400;1,600&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
 	<!-- Custom Styles -->
-	<link rel="stylesheet" type="text/css" href="/assets/style_v23_02_13.css">
+	<link rel="stylesheet" type="text/css" href="/assets/style_v23_03_15.css">
 	<link rel="stylesheet" type="text/css" href="/assets/toggle-switchy.css">
 </head>
 

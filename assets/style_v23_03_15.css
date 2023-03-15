@@ -84,6 +84,31 @@
 	}
 }
 
+/* tooltip hvoer text */
+.tooltiptext {
+	white-space: nowrap;
+	position: absolute;
+	top: 0;
+	background-color: white;
+	padding: 2px;
+	padding-left: 3px;
+	border-radius: 3px;
+	display: none;
+	color: #555;
+	border: 1px solid #ccc;
+	z-index: 99;
+}
+.form-control {
+	padding-left: 3px !important;
+}
+.form-control.input-hovered {
+	position: relative;
+	z-index: 999;
+	border-right: none !important;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
 /* make sure autocomplete list is not hidden behind modal */
 .ui-front {
     z-index: 9999;

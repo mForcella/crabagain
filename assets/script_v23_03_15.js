@@ -65,6 +65,36 @@ $(document).on('input', '.clearable', function() {
     }
 });
 
+// on hover input, show overflow text as tool tip
+$("input").each(function() {
+	var span = $('<span/>', {
+	    id: $(this).attr("id")+"_output",
+	    class: 'tooltiptext'
+	}).appendTo($(this).parents()[0]);
+	
+	// make sure input element has an ID assigned
+	if ($(this).attr("id") != undefined) {
+		$(this).hover(
+			// mousein
+		  function() {
+		  	// check for input content
+		  	if ($(this).val() != "") {
+		  		$(span).html($(this).val());
+		  		// check for overflow and reveal span
+		  		if ($(span).width() > $(this).width()) {
+		  			$(span).show();
+		  			$(this).addClass("input-hovered");
+		  		}
+		  	}
+		  	// mouseout
+		  }, function() {
+		  	$(span).hide();
+		  	$(this).removeClass("input-hovered");
+		  }
+		);
+	}
+});
+
 // trigger 'unsaved changes' alert when leaving the page
 $("input").on("change", function(){
 	if (this.id != "gm_password") {
