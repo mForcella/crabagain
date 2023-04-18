@@ -139,6 +139,9 @@
 	    	if ($result) {
 		    	while($row = $result->fetch_assoc()) {
 		    		array_push($feats, $row);
+		    		if ($row['name'] == "Arcane Blood" || $row['name'] == "Divine Magic") {
+		    			$user['magic_talents'] = true;
+		    		}
 		    	}
 	    	}
 	    	// get user trainings
@@ -217,9 +220,9 @@
 	<!-- Google Fonts -->
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;1,400;1,600&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;800&family=Alegreya:ital,wght@0,400;1,400;1,600&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
 	<!-- Custom Styles -->
-	<link rel="stylesheet" type="text/css" href="/assets/style_v23_03_15.css">
+	<link rel="stylesheet" type="text/css" href="<?php echo $keys['styles'] ?>">
 
 </head>
 
@@ -281,6 +284,12 @@
 	    ?>
 	</nav>
 
+	<img id="banner-1" class="banner-image" src="assets/image/banners/dnd-banner-1.jpeg">
+	<img id="banner-2" class="banner-image" src="assets/image/banners/dnd-banner-2.jpeg">
+	<img id="banner-3" class="banner-image" src="assets/image/banners/dnd-banner-3.jpeg">
+	<img id="banner-4" class="banner-image" src="assets/image/banners/dnd-banner-4.jpeg">
+	<img id="banner-5" class="banner-image active" src="assets/image/banners/dnd-banner-5.jpeg">
+
 	<div class="header">
 		<div class="row">
 			<div class="col-xs-4">
@@ -308,7 +317,7 @@
 		<option value="#section_actions">Actions, Move, & Initiative</option>
 		<option value="#section_motivators">Motivators</option>
 		<option value="#section_attributes">Attributes</option>
-		<option value="#section_feats">Feats</option>
+		<option value="#section_feats">Talents</option>
 		<option value="#section_items">Items</option>
 		<option value="#section_weight">Weight Capacity</option>
 		<option value="#section_notes">Notes</option>
@@ -323,24 +332,26 @@
 
 				<!-- section: name, level, xp -->
 				<div class="section form-horizontal">
+
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="character_name">Name</label>
-						<div class="col-sm-4 col-xs-8 mobile-pad-bottom">
+						<div class="col-sm-6 col-xs-8 mobile-pad-bottom">
 							<input class="form-control" type="text" id="character_name" name="character_name" value="<?php echo isset($user) ? htmlspecialchars($user['character_name']) : '' ?>">
 						</div>
 						<!-- readonly, unless new character -->
-						<label class="control-label col-sm-4 col-xs-4 smaller" for="attribute_pts">Attribute Pts</label>
+						<label class="control-label col-sm-2 col-xs-4 font-small smaller" for="attribute_pts">Attribute Pts</label>
 						<div class="col-sm-2 col-xs-8">
 							<input class="form-control" <?php echo isset($user) && $user['xp'] != 0 ? 'readonly' : 'type="number"' ?> min="0" id="attribute_pts" name="attribute_pts" value="<?php echo isset($user) ? htmlspecialchars($user['attribute_pts']) : 12 ?>">
 						</div>
 					</div>
-					<div class="form-group">
-						<label class="control-label col-sm-2 col-xs-4" for="xp">Experience</label>
-						<div class="col-sm-4 col-xs-8 mobile-pad-bottom">
+
+					<div class="form-group tablet-adjust">
+						<label class="control-label col-sm-2 col-xs-4" for="xp">XP</label>
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 							<input class="form-control" readonly data-toggle="modal" data-target="#xp_modal" name="xp" id="xp" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['xp']) : 0 ?>">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="level">Level</label>
-						<div class="col-sm-4 col-xs-8">
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 							<?php
 								$levels = [];
 								$xp_total = 0;
@@ -360,15 +371,39 @@
 							?>
 							<input class="form-control" readonly name="level" id="level" value="<?php echo $level ?>">
 						</div>
+						<label class="control-label col-sm-2 col-xs-4 font-small smaller" for="caster_level">Caster Level</label>
+						<div class="col-sm-2 col-xs-8">
+							<?php
+								$caster_level = isset($user) ? $user['vitality'] + 10 : 0;
+							?>
+							<input class="form-control" readonly name="caster_level" id="caster_level" value="<?php echo $caster_level ?>">
+						</div>
 					</div>
+
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="morale">Morale</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 							<input class="form-control" type="number" name="morale" id="morale" min="-10" value="<?php echo isset($user) ? htmlspecialchars($user['morale']) : 0 ?>">
 						</div>
-						<label class="control-label col-sm-2 col-xs-4" for="morale_effect">Effect</label>
-						<div class="col-sm-6 col-xs-8">
+						<div class="col-xs-4 d-sm-none"></div>
+						<div class="col-sm-4 col-xs-8 mobile-pad-bottom">
 							<input class="form-control" readonly id="morale_effect" name="morale_effect">
+						</div>
+						<?php
+							$fate = 0;
+							// vitality bonus
+							$fate += isset($user) ? (
+								$user['vitality'] >= 0 ?
+									floor($user['vitality']/2) :
+									(ceil($user['vitality']/3) == 0 ? 0 : ceil($user['vitality']/3))
+							) : 0;
+							// morale bonus
+							$morale = isset($user) ? htmlspecialchars($user['morale']) : 0;
+							$fate += $morale >= 6 ? 2 : ($morale >= 2 ? 1 : 0);
+						?>
+						<label class="control-label col-sm-2 col-xs-4" for="fate">Fate</label>
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+							<input class="form-control" name="fate" id="fate" value="<?php echo $fate ?>">
 						</div>
 					</div>
 				</div>
@@ -611,22 +646,37 @@
 							<input class="form-control" readonly name="dodge" id="dodge" value="<?php echo $dodge ?>">
 						</div>
 					</div>
-					<div class="form-group">
-						<label class="control-label col-sm-2 col-xs-4" for="fear">Fear</label>
-						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+
+					<div class="form-group row-narrow-desktop">
+						<div class="col-sm-3 pad-left-right-zero">
+							<label class="control-label col-sm-7 col-xs-4" for="magic">Magic</label>
+							<div class="col-sm-5 col-xs-8 no-pad-input mobile-pad-bottom">
+							<input class="form-control" type="text" name="magic" id="magic_text" value="">
+							<input class="form-control hidden-number" type="number" id="magic">
+							</div>
+						</div>
+						<div class="col-sm-3 pad-left-right-zero">
+							<label class="control-label col-sm-7 col-xs-4" for="fear">Fear</label>
+							<div class="col-sm-5 col-xs-8 no-pad-input mobile-pad-bottom">
 							<input class="form-control" type="text" name="fear" id="fear_text" value="<?php echo isset($user) ? htmlspecialchars($user['fear']) : '' ?>">
 							<input class="form-control hidden-number" type="number" id="fear">
+							</div>
 						</div>
-						<label class="control-label col-sm-2 col-xs-4" for="poison">Poison</label>
-						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+						<div class="col-sm-3 pad-left-right-zero">
+							<label class="control-label col-sm-7 col-xs-4" for="poison">Poison</label>
+							<div class="col-sm-5 col-xs-8 no-pad-input mobile-pad-bottom">
 							<input class="form-control" type="text" name="poison" id="poison_text" value="<?php echo isset($user) ? htmlspecialchars($user['poison']) : '' ?>">
 							<input class="form-control hidden-number" type="number" id="poison">
+							</div>
 						</div>
-						<label class="control-label col-sm-2 col-xs-4" for="disease">Disease</label>
-						<div class="col-sm-2 col-xs-8">
+						<div class="col-sm-3 pad-left-right-zero">
+							<label class="control-label col-sm-7 col-xs-4" for="disease">Disease</label>
+							<div class="col-sm-5 col-xs-8 no-pad-input">
 							<input class="form-control" type="text" name="disease" id="disease_text" value="<?php echo isset($user) ? htmlspecialchars($user['disease']) : '' ?>">
 							<input class="form-control hidden-number" type="number" id="disease">
+							</div>
 						</div>
+
 					</div>
 				</div>
 				<!-- end section: defense -->
@@ -689,6 +739,43 @@
 							</div>
 						</div>
 
+						<div class="col-sm-6">
+							<div class="row">
+								<label class="control-label col-sm-12 center full-width" for="fatigue">Fatigue</label>
+							</div>
+							<div class="row">
+								<div class="col-xs-12 no-pad">
+									<?php 
+										$fatigue = isset($user) ? ($user['fatigue'] == '' ? 0 : $user['fatigue']) : 0;
+									?>
+									<select class="form-control" id="fatigue" name="fatigue" onchange="updateTotalWeight(false)">
+										<option value="0" <?php echo $fatigue == 0 ? 'selected' : '' ?>>None</option>
+										<option value="1" <?php echo $fatigue == 1 ? 'selected' : '' ?>>Tired</option>
+										<option value="2" <?php echo $fatigue == 2 ? 'selected' : '' ?>>Weary</option>
+										<option value="3" <?php echo $fatigue == 3 ? 'selected' : '' ?>>Spent</option>
+										<option value="4" <?php echo $fatigue == 4 ? 'selected' : '' ?>>Exhausted</option>
+									</select>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-sm-6">
+							<div class="row">
+								<label class="control-label col-sm-12 center full-width" for="encumberence">Encumberence</label>
+							</div>
+							<div class="row">
+								<div class="col-xs-12 no-pad">
+									<input class="form-control" type="text" readonly id="encumberence">
+									<!-- <select class="form-control" id="encumberence" disabled style="background-color: white;">
+										<option value="0">Unhindered</option>
+										<option value="1">Encumbered</option>
+										<option value="2">Burdened</option>
+										<option value="3">Overburdened</option>
+									</select> -->
+								</div>
+							</div>
+						</div>
+
 					</div>
 				</div>
 				<!-- end section: health -->
@@ -705,51 +792,26 @@
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="standard">Standard</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-							<?php
-								$standard = isset($user) ? (
-									$user['speed'] >= 0 ?
-										1 + floor($user['speed']/4) :
-										1 + round($user['speed']/6)
-								) : 1;
-							?>
-							<input class="form-control" readonly name="standard" id="standard" value="<?php echo $standard ?>">
+							<input class="form-control" readonly name="standard" id="standard" value="">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="quick">Quick</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-							<?php
-								$quick = isset($user) ? (
-									$user['speed'] >= 0 ?
-										($user['speed']/2 % 2 == 0 ? 0 : 1) :
-										(ceil($user['speed']/3) % 2 == 0 ? 0 : 1)
-								) : 0;
-							?>
-							<input class="form-control" readonly name="quick" id="quick" value="<?php echo $quick ?>">
+							<input class="form-control" readonly name="quick" id="quick" value="">
 						</div>
-						<label class="control-label col-sm-2 col-xs-4" for="free">Free</label>
+						<label class="control-label col-sm-2 col-xs-4 penalty" for="action_penalty">Penalty</label>
 						<div class="col-sm-2 col-xs-8">
-							<input class="form-control" type="number" name="free" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['free']) : '' ?>">
+							<input class="form-control" type="text" name="action_penalty" id="action_penalty_text" value="">
+							<input class="form-control hidden-number" type="number" id="action_penalty">
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-2 col-xs-4" for="move">Move</label>
-						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-							<?php
-								$move = isset($user) ? ($user['size'] == "Small" ? 0.5 :
-									($user['size'] == "Large" ? 1.5 : 1)
-								) : 1;
-							?>
-							<input class="form-control" readonly name="move" id="move" value="<?php echo $move ?>">
-						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="initiative">Initiative</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-							<?php
-								$initiative = isset($user) ? (
-									$user['awareness'] >= 0 ?
-										10 - floor($user['awareness']/2) :
-										10 - ceil($user['awareness']/3)
-								) : 10;
-							?>
-							<input class="form-control" readonly name="initiative" id="initiative" value="<?php echo $initiative ?>">
+							<input class="form-control" readonly name="initiative" id="initiative" value="">
+						</div>
+						<label class="control-label col-sm-2 col-xs-4" for="move">Move/Run</label>
+						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
+							<input class="form-control" readonly name="move" id="move" value="">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4 penalty" for="move_penalty">Penalty</label>
 						<div class="col-sm-2 col-xs-8">
@@ -784,7 +846,7 @@
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" onclick="newTrainingModal('Strength')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="Strength_btn" onclick="newTrainingModal('Strength')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -810,7 +872,7 @@
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" onclick="newTrainingModal('Fortitude')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="Fortitude_btn" onclick="newTrainingModal('Fortitude')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -838,7 +900,7 @@
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" onclick="newTrainingModal('Speed')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="Speed_btn" onclick="newTrainingModal('Speed')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -864,7 +926,7 @@
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" onclick="newTrainingModal('Agility')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="Agility_btn" onclick="newTrainingModal('Agility')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -892,7 +954,7 @@
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" onclick="newTrainingModal('Precision')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="Precision_btn" onclick="newTrainingModal('Precision')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -918,7 +980,7 @@
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" onclick="newTrainingModal('Awareness')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="Awareness_btn" onclick="newTrainingModal('Awareness')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -946,7 +1008,7 @@
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" onclick="newTrainingModal('Allure')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="Allure_btn" onclick="newTrainingModal('Allure')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -972,7 +1034,7 @@
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" onclick="newTrainingModal('Deception')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="Deception_btn" onclick="newTrainingModal('Deception')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -1000,7 +1062,7 @@
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" onclick="newTrainingModal('Intellect')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="Intellect_btn" onclick="newTrainingModal('Intellect')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -1026,7 +1088,7 @@
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" onclick="newTrainingModal('Innovation')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="Innovation_btn" onclick="newTrainingModal('Innovation')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -1037,7 +1099,7 @@
 					<div class="form-group">
 						<div class="col-sm-6 attribute-col" id="col_intuition">
 							<div class="row attribute-row">
-								<label class="control-label col-md-7 col-xs-8" for="intuition"><span class="attribute-name">Intution</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_intuition" onclick="toggleHidden('col_intuition')"></label>
+								<label class="control-label col-md-7 col-xs-8" for="intuition"><span class="attribute-name">Intuition</span><span class="glyphicon glyphicon-edit hover-hide" id="tog_intuition" onclick="toggleHidden('col_intuition')"></label>
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
 										<span class="attribute-val" id="intuition_text"></span>
@@ -1050,11 +1112,11 @@
 							<div class="row training">
 								<div class="col-md-12">
 									<div class="row">
-										<div id="Intution"></div>
+										<div id="Intuition"></div>
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" onclick="newTrainingModal('Intution')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="Intuition_btn" onclick="newTrainingModal('Intuition')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -1080,7 +1142,7 @@
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" onclick="newTrainingModal('Vitality')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="Vitality_btn" onclick="newTrainingModal('Vitality')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -1100,7 +1162,7 @@
 						<div class="form-group motivator-bonus">
 							<label for="bonuses">Bonuses:</label>
 							<?php
-								// get two highest motivator values
+								// get 3 highest motivator values
 								if (isset($user)) {
 									$motivators = [];
 									array_push($motivators, $user['motivator_1_pts'] == '' ? 0 : $user['motivator_1_pts']);
@@ -1113,53 +1175,126 @@
 								} else {
 									$bonuses = 0;
 								}
+
+								$show_btn = !isset($user) || $user['motivator_1'] == "" || $user['motivator_2'] == "" || $user['motivator_3'] == "" || $user['motivator_4'] == "";
 							?>
 							<input class="form-control" readonly name="bonuses" id="bonuses" value="<?php echo $bonuses ?>">
 						</div>
 					</div>
-
-					<div class="form-group no-margin">
-						<div class="col-xs-3 no-pad-mobile no-pad-left">
-							<input class="form-control" type="text" name="motivator_1" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_1']) : '' ?>">
-						</div>
-						<label class="control-label col-xs-2 no-pad-mobile" for="motivator_1_pts">Points:</label>
-						<div class="col-xs-1 no-pad">
-							<input class="form-control motivator-pts" type="number" name="motivator_1_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_1_pts']) : '' ?>">
-						</div>
-
-						<div class="col-xs-3 no-pad-mobile pad-left-mobile">
-							<input class="form-control" type="text" name="motivator_2" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_2']) : '' ?>">
-						</div>
-						<label class="control-label col-xs-2 no-pad-mobile" for="motivator_2_pts">Points:</label>
-						<div class="col-xs-1 no-pad">
-							<input class="form-control motivator-pts" type="number" name="motivator_2_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_2_pts']) : '' ?>">
-						</div>
+					<div class="center" id="motivator_button" <?php echo $show_btn ? '' : 'hidden' ?>>
+						<button class="btn btn-primary" type="button" data-toggle="modal" data-target="#motivator_modal" style="position: relative;">Set Motivators</button>
 					</div>
 
-					<div class="form-group no-margin">
-						<div class="col-xs-3 no-pad-mobile no-pad-left">
-							<input class="form-control" type="text" name="motivator_3" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_3']) : '' ?>">
-						</div>
-						<label class="control-label col-xs-2 no-pad-mobile" for="motivator_3_pts">Points:</label>
-						<div class="col-xs-1 no-pad">
-							<input class="form-control motivator-pts" type="number" name="motivator_3_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_3_pts']) : '' ?>">
+					<div id="motivators" <?php echo $show_btn ? 'hidden' : '' ?>>
+						<div class="form-group no-margin">
+							<div class="col-xs-4 no-pad-mobile no-pad-left">
+								<input class="form-control" type="text" name="motivator_1" id="motivator_1" readonly value="<?php echo isset($user) ? $user['motivator_1'] : '' ?>">
+							</div>
+							<label class="control-label col-xs-1 no-pad-left align-right font-mobile-small" for="motivator_1_pts">Pts:</label>
+							<div class="col-xs-1 no-pad">
+								<input class="form-control motivator-pts" type="number" name="motivator_1_pts" id="motivator_1_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_1_pts']) : '' ?>">
+							</div>
+
+							<div class="col-xs-4 no-pad-mobile pad-left-mobile">
+								<input class="form-control" type="text" name="motivator_2" id="motivator_2" readonly value="<?php echo isset($user) ? $user['motivator_2'] : '' ?>">
+							</div>
+							<label class="control-label col-xs-1 no-pad-left align-right font-mobile-small" for="motivator_2_pts">Pts:</label>
+							<div class="col-xs-1 no-pad">
+								<input class="form-control motivator-pts" type="number" name="motivator_2_pts" id="motivator_2_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_2_pts']) : '' ?>">
+							</div>
 						</div>
 
-						<div class="col-xs-3 no-pad-mobile pad-left-mobile">
-							<input class="form-control" type="text" name="motivator_4" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_4']) : '' ?>">
-						</div>
-						<label class="control-label col-xs-2 no-pad-mobile" for="motivator_4_pts">Points:</label>
-						<div class="col-xs-1 no-pad">
-							<input class="form-control motivator-pts" type="number" name="motivator_4_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_4_pts']) : '' ?>">
+						<div class="form-group no-margin">
+							<div class="col-xs-4 no-pad-mobile no-pad-left">
+								<input class="form-control" type="text" name="motivator_3" id="motivator_3" readonly value="<?php echo isset($user) ? $user['motivator_3'] : '' ?>">
+							</div>
+							<label class="control-label col-xs-1 no-pad-left align-right font-mobile-small" for="motivator_3_pts">Pts:</label>
+							<div class="col-xs-1 no-pad">
+								<input class="form-control motivator-pts" type="number" name="motivator_3_pts" id="motivator_3_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_3_pts']) : '' ?>">
+							</div>
+
+							<div class="col-xs-4 no-pad-mobile pad-left-mobile">
+								<input class="form-control" type="text" name="motivator_4" id="motivator_4" readonly value="<?php echo isset($user) ? $user['motivator_4'] : '' ?>">
+							</div>
+							<label class="control-label col-xs-1 no-pad-left align-right font-mobile-small" for="motivator_4_pts">Pts:</label>
+							<div class="col-xs-1 no-pad">
+								<input class="form-control motivator-pts" type="number" name="motivator_4_pts" id="motivator_4_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_4_pts']) : '' ?>">
+							</div>
 						</div>
 					</div>
 
 				</div>
+
+			  <!-- motivators modal -->
+			  <div class="modal" id="motivator_modal" tabindex="-1" role="dialog">
+			    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+			      <div class="modal-content">
+			        <div class="modal-header">
+			          <h4 class="modal-title">Motivators</h4>
+			        </div>
+			        <div class="modal-body">
+			        	<h4 class="control-label center">Please select your motivators</h4>
+								<?php 
+									$motivators = [
+										'',
+										'Altruism',
+										'Freedom',
+										'Harmony',
+										'Heroism',
+										'Honor',
+										'Justice',
+										'Pleasure',
+										'Power',
+										'Pragmatism',
+										'Prestige'
+									];
+								?>
+			        	<label>Primary Motivator</label>
+								<select class="form-control" id="m1" onchange="motivatorCheck(this.id)">
+									<?php 
+										foreach ($motivators as $motivator) {
+											echo '<option value="'.$motivator.'">'.$motivator.'</option>';
+										}
+									?>
+								</select>
+			        	<label>Secondary Motivator</label>
+								<select class="form-control" id="m2" onchange="motivatorCheck(this.id)">
+									<?php 
+										foreach ($motivators as $motivator) {
+											echo '<option value="'.$motivator.'">'.$motivator.'</option>';
+										}
+									?>
+								</select>
+			        	<label>Turdiary Motivator</label>
+								<select class="form-control" id="m3" onchange="motivatorCheck(this.id)">
+									<?php 
+										foreach ($motivators as $motivator) {
+											echo '<option value="'.$motivator.'">'.$motivator.'</option>';
+										}
+									?>
+								</select>
+			        	<label>Kwawdanary Motivator</label>
+								<select class="form-control" id="m4" onchange="motivatorCheck(this.id)">
+									<?php 
+										foreach ($motivators as $motivator) {
+											echo '<option value="'.$motivator.'">'.$motivator.'</option>';
+										}
+									?>
+								</select>
+			        	<div class="button-bar">
+				        	<button type="button" class="btn btn-primary" onclick="setMotivators()">Ok</button>
+				        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+			        	</div>
+			        </div>
+			      </div>
+			    </div>
+			  </div>
+
 				<!-- end section: motivators -->
 
 				<!-- section: feats & traits -->
 				<div class="section form-horizontal">
-					<div class="section-title" id="section_feats"><span>Feats & Traits</span> <i class="fa-solid fa-trophy"></i></div>
+					<div class="section-title" id="section_feats"><span>Talents & Traits</span> <i class="fa-solid fa-trophy"></i></div>
 					<div class="form-group">
 						<div class="col-sm-12">
 							<div id="feats">
@@ -1288,9 +1423,9 @@
 						</div>
 
 						<p class="col-xs-3"></p>
-						<p class="col-xs-3 center resize-mobile-small">(-1 Quick Action)</p>
-						<p class="col-xs-3 center resize-mobile-small">(-1 Quick Action, <br class="mobile-break">-0.5 Move)</p>
-						<p class="col-xs-3 center resize-mobile-small">(-1 Quick Action, <br class="mobile-break">-1 Move)</p>
+						<p class="col-xs-3 center resize-mobile-small">(-10 Move)</p>
+						<p class="col-xs-3 center resize-mobile-small">(-1 QA, <br class="mobile-break">-10 Move)</p>
+						<p class="col-xs-3 center resize-mobile-small">(-1 SA, <br class="mobile-break">-10 Move)</p>
 					</div>
 				</div>
 			</div>
@@ -1331,6 +1466,42 @@
 		<input type="hidden" name="recaptcha_response" id="recaptcha_response">
 	</form>
 
+	<!-- new school modal -->
+  <div class="modal" id="new_school_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="note_modal_title">New Magic School</h4>
+        </div>
+        <div class="modal-body">
+        	<label class="control-label">Choose a Talent from your new school</label>
+        	<select class="form-control" id="magic_talents">
+        	</select>
+        	<select class="form-control elemental_select">
+        		<option value="Fire">Fire</option>
+        		<option value="Ice">Ice</option>
+        		<option value="Electricity">Electricity</option>
+        	</select>
+        	<select class="form-control elementalist_select">
+        		<option value="Earth">Earth</option>
+        		<option value="Water">Water</option>
+        		<option value="Air">Air</option>
+        	</select>
+        	<select class="form-control superhuman_select">
+        		<option value="Power/Dexterity">Power (Strength/Fortitude) & Dexterity (Speed/Agility)</option>
+        		<option value="Power/Precision">Power (Strength/Fortitude) & Perception (Precision/Awareness)</option>
+        		<option value="Dexterity/Precision">Dexterity (Speed/Agility) & Perception (Precision/Awareness)</option>
+        	</select>
+        	<textarea class="form-control" id="talent_descrip" readonly></textarea>
+        	<div class="button-bar">
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Learn Magic!</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="cancelMagic()">Cancel</button>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 	<!-- xp modal -->
   <div class="modal" id="xp_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
@@ -1339,7 +1510,6 @@
           <h4 class="modal-title">Experience Points</h4>
         </div>
         <div class="modal-body">
-        	<!-- <h3 class="center">Current XP: <span id="xp_text"><?php echo isset($user) ? $user['xp'] : 0 ?></span></h3> -->
         	<!-- get xp to next level -->
 					<?php
 						$current_xp = isset($user) ? $user['xp'] : 0;
@@ -1352,16 +1522,7 @@
 						}
 					?>
         	<h3 class="center">Next Level: <span id="next_level"><?php echo $next_level ?></span> xp</h3>
-        	<!-- input for adding xp -->
-        	<!-- <div class="add-xp">
-	        	<h3 class="center">Add XP:</h3>
-	        	<input class="form-control" type="number" id="add_xp">
-	        	<div class="button-bar">
-	        		<button type="button" class="btn btn-primary" onclick="addXP()"><span class="glyphicon glyphicon-plus-sign"></span></button>
-	        	</div>
-        	</div> -->
         	<div class="button-bar">
-	        	<!-- <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="setXP()">Ok</button> -->
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
         	</div>
         </div>
@@ -1441,13 +1602,15 @@
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title" id="feat_modal_title">New Feat/Trait</h4>
+          <h4 class="modal-title" id="feat_modal_title">New Talent/Trait</h4>
         </div>
         <div class="modal-body">
         	<!-- show dropdown only during character creation -->
         	<label class="control-label <?php echo isset($user) && $user['xp'] != 0 ? 'hidden' : ''; ?>" id="select_feat_type_label">Type</label>
         	<select class="form-control <?php echo isset($user) && $user['xp'] != 0 ? 'hidden' : ''; ?>" id="select_feat_type">
-        		<option value="feat_name">Standard Feat</option>
+        		<option value="feat_name">Standard Talent</option>
+        		<!--  hide unless user has magic -->
+        		<option id="magic_option" value="magic_talent_name" <?php echo isset($user) && $user['magic_talents'] == true ? '' : 'hidden'; ?>>Magical Talent</option>
         		<!-- hide options if their counts are zero -->
         		<option value="social_trait_name" <?php echo count($feat_ids) > 0 && $counts['social_count'] == 0 ? 'hidden' : '' ?>>Social Trait</option>
         		<option value="physical_trait_pos_name" <?php echo count($feat_ids) > 0 && $counts['physical_pos_count'] == 0 ? 'hidden' : '' ?>>Physical Trait (Positive)</option>
@@ -1459,6 +1622,7 @@
         	<label class="control-label">Name</label>
         	<input type="hidden" id="feat_name_val">
         	<input class="form-control clearable feat-type" type="text" id="feat_name">
+        	<input class="form-control clearable feat-type hidden" type="text" id="magic_talent_name">
         	<select class="form-control feat-type feat-select hidden" id="social_trait_name">
         		<option></option>
         		<?php
@@ -1519,12 +1683,77 @@
         			}
         		?>
         	</select>
+
+        	<select class="form-control elemental_select">
+        		<option value="Fire">Fire</option>
+        		<option value="Ice">Ice</option>
+        		<option value="Electricity">Electricity</option>
+        	</select>
+
+        	<select class="form-control elementalist_select">
+        		<option value="Earth">Earth</option>
+        		<option value="Water">Water</option>
+        		<option value="Air">Air</option>
+        	</select>
+
+        	<select class="form-control superhuman_select">
+        		<option value="Power/Dexterity">Power (Strength/Fortitude) & Dexterity (Speed/Agility)</option>
+        		<option value="Power/Precision">Power (Strength/Fortitude) & Perception (Precision/Awareness)</option>
+        		<option value="Dexterity/Precision">Dexterity (Speed/Agility) & Perception (Precision/Awareness)</option>
+        	</select>
+
         	<label class="control-label">Description</label>
         	<textarea class="form-control" id="feat_description" rows="6" maxlength="2000"></textarea>
         	<input type="hidden" id="feat_id">
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newFeat()" id="feat_submit_btn">Ok</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="vows_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Vows</h4>
+        </div>
+        <div class="modal-body">
+        	<h4 class="center">Choose a Vow to follow in service to your God</h4>
+	        <div class="form-check">
+	        	<input class="form-check-input" type="radio" name="vow" id="Poverty" value="Poverty" checked="checked">
+			      <label class="form-check-label" for="Poverty">Vow of Poverty</label>
+			    </div>
+			    <label class="smaller narrow" id="Poverty_description" for="Poverty">You have sworn against the pursuit of material things. You cannot accrue wealth or unnecessary items or partake in excesses and luxuries. Any wealth you might acquire must be given to those in need, or your Church, and not to other party members.</label>
+	        <div class="form-check">
+	        	<input class="form-check-input" type="radio" name="vow" id="Peace" value="Peace">
+			      <label class="form-check-label" for="Peace">Vow of Peace</label>
+			    </div>
+			    <label class="smaller narrow" id="Peace_description" for="Peace">You have sworn off of violence. While you may still defend yourself and others, you must do all in your power to ensure violence is avoided when possible, and when it cannot be avoided, that killing is avoided when possible. Even if you are struck, striking back should be a last resort unless you perceive death or severe bodily injury to be imminent.</label>
+	        <div class="form-check">
+	        	<input class="form-check-input" type="radio" name="vow" id="Hedonism" value="Hedonism">
+			      <label class="form-check-label" for="Hedonism">Vow of Hedonism</label>
+			    </div>
+			    <label class="smaller narrow" id="Hedonism_description" for="Hedonism">You find religious ecstasy only through excess, and your God speaks to you only at your moments of highest pleasure. You may only abstain during times when it would be virtually impossible for you to seek out pleasures, or if doing so would lead to personal harm, or harm to your God and their desires.</label>
+	        <div class="form-check">
+	        	<input class="form-check-input" type="radio" name="vow" id="Protection" value="Protection">
+			      <label class="form-check-label" for="Protection">Vow of Protection</label>
+			    </div>
+			    <label class="smaller narrow" id="Protection_description" for="Protection">You have sworn to protect the good and just in the world. Wherever you see people in need, so long as they align with you and your God morally, you are required to help. The only exception would be if helping would lead to your imminent death or somehow interfere with the greater needs of your God.</label>
+	        <div class="form-check">
+	        	<input class="form-check-input" type="radio" name="vow" id="Freedom" value="Freedom">
+			      <label class="form-check-label" for="Freedom">Vow of Freedom</label>
+			    </div>
+			    <label class="smaller narrow" id="Freedom_description" for="Freedom">You have sworn to thwart authority at every turn. If anyone is being systemically oppressed by a system of law, bureaucracy, or set of rules, you are compelled to intercede. This does not necessarily mean aiding an individual or group of people, as long as the institution suffers in some way.</label>
+	        <div class="form-check">
+	        	<input class="form-check-input" type="radio" name="vow" id="Truth" value="Truth">
+			      <label class="form-check-label" for="Truth">Vow of Truth</label>
+			    </div>
+			    <label class="smaller narrow" id="Truth_description" for="Truth">You have sworn to never lie and seek out truth wherever it may hide. While a lie may be permitted from time to time, it can only be in greater service to your God. Additionally, if blatant lies surround you, you will be obliged to help reveal the truth, unless doing so would somehow be a disservice to your God or greater purpose.</label>
+        	<div class="button-bar">
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
         	</div>
         </div>
       </div>
@@ -1539,24 +1768,35 @@
           <h4 class="modal-title" id="training_modal_title">New Skill Training</h4>
         </div>
         <div class="modal-body">
-        	<h4 class="control-label">Skill / Training Name</h4>
-        	<input class="form-control" type="text" id="training_name">
-        	<br>
         	<div id="skill_type">
         		<h4 class="control-label">
         			Skill / Training Type
         		</h4>
+	        	<div class="form-check" id="magic_inputs">
+		        	<input class="form-check-input" type="radio" name="skill_type" id="school" value="4">
+		        	<label class="form-check-label" for="school">Magic School (4 attribute pt)</label>
+        			<select class="form-control skill-name" id="school_name">
+        				<option value=""></option>
+        				<option value="Ka">Ka</option>
+        				<option value="Avani">Avani</option>
+        				<option value="Nouse">Nouse</option>
+        				<option value="Soma">Soma</option>
+        			</select>
+	        	</div>
 	        	<div class="form-check">
 		        	<input class="form-check-input" type="radio" name="skill_type" id="unique" value="4">
 		        	<label class="form-check-label" for="unique">Unique Skill (4 attribute pts)</label>
+        			<input class="form-control skill-name clearable" type="text" id="skill_name">
 	        	</div>
 	        	<div class="form-check">
 		        	<input class="form-check-input" type="radio" name="skill_type" id="training" value="2">
 		        	<label class="form-check-label" for="training">Training (2 attribute pts)</label>
+        			<input class="form-control skill-name clearable" type="text" id="training_name">
 	        	</div>
 	        	<div class="form-check">
 		        	<input class="form-check-input" type="radio" name="skill_type" id="focus" value="1">
 		        	<label class="form-check-label" for="focus">Focus (1 attribute pt)</label>
+        			<input class="form-control skill-name clearable" type="text" id="focus_name">
 	        	</div>
         	</div>
         	<input type="hidden" id="attribute_type">
@@ -1849,16 +2089,16 @@
         </div>
         <div class="modal-body">
         	<h4>Character Creation</h4>
-					<p>When creating a new character you will start with a default of 12 Attribute Points. This value is 'unlocked' during character creation, and can be adjusted based on any modifiers. Your Attribute Points can be allocated by selecting the <i>Allocate Attribute Points</i> option from the nav menu. Points will be automatically adjusted as you increase or decrease Attributes, and as Feats and Trainings are added. Your Attributes and Feats are also 'unlocked' during character creation, allowing you to add additional starting Feats/Traits and Skills as needed. In order to save a newly created character, you will need to know the 'secret code.' If you don't know what it is, ask your GM. If they don't know it...find a new GM? You will also need to set a personal password when creating a new character, which you will need when updating your character in the future.</p><br>
+					<p>When creating a new character you will start with a default of 12 Attribute Points. This value is 'unlocked' during character creation, and can be adjusted based on any modifiers. Your Attribute Points can be allocated by selecting the <i>Allocate Attribute Points</i> option from the nav menu. Points will be automatically adjusted as you increase or decrease Attributes, and as Talents and Trainings are added. Your Attributes and Talents are also 'unlocked' during character creation, allowing you to add additional starting Talents/Traits and Skills as needed. In order to save a newly created character, you will need to know the 'secret code.' If you don't know what it is, ask your GM. If they don't know it...find a new GM? You will also need to set a personal password when creating a new character, which you will need when updating your character in the future.</p><br>
 					<h4>Adding XP & Allocating Attribute Points</h4>
-					<p>Once your character has begun collecting XP, all of your Attribute Values, Skills, and Feats will be locked. The only way to modify your Attributes is by accruing and allocating Attribute Points. As you add XP, your level will be automatically adjusted, and as you gain levels, Attribute Points will automatically be added. These Attribute Points can then be allocated via the <i>Allocate Attribute Points</i> option from the nav menu. Attributes can only be raised by one point per allocation, and only one unique skill or feat, as well as one Focus or Training, can be added per allocation. Attribute Points will be automatically deducted. If additional modifications need to be made to Attributes, Skills or Feats, this will need to be done through the <i>GM Edit Mode</i>.</p><br>
+					<p>Once your character has begun collecting XP, all of your Attribute Values, Skills, and Talents will be locked. The only way to modify your Attributes is by accruing and allocating Attribute Points. As you add XP, your level will be automatically adjusted, and as you gain levels, Attribute Points will automatically be added. These Attribute Points can then be allocated via the <i>Allocate Attribute Points</i> option from the nav menu. Attributes can only be raised by one point per allocation, and only one unique Skill or Talent, as well as one Focus or Training, can be added per allocation. Attribute Points will be automatically deducted. If additional modifications need to be made to Attributes, Skills or Talents, this will need to be done through the <i>GM Edit Mode</i>.</p><br>
 					<h4>GM Edit Mode</h4>
-					<p>Using the admin password (set when creating the campaign), the GM can unlock and edit Attribute Points, XP, Attribute Values, Skills, and Feats. The GM can use this edit mode to make and save changes to any of the characters at any time. 
+					<p>Using the admin password (set when creating the campaign), the GM can unlock and edit Attribute Points, XP, Attribute Values, Skills, and Talents. The GM can use this edit mode to make and save changes to any of the characters at any time. 
 						<br><br><span class="narrow"><strong>NOTE:</strong> If modiyfing a character <i>during gameplay</i> make sure that player has saved their character beforehand to ensure that you are working with the most current version of that character.</span></p><br>
 					<h4>Campaign Admin</h4>
 					<p>The campaign admin page is password protected and can only be accessed with the admin password. The admin page provides a quick view of all characters and certain attributes. It is also where the GM is able to award XP to characters. You can also award bonus XP based on leftover Motivator chips bonuses and costumes. 
 						<br><br><span class="narrow"><strong>NOTE:</strong> XP bonuses from Motivator arguments are automatically awarded when characters increase these values on their character sheets.</span><br>
-						You can also view all available Feats, Traits, Compelling Actions, and Profressions. You can add new Feats and Traits, and you can adjust which Feats and Traits are available to your players.</p>
+						You can also view all available Talents, Traits, Compelling Actions, and Profressions. You can add new Talents and Traits, and you can adjust which Talents and Traits are available to your players.</p>
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary forgot-password-btn" data-dismiss="modal">Ok</button>
         	</div>
@@ -1880,7 +2120,7 @@
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-	<script src="/assets/script_v23_03_15.js"></script>
+	<script src="<?php echo $keys['scripts'] ?>"></script>
 	<script type="text/javascript">
 
 		var keys = <?php echo json_encode($keys); ?>;

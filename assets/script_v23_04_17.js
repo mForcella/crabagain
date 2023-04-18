@@ -5,6 +5,7 @@ var skipEnabled = [];
 // arrays to make sure we don't have feats/trainings with the same name
 var trainingNames = [];
 var featNames = [];
+var schoolNames = [];
 // bools to determine rules and element visibility for various operating modes
 var allocatingAttributePts = false;
 var characterCreation = false;
@@ -26,6 +27,94 @@ var user_feats = [];
 // show encumbered alert
 var loadingItems = false;
 var suppressAlerts = false;
+// for adjusting motivator bonuses
+var pts = [];
+var pts_prev = [];
+
+var schoolTalents = {
+	"Ka": [
+		{
+			"name":"Elemental Master",
+			"description":"You may choose 1 type of Elemental Magic when this Talent is taken: Fire, Ice or Electricity. "+
+			"You can cause extreme temperature fluctuations to heat or freeze things, create protective bubbles against "+
+			"hot or cold, and manipulate electricity, creating lightning and force fields or disabling electronic devices. "+
+			"Attacking with this School deals Damage with either fire, cold, or electricity. Flammable objects stay on fire, "+
+			"dealing additional Damage on subsequent rounds. Cold Damage slows a target, Encumbering them. Electrical Damage "+
+			"is Non-lethal, Dazing targets and ignoring any armor that is completely sealed against electricity."
+		},
+		{
+			"name":"Metal Master",
+			"description":"You can control the properties of metal, as well as move metal objects with your mind by "+
+			"creating magnetic fields. You can magnetize or demagnetize objects, as well as weaken metal objects, "+
+			"animate metal statues and suits of armor or even transmute one metal into another."
+		},
+	],
+	"Avani": [
+		{
+			"name":"Nature Master",
+			"description":"You are one with the beasts and the wild places. You may speak with, and sway the disposition "+
+			"of animals, or communicate with the land. You can use this to speak directly with animals or call upon them "+
+			"for help, and even bond your soul with an animal, seeing through them and speaking to them telepathically. "+
+			"You can alter and enhance the properties of plants, creating potions and poisons. You can purify water and "+
+			"even create sustenance from little more than dirt."
+		},
+		{
+			"name":"Elementalist",
+			"description":"You have become one with the elements. You may choose one type of Elemental Magic when this "+
+			"Talent is learned: Earth, Water or Air. You can manipulate dirt, mud, and rock, splitting the earth open, "+
+			"raising or shifting stone, animating stone statues or even causing violent earthquakes. You can control "+
+			"the movements of water, raising or lowering water levels, creating waterspouts or waves, fog, rain or snow, "+
+			"and walking on water. You can alter wind patterns and create powerful storms or tornados. When causing "+
+			"earthquakes and gusts of wind, the Agility or Strength DL to remain standing is the same as your roll, as "+
+			"is the Strength check for any non-living structures to remain standing."
+		},
+	],
+	"Nouse": [
+		{
+			"name":"Illusionist",
+			"description":"You are a master at manipulating the senses of others. You can make people see, hear, taste, "+
+			"smell and feel whatever you wish, however, you cannot truly control anyone’s thoughts and desires."
+		},
+		{
+			"name":"Psychic",
+			"description":"You are a master at sensing and reading minds, thoughts, and emotions and projecting your own "+
+			"thoughts and feelings into theirs."
+		},
+		{
+			"name":"Ensi",
+			"description":"Your mind is merely an extension of your body and you can move, bend and break objects or "+
+			"people using only your willpower."
+		},
+		{
+			"name":"Seer",
+			"description":"Your mind is untethered by time – You can even see into the past and futures of yourself and "+
+			"others, catching brief glimpses of what may come to pass, within seconds or even years. The future is not set, "+
+			"and this will only give you hints about what may come to pass if certain actions are taken."
+		},
+	],
+	"Soma": [
+		{
+			"name":"Healer",
+			"description":"You know how to manipulate the very fabric of the human body. You can Heal yourself and others, "+
+			"neutralize poison, ignore Wound penalties, and fight disease. The DL for neutralizing Poison and Disease is "+
+			"equal to the DL to resist. For Healing, Soma replaces the Natural Healing roll, and the character may roll "+
+			"immediately for themselves or others without Rest."
+		},
+		{
+			"name":"Tormentor",
+			"description":"You know how to cause pain, burst blood vessels, and rupture organs with little more than a "+
+			"touch. This Damage is always against a Toughness of 0 plus or minus Scale Modifiers only, and bypasses all "+
+			"Armor as long as skin can be touched."
+		},
+		{
+			"name":"Superhuman",
+			"description":"You can accomplish incredible, physical feats with your body. Choose 2 Major Physical "+
+			"Attributes when this Talent is taken (i.e. Power & Dexterity, OR Dexterity & Perception). You can greatly "+
+			"increase your strength, speed, and abilities or alter your perception, to see, hear, smell, and taste "+
+			"things beyond normal human perception."
+		},
+	]
+};
 
 var attributes = [
 	'strength',
@@ -42,11 +131,42 @@ var attributes = [
 	'vitality',
 ];
 
+var banners = [
+	'banner-1',
+	'banner-2',
+	'banner-3',
+	'banner-4',
+	'banner-5'
+];
+
+var activeBanner = "banner-5";
+
+// banner slider - every ten seconds
+var slide = window.setInterval(function() {
+	// get current active image
+	$(".banner-image").each(function() {
+		if ($(this).hasClass("active")) {
+			// slide next image left
+			var index = banners.indexOf(activeBanner) == banners.length - 1 ? 0 : banners.indexOf(activeBanner) + 1;
+			var id = banners[index];
+			$("#"+id).animate({
+			    left: "0"
+			}, 500, function() {
+				// remove active class
+				$("#"+activeBanner).removeClass("active").css("left", "100vw");
+				// add active class
+				activeBanner = id;
+				$("#"+activeBanner).addClass("active");
+			});
+		}
+	});
+}, 10000);
+
 // detect if we're on a touchscreen
 var is_mobile = $('#is_mobile').css('display')=='none';
 
 // hover function for clearable inputs
-function tog(v){ return v?'addClass':'removeClass'; }
+function tog(v) { return v?'addClass':'removeClass'; }
 
 // back to select campaign page
 function back() {
@@ -58,10 +178,17 @@ $(document).on('input', '.clearable', function() {
     $(this)[tog(this.value)]('x');
 }).on('mousemove', '.x', function(e) {
     $(this)[tog(this.offsetWidth-18 < e.clientX-this.getBoundingClientRect().left)]('onX');   
-}).on('click', '.onX', function(){
+}).on('click', '.onX', function() {
     $(this).removeClass('x onX').val('');
     if (this.id == "feat_name") {
     	$("#feat_description").val("").height("125px");
+    }
+    if (this.id == "magic_talent_name") {
+    	$("#feat_description").val("").height("125px");
+		// hide additional inputs
+		$(".elemental_select").hide();
+		$(".elementalist_select").hide();
+		$(".superhuman_select").hide();
     }
 });
 
@@ -75,36 +202,50 @@ $("input").each(function() {
 	// make sure input element has an ID assigned
 	if ($(this).attr("id") != undefined) {
 		$(this).hover(
-			// mousein
-		  function() {
-		  	// check for input content
-		  	if ($(this).val() != "") {
-		  		$(span).html($(this).val());
-		  		// check for overflow and reveal span
-		  		if ($(span).width() > $(this).width()) {
-		  			$(span).show();
-		  			$(this).addClass("input-hovered");
-		  		}
-		  	}
-		  	// mouseout
-		  }, function() {
-		  	$(span).hide();
-		  	$(this).removeClass("input-hovered");
-		  }
+			// mousein - show overflow text
+			function() {
+			  	// check for input content
+			  	if ($(this).val() != "") {
+			  		$(span).html($(this).val());
+			  		// check for overflow and reveal span, unless input already has focus
+			  		if ($(span).width() > $(this).width() && !$(this).is(":focus")) {
+			  			$(span).show();
+			  			$(this).addClass("input-hovered");
+			  			// disable scrolling on hover, but enable on focus
+			  			$(this).on("scroll", function(e) {
+			  				$(this).scrollLeft(0);
+			  			});
+			  		}
+			  	}
+			// mouseout - hide overflow text
+			}, function() {
+			  	$(span).hide();
+			  	$(this).removeClass("input-hovered");
+			}
 		);
 	}
 });
 
+// hide overflow text on input focus; and disallow focus on readonly inputs
+$("input").on("focus", function() {
+	if (!$(this).is("[readonly]")) {
+		$(this).removeClass("input-hovered");
+		$(this).unbind("scroll");
+	} else {
+		$(this).blur();
+	}
+});
+
 // trigger 'unsaved changes' alert when leaving the page
-$("input").on("change", function(){
+$("input").on("change", function() {
 	if (this.id != "gm_password") {
 		unsavedChanges = true;
 	}
 });
-$("textarea").on("input propertychange", function(){
+$("textarea").on("input propertychange", function() {
 	unsavedChanges = true;
 });
-$("#user_form").on("submit", function(){
+$("#user_form").on("submit", function() {
 	unsavedChanges = false;
 });
 $(window).on("beforeunload", function(e) {
@@ -125,7 +266,7 @@ if (!is_mobile) {
 
 // enable attribute edit btn hide / show on hover; don't hide on mobile
 if (is_mobile) {
-	$(".attribute-col").each(function(){
+	$(".attribute-col").each(function() {
 		$(this).find('.hover-hide').hide();
 	});
 }
@@ -146,7 +287,7 @@ $(document).mouseup(function(e) {
 // resize character background textarea to fit text
 $("#background").height( $("#background")[0].scrollHeight );
 
-$("#attribute_pts").on("input", function(){
+$("#attribute_pts").on("input", function() {
 	if (parseInt($(this).val()) == 0) {
 		$("#attribute_pts_span").addClass("disabled");
 	} else {
@@ -154,7 +295,7 @@ $("#attribute_pts").on("input", function(){
 	}
 });
 
-$("#select_feat_type").on("change", function(){
+$("#select_feat_type").on("change", function() {
 	$(".feat-type").addClass("hidden");
 	$("#"+$(this).val()).removeClass("hidden").trigger("change");
 	if ($(this).val() == "feat_name") {
@@ -162,13 +303,54 @@ $("#select_feat_type").on("change", function(){
 		$("#feat_name_val").val("");
 		$("#feat_description").val("");
 	}
+	// hide additional inputs
+	$(".elemental_select").hide();
+	$(".elementalist_select").hide();
+	$(".superhuman_select").hide();
+});
+
+// show hidden inputs on skill type radio select
+$("#unique").on("click", function() {
+	$("#skill_name").show();
+	$("#training_name").hide();
+	$("#focus_name").hide();
+	$("#school_name").hide();
+});
+$("#training").on("click", function() {
+	$("#skill_name").hide();
+	$("#training_name").show();
+	$("#focus_name").hide();
+	$("#school_name").hide();
+});
+$("#focus").on("click", function() {
+	$("#skill_name").hide();
+	$("#training_name").hide();
+	$("#focus_name").show();
+	$("#school_name").hide();
+});
+$("#school").on("click", function() {
+	$("#skill_name").hide();
+	$("#training_name").hide();
+	$("#focus_name").hide();
+	$("#school_name").show();
+});
+
+
+// make sure school isn't already trained
+$("#school_name").on("change", function() {
+	// strip out (Governing) for name comparison
+	for (var i in schoolNames) {
+		if ($(this).val() == schoolNames[i].replace(" (Governing)", "")) {
+			$(this).val("");
+		}
+	}
 });
 
 // highlight attributes
 if (!is_mobile) {
-	$(".attribute-row").hover(function(){
+	$(".attribute-row").hover(function() {
 		$(this).addClass("highlight");
-	}, function(){
+	}, function() {
 		$(this).removeClass("highlight");
 	});
 }
@@ -190,7 +372,7 @@ function GMEditMode() {
 	  data: { 'password' : password, 'admin_password' : campaign['admin_password'], 'hashed_password': "" },
 	  ContentType: "application/json",
 	  type: 'POST',
-	  success: function(response){
+	  success: function(response) {
 	  	if (response == 1) {
 	  		// enter admin edit mode
 			adminEditMode = true;
@@ -200,7 +382,7 @@ function GMEditMode() {
 			$(".glyphicon-menu-hamburger").hide().toggleClass("active");
 
 			// show hidden attribute icons
-			$(".attribute-col").find(".hidden-icon").each(function(){
+			$(".attribute-col").find(".hidden-icon").each(function() {
 				$(this).show();
 			});
 
@@ -265,7 +447,7 @@ function selectWeapon(id) {
 	$.each(weapons, function(i, weapon) {
 		var count = 0;
 		var qty = isNaN(weapon['quantity']) ? 1 : weapon['quantity'];
-		$(".weapon-select").each(function(){
+		$(".weapon-select").each(function() {
 			if (this.id != "weapon_select_"+id && selected == $(this).val() && selected != "") {
 				count += 1;
 			}
@@ -329,7 +511,7 @@ function allocateAttributePts(e) {
 	}
 
 	// show hidden attribute icons
-	$(".attribute-col").find(".hidden-icon").each(function(){
+	$(".attribute-col").find(".hidden-icon").each(function() {
 		// don't show remove buttons
 		if (!$(this).hasClass("glyphicon-remove")) {
 			$(this).show();
@@ -343,7 +525,7 @@ function allocateAttributePts(e) {
 		// hide edit buttons
 		$(".attribute-col").unbind("mouseenter mouseleave");
 		if (is_mobile) {
-			$(".attribute-col").each(function(){
+			$(".attribute-col").each(function() {
 				$(this).find(".glyphicon-edit").hide();
 			});
 		}
@@ -351,24 +533,24 @@ function allocateAttributePts(e) {
 	// hide hamburger menu
 	$(".glyphicon-menu-hamburger").hide().toggleClass("active");
 	// dismiss menu
-  $(".nav-menu").toggleClass("active");
-  // set attribute count value
-  $(".attribute-count").html($("#attribute_pts").val()+" Points");
+	$(".nav-menu").toggleClass("active");
+	// set attribute count value
+	$(".attribute-count").html($("#attribute_pts").val()+" Points");
 	// show attribute point counter
-  $(".attribute-pts").toggleClass("active");
-  // reset arrays
-  allocatingAttributePts = true;
-  trainings = [];
-  feats = [];
-  skills = [];
-  attributeVals = [];
-  trainingVals = [];
-  // save attribute values
+	$(".attribute-pts").toggleClass("active");
+	// reset arrays
+	allocatingAttributePts = true;
+	trainings = [];
+	feats = [];
+	skills = [];
+	attributeVals = [];
+	trainingVals = [];
+	// save attribute values
 	for (var i in attributes) {
 		attributeVals.push($("#"+attributes[i]+"_val").val());
 	}
-  // save training values
-	$(".training-row").each(function(){
+ 	// save training values
+	$(".training-row").each(function() {
 		var key = $(this).find(".with-hidden").attr("for");
 		var value = $("#"+key+"_val").val();
 		trainingVals[key] = value;
@@ -377,7 +559,7 @@ function allocateAttributePts(e) {
 
 // finish point allocation mode
 function endEditAttributes(accept) {
-  allocatingAttributePts = false;
+  	allocatingAttributePts = false;
 	$(".attribute-pts").toggleClass("active");
 	$(".glyphicon-menu-hamburger").show();
 	$(".attribute-col").find(".hidden-icon").hide();
@@ -388,16 +570,16 @@ function endEditAttributes(accept) {
 	// restore attribute-col hover function for edit buttons
 	if (characterCreation) {
 		if (!is_mobile) {
-			$(".attribute-col").each(function(){
-				$(this).hover(function(){
+			$(".attribute-col").each(function() {
+				$(this).hover(function() {
 					$(this).find('.hover-hide').show();
 				},
-				function(){
+				function() {
 					$(this).find('.hover-hide').hide();
 				});
 			});
 		} else {
-			$(".attribute-col").each(function(){
+			$(".attribute-col").each(function() {
 				$(this).find(".hover-hide").show();
 			});
 		}
@@ -413,6 +595,7 @@ function endEditAttributes(accept) {
 		for (var i in attributes) {
 			$("#"+attributes[i]+"_val").val(attributeVals[i]);
 			$("#"+attributes[i]+"_text").html(attributeVals[i] >= 0 ? "+"+attributeVals[i] : attributeVals[i]);
+			adjustAttribute(attributes[i], 0);
 		}
 		// restore training values
 		for (var key in trainingVals) {
@@ -446,29 +629,12 @@ function endEditAttributes(accept) {
 }
 
 // save motivator point value on focus
-$('.motivator-pts').on('focusin', function(){
+$('.motivator-pts').on('focusin', function() {
     $(this).data('val', $(this).val());
 });
 // on motivator pt change, adjust bonuses
-$(".motivator-pts").on("input", function(){
-	var pts = [];
-	var pts_prev = [];
-	var score = 0;
-	$(".motivator-pts").each(function(){
-		pts.push($(this).val() == "" ? 0 : parseInt($(this).val()));
-		pts_prev.push($(this).data('val') != undefined ? parseInt($(this).data('val')) : parseInt($(this).val()));
-	});
-	// add the highest 3 pt values
-	pts.sort(function(a, b) {
-	  return b - a;
-	});
-	pts_prev.sort(function(a, b) {
-	  return b - a;
-	});
-	score = pts[0] + pts[1] + pts[2];
-	var bonuses = score >= 64 ? 5 : (score >= 32 ? 4 : (score >= 16 ? 3 : (score >= 8 ? 2 : (score >= 4 ? 1 : 0))));
-	$("#bonuses").val(bonuses);
-
+$(".motivator-pts").on("input", function() {
+	setMotivatorBonus();
 	// adjust xp
 	var current = $(this).val();
 	var prev = $(this).data('val');
@@ -483,6 +649,31 @@ $(".motivator-pts").on("input", function(){
 		$("#xp").val(parseInt($("#xp").val()) - parseInt($("#level").val())).trigger("change");
 	}
 });
+
+function setMotivatorBonus() {
+	pts = [];
+	pts_prev = [];
+	var score = 0;
+	$(".motivator-pts").each(function() {
+		pts.push($(this).val() == "" ? 0 : parseInt($(this).val()));
+		pts_prev.push($(this).data('val') != undefined ? parseInt($(this).data('val')) : parseInt($(this).val()));
+	});
+	// add the highest 3 pt values
+	pts.sort(function(a, b) {
+	  return b - a;
+	});
+	pts_prev.sort(function(a, b) {
+	  return b - a;
+	});
+	score = pts[0] + pts[1] + pts[2];
+	var bonuses = score >= 64 ? 5 : (score >= 32 ? 4 : (score >= 16 ? 3 : (score >= 8 ? 2 : (score >= 4 ? 1 : 0))));
+
+	// check for morale modifiers
+	var morale = $("#morale").val();
+	bonuses += morale >= 4 ? 1 : (morale <= -4 ? -1 : 0);
+
+	$("#bonuses").val(bonuses);
+}
 
 // on xp change, adjust level
 $("#xp").change(function() {
@@ -559,6 +750,7 @@ $("#xp").change(function() {
 // on morale change, set morale effect
 $("#morale").on("input", function() {
 	setMoraleEffect(parseInt($(this).val()));
+	setMotivatorBonus();
 });
 
 // set max damage to resilience
@@ -575,12 +767,12 @@ function editSize() {
 	// set size text
 	var size = $("#character_size_select").val();
 	user['size'] = size;
-	var size_text = size == "Small" ? "Small; +2 Defend/Dodge/Stealth, -0.5 Move" : (size == "Large" ? "Large; -2 Defend/Dodge/Stealth, +0.5 Move" : size)
+	var size_text = size == "Small" ? "Small; +2 Defend/Dodge/Stealth, -10 Move" : (size == "Large" ? "Large; -2 Defend/Dodge/Stealth, +10 Move" : size)
 	$("#character_size_text").html(size_text);
 	$("#character_size_val").val(size);
 	setDodge();
 	setDefend();
-	updateTotalWeight();
+	updateTotalWeight(false);
 }
 
 function setDodge() {
@@ -598,7 +790,7 @@ function setDefend() {
 	var defend = 10 + agility + (size == "Small" ? 2 : (size == "Large" ? -2 : 0));
 	// check for weapon defend mofifier
 	var bonus = 0;
-	$(".weapon-select").each(function(){
+	$(".weapon-select").each(function() {
 		if ($(this).val() != "") {
 			for (var i in weapons) {
 				if ($(this).val() == weapons[i]['name'] && weapons[i]['defend'] != ''&& weapons[i]['defend'] != undefined) {
@@ -626,14 +818,14 @@ function setToughness() {
 }
 
 // penalty inputs - if val is zero, clear input
-$(".penalty-val").on("input", function(){
+$(".penalty-val").on("input", function() {
 	if ($(this).val() == 0) {
 		$(this).val("");
 	}
 });
 
 // anchor link dropdown
-$("#anchor_links").on("change", function(){
+$("#anchor_links").on("change", function() {
 	if ($(this).val() != "") {
 		$('html,body').animate({scrollTop: $($(this).val()).offset().top},'slow');
 		$(this).val("");
@@ -644,7 +836,7 @@ $("#anchor_links").on("change", function(){
 enableHiddenNumbers();
 
 // user navigation
-$("#user_select").on("change", function(){
+$("#user_select").on("change", function() {
 	if ($(this).val() == "") {
 		window.location.replace("/?campaign="+$('#campaign_id').val());
 	} else {
@@ -665,14 +857,17 @@ $("#training_name").on('keypress', function (event) {
 });
 
 // focus inputs on modal open -  inputs on modal close
-$("#new_training_modal").on('shown.bs.modal', function(){
+$("#new_training_modal").on('shown.bs.modal', function() {
 	$("#training_name").focus();
 });
-$("#new_weapon_modal").on('shown.bs.modal', function(){
+$("#new_training_modal").on('hidden.bs.modal', function() {
+
+});
+$("#new_weapon_modal").on('shown.bs.modal', function() {
 	$(focus_id == "" ? "#weapon_name" : focus_id).focus();
 	focus_id = "";
 });
-$("#new_weapon_modal").on('hidden.bs.modal', function(){
+$("#new_weapon_modal").on('hidden.bs.modal', function() {
 	$("#weapon_modal_title").html("New Weapon");
 	$("#weapon_name").val("");
 	$("#weapon_damage").val("");
@@ -685,71 +880,71 @@ $("#new_weapon_modal").on('hidden.bs.modal', function(){
 	$("#weapon_weight").val("");
 	$("#weapon_qty").val("");
 });
-$("#new_protection_modal").on('shown.bs.modal', function(){
+$("#new_protection_modal").on('shown.bs.modal', function() {
 	$(focus_id == "" ? "#protection_name" : focus_id).focus();
 	focus_id = "";
 });
-$("#new_protection_modal").on('hidden.bs.modal', function(){
+$("#new_protection_modal").on('hidden.bs.modal', function() {
 	$("#protection_modal_title").html("New Protection");
 	$("#protection_name").val("");
 	$("#protection_bonus").val("");
 	$("#protection_notes").val("");
 	$("#protection_weight").val("");
 });
-$("#new_healing_modal").on('shown.bs.modal', function(){
+$("#new_healing_modal").on('shown.bs.modal', function() {
 	$(focus_id == "" ? "#healing_name" : focus_id).focus();
 	focus_id = "";
 });
-$("#new_healing_modal").on('hidden.bs.modal', function(){
+$("#new_healing_modal").on('hidden.bs.modal', function() {
 	$("#healing_modal_title").html("New Healing/Potion/Drug");
 	$("#healing_name").val("");
 	$("#healing_quantity").val("");
 	$("#healing_effect").val("");
 	$("#healing_weight").val("");
 });
-$("#new_misc_modal").on('shown.bs.modal', function(){
+$("#new_misc_modal").on('shown.bs.modal', function() {
 	$(focus_id == "" ? "#misc_name" : focus_id).focus();
 	focus_id = "";
 });
-$("#new_misc_modal").on('hidden.bs.modal', function(){
+$("#new_misc_modal").on('hidden.bs.modal', function() {
 	$("#misc_modal_title").html("New Miscellaneous Item");
 	$("#misc_name").val("");
 	$("#misc_quantity").val("");
 	$("#misc_notes").val("");
 	$("#misc_weight").val("");
 });
-$("#new_note_modal").on('shown.bs.modal', function(){
+$("#new_note_modal").on('shown.bs.modal', function() {
 	$("#note_title").focus();
 });
-$("#new_note_modal").on('hidden.bs.modal', function(){
+$("#new_note_modal").on('hidden.bs.modal', function() {
 	$("#note_modal_title").html("New Note");
 	$("#note_title").val("");
 	$("#note_content").val("");
 });
-$("#xp_modal").on('shown.bs.modal', function(){
+$("#xp_modal").on('shown.bs.modal', function() {
 	$("#add_xp").focus();
 });
-$("#new_password_modal").on('shown.bs.modal', function(){
+$("#new_password_modal").on('shown.bs.modal', function() {
 	$("#new_password").focus();
 	toggleMenu();
 });
-$("#password_modal").on('shown.bs.modal', function(){
+$("#password_modal").on('shown.bs.modal', function() {
 	$("#password").focus();
 	toggleMenu();
 });
-$("#gm_modal").on('shown.bs.modal', function(){
+$("#gm_modal").on('shown.bs.modal', function() {
 	$("#gm_password").focus();
 	toggleMenu();
 });
-$("#gm_modal").on('hidden.bs.modal', function(){
+$("#gm_modal").on('hidden.bs.modal', function() {
 	$("#gm_title").html("GM Edit Mode")
 });
-$("#help_modal").on('shown.bs.modal', function(){
+$("#help_modal").on('shown.bs.modal', function() {
 	// toggleMenu();
 });
 
 // on modal shown, update modal title and clear inputs
-$("#new_feat_modal").on('shown.bs.modal', function(){
+$("#new_feat_modal").on('shown.bs.modal', function() {
 	$("#feat_name").focus();
 	// gm edit mode - unhide select feat type elements
 	if (adminEditMode || characterCreation) {
@@ -759,8 +954,13 @@ $("#new_feat_modal").on('shown.bs.modal', function(){
 		$("#select_feat_type").addClass("hidden");
 		$("#select_feat_type_label").addClass("hidden");
 	}
+	// hide additional inputs
+	$(".elemental_select").hide();
+	$(".elementalist_select").hide();
+	$(".superhuman_select").hide();
+
 });
-$("#new_feat_modal").on('hidden.bs.modal', function(){
+$("#new_feat_modal").on('hidden.bs.modal', function() {
 	$("#feat_modal_title").html("New Feat");
 	$("#feat_name").val("").removeClass("x onX").attr("disabled", false);
 	$("#feat_description").val("").height("125px");
@@ -775,15 +975,7 @@ $("#new_feat_modal").on('hidden.bs.modal', function(){
 	$("#morale_trait_name").val("").attr("disabled", false);
 });
 
-$("#new_training_modal").on('shown.bs.modal', function(){
-	// if (allocatingAttributePts) {
-	// 	$("#skill_type").show();
-	// } else {
-	// 	$("#skill_type").hide();
-	// }
-});
-
-$("#encumbered_modal").on('hidden.bs.modal', function(){
+$("#encumbered_modal").on('hidden.bs.modal', function() {
 	// check if we should suppress encumbered alerts
 	if ($("#suppress_alert").is(":checked")) {
 		suppressAlerts = true;
@@ -791,19 +983,19 @@ $("#encumbered_modal").on('hidden.bs.modal', function(){
 });
 
 // enable / disable password submit btn
-$("#new_password").on("keypress", function(){
+$("#new_password").on("keypress", function() {
 	$("#password_btn").attr("disabled", $("#new_password").val() == "" || $("#password_conf").val() == "" || $("#email").val() == "");
 });
-$("#password_conf").on("keypress", function(){
+$("#password_conf").on("keypress", function() {
 	$("#password_btn").attr("disabled", $("#new_password").val() == "" || $("#password_conf").val() == "" || $("#email").val() == "");
 });
-$("#email").on("keypress", function(){
+$("#email").on("keypress", function() {
 	$("#password_btn").attr("disabled", $("#new_password").val() == "" || $("#password_conf").val() == "" || $("#email").val() == "");
 });
 
 // on weapon-name input focus, show other weapon inputs
-$(".weapon-name").each(function(){
-	$(this).on("focus", function(){
+$(".weapon-name").each(function() {
+	$(this).on("focus", function() {
 		if ($("#"+$(this).attr("name")).is(":visible") && $("#"+$(this).attr("name")).hasClass("glyphicon-chevron-down")) {
 			$("#"+$(this).attr("name")).trigger("click");
 		}
@@ -811,7 +1003,7 @@ $(".weapon-name").each(function(){
 });
 
 // autofill feat description on option select
-$(".feat-select").on("change", function(){
+$(".feat-select").on("change", function() {
 	var description = "";
 	var cost = "";
 	for (var i in feat_list) {
@@ -852,6 +1044,12 @@ function setFeatList() {
 								break;
 							case 'training':
 								satisfied = satisfied ? true : includesIgnoreCase(trainingNames, req[key]);
+								if (req[key] == "Ka" || req[key] == "Avani" || req[key] == "Nouse" || req[key] == "Soma") {
+									feat['magic'] = true;
+								}
+								break;
+							case 'character_creation':
+								satisfied = characterCreation;
 								break;
 							default: // skill
 								satisfied = satisfied ? true : user[key] >= req[key];
@@ -873,117 +1071,171 @@ function setFeatList() {
 	});
 
 	// sort and merge feat lists
-	var list1 = [];
+	var standard_list1 = [];
+	var magic_list1 = [];
 	for (var i in eligible_feats) {
-		list1.push(eligible_feats[i]['name']);
+		if (eligible_feats[i]['magic'] == true) {
+			magic_list1.push(eligible_feats[i]['name']);
+		} else {
+			standard_list1.push(eligible_feats[i]['name']);
+		}
 	}
-	list1.sort();
-	var list2 = [];
+	standard_list1.sort();
+	magic_list1.sort();
+	var standard_list2 = [];
+	var magic_list2 = [];
 	for (var i in ineligible_feats) {
-		list2.push(ineligible_feats[i]['name']);
+		if (ineligible_feats[i]['magic'] == true) {
+			magic_list2.push(ineligible_feats[i]['name']);
+		} else {
+			standard_list2.push(ineligible_feats[i]['name']);
+		}
 	}
-	list2.sort();
-	var list = list1.concat(list2);
+	standard_list2.sort();
+	magic_list2.sort();
+	var standardList = standard_list1.concat(standard_list2);
+	var magicList = magic_list1.concat(magic_list2);
 
-	$("#feat_name").autocomplete({
+	$("#magic_talent_name").autocomplete({
 		source: function(input, add) {
-			var suggestions = [];
-			$.each(list, function(i, feat_name) {
-				if (feat_name.toLowerCase().includes(input['term'].toLowerCase())) {
-					var entry = new Object();
-					entry.value = feat_name;
-					// check if attribute requirements are satisfied
-					entry.satisfied = true;
-					$.each(feat_list, function(j, feat_vals) {
-						if (feat_vals['name'] == feat_name) {
-							$.each(feat_vals['requirements'], function(k, reqs) {
-								$.each(reqs, function(l, req) {
-									for (key in req) {
-										if (key == "character_creation") {
-											entry.hidden = adminEditMode ? false : !characterCreation;
-										}
-									}
-								});
-								// set satisfied value to list entry - satisfied always true in GM edit mode
-								entry.satisfied = adminEditMode ? true : feat_vals['satisfied'];
-							});
-						}
-	 				});
-	 				// check if user is already trained in the feat
-	 				var found = false;
-	 				for (var i in user_feats) {
-	 					if (user_feats[i]['name'].toLowerCase() == entry['value'].toLowerCase()) {
-	 						found = true;
-	 						break;
-	 					}
-	 				}
-	 				if (!found) {
-						suggestions.push(entry);
-	 				}
-				}
-			});
-			add(suggestions);
+			featSourceFunction(input, add, magicList);
 		},
 		create: function (event, ui) {
 			$(this).data("ui-autocomplete")._renderItem = function(ul, item) {
-				var listItem = $("<li></li>")
-				.data("item.autocomplete", item)
-				.append("<a>" + item.label + "</a>")
-				.appendTo(ul);
-
-				// adjust class based on whether requirements are satisfied or not
-				if (!item.satisfied) {
-					listItem.addClass("italic");
-				} else {
-					listItem.addClass("bold");
-				}
-				if (item.hidden) {
-					listItem.addClass("hidden");
-				}
-
-				return listItem;
+				return featCreateFunction(ul, item);
 			};
 		},
 		select: function(event, ui) {
-			// build user message if requirements aren't satisfied
-			if (!ui.item.satisfied) {
-				var requirements = "";
-				for (var i in feat_list) {
-					if (feat_list[i]['name'] == ui.item.value) {
-						for (var j in feat_list[i]['requirements']) {
-							for (var k in feat_list[i]['requirements'][j]) {
-								for (var key in feat_list[i]['requirements'][j][k]) {
-									requirements += key == "character_creation" ? "*only available during character creation" : 
-									(key == "precision_" ? "Precision" : capitalize(key)) + " : " + feat_list[i]['requirements'][j][k][key];
-								}
-								if (feat_list[i]['requirements'][j].length > 1 && k < feat_list[i]['requirements'][j].length-1) {
-									requirements += " OR ";
-								}
-							}
-							requirements += "\n";
-						}
-						requirements += "\n";
-						requirements += feat_list[i]['name']+"\n";
-						requirements += feat_list[i]['description'];
-					}
-				}
-				alert("Requirements not met for "+ui.item.value+":\n\n"+requirements);
-				$("#feat_name").val("").removeClass("x onX");
-				$("#feat_description").val("");
-				return false;
-			} else {
-				// auto fill description on feat selection
-				var description = "";
-				for (var i in feat_list) {
-					if (feat_list[i]['name'] == ui.item.value) {
-						description = feat_list[i]['description'];
-					}
-				}
-				$("#feat_name_val").val(ui.item.value);
-				$("#feat_description").val(description).height($("#feat_description")[0].scrollHeight);
-			}
+			return featSelectFunction(ui);
 		}
 	});
+
+	$("#feat_name").autocomplete({
+		source: function(input, add) {
+			featSourceFunction(input, add, standardList);
+		},
+		create: function (event, ui) {
+			$(this).data("ui-autocomplete")._renderItem = function(ul, item) {
+				return featCreateFunction(ul, item);
+			};
+		},
+		select: function(event, ui) {
+			return featSelectFunction(ui);
+		}
+	});
+}
+
+function featSourceFunction(input, add, list) {
+	var suggestions = [];
+	$.each(list, function(i, feat_name) {
+		if (feat_name.toLowerCase().includes(input['term'].toLowerCase())) {
+			var entry = new Object();
+			entry.value = feat_name;
+			// check if attribute requirements are satisfied
+			entry.satisfied = true;
+			$.each(feat_list, function(j, feat_vals) {
+				if (feat_vals['name'] == feat_name) {
+					$.each(feat_vals['requirements'], function(k, reqs) {
+						$.each(reqs, function(l, req) {
+							for (key in req) {
+								if (key == "character_creation") {
+									entry.hidden = adminEditMode ? false : !characterCreation;
+								}
+							}
+						});
+						// set satisfied value to list entry - satisfied always true in GM edit mode
+						entry.satisfied = adminEditMode ? true : feat_vals['satisfied'];
+					});
+				}
+				});
+				// check if user is already trained in the feat
+				var found = false;
+				for (var i in user_feats) {
+					if (user_feats[i]['name'].toLowerCase() == entry['value'].toLowerCase()) {
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+				suggestions.push(entry);
+				}
+		}
+	});
+	add(suggestions);
+}
+
+function featCreateFunction(ul, item) {
+	var listItem = $("<li></li>")
+	.data("item.autocomplete", item)
+	.append("<a>" + item.label + "</a>")
+	.appendTo(ul);
+
+	// adjust class based on whether requirements are satisfied or not
+	if (!item.satisfied) {
+		listItem.addClass("italic");
+	} else {
+		listItem.addClass("bold");
+	}
+	if (item.hidden) {
+		listItem.addClass("hidden");
+	}
+
+	return listItem;
+}
+
+function featSelectFunction(ui) {
+	// build user message if requirements aren't satisfied
+	if (!ui.item.satisfied) {
+		var requirements = "";
+		for (var i in feat_list) {
+			if (feat_list[i]['name'] == ui.item.value) {
+				for (var j in feat_list[i]['requirements']) {
+					for (var k in feat_list[i]['requirements'][j]) {
+						for (var key in feat_list[i]['requirements'][j][k]) {
+							requirements += key == "character_creation" ? "*only available during character creation" : 
+							(key == "precision_" ? "Precision" : capitalize(key)) + " : " + feat_list[i]['requirements'][j][k][key];
+						}
+						if (feat_list[i]['requirements'][j].length > 1 && k < feat_list[i]['requirements'][j].length-1) {
+							requirements += " OR ";
+						}
+					}
+					requirements += "\n";
+				}
+				requirements += "\n";
+				requirements += feat_list[i]['name']+"\n";
+				requirements += feat_list[i]['description'];
+			}
+		}
+		alert("Requirements not met for "+ui.item.value+":\n\n"+requirements);
+		$("#feat_name").val("").removeClass("x onX");
+		$("#feat_description").val("");
+		return false;
+	} else {
+
+		// check for talents requiring additional selection
+		var talent = ui.item.value;
+		$(".elemental_select").hide();
+		$(".elementalist_select").hide();
+		$(".superhuman_select").hide();
+		if (talent == "Elemental Master") {
+			$(".elemental_select").show();
+		} else if (talent == "Elementalist") {
+			$(".elementalist_select").show();
+		} else if (talent == "Superhuman") {
+			$(".superhuman_select").show();
+		}
+
+		// auto fill description on feat selection
+		var description = "";
+		for (var i in feat_list) {
+			if (feat_list[i]['name'] == ui.item.value) {
+				description = feat_list[i]['description'];
+			}
+		}
+		$("#feat_name_val").val(ui.item.value);
+		$("#feat_description").val(description).height($("#feat_description")[0].scrollHeight);
+		return true;
+	}
 }
 
 // set attribute values on page load
@@ -993,14 +1245,14 @@ function setAttributes(user) {
 			$("#"+attributes[i]+"_text").html(user[attributes[i]] >= 0 ? "+"+user[attributes[i]] : user[attributes[i]]);
 			$("#"+attributes[i]+"_val").val(user[[attributes[i]]]);
 		} else {
+			user[attributes[i]] = 0;
 			$("#"+attributes[i]+"_text").html("+0");
 			$("#"+attributes[i]+"_val").val(0);
 		}
 	}
 	// set morale effect from morale
-	if (user['morale'] != null) {
-		setMoraleEffect(parseInt(user['morale']));
-	}
+	setMoraleEffect(user['morale'] == null ? 0 : parseInt(user['morale']));
+	setMotivatorBonus();
 	// set size text
 	editSize();
 	// set initiative
@@ -1027,20 +1279,47 @@ function setAttributes(user) {
 }
 
 function setMoraleEffect(morale) {
-	var moraleEffects = {
-		2: "Once per Encounter you can re-roll a Fate",
-		4: "Once per Encounter you can re-roll a d20",
-		6: "Once per Session you can declare a Fate 6",
-		8: "You gain 1 additional Motivator Bonus per Session",
-		10: "You gain a Benefit on a Fate 5 or 6"
+	var positiveEffects = {
+		2: "You gain +1 Fate",
+		4: "You gain 1 Motivator Bonus Each Session",
+		6: "You gain +1 Fate",
+		8: "Once per Session you can declare a Fate 6, leading to an Epic Success"
+	};
+	var negativeEffects = {
+		2: "You suffer -1 Fate",
+		4: "You lose 1 Motivator Bonus Each Session",
+		6: "You suffer -1 Fate",
+		8: "You no longer gain a Benefit on a Fate 6"
 	};
 	var moraleEffect = "No Effect";
-	for (var key in moraleEffects) {
-		if (morale >= key) {
-			moraleEffect = moraleEffects[key];
+	if (morale > 0) {
+		for (var key in positiveEffects) {
+			if (morale >= key) {
+				moraleEffect = positiveEffects[key];
+			}
+		}
+	} else {
+		morale *= -1;
+		for (var key in negativeEffects) {
+			if (morale >= key) {
+				moraleEffect = negativeEffects[key];
+			}
 		}
 	}
 	$("#morale_effect").val(moraleEffect);
+	adjustFate();
+}
+
+function adjustFate() {
+	var fate = 0;
+	// get morale
+	var morale = $("#morale").val();
+	fate += morale >= 6 ? 2 : (morale >= 2 ? 1 : 0);
+	fate -= morale <= -6 ? 2 : (morale <= -2 ? 1 : 0);
+	// get vitality
+	var vitality = $("#vitality_val").val();
+	fate += vitality >= 0 ? Math.floor(vitality/2) : Math.ceil(vitality/3);
+	$("#fate").val(fate);
 }
 
 // adjust attribute value
@@ -1090,7 +1369,7 @@ function adjustAttribute(attribute, val) {
 			$("#burdened").val(base/4*3);
 			$("#overburdened").val(base);
 			// adjust melee weapon damage
-			$(".weapon-select").each(function(){
+			$(".weapon-select").each(function() {
 				for(var i in weapons) {
 					if ($(this).val() == weapons[i]['name'] && weapons[i]['type'] == 'Melee') {
 						// set damage to max or damage + mod
@@ -1116,7 +1395,7 @@ function adjustAttribute(attribute, val) {
 			break;
 		case 'speed':
 			adjustInitiative();
-			updateTotalWeight();
+			updateTotalWeight(false);
 			break;
 		case 'agility':
 			// adjust dodge and defend
@@ -1125,7 +1404,7 @@ function adjustAttribute(attribute, val) {
 			break;
 		case 'precision_':
 			// adjust ranged weapon damage
-			$(".weapon-select").each(function(){
+			$(".weapon-select").each(function() {
 				for(var i in weapons) {
 					if ($(this).val() == weapons[i]['name'] && weapons[i]['type'] == 'Ranged') {
 						// set damage to max or damage + mod
@@ -1148,6 +1427,12 @@ function adjustAttribute(attribute, val) {
 			$("#initiative").val(initiative);
 			adjustInitiative();
 			break;
+		case 'vitality':
+			// adjust fate and caster level
+			var caster_level = newVal >= 0 ? 10 + Math.floor(newVal/2) : 10 - Math.ceil(newVal/3);
+			$("#caster_level").val(caster_level);
+			adjustFate();
+			break;
 	}
 	// adjust eligibility of feat list
 	setFeatList();
@@ -1157,14 +1442,14 @@ function adjustAttribute(attribute, val) {
 function toggleHidden(col) {
 	// if mobile, toggle all other edit buttons hidden
   if (is_mobile) {
-  	$(".attribute-col").each(function(){
+  	$(".attribute-col").each(function() {
   		if (this.id != col) {
   			$(this).find(".glyphicon-edit").toggle();
   		}
   	});
   } else {
   	// if desktop, make sure all other hidden icons are hidden
-  	$(".attribute-col").each(function(){
+  	$(".attribute-col").each(function() {
   		if (this.id != col) {
   			$(this).find(".hidden-icon").hide();
   		}
@@ -1205,7 +1490,7 @@ function validatePassword() {
 	  data: { 'password' : $("#password").val(), 'user_id' : $("#user_id").val(), 'campaign_id' : $("#campaign_id").val() },
 	  ContentType: "application/json",
 	  type: 'POST',
-	  success: function(response){
+	  success: function(response) {
 	  	// on response success, submit form
 	  	if (response == 1) {
 	  		// close modal
@@ -1254,7 +1539,7 @@ function forgotPassword() {
 	  data: { 'user_id' : $("#user_id").val() },
 	  ContentType: "application/json",
 	  type: 'POST',
-	  success: function(response){
+	  success: function(response) {
 	  	// no action necessary
 	  }
 	});
@@ -1265,12 +1550,45 @@ function newFeat() {
 	var featName = $("#feat_name_val").val() == "" ? $("#feat_name").val() : $("#feat_name_val").val();
 	var featDescription = $("#feat_description").val();
 	if (featName != "" && featDescription != " ") {
-		addFeatElements(featName, featDescription.trim(), $("#feat_id").val());
+		// check for talents requiring additional selection
+		var featDisplayName = "";
+		if (featName == "Elemental Master") {
+			featDisplayName = featName + " ("+$(".elemental_select").val()+")";
+		} else if (featName == "Elementalist") {
+			featDisplayName = featName + " ("+$(".elementalist_select").val()+")";
+		} else if (featName == "Superhuman") {
+			featDisplayName = featName + " ("+$(".superhuman_select").val()+")";
+		}
+		addFeatElements(featName, featDescription.trim(), $("#feat_id").val(), featDisplayName);
+	}
+	// check for 'Divine Magic'
+	if (featName == "Divine Magic") {
+		// prompt to choose a vow
+		$("#vows_modal").modal("show");
 	}
 }
 
+$("#vows_modal").on('hidden.bs.modal', function() {
+	// get selected radio value
+	var vow = $("input[type='radio'][name='vow']:checked").val();
+	// add new feat
+	$("#feat_name_val").val("Vow of "+vow);
+	$("#feat_description").val($("#"+vow+"_description").html());
+	newFeat();
+	// scroll back to feats section
+	$([document.documentElement, document.body]).animate({
+        scrollTop: $("#section_feats").offset().top-100
+    }, 200);
+});
+
 // create html elements for feat
-function addFeatElements(featName, featDescription, id) {
+function addFeatElements(featName, featDescription, id, featDisplayName = "") {
+	// check for magic talents
+	user['magic_talents'] = user['magic_talents'] || featName == "Arcane Blood" || featName == "Divine Magic";
+	if (user['magic_talents']) {
+		$("#magic_option").show();
+	}
+
 	var id_val = id == "" ? uuid() : "training_"+id;
 	var featDescription = featDescription.split("\n\n")[0]; // remove extraneous text from feat descriptions
 
@@ -1354,7 +1672,7 @@ function addFeatElements(featName, featDescription, id) {
 			$(".attribute-count").html(pts - cost+" Points");
 		}
 
-		featNames.push(featName);
+		featNames.push(featDisplayName == "" ? featName : featDisplayName);
 		user_feats.push({"name":featName, "type":featType});
 		var feat_container = createElement('div', 'feat', '#feats', id_val);
 		if (allocatingAttributePts) {
@@ -1366,7 +1684,7 @@ function addFeatElements(featName, featDescription, id) {
     $('<p />', {
     	'id': id_val+"_name",
     	'class': 'feat-title',
-    	'text': featName+" : "
+    	'text': (featDisplayName == "" ? featName : featDisplayName)+" : "
     }).appendTo(feat_title_descrip);
 
     var feat_descrip = $('<p />', {
@@ -1374,14 +1692,14 @@ function addFeatElements(featName, featDescription, id) {
       'text': featDescription.length > 100 ? featDescription.substring(0,100)+"..." : featDescription
     }).appendTo(feat_title_descrip);
 
-		// if allocating points, make sure remove button is visible
-		var removeBtn = createElement('span', 'glyphicon glyphicon-remove hidden-icon', feat_container, id_val+"_remove");
-		if (allocatingAttributePts || adminEditMode || characterCreation) {
-			removeBtn.show();
-		}
+	// if allocating points, make sure remove button is visible
+	var removeBtn = createElement('span', 'glyphicon glyphicon-remove hidden-icon', feat_container, id_val+"_remove");
+	if (allocatingAttributePts || adminEditMode || characterCreation) {
+		removeBtn.show();
+	}
 
     // add click function to edit button
-    feat_title_descrip.on("click", function(){
+    feat_title_descrip.on("click", function() {
     	var name = $("#"+id_val+"_name").html().split(" : ")[0];
     	// figure out what type of feat we are editing
     	var featType = "";
@@ -1406,63 +1724,24 @@ function addFeatElements(featName, featDescription, id) {
 			$("#feat_description").height( $("#feat_description")[0].scrollHeight );
     });
 
-    $("#"+id_val+"_remove").on("click", function(){
+    $("#"+id_val+"_remove").on("click", function() {
     	var name = $("#"+id_val+"_name").html();
     	// confirm delete
-    	var conf = confirm("Remove feat, '"+name.split(" : ")[0]+"'?");
+    	var conf = confirm("Remove Talent, '"+name.split(" : ")[0]+"'?");
     	if (conf) {
-
-	    	// if allocating attribute points, increase points
-	    	if (allocatingAttributePts) {
-					var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
-					// if removing a negative trait, make sure we have enough points
-					if (cost < 0 && pts + cost < 0) {
-						alert("Not enough attribute points to remove trait, "+featName);
-						return;
-					}
-
-					$(".attribute-count").html(pts + cost +" Points");
-					var index = feats.indexOf(feat_container);
-					if (index !== -1) {
-					  feats.splice(index, 1);
-					}
-	    	}
-
-    		// remove elements and update arrays
-    		unsavedChanges = true;
-    		$("#"+id_val).remove();
-				var index = featNames.indexOf(featName);
-				if (index !== -1) {
-				  featNames.splice(index, 1);
-				}
-				for (var i in user_feats) {
-					if (user_feats[i]['name'] == featName) {
-					  user_feats.splice(i, 1);
-					  break;
-					}
-				}
-
-	    	// check if we're removing feats that affect attributes
-				if (featName.toLowerCase() == "improved critical hit") {
-					selectWeapon(1);
-					selectWeapon(2);
-					selectWeapon(3);
-				}
-				if (featName.toLowerCase() == "quick and the dead") {
-					adjustInitiative();
-				}
+    		removeFeatFunction(id_val, featName);
     	}
     });
 
-		// highlight on hover
-		feat_container.hover(function(){
-			$(this).addClass("highlight");
-		}, function(){
-			$(this).removeClass("highlight");
-		});
+	// highlight on hover
+	feat_container.hover(function() {
+		$(this).addClass("highlight");
+	}, function() {
+		$(this).removeClass("highlight");
+	});
 
-		// add hidden inputs
-    createInput('', 'hidden', 'feat_names[]', featName, feat_container, id_val+"_name_val");
+	// add hidden inputs
+    createInput('', 'hidden', 'feat_names[]', (featDisplayName == "" ? featName : featDisplayName), feat_container, id_val+"_name_val");
     createInput('', 'hidden', 'feat_descriptions[]', featDescription, feat_container, id_val+"_descrip_val");
 		createInput('', 'hidden', 'feat_ids[]', id, feat_container);
 	}
@@ -1478,6 +1757,51 @@ function addFeatElements(featName, featDescription, id) {
 		// adjust initiative value
 		adjustInitiative();
 	}
+
+	// adjust feat eligibility
+	setFeatList();
+}
+
+function removeFeatFunction(id_val, featName) {
+	// if allocating attribute points, increase points
+	if (allocatingAttributePts) {
+			var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
+			// if removing a negative trait, make sure we have enough points
+			if (cost < 0 && pts + cost < 0) {
+				alert("Not enough attribute points to remove trait, "+featName);
+				return;
+			}
+
+			$(".attribute-count").html(pts + cost +" Points");
+			var index = feats.indexOf(feat_container);
+			if (index !== -1) {
+			  feats.splice(index, 1);
+			}
+	}
+
+	// remove elements and update arrays
+	unsavedChanges = true;
+	$("#"+id_val).remove();
+		var index = featNames.indexOf(featName);
+		if (index !== -1) {
+		  featNames.splice(index, 1);
+		}
+		for (var i in user_feats) {
+			if (user_feats[i]['name'] == featName) {
+			  user_feats.splice(i, 1);
+			  break;
+			}
+		}
+
+	// check if we're removing feats that affect attributes
+	if (featName.toLowerCase() == "improved critical hit") {
+		selectWeapon(1);
+		selectWeapon(2);
+		selectWeapon(3);
+	}
+	if (featName.toLowerCase() == "quick and the dead") {
+		adjustInitiative();
+	}
 }
 
 function adjustInitiative() {
@@ -1487,31 +1811,327 @@ function adjustInitiative() {
 	var quick = includesIgnoreCase(featNames, "quick and the dead");
 	if (quick && speed > awareness && awareness >= 0) {
 		// set initiative based on speed value
-		var initiative = 10 - Math.floor(speed/2);
-		var secondary = 10 - Math.floor(awareness/2);
+		var initiative = 6 - Math.floor(speed/2);
+		var secondary = 6 - Math.floor(awareness/2);
 	} else {
-		var initiative = awareness >= 0 ? 10 - Math.floor(awareness/2) : 10 - Math.ceil(awareness/3);
-		var secondary = speed >= 0 ? 10 - Math.floor(speed/2) : 10 - Math.ceil(speed/3);
+		var initiative = awareness >= 0 ? 6 - Math.floor(awareness/2) : 6 - Math.ceil(awareness/3);
+		var secondary = speed >= 0 ? 6 - Math.floor(speed/2) : 6 - Math.ceil(speed/3);
 	}
 	$("#initiative").val(initiative+" / "+secondary+"");
 }
 
 function newTrainingModal(attribute) {
+	var skillAutocompletes = {
+		'Strength':
+		{
+			'skill':[
+				'Swimming'
+			],
+			'training':[],
+			'focus':[
+				'Climb',
+				'Jump',
+				'Lift'
+			],
+		},
+		'Fortitude':
+		{
+			'skill':[
+				'Swimming'
+			],
+			'training':[],
+			'focus':[
+				'Resist Poison',
+				'Resist Disease'
+			],
+		},
+		'Speed':
+		{
+			'skill':[],
+			'training':[],
+			'focus':[
+				'Run',
+				'React'
+			],
+		},
+		'Agility':
+		{
+			'skill':[
+				'Ride Animal'
+			],
+			'training':[],
+			'focus':[
+				// 'Attack - specific weapon'
+			],
+		},
+		'Awareness':
+		{
+			'skill':[
+				'Stealth'
+			],
+			'training':[],
+			'focus':[
+				'Search',
+				'Listen',
+				'Smell',
+				'Taste'
+			],
+		},
+		'Precision':
+		{
+			'skill':[
+				'Demolitions',
+				'Security',
+				'Drive',
+				'Pilot',
+				'Sleight of Hand'
+			],
+			'training':[],
+			'focus':[
+				// 'Shoot - specific weapon',
+				// 'Throw - specific weapon'
+			],
+		},
+		'Allure':
+		{
+			'skill':[
+				'Train Animal',
+				'Perform'
+			],
+			'training':[],
+			'focus':[
+				'Seduce',
+				'Diplomacy',
+				'Barter'
+			],
+		},
+		'Deception':
+		{
+			'skill':[
+				'Hacking',
+				'Perform',
+				'Sleight of Hand',
+				'Stealth'
+			],
+			'training':[],
+			'focus':[
+				'Disguise'
+			],
+		},
+		'Innovation':
+		{
+			'skill':[
+				'Engineering',
+				'Hacking',
+				'First Aid',
+				'Tactics',
+				'Security',
+				'Drive',
+				'Pilot',
+				'Sail'
+			],
+			'training':[],
+			'focus':[
+				// 'Craft - specific item'
+			],
+		},
+		'Intellect':
+		{
+			'skill':[
+				'Engineering',
+				'First Aid',
+				'Survival',
+				'Demolitions',
+				'Sail'
+			],
+			'training':[],
+			'focus':[
+				'Appraise',
+				// 'Academia - specific area',
+				// 'Culture - specific area',
+				'Languages',
+				// 'Religion - specific religion',
+				'Magic',
+				// 'Profession - specific profession'
+			],
+		},
+		'Intuition':
+		{
+			'skill':[
+				'Survival',
+				'Tactics',
+				'Ride Animal'
+			],
+			'training':[],
+			'focus':[
+				'Sense Motive',
+				'Interrogate'
+			],
+		},
+		'Vitality':
+		{
+			'skill':[],
+			'training':[],
+			'focus':[
+				'Intimidate',
+				'Willpower'
+			],
+		},
+	};
+
 	// launch modal
 	$("#training_modal_title").html("New "+attribute+" Training");
 	$("#attribute_type").val(attribute);
 	$("#training_name").val("");
+
+	// unselect radios and hide and clear inputs
+	$("input:radio[name='skill_type']").each(function(i) {
+	      this.checked = false;
+	});
+	$("#skill_name").val("").hide();
+	$("#training_name").val("").hide();
+	$("#focus_name").val("").hide();
+	$("#school_name").val("").hide();
+
+	// if vitality, check for magic talents
+	if (attribute == "Vitality" && user['magic_talents'] == true) {
+		// TODO if divine magic, only one school is allowed
+		$("#magic_inputs").show();
+	} else {
+		$("#magic_inputs").hide();
+	}
+
+	// set autocomplete values to inputs - skill_name, training_name, focus_name
+	var skill = skillAutocompletes[attribute]['skill'];
+	var training = skillAutocompletes[attribute]['training'];
+	var focus = skillAutocompletes[attribute]['focus'];
+	$("#skill_name").autocomplete({
+		source: skill
+	});
+	$("#training_name").autocomplete({
+		source: training
+	});
+	$("#focus_name").autocomplete({
+		source: focus
+	});
+
 	$("#new_training_modal").modal("show");
 }
 
 // add a new training from modal values
 function newTraining() {
-	var trainingName = $("#training_name").val();
+	// check inputs - skill_name, training_name, focus_name, school_name - get value from non-hidden input
+	var trainingName = $("#skill_name").is(":visible") ? $("#skill_name").val() : 
+	( $("#training_name").is(":visible") ? $("#training_name").val() : 
+		( $("#focus_name").is(":visible") ? $("#focus_name").val() : 
+			($("#school_name").is(":visible") ? $("#school_name").val() : "" ) ) );
 	var attribute = $("#attribute_type").val();
 	if (trainingName != "") {
-		addTrainingElements(trainingName, attribute, '');
+		var id_val = addTrainingElements(trainingName, attribute, '');
+	}
+
+	// if magic school - prompt to choose talent
+	if ($("#school_name").is(":visible")) {
+		// if arcane blood - check if governing school (first school)
+		if (featNames.includes("Arcane Blood") && schoolNames.length == 1) {
+			// update label content
+			var label_content = $("#"+id_val+"_label").html();
+			label_content = label_content.replace(trainingName, trainingName+" (Governing)");
+			$("#"+id_val+"_label").html(label_content);
+			// update remove button function
+			var removeBtn = $("#"+id_val+"_text"+"_remove");
+			var row = $("#"+id_val+"_row");
+			removeBtn.on("click", function() {
+				removeTrainingFunction(trainingName, row);
+			});
+			// update input value
+			var input_content = $("#"+id_val+"_name").val();
+			input_content = input_content.replace(trainingName, trainingName+" (Governing)");
+			$("#"+id_val+"_name").val(input_content);
+		}
+
+		skills.push($("#"+id_val+"_row"));
+		var talents = schoolTalents[trainingName];
+		$("#magic_talents").html("");
+		$('<option />', {
+		  'value': '',
+		}).appendTo($("#magic_talents"));
+		for (var i in talents) {
+			$('<option />', {
+			  'value': trainingName+":"+talents[i]['name'],
+			  'text': talents[i]['name'],
+			}).appendTo($("#magic_talents"));
+		}
+		$("#talent_descrip").height(54).val("");
+		$(".elemental_select").hide();
+		$(".elementalist_select").hide();
+		$(".superhuman_select").hide();
+		$("#new_school_modal").modal("show");
 	}
 }
+
+// add new magic school with starting talent
+function newSchool() {
+	$("#feat_name_val").val($("#magic_talents").val().split(":")[1]);
+	$("#feat_description").val($("#talent_descrip").val());
+	newFeat();
+}
+
+
+$("#new_school_modal").on('hidden.bs.modal', function() {
+	// make sure that a talent has been selected
+	if ($("#magic_talents").val() == "") {
+		cancelMagic();
+	} else {
+		newSchool();
+	}
+});
+
+// add new magic school canceled without selecting starting talent
+function cancelMagic() {
+	$("#magic_talents").val("");
+	// remove the last added school training
+	for (var i in skills) {
+		var index = trainingNames.indexOf(skills[i].text().split("+0")[0]);
+		if (index !== -1) {
+		  trainingNames.splice(index, 1);
+		}
+		index = schoolNames.indexOf(skills[i].text().split("+0")[0]);
+		if (index !== -1) {
+		  schoolNames.splice(index, 1);
+		}
+		var row = skills[i].remove();
+	}
+	// if allocating points, reset point count
+	if (allocatingAttributePts) {
+		var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
+		$(".attribute-count").html(pts + 4 +" Points");
+	}
+}
+
+// show description on talent select
+$("#magic_talents").on("change", function() {
+	$("#talent_descrip").height(54).val("");
+	var talents = schoolTalents[$(this).val().split(":")[0]];
+	for (var i in talents) {
+		if (talents[i]['name'] == $(this).val().split(":")[1]) {
+			$("#talent_descrip").val(talents[i]['description']);
+			$("#talent_descrip").height( $("#talent_descrip")[0].scrollHeight );
+		}
+	}
+	// check for talents requiring additional selection
+	var talent = $(this).val().split(":")[1];
+	$(".elemental_select").hide();
+	$(".elementalist_select").hide();
+	$(".superhuman_select").hide();
+	if (talent == "Elemental Master") {
+		$(".elemental_select").show();
+	} else if (talent == "Elementalist") {
+		$(".elementalist_select").show();
+	} else if (talent == "Superhuman") {
+		$(".superhuman_select").show();
+	}
+});
 
 // create html elements for training
 function addTrainingElements(trainingName, attribute, id, value='') {
@@ -1519,6 +2139,11 @@ function addTrainingElements(trainingName, attribute, id, value='') {
 	if (includesIgnoreCase(trainingNames, trainingName)) {
 		alert("Training name already in use");
 		return;
+	}
+
+	// keep track of magic schools
+	if (trainingName.includes("Ka") || trainingName.includes("Avani") || trainingName.includes("Nouse") || trainingName.includes("Soma")) {
+		schoolNames.push(trainingName);
 	}
 
 	// make sure skill type is selected - if adding a new training (value = '')
@@ -1568,13 +2193,14 @@ function addTrainingElements(trainingName, attribute, id, value='') {
 	  'class': 'control-label with-hidden',
 	  'for': id_val,
 	  'text': trainingName,
+	  'id': id_val+"_label"
 	}).appendTo(div_left);
 
 	// highlight training on hover
 	if (!is_mobile) {
-		row.hover(function(){
+		row.hover(function() {
 			$(this).addClass("highlight");
-		}, function(){
+		}, function() {
 			$(this).removeClass("highlight");
 		});
 	}
@@ -1582,35 +2208,12 @@ function addTrainingElements(trainingName, attribute, id, value='') {
 	// add remove button
 	// if allocating points, make sure remove button is visible
 	var removeBtn = createElement('span', 'glyphicon glyphicon-remove hidden-icon', label_left, id_val+"_text"+"_remove");
-	if (allocatingAttributePts || adminEditMode || characterCreation) {
+	var editingSection = $("#"+attribute+"_btn").find(".glyphicon-plus-sign").is(":visible");
+	if (allocatingAttributePts || adminEditMode || editingSection) {
 		removeBtn.show();
 	}
-	removeBtn.on("click", function(){
-		var conf = confirm("Remove training '"+trainingName+"'?");
-		if (conf) {
-			unsavedChanges = true;
-			// if allocating points, increase point count
-			if (allocatingAttributePts) {
-				var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
-				$(".attribute-count").html(pts + skill_pts +" Points");
-				if (skill_pts == 1 || skill_pts == 2) {
-					var index = trainings.indexOf(row);
-					if (index !== -1) {
-					  trainings.splice(index, 1);
-					}
-				} else {
-					var index = skills.indexOf(row);
-					if (index !== -1) {
-					  skills.splice(index, 1);
-					}
-				}
-			}
-			row.remove();
-			var index = trainingNames.indexOf(trainingName);
-			if (index !== -1) {
-			  trainingNames.splice(index, 1);
-			}
-		}
+	removeBtn.on("click", function() {
+		removeTrainingFunction(trainingName, row);
 	});
 
 	var div_right = createElement('div', 'col-md-5 col-xs-4', row);
@@ -1625,22 +2228,22 @@ function addTrainingElements(trainingName, attribute, id, value='') {
 	  'html': value == '' ? '+0' : (value >= 0 ? "+"+value : value),
 	}).appendTo(label_right);
 
-	createInput('', 'hidden', 'training[]', trainingName+":"+attribute, label_right);
+	createInput('', 'hidden', 'training[]', trainingName+":"+attribute, label_right, id_val+"_name");
 	createInput('', 'hidden', 'training_val[]', value == '' ? 0 : value, label_right, id_val+"_val");
 	createInput('', 'hidden', 'training_ids[]', id, label_right);
 
 	var up = createElement('span', 'glyphicon glyphicon-plus hidden-icon', label_right, id_val+"_up");
-	$("#"+id_val+"_up").on("click", function(){
+	$("#"+id_val+"_up").on("click", function() {
 		adjustAttribute(id_val, 1);
 	});
 
 	var down = createElement('span', 'glyphicon glyphicon-minus hidden-icon', label_right, id_val+"_down");
-	$("#"+id_val+"_down").on("click", function(){
+	$("#"+id_val+"_down").on("click", function() {
 		adjustAttribute(id_val, -1);
 	});
 
 	// GM edit mode - show plus minus icons
-	if (adminEditMode || characterCreation) {
+	if (adminEditMode || editingSection) {
 		up.show();
 		down.show();
 	}
@@ -1649,6 +2252,59 @@ function addTrainingElements(trainingName, attribute, id, value='') {
 	enableHighlighting();
 	enableHiddenNumbers();
 
+	// adjust feat eligibility
+	setFeatList();
+
+	return id_val;
+}
+
+function removeTrainingFunction(trainingName, row) {
+	var conf = confirm("Remove training '"+trainingName+"'?");
+	if (conf) {
+		unsavedChanges = true;
+		// if allocating points, increase point count
+		if (allocatingAttributePts) {
+			var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
+			$(".attribute-count").html(pts + skill_pts +" Points");
+			if (skill_pts == 1 || skill_pts == 2) {
+				var index = trainings.indexOf(row);
+				if (index !== -1) {
+				  trainings.splice(index, 1);
+				}
+			} else {
+				var index = skills.indexOf(row);
+				if (index !== -1) {
+				  skills.splice(index, 1);
+				}
+			}
+		}
+		row.remove();
+		var index = trainingNames.indexOf(trainingName);
+		if (index !== -1) {
+		  	trainingNames.splice(index, 1);
+		}
+		index = schoolNames.indexOf(trainingName);
+		if (index !== -1) {
+		  	schoolNames.splice(index, 1);
+			// check if we're removing a magic school and delete any associated talents
+			var school = trainingName.replace(" (Governing)", "");
+			var talents = schoolTalents[school];
+			for (var i in talents) {
+				for (var j in featNames) {
+					if (featNames[j].includes(talents[i]['name'])) {
+						$(".feat-title").each(function() {
+							if ($(this).html().split(" : ")[0] == featNames[j]) {
+								var id_val = $(this).attr("id").split("_name")[0];
+								removeFeatFunction(id_val, featNames[j]);
+							}
+						});
+					}
+				}
+			}
+		}
+		// update feat list
+		setFeatList();
+	}
 }
 
 // get note values from modal
@@ -1712,19 +2368,19 @@ function addNoteElements(title, note, id) {
 	createInput('', 'hidden', 'note_ids[]', id, span);
 
 	// highlight on hover
-	span.hover(function(){
+	span.hover(function() {
 		$(this).addClass("highlight");
-	}, function(){
+	}, function() {
 		$(this).removeClass("highlight");
 	});
 
 	// edit on click
-	span.click(function(){
+	span.click(function() {
 		editNote(id_val);
 	});
 
 	// enable remove button
-	remove.click(function(){
+	remove.click(function() {
 		var conf = confirm("Delete note, " + (title == "" ? "[no title]" : title) + "?");
 		if (conf) {
 			li.remove();
@@ -1792,7 +2448,7 @@ function newWeapon() {
 		// check if this weapon is selected - update stats
 		for (var i in weapons) {
 			if (weapons[i]['name'] == originalName) {
-				$($(".weapon-select").get().reverse()).each(function(){
+				$($(".weapon-select").get().reverse()).each(function() {
 					if ($(this).val() == originalName) {
 						weapons[i]['damage'] = damage;
 						weapons[i]['defend'] = defend;
@@ -1805,7 +2461,7 @@ function newWeapon() {
 						selectWeapon(this.id.slice(-1));
 					}
 					// update select list with new name
-					$(this).find("option").each(function(){
+					$(this).find("option").each(function() {
 						if ($(this).val() == originalName) {
 							$(this).val(name);
 							$(this).html(name);
@@ -1861,42 +2517,42 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 	dmg_input.attr("readonly", true);
 	note_input.attr("readonly", true);
 	wgt_input.attr("readonly", true);
-	name_input.click(function(){
+	name_input.click(function() {
 		editWeapon(id_val, "name");
 	});
-	qty_input.click(function(){
+	qty_input.click(function() {
 		editWeapon(id_val, "qty");
 	});
-	dmg_input.click(function(){
+	dmg_input.click(function() {
 		editWeapon(id_val, "damage");
 	});
-	note_input.click(function(){
+	note_input.click(function() {
 		// look for range, rof, defend, and crit values
 		var note_val = note_input.val();
 		var focus = note_val.includes("Range") ? "range" : 
 			(note_val.includes("RoF") ? "rof" : (note_val.includes("Defend") ? "defend" : (note_val.includes("Critical") ? "crit" : "notes")));
 		editWeapon(id_val, focus);
 	});
-	wgt_input.click(function(){
+	wgt_input.click(function() {
 		editWeapon(id_val, "weight");
 	});
 	// TODO why is this necessary? no name value?
-	dmg_input.hover(function(){
+	dmg_input.hover(function() {
 		$("#weapon_dmg_label").addClass("highlight");
 	},
-	function(){
+	function() {
 		$("#weapon_dmg_label").removeClass("highlight");
 	});
-	note_input.hover(function(){
+	note_input.hover(function() {
 		$("#weapon_note_label").addClass("highlight");
 	},
-	function(){
+	function() {
 		$("#weapon_note_label").removeClass("highlight");
 	});
 
 	// add remove button
 	createElement('span', 'glyphicon glyphicon-remove', div6, id_val+"_remove");
-	$("#"+id_val+"_remove").on("click", function(){
+	$("#"+id_val+"_remove").on("click", function() {
 		var item = $("#"+id_val+"_name").val();
 		var conf = confirm("Remove item '"+item+"'?");
 		if (conf) {
@@ -1909,7 +2565,7 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 		  	}
 		  }
 		  // clear inputs if weapon is selected
-		  $(".weapon-select").find("option").each(function(){
+		  $(".weapon-select").find("option").each(function() {
 		  	if ($(this).val() == name) {
 			  	if ($(this).is(":selected")) {
 			  		// clear inputs
@@ -1930,7 +2586,7 @@ function addWeaponElements(type, name, qty, damage, max_damage, range, rof, defe
 
 	// make sure it isn't already in the select list
 	var found = false;
-	$("#weapon_select_1").find("option").each(function(){
+	$("#weapon_select_1").find("option").each(function() {
 		if ($(this).val() == name) {
 			found = true;
 		}
@@ -1995,7 +2651,7 @@ function editWeapon(weapon_id, input_id) {
 }
 
 // don't allow ; in RoF inputs; used for parsing note value
-$("#weapon_rof").on('keypress', function(e){
+$("#weapon_rof").on('keypress', function(e) {
 	if (e.charCode == 59) {
 		e.preventDefault();
 		return false;
@@ -2069,16 +2725,16 @@ function addProtectionElements(name, bonus, notes, weight, is_equipped, id) {
 	bonus_input.attr("readonly", true);
 	notes_input.attr("readonly", true);
 	weight_input.attr("readonly", true);
-	name_input.click(function(){
+	name_input.click(function() {
 		editProtection(id_val, "name");
 	});
-	bonus_input.click(function(){
+	bonus_input.click(function() {
 		editProtection(id_val, "bonus");
 	});
-	notes_input.click(function(){
+	notes_input.click(function() {
 		editProtection(id_val, "notes");
 	});
-	weight_input.click(function(){
+	weight_input.click(function() {
 		editProtection(id_val, "weight");
 	});
 
@@ -2086,7 +2742,7 @@ function addProtectionElements(name, bonus, notes, weight, is_equipped, id) {
 	createElement('span', 'glyphicon svg fa-solid icon-armor custom-icon', div3, id_val+"_equip");
 	createElement('span', 'glyphicon glyphicon-ban-circle', div3, id_val+"_equip_ban");
 	createInput('', 'hidden', 'protection_equipped[]', is_equipped == null ? false : is_equipped, div3, id_val+"_equipped");
-	$(div3).on("click", function(){
+	$(div3).on("click", function() {
 		var item = $("#"+id_val+"_name").val();
 		var conf = confirm(($("#"+id_val+"_equip_ban").is(":visible") ? "Equip" : "Unequip")+" protection '"+item+"'?");
 		if (conf) {
@@ -2108,16 +2764,16 @@ function addProtectionElements(name, bonus, notes, weight, is_equipped, id) {
 		}
 	});
 	// to toggle ban icon on hover...
-	// $(div3).hover(function(){
+	// $(div3).hover(function() {
 	// 	$("#"+id_val+"_equip_ban").toggle();
 	// },
-	// function(){
+	// function() {
 	// 	$("#"+id_val+"_equip_ban").toggle();
 	// });
 
 	// add remove button
 	createElement('span', 'glyphicon glyphicon-remove', div6, id_val+"_remove");
-	$("#"+id_val+"_remove").on("click", function(){
+	$("#"+id_val+"_remove").on("click", function() {
 		var item = $("#"+id_val+"_name").val();
 		var conf = confirm("Remove item '"+item+"'?");
 		if (conf) {
@@ -2214,22 +2870,22 @@ function addHealingElements(name, quantity, effect, weight, id) {
 	qty_input.attr("readonly", true);
 	effect_input.attr("readonly", true);
 	weight_input.attr("readonly", true);
-	name_input.click(function(){
+	name_input.click(function() {
 		editHealing(id_val, "name");
 	});
-	qty_input.click(function(){
+	qty_input.click(function() {
 		editHealing(id_val, "quantity");
 	});
-	effect_input.click(function(){
+	effect_input.click(function() {
 		editHealing(id_val, "effect");
 	});
-	weight_input.click(function(){
+	weight_input.click(function() {
 		editHealing(id_val, "weight");
 	});
 
 	// add remove button
 	createElement('span', 'glyphicon glyphicon-remove', div5, id_val+"_remove");
-	$("#"+id_val+"_remove").on("click", function(){
+	$("#"+id_val+"_remove").on("click", function() {
 		var item = $("#"+id_val+"_name").val();
 		var conf = confirm("Remove item '"+item+"'?");
 		if (conf) {
@@ -2306,22 +2962,22 @@ function addMiscElements(name, quantity, notes, weight, id) {
 	qty_input.attr("readonly", true);
 	notes_input.attr("readonly", true);
 	weight_input.attr("readonly", true);
-	name_input.click(function(){
+	name_input.click(function() {
 		editMisc(id_val, "name");
 	});
-	qty_input.click(function(){
+	qty_input.click(function() {
 		editMisc(id_val, "quantity");
 	});
-	notes_input.click(function(){
+	notes_input.click(function() {
 		editMisc(id_val, "notes");
 	});
-	weight_input.click(function(){
+	weight_input.click(function() {
 		editMisc(id_val, "weight");
 	});
 
 	// add remove button
 	createElement('span', 'glyphicon glyphicon-remove', div5, id_val+"_remove");
-	$("#"+id_val+"_remove").on("click", function(){
+	$("#"+id_val+"_remove").on("click", function() {
 		var item = $("#"+id_val+"_name").val();
 		var conf = confirm("Remove item '"+item+"'?");
 		if (conf) {
@@ -2353,13 +3009,13 @@ function editMisc(misc_id, input_id) {
 function updateTotalWeight(showMsg = false) {
 	var totalWeight = 0
 	// find all wgt inputs
-	$(".item").each(function(){
+	$(".item").each(function() {
 		var qty = 1;
 		var wgt = 0;
-		$(this).find('.qty').each(function(){
+		$(this).find('.qty').each(function() {
 			qty = $(this).val() == "" ? 1 : (isNaN($(this).val()) ? 1 : $(this).val());
 		});
-		$(this).find('.wgt').each(function(){
+		$(this).find('.wgt').each(function() {
 			wgt = $(this).val() == "" ? 0 : $(this).val();
 		});
 		totalWeight += parseFloat(qty) * parseFloat(wgt);
@@ -2375,37 +3031,66 @@ function updateTotalWeight(showMsg = false) {
 	var speed = user['speed'] == undefined ? 0 : user['speed'];
 	var standard = speed >=0 ? 1 + Math.floor(speed/4) : 1 - Math.round(-1*speed/6);
 	var quick = speed >= 0 ? (Math.floor(speed/2) % 2 == 0 ? 0 : 1) : (Math.ceil(speed/3) % 2 == 0 ? 0 : 1);
-	var move = user['size'] == undefined ? 1 : (user['size'] == "Small" ? 0.5 : (user['size'] == "Large" ? 1.5 : 1));
+	var move = user['size'] == undefined ? 40 : (user['size'] == "Small" ? 30 : (user['size'] == "Large" ? 50 : 40));
+	var fatigue = $("#fatigue").val();
 
 	// adjust action/move values
 	var msg = "";
 	if (parseFloat(totalWeight) <= capacity/4) {
 		// unhindered, no modification to actions
 		$("#unhindered").addClass("selected");
+		$("#encumberence").val("Unhindered");
 	} else if (parseFloat(totalWeight) <= capacity/2) {
-		// encumbered, -1 QA
+		// encumbered, -10 Move
 		$("#encumbered").addClass("selected");
-		standard = quick == 0 ? standard - 1 : standard;
-		quick = quick == 0 ? 1 : 0;
-		msg = "You are encumbered (-1 QA).<br>Reduce your item weight to remove the penalty.";
+		$("#encumberence").val("Encumbered");
+		move = move >= 10 ? move - 10 : 0;
+		msg = "You are encumbered (-10 Move).<br>Reduce your item weight to remove the penalty.";
 	} else if (parseFloat(totalWeight) <= capacity/4*3) {
-		// burdened, -1 QA, -0.5 Move
+		// burdened, -1 QA, -10 Move
 		$("#burdened").addClass("selected");
-		standard = quick == 0 ? standard - 1 : standard;
-		quick = quick == 0 ? 1 : 0;
-		move = move >= 0.5 ? move - 0.5 : 0;
-		msg = "You are burdened (-1 QA, -0.5 Move).<br>Reduce your item weight to remove the penalty.";
+		$("#encumberence").val("Burdened");
+		// no change if SA already 0
+		if (standard > 0) {
+			standard = quick > 0 ? standard : standard - 1;
+			quick = quick > 0 ? quick - 1 : quick + 1;
+		}
+		move = move >= 10 ? move - 10 : 0;
+		msg = "You are burdened (-1 QA, -10 Move).<br>Reduce your item weight to remove the penalty.";
 	} else {
-		// overburdened, -1 QA, -1 Move
+		// overburdened, -1 SA, -10 Move
 		$("#overburdened").addClass("selected");
-		standard = quick == 0 ? standard - 1 : standard;
-		quick = quick == 0 ? 1 : 0;
-		move = move >= 1 ? move - 1 : 0;
-		msg = "You are overburdened (-1 QA, -1 Move).<br>Reduce your item weight to remove the penalty.";
+		$("#encumberence").val("Overburdened");
+		standard = standard > 0 ? standard - 1 : standard;
+		move = move >= 10 ? move - 10 : 0;
+		msg = "You are overburdened (-1 SA, -10 Move).<br>Reduce your item weight to remove the penalty.";
 	}
+
+	// check for fatigue
+	if (fatigue == 0) {
+		// do nothing
+	} else if (fatigue == 1) {
+		// tired, -10 Move
+		move = move >= 10 ? move - 10 : 0;
+	} else if (fatigue == 2) {
+		// weary, -1 QA, -10 Move
+		if (standard > 0) {
+			standard = quick > 0 ? standard : standard - 1;
+			quick = quick > 0 ? quick - 1 : quick + 1;
+		}
+		move = move >= 10 ? move - 10 : 0;
+	} else {
+		// overburdened, -1 SA, -10 Move
+		standard = standard > 0 ? standard - 1 : standard;
+		move = move >= 10 ? move - 10 : 0;
+	}
+
+	// make sure user has at least one quick action
+	quick = standard == 0 && quick == 0 ? 1 : quick;
+	var run = move + speed * 5;
 	$("#standard").val(standard);
 	$("#quick").val(quick);
-	$("#move").val(move);
+	$("#move").val(move+"/"+run);
 
 	// if we are adding or editing items, show alert if character is encumbered
 	var encumbered = parseFloat(totalWeight) > capacity/4;
@@ -2417,8 +3102,45 @@ function updateTotalWeight(showMsg = false) {
 	}
 }
 
+function setMotivators() {
+	// make sure all motivators are selected
+	var m1 = $("#m1").val();
+	var m2 = $("#m2").val();
+	var m3 = $("#m3").val();
+	var m4 = $("#m4").val();
+	if (m1 == "" || m2 == "" || m3 == "" || m4 == "") {
+		alert("Please set all motivators");
+		return;
+	}
+	// set motivator values
+	$("#motivator_1").val(m1);
+	$("#motivator_1_pts").val(2);
+	$("#motivator_2").val(m2);
+	$("#motivator_2_pts").val(1);
+	$("#motivator_3").val(m3);
+	$("#motivator_3_pts").val(1);
+	$("#motivator_4").val(m4);
+	$("#motivator_4_pts").val(0);
+	$("#bonuses").val(1);
+	// close modal, hide and show elements
+	$("#motivator_modal").modal("hide");
+	$("#motivator_button").hide();
+	$("#motivators").show();
+}
+
+function motivatorCheck(id) {
+	var ids = ['m1', 'm2', 'm3', 'm4']
+	for (var i in ids) {
+		if (ids[i] != id) {
+			if ($("#"+ids[i]).val() == $("#"+id).val()) {
+				$("#"+id).val("");
+			}
+		}
+	}
+}
+
 function enableHighlighting() {
-	$("input").each(function(){
+	$("input").each(function() {
 		if (!highlightEnabled.includes($(this).attr("name")+":"+this.id)) {
 			highlightEnabled.push($(this).attr("name")+":"+this.id);
 			// if input ID is type '_text', grab the 'hidden-number' input instead
@@ -2427,17 +3149,17 @@ function enableHighlighting() {
 			var labelTrigger = $(this).attr("name") == 'training_val[]' ? this.id.split("_text")[0] : $(this).attr("name");
 			// on mobile, highlight label on focus; on desktop, highlight label on hover
 			if (is_mobile) {
-				inputElement.on("focus", function(){
+				inputElement.on("focus", function() {
 					$("label[for='"+labelTrigger+"']").addClass("highlight");
 				});
-				inputElement.on("focusout", function(){
+				inputElement.on("focusout", function() {
 					$("label[for='"+labelTrigger+"']").removeClass("highlight");
 				});
 			} else {
-				inputElement.hover(function (){
+				inputElement.hover(function () {
 					$("label[for='"+labelTrigger+"']").addClass("highlight");
 				},
-				function(){
+				function() {
 					$("label[for='"+labelTrigger+"']").removeClass("highlight");
 				});
 			}
@@ -2446,7 +3168,7 @@ function enableHighlighting() {
 		if (this.id.includes("_text")) {
 			if (!skipEnabled.includes(this.id)) {
 				skipEnabled.push(this.id);
-				$(this).on("focus", function(){
+				$(this).on("focus", function() {
 					$("#"+this.id.split("_text")[0]).focus();
 				});
 			}
@@ -2456,10 +3178,10 @@ function enableHighlighting() {
 
 // hidden number inputs - to trigger the number keypad for text inputs (mobile)
 function enableHiddenNumbers() {
-	$(".hidden-number").each(function(){
+	$(".hidden-number").each(function() {
 		if (!hiddenEnabled.includes(this.id)) {
 			hiddenEnabled.push(this.id);
-			$(this).on("focus", function(){
+			$(this).on("focus", function() {
 				// remove type='number' attribute to allow input of non-numeric input
 				$(this).removeAttr("type");
 				// get current input val of text field
@@ -2468,7 +3190,7 @@ function enableHiddenNumbers() {
 				// empty text field
 				input.val("");
 			});
-			$(this).on("focusout", function(){
+			$(this).on("focusout", function() {
 				// copy value from number input to text input
 				var input = $("#"+this.id+"_text");
 				input.val($(this).val());
@@ -2491,7 +3213,7 @@ function submitSuggestion() {
 	  data: { 'message' : $("#suggestion").val() },
 	  ContentType: "application/json",
 	  type: 'POST',
-	  success: function(response){
+	  success: function(response) {
 	  	if (response == 'ok') {
 	  		alert("Thanks for your suggestion! I'm sure someone is hard at work to address your concern.");
 	  	}

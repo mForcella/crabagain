@@ -81,8 +81,8 @@
 			$user['defend_bonus'] = $defend_bonus;
 
 			// get primary / secondary initiative
-			$user['primary'] = $user['awareness'] >= 0 ? 10 - floor($user['awareness']/2) : 10 - ceil($user['awareness']/3);
-			$user['secondary'] = $user['speed'] >= 0 ? 10 - floor($user['speed']/2) : 10 - ceil($user['speed']/3);
+			$user['primary'] = $user['awareness'] >= 0 ? 6 - floor($user['awareness']/2) : 6 - ceil($user['awareness']/3);
+			$user['secondary'] = $user['speed'] >= 0 ? 6 - floor($user['speed']/2) : 6 - ceil($user['speed']/3);
 
 			// if character has 'quick and the dead' as feat, primary and secondary can be switched
 			$sql = "SELECT count(*) as count FROM user_feat WHERE user_id = ".$user["id"]." AND LOWER(name) LIKE '%quick %dead'";
@@ -249,7 +249,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;1,400;1,600&family=Merriweather:wght@300;700&display=swap" rel="stylesheet">
 	<!-- Custom Styles -->
-	<link rel="stylesheet" type="text/css" href="/assets/style_v23_03_15.css">
+	<link rel="stylesheet" type="text/css" href="<?php echo $keys['styles'] ?>">
 	<link rel="stylesheet" type="text/css" href="/assets/toggle-switchy.css">
 </head>
 
@@ -314,10 +314,12 @@
 		background-color: #cccccc;
 	}
 	#xp_modal .note {
-		max-width: 500px;
+		/*max-width: 500px;*/
 		margin: 0 auto;
 		margin-top: 15px;
 		cursor: default;
+		white-space: normal;
+		width: 100%;
 	}
 	#xp_modal .toggle-switchy {
 		transform: scale(0.7);
@@ -517,7 +519,7 @@
 		    -webkit-transform: scale(1.3);
 		}
 		#xp_modal .note {
-			max-width: 300px;
+			/*max-width: 300px;*/
 		}
 	}
 	/* extra small for mobile? */

@@ -316,6 +316,145 @@ var featList = [
 		],
 		'type':'feat'
 	},
+	{
+		'name':'Arcane Blood',
+		'description':'Powerful Magic runs through your veins. You gain the use of Animas Magic as a Talent. You cannot cast '+
+		'other Magic Schools without Training (4 Skill Points). The first School you learn is your Governing School.',
+		'requirements':[
+			[{'vitality':2}],
+			[{'character_creation':true}],
+		],
+		'type':'feat'
+	},
+	{
+		'name':'Divine Magic',
+		'description':'The Gods have bestowed powerful Magic upon you. You gain the use of Animas Magic as a Talent. You cannot '+
+		'cast other Magic Schools without Training (4 Skill Points). You can never Train in more than 1 School, and it must '+
+		'be your deities favored School. You must also choose one Vow to follow in service to your God.',
+		'requirements':[
+			[{'vitality':2}],
+			[{'character_creation':true}],
+		],
+		'type':'feat'
+	},
+	{
+		'name':'Elemental Master',
+		"description":"You may choose 1 type of Elemental Magic when this Talent is taken: Fire, Ice or Electricity. "+
+		"You can cause extreme temperature fluctuations to heat or freeze things, create protective bubbles against "+
+		"hot or cold, and manipulate electricity, creating lightning and force fields or disabling electronic devices. "+
+		"Attacking with this School deals Damage with either fire, cold, or electricity. Flammable objects stay on fire, "+
+		"dealing additional Damage on subsequent rounds. Cold Damage slows a target, Encumbering them. Electrical Damage "+
+		"is Non-lethal, Dazing targets and ignoring any armor that is completely sealed against electricity.",
+		'requirements':[
+			[{'training':'Ka'}],
+		],
+		'type':'feat'
+	},
+	{
+		'name':'Metal Master',
+		"description":"You can control the properties of metal, as well as move metal objects with your mind by "+
+		"creating magnetic fields. You can magnetize or demagnetize objects, as well as weaken metal objects, "+
+		"animate metal statues and suits of armor or even transmute one metal into another.",
+		'requirements':[
+			[{'training':'Ka'}],
+		],
+		'type':'feat'
+	},
+	{
+		'name':'Nature Master',
+		"description":"You are one with the beasts and the wild places. You may speak with, and sway the disposition "+
+		"of animals, or communicate with the land. You can use this to speak directly with animals or call upon them "+
+		"for help, and even bond your soul with an animal, seeing through them and speaking to them telepathically. "+
+		"You can alter and enhance the properties of plants, creating potions and poisons. You can purify water and "+
+		"even create sustenance from little more than dirt.",
+		'requirements':[
+			[{'training':'Avani'}],
+		],
+		'type':'feat'
+	},
+	{
+		'name':'Elementalist',
+		"description":"You have become one with the elements. You may choose one type of Elemental Magic when this "+
+		"Talent is learned: Earth, Water or Air. You can manipulate dirt, mud, and rock, splitting the earth open, "+
+		"raising or shifting stone, animating stone statues or even causing violent earthquakes. You can control "+
+		"the movements of water, raising or lowering water levels, creating waterspouts or waves, fog, rain or snow, "+
+		"and walking on water. You can alter wind patterns and create powerful storms or tornados. When causing "+
+		"earthquakes and gusts of wind, the Agility or Strength DL to remain standing is the same as your roll, as "+
+		"is the Strength check for any non-living structures to remain standing.",
+		'requirements':[
+			[{'training':'Avani'}],
+		],
+		'type':'feat'
+	},
+	{
+		'name':'Illusionist',
+		"description":"You are a master at manipulating the senses of others. You can make people see, hear, taste, "+
+		"smell and feel whatever you wish, however, you cannot truly control anyone’s thoughts and desires.",
+		'requirements':[
+			[{'training':'Nouse'}],
+		],
+		'type':'feat'
+	},
+	{
+		'name':'Psychic',
+		"description":"You are a master at sensing and reading minds, thoughts, and emotions and projecting your own "+
+		"thoughts and feelings into theirs.",
+		'requirements':[
+			[{'training':'Nouse'}],
+		],
+		'type':'feat'
+	},
+	{
+		'name':'Ensi',
+		"description":"Your mind is merely an extension of your body and you can move, bend and break objects or "+
+		"people using only your willpower.",
+		'requirements':[
+			[{'training':'Nouse'}],
+		],
+		'type':'feat'
+	},
+	{
+		'name':'Seer',
+		"description":"Your mind is untethered by time – You can even see into the past and futures of yourself and "+
+		"others, catching brief glimpses of what may come to pass, within seconds or even years. The future is not set, "+
+		"and this will only give you hints about what may come to pass if certain actions are taken.",
+		'requirements':[
+			[{'training':'Nouse'}],
+		],
+		'type':'feat'
+	},
+	{
+		'name':'Healer',
+		"description":"You know how to manipulate the very fabric of the human body. You can Heal yourself and others, "+
+		"neutralize poison, ignore Wound penalties, and fight disease. The DL for neutralizing Poison and Disease is "+
+		"equal to the DL to resist. For Healing, Soma replaces the Natural Healing roll, and the character may roll "+
+		"immediately for themselves or others without Rest.",
+		'requirements':[
+			[{'training':'Soma'}],
+		],
+		'type':'feat'
+	},
+	{
+		'name':'Tormentor',
+		"description":"You know how to cause pain, burst blood vessels, and rupture organs with little more than a "+
+		"touch. This Damage is always against a Toughness of 0 plus or minus Scale Modifiers only, and bypasses all "+
+		"Armor as long as skin can be touched.",
+		'requirements':[
+			[{'training':'Soma'}],
+		],
+		'type':'feat'
+	},
+	{
+		'name':'Superhuman',
+		"description":"You can accomplish incredible, physical feats with your body. Choose 2 Major Physical "+
+		"Attributes when this Talent is taken (i.e. Power & Dexterity, OR Dexterity & Perception). You can greatly "+
+		"increase your strength, speed, and abilities or alter your perception, to see, hear, smell, and taste "+
+		"things beyond normal human perception.",
+		'requirements':[
+			[{'training':'Soma'}],
+		],
+		'type':'feat'
+	},
 
 	// *** Social Traits *** //
 	{
