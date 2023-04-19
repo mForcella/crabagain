@@ -3,3 +3,5 @@
 $keys['recaptcha_secret'] = "your_secret_key";
 $keys['master_password'] = "your_master_password";
 $keys['nerd_test'] = "nerd_test_password";
+$keys['styles'] = '/assets/name_of_current_style_sheet.css';
+$keys['scripts'] = '/assets/name_of_current_script_file.js';

@@ -11,6 +11,7 @@ var allocatingAttributePts = false;
 var characterCreation = false;
 var adminEditMode = false;
 var unsavedChanges = false;
+var addingNewSchool = false;
 // arrays used to restore attribute values, feats, and trainings on cancel allocate points
 var attributeVals = [];
 var trainingVals = [];
@@ -149,7 +150,7 @@ var slide = window.setInterval(function() {
 			// slide next image left
 			var index = banners.indexOf(activeBanner) == banners.length - 1 ? 0 : banners.indexOf(activeBanner) + 1;
 			var id = banners[index];
-			$("#"+id).animate({
+			$("#"+id).show().animate({
 			    left: "0"
 			}, 500, function() {
 				// remove active class
@@ -968,6 +969,7 @@ $("#new_feat_modal").on('hidden.bs.modal', function() {
 	// reset all dropdowns
 	$("#select_feat_type").val("feat_name").trigger("change");
 	$("#social_trait_name").val("").attr("disabled", false);
+	$("#social_background_name").val("").attr("disabled", false);
 	$("#physical_trait_pos_name").val("").attr("disabled", false);
 	$("#physical_trait_neg_name").val("").attr("disabled", false);
 	$("#compelling_action_name").val("").attr("disabled", false);
@@ -1657,9 +1659,15 @@ function addFeatElements(featName, featDescription, id, featDisplayName = "") {
 		if (allocatingAttributePts) {
 
 			// only one feat/skill per level
-			if (!characterCreation && feats.length > 0 || skills.length > 0) {
+			if ((!addingNewSchool && !characterCreation) && (feats.length > 0 || skills.length > 0)) {
 				alert("Only one new feat or unique skill can be added per level.");
 				return;
+			}
+
+			// make magic talent free
+			if (addingNewSchool) {
+				cost = 0;
+				addingNewSchool = false;
 			}
 
 			// make sure we have enough points
@@ -1729,7 +1737,7 @@ function addFeatElements(featName, featDescription, id, featDisplayName = "") {
     	// confirm delete
     	var conf = confirm("Remove Talent, '"+name.split(" : ")[0]+"'?");
     	if (conf) {
-    		removeFeatFunction(id_val, featName);
+    		removeFeatFunction(id_val, featName, cost, feat_container);
     	}
     });
 
@@ -1762,21 +1770,22 @@ function addFeatElements(featName, featDescription, id, featDisplayName = "") {
 	setFeatList();
 }
 
-function removeFeatFunction(id_val, featName) {
+function removeFeatFunction(id_val, featName, cost, feat_container=null) {
 	// if allocating attribute points, increase points
 	if (allocatingAttributePts) {
-			var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
-			// if removing a negative trait, make sure we have enough points
-			if (cost < 0 && pts + cost < 0) {
-				alert("Not enough attribute points to remove trait, "+featName);
-				return;
-			}
+		var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
+		// if removing a negative trait, make sure we have enough points
+		if (cost < 0 && pts + cost < 0) {
+			alert("Not enough attribute points to remove trait, "+featName);
+			return;
+		}
 
-			$(".attribute-count").html(pts + cost +" Points");
-			var index = feats.indexOf(feat_container);
-			if (index !== -1) {
-			  feats.splice(index, 1);
-			}
+		$(".attribute-count").html(pts + cost +" Points");
+		// TODO need to figure out how to remove feat_container on remove school?
+		var index = feats.indexOf(feat_container);
+		if (index !== -1) {
+		  feats.splice(index, 1);
+		}
 	}
 
 	// remove elements and update arrays
@@ -2042,7 +2051,7 @@ function newTraining() {
 			var removeBtn = $("#"+id_val+"_text"+"_remove");
 			var row = $("#"+id_val+"_row");
 			removeBtn.on("click", function() {
-				removeTrainingFunction(trainingName, row);
+				removeTrainingFunction(trainingName, row, 4);
 			});
 			// update input value
 			var input_content = $("#"+id_val+"_name").val();
@@ -2072,6 +2081,7 @@ function newTraining() {
 
 // add new magic school with starting talent
 function newSchool() {
+	addingNewSchool = true;
 	$("#feat_name_val").val($("#magic_talents").val().split(":")[1]);
 	$("#feat_description").val($("#talent_descrip").val());
 	newFeat();
@@ -2213,7 +2223,7 @@ function addTrainingElements(trainingName, attribute, id, value='') {
 		removeBtn.show();
 	}
 	removeBtn.on("click", function() {
-		removeTrainingFunction(trainingName, row);
+		removeTrainingFunction(trainingName, row, skill_pts);
 	});
 
 	var div_right = createElement('div', 'col-md-5 col-xs-4', row);
@@ -2258,7 +2268,7 @@ function addTrainingElements(trainingName, attribute, id, value='') {
 	return id_val;
 }
 
-function removeTrainingFunction(trainingName, row) {
+function removeTrainingFunction(trainingName, row, skill_pts) {
 	var conf = confirm("Remove training '"+trainingName+"'?");
 	if (conf) {
 		unsavedChanges = true;
@@ -2292,10 +2302,11 @@ function removeTrainingFunction(trainingName, row) {
 			for (var i in talents) {
 				for (var j in featNames) {
 					if (featNames[j].includes(talents[i]['name'])) {
+						var i = 0;
 						$(".feat-title").each(function() {
 							if ($(this).html().split(" : ")[0] == featNames[j]) {
 								var id_val = $(this).attr("id").split("_name")[0];
-								removeFeatFunction(id_val, featNames[j]);
+								removeFeatFunction(id_val, featNames[j], 0);
 							}
 						});
 					}

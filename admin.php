@@ -167,6 +167,14 @@
 			$total_count += $row['count'];
 		}
 	}
+	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'social_background'";
+	$result = $db->query($sql);
+	if ($result) {
+		while($row = $result->fetch_assoc()) {
+			$counts['social_background_count'] = $row['count'];
+			$total_count += $row['count'];
+		}
+	}
 
 	// get feat active status
 	$campaign_feats = [];
@@ -920,6 +928,41 @@
 					?>
 				</table>
 			</div>
+
+			<div class="title">
+				<h4 class="table-heading" id="section_social_background">Social Backgrounds</h4>
+				<label class="toggle-switchy" for="social_background_toggle" data-size="sm" data-text="false">
+					<input checked type="checkbox" id="social_background_toggle" checked onclick="enable(this, 'social_background-check')">
+					<span class="toggle">
+						<span class="switch"></span>
+					</span>
+				</label>
+			</div>
+			<span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('social_background')"></span>
+			<div class="panel panel-default">
+				<table class="table" id="social_background_table">
+					<tr>
+						<th>Available <input type='checkbox' class="social_background-check" checked onclick="checkAll(this, 'social_background-check')"></th>
+						<th>Name</th>
+						<th>Description</th>
+						<th>Edit</th>
+					</tr>
+					<?php
+						foreach($feat_list as $feat) {
+							if ($feat['type'] == 'social_background') {
+								echo 
+								"<tr class='table-row' id='row_".$feat['id']."'>
+									<td class='center'><input class='social_background-check' type='checkbox' ".(isset($feat['active']) || $counts['social_background_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$feat['id']."'></td>
+									<td>".$feat['name']."</td>
+									<td>".$feat['description']."</td>
+									<td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
+								</tr>";
+							}
+						}
+					?>
+				</table>
+			</div>
+
 		</form>
 
 	</div>
@@ -1805,6 +1848,9 @@
 								break;
 							case "profession":
 							    var element = $("#profession_table");
+								break;
+							case "social_background":
+							    var element = $("#social_background_table");
 								break;
 						}
 						row.appendTo(element);

@@ -224,4 +224,19 @@ INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (100, 'Supe
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (71, 100);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (71, 'training', 'Soma');
 
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (101, 'Martial Arts', 'You have trained extensively in hand-to-hand combat and can more effectively attack and defend while Unarmed. You no longer suffer Quick Action penalties on Unarmed attacks and treat all Disarm attempts as Quick Actions and may attempt Knockdowns in conjunction with any other attack without spending an additional Quick Action. You may also apply half your Brawl bonus to Dodge. If you also have Dual Weapon Master and are Unarmed or using light weapons you reduce your Free Action Attack and Riposte penalties by 2.', 'feat', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (72, 101);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (72, 'agility', 2);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (73, 101);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (73, 'speed', 2);
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (102, 'Relentless Defense', 'You’ve always said that the best offense is a good defense. You can no longer be Flanked and may also apply half of your Speed bonus to Defend now. Additionally, you may attempt to catch thrown weapons or arrows fired at you, or within 5 feet of you, by rolling your Brawl. The DL is equal to the attacker’s roll +5 and is a minimum of DL 15. If you beat the attack roll, but fail to catch it, you are still not struck. If it was being fired at someone else, it may still strike them if you fail to catch it.', 'feat', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (74, 102);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (74, 'agility', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (75, 102);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (75, 'speed', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (76, 21);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (76, 'feat', 'Martial Arts');
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (77, 21);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (77, 'feat', 'Lightning Reflexes');
 

@@ -48,6 +48,9 @@
 		case "profession":
 		$sql = "INSERT INTO feat_or_trait (name, description, type) VALUES ('".addslashes($_POST['feat_name'])."', '".addslashes($_POST['feat_descrip'])."', 'profession')";
 		break;
+		case "social_background":
+		$sql = "INSERT INTO feat_or_trait (name, description, type) VALUES ('".addslashes($_POST['feat_name'])."', '".addslashes($_POST['feat_descrip'])."', 'social_background')";
+		break;
 	}
 	$db->query($sql);
 	

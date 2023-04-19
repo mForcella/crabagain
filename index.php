@@ -75,6 +75,13 @@
 			$counts['profession_count'] = $row['count'];
 		}
 	}
+	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'social_background'";
+	$result = $db->query($sql);
+	if ($result) {
+		while($row = $result->fetch_assoc()) {
+			$counts['social_background_count'] = $row['count'];
+		}
+	}
   
   // get feat list
 	$feat_list = [];
@@ -1176,7 +1183,7 @@
 									$bonuses = 0;
 								}
 
-								$show_btn = !isset($user) || $user['motivator_1'] == "" || $user['motivator_2'] == "" || $user['motivator_3'] == "" || $user['motivator_4'] == "";
+								$show_btn = !isset($user) || $user['motivator_1'] == "" || $user['motivator_2'] == "" || $user['motivator_3'] == "";
 							?>
 							<input class="form-control" readonly name="bonuses" id="bonuses" value="<?php echo $bonuses ?>">
 						</div>
@@ -1218,7 +1225,7 @@
 							</div>
 							<label class="control-label col-xs-1 no-pad-left align-right font-mobile-small" for="motivator_4_pts">Pts:</label>
 							<div class="col-xs-1 no-pad">
-								<input class="form-control motivator-pts" type="number" name="motivator_4_pts" id="motivator_4_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_4_pts']) : '' ?>">
+								<input class="form-control motivator-pts" type="number" name="motivator_4_pts" id="motivator_4_pts" min="0" value="<?php echo isset($user) && $user['motivator_4'] != '' ? htmlspecialchars($user['motivator_4_pts']) : '' ?>">
 							</div>
 						</div>
 					</div>
@@ -1562,9 +1569,9 @@
         		$size = isset($user['size']) ? $user['size'] : 'Medium';
         	?>
         	<select class="form-control" id="character_size_select">
-        		<option value="Small" <?php echo $size == "Small" ? 'selected' : '' ?>>Small</option>
-        		<option value="Medium" <?php echo $size == "Medium" ? 'selected' : '' ?>>Medium</option>
-        		<option value="Large" <?php echo $size == "Large" ? 'selected' : '' ?>>Large</option>
+        		<option value="Small" <?php echo $size == "Small" ? 'selected' : '' ?>>Small (3’0”–4’11”)</option>
+        		<option value="Medium" <?php echo $size == "Medium" ? 'selected' : '' ?>>Medium (5’0”–6’11”)</option>
+        		<option value="Large" <?php echo $size == "Large" ? 'selected' : '' ?>>Large (7’0”–8’11”)</option>
         	</select>
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="editSize()">Ok</button>
@@ -1612,6 +1619,7 @@
         		<!--  hide unless user has magic -->
         		<option id="magic_option" value="magic_talent_name" <?php echo isset($user) && $user['magic_talents'] == true ? '' : 'hidden'; ?>>Magical Talent</option>
         		<!-- hide options if their counts are zero -->
+        		<option value="social_background_name" <?php echo count($feat_ids) > 0 && $counts['social_background_count'] == 0 ? 'hidden' : '' ?>>Social Background</option>
         		<option value="social_trait_name" <?php echo count($feat_ids) > 0 && $counts['social_count'] == 0 ? 'hidden' : '' ?>>Social Trait</option>
         		<option value="physical_trait_pos_name" <?php echo count($feat_ids) > 0 && $counts['physical_pos_count'] == 0 ? 'hidden' : '' ?>>Physical Trait (Positive)</option>
         		<option value="physical_trait_neg_name" <?php echo count($feat_ids) > 0 && $counts['physical_neg_count'] == 0 ? 'hidden' : '' ?>>Physical Trait (Negative)</option>
@@ -1623,6 +1631,16 @@
         	<input type="hidden" id="feat_name_val">
         	<input class="form-control clearable feat-type" type="text" id="feat_name">
         	<input class="form-control clearable feat-type hidden" type="text" id="magic_talent_name">
+        	<select class="form-control feat-type feat-select hidden" id="social_background_name">
+        		<option></option>
+        		<?php
+        			foreach ($feat_list as $feat) {
+        				if ($feat['type'] == 'social_background') {
+        					echo "<option value='".str_replace('\'','',$feat['name'])."'>".$feat['name']."</option>";
+        				}
+        			}
+        		?>
+        	</select>
         	<select class="form-control feat-type feat-select hidden" id="social_trait_name">
         		<option></option>
         		<?php

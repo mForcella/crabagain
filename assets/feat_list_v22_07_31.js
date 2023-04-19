@@ -455,6 +455,34 @@ var featList = [
 		],
 		'type':'feat'
 	},
+	{
+		'name':'Martial Arts',
+		"description":"You have trained extensively in hand-to-hand combat and can more effectively attack and defend while "+
+		"Unarmed. You no longer suffer Quick Action penalties on Unarmed attacks and treat all Disarm attempts as Quick Actions "+
+		"and may attempt Knockdowns in conjunction with any other attack without spending an additional Quick Action. You may "+
+		"also apply half your Brawl bonus to Dodge. If you also have Dual Weapon Master and are Unarmed or using light weapons "+
+		"you reduce your Free Action Attack and Riposte penalties by 2.",
+		'requirements':[
+			[{'agility':2}],
+			[{'speed':2}],
+		],
+		'type':'feat'
+	},
+	{
+		'name':'Relentless Defense',
+		"description":"You’ve always said that the best offense is a good defense. You can no longer be Flanked and may also "+
+		"apply half of your Speed bonus to Defend now. Additionally, you may attempt to catch thrown weapons or arrows fired at "+
+		"you, or within 5 feet of you, by rolling your Brawl. The DL is equal to the attacker’s roll +5 and is a minimum of "+
+		"DL 15. If you beat the attack roll, but fail to catch it, you are still not struck. If it was being fired at someone "+
+		"else, it may still strike them if you fail to catch it.",
+		'requirements':[
+			[{'agility':4}],
+			[{'speed':4}],
+			[{'feat':'Martial Arts'}],
+			[{'feat':'Lightning Reflexes'}],
+		],
+		'type':'feat'
+	},
 
 	// *** Social Traits *** //
 	{
@@ -749,6 +777,69 @@ var featList = [
 		'never be outright hostile toward you as long as you are alone. You also begin the game Trained in Stealth and either '+
 		'Security OR Sleight of Hand.',
 		'type':'profession'
+	},
+
+	// *** Social Backgrounds *** //
+	{
+		'name':'Nobility',
+		'description':'You’ve never had a family to look out for you, and the roof over your head was the sky more often than not. '+
+		'But it made you resilient and creative, and you know how to get along with the wrong kind of people. Any time you are in a '+
+		'town or city you can make an Intuition or Awareness roll to find black market or illegal activities, and these people will '+
+		'never be outright hostile toward you as long as you are alone. You also begin the game Trained in Stealth and either '+
+		'Security OR Sleight of Hand.',
+		'type':'social_background'
+	},
+	{
+		'name':'Courtier',
+		'description':'You weren’t rich, but you lived a wealthy life on the coattails of others, mainly by kissing the right '+
+		'asses and knowing how to manipulate your superiors. You gain 3 Bonus Skill Points to place in Diplomacy, Seduce or '+
+		'Sense Motive Focuses. You are Literate and gain 1d4 additional starting funds.',
+		'type':'social_background'
+	},
+	{
+		'name':'Merchant',
+		'description':'You came from a Merchant family, which meant you worked hard and often to keep yourselves above the '+
+		'peasant masses. You understand people and business well and travelled the world often buying, selling and trading. '+
+		'You gain 3 Bonus Skill Points to place in Appraise, Barter or Languages Focuses. You are Literate and gain 1d4 '+
+		'additional starting funds.',
+		'type':'social_background'
+	},
+	{
+		'name':'Scholar',
+		'description':'You trained extensively with the most educated minds of your city, tirelessly transcribing texts and '+
+		'reading more books than even the wealthiest minds have consumed. You gain 4 Bonus Skill Points to place in Academia, '+
+		'Culture, Languages or Religion. You are Literate.',
+		'type':'social_background'
+	},
+	{
+		'name':'Soldier',
+		'description':'You spent some time enlisted in the military, defending your home. You’ve seen your share of battle, '+
+		'but you’re ready for new adventures and some real freedom. You gain a +1 Bonus in Shoot and Attack. You must choose '+
+		'a specific Weapon Type for each Focus and you may apply the Bonus after initial Skill Points have been spent. You are '+
+		'Illiterate.',
+		'type':'social_background'
+	},
+	{
+		'name':'Craftsman',
+		'description':'You made stuff, and you made it well enough to make a decent living, but never well enough to really '+
+		'get noticed. You gain a +2 Bonus in a single Craft Item Focus and you may apply the Bonus after initial Skill Points '+
+		'have been spent. You are Illiterate.',
+		'type':'social_background'
+	},
+	{
+		'name':'Peasant',
+		'description':'You broke your body to keep the rich fat and barely enough food in your own belly. You’ve survived '+
+		'the hardest of times and come out strong for it. You gain 5 Bonus Skill Points to place in Lift, Resist Disease or '+
+		'Craft Item Focuses. You are Illiterate and lose 1d4 starting funds.',
+		'type':'social_background'
+	},
+	{
+		'name':'Street Urchin',
+		'description':'You never had a real home and survived off of wit, luck and a lot of illegal activity. You’re a '+
+		'survivor and as resourceful as they come. You gain 2 Bonus Skill Points to place in Disguise, Search, Listen or '+
+		'Run Focuses and gain the Security, Stealth or Sleight of Hand Unique Skill for free. You are Illiterate and lose '+
+		'2d4 starting funds.',
+		'type':'social_background'
 	},
 
 	// *** Compelling Actions *** //
