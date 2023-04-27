@@ -1168,6 +1168,8 @@
 							<option value="awareness">Awareness</option>
 							<option value="allure">Allure</option>
 							<option value="deception">Deception</option>
+							<option value="intellect">Intellect</option>
+							<option value="innovation">Innovation</option>
 							<option value="intuition">Intuition</option>
 							<option value="vitality">Vitality</option>
 						</select>
@@ -1760,6 +1762,7 @@
 					error = "Bonus is required";
 				}
 				break;
+			case "social_background":
 			case "social_trait":
 			case "compelling_action":
 			case "profession":
@@ -1889,6 +1892,14 @@
 			    	}
 			    	requirements.push(req_set);
 			    });
+			    // check for 'character_create_only'
+			    if ($("#character_create_only").prop("checked", true)) {
+			    	var req_set = [];
+			    	var req = [];
+			    	req["character_creation"] = true;
+			    	req_set.push(req);
+			    	requirements.push(req_set);
+				}
 			    feat['requirements'] = requirements;
     			break;
 			case "physical_trait_pos":
@@ -1935,6 +1946,9 @@
 			    $(".feat-req-val").each(function(){
 			    	reqs += "&#8226;"+$(this).val()+"<br>";
 			    });
+			    if ($("#character_create_only").prop("checked", true)) {
+				    reqs += "&#8226;Character Creation Only<br>";
+				}
     			$('<td />', {
 			    	'html': reqs
 			    }).appendTo(row);

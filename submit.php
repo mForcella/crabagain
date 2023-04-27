@@ -110,6 +110,8 @@
 	if (isset($_POST['training'])) {
 		$training = $_POST['training'];
 		$training_val = $_POST['training_val'];
+		$training_magic = $_POST['training_magic'];
+		$training_governing = $_POST['training_governing'];
 		$ids = $_POST['training_ids'];
 
 		// delete trainings not in ID list
@@ -120,7 +122,7 @@
 			$vals = explode(":", $training[$i]);
 			// update where ID not empty; insert new where ID empty
 			if ($ids[$i] == "") {
-				$sql = "INSERT INTO user_training (name, attribute_group, value, user_id) VALUES ('".addslashes($vals[0])."', '".$vals[1]."', '".$training_val[$i]."', '".$user_id."')";
+				$sql = "INSERT INTO user_training (name, attribute_group, value, magic_school, governing_school, user_id) VALUES ('".addslashes($vals[0])."', '".$vals[1]."', '".$training_val[$i]."', '".$training_magic[$i]."', '".$training_governing[$i]."', '".$user_id."')";
 			} else {
 				$sql = "UPDATE user_training SET name = '".addslashes($vals[0])."', attribute_group = '".$vals[1]."', value = ".$training_val[$i]." WHERE id = ".$ids[$i];
 			}

@@ -1,4 +1,12 @@
 
+  -- To get foreign key names
+  -- SHOW CREATE TABLE `yourtable`;
+
+  -- To add on delete cascade
+  -- ALTER TABLE feat_or_trait_req_set DROP FOREIGN KEY `feat_or_trait_req_set_ibfk_1`;
+  -- ALTER TABLE feat_or_trait_req_set ADD CONSTRAINT `feat_or_trait_req_set_ibfk_1`
+  -- FOREIGN KEY (`feat_id`) REFERENCES feat_or_trait(`id`) ON DELETE CASCADE;
+
   CREATE TABLE feat_or_trait (
     id int PRIMARY KEY AUTO_INCREMENT,
     name varchar(255),
@@ -12,7 +20,7 @@
     id int PRIMARY KEY AUTO_INCREMENT,
     feat_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (feat_id) REFERENCES feat_or_trait(id)
+    FOREIGN KEY (feat_id) REFERENCES feat_or_trait(id) ON DELETE CASCADE
   );
 
   CREATE TABLE feat_or_trait_req (
@@ -21,7 +29,7 @@
     type varchar(255),
     value varchar(255),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (req_set_id) REFERENCES feat_or_trait_req_set(id)
+    FOREIGN KEY (req_set_id) REFERENCES feat_or_trait_req_set(id) ON DELETE CASCADE
   );
 
   CREATE TABLE campaign (
@@ -36,20 +44,19 @@
     campaign_id int,
     feat_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (campaign_id) REFERENCES campaign(id),
-    FOREIGN KEY (feat_id) REFERENCES feat_or_trait(id)
+    FOREIGN KEY (campaign_id) REFERENCES campaign(id) ON DELETE CASCADE,
+    FOREIGN KEY (feat_id) REFERENCES feat_or_trait(id) ON DELETE CASCADE
   );
 
   CREATE TABLE user (
+    -- Non-character values
     id int PRIMARY KEY AUTO_INCREMENT,
-    campaign_id int,
     email varchar(255),
     password varchar(255),
+    reset_token varchar(255),
+    campaign_id int,
+    -- Physical characteristics and descriptors
     character_name varchar(64),
-    attribute_pts int,
-    xp int,
-    -- xp_awarded int DEFAULT 0,
-    morale int,
     race varchar(64),
     height varchar(64),
     weight varchar(64),
@@ -59,6 +66,10 @@
     gender varchar(64),
     other varchar(255),
     size varchar(64),
+    background varchar(2000),
+    -- Attributes and XP
+    xp int,
+    attribute_pts int,
     strength int,
     fortitude int,
     speed int,
@@ -71,20 +82,23 @@
     innovation int,
     intuition int,
     vitality int,
-    move_penalty varchar(64),
-    defend varchar(64),
+    -- Defense
     magic varchar(64),
     fear varchar(64),
     poison varchar(64),
     disease varchar(64),
+    -- Wounds and morale states
+    morale int,
     damage int,
     wounds int,
     fatigue int,
     wound_penalty varchar(64),
-    background varchar(2000),
+    move_penalty varchar(64),
+    -- Equipped weapons
     weapon_1 varchar(64),
     weapon_2 varchar(64),
     weapon_3 varchar(64),
+    -- Motivators
     motivator_1 varchar(64),
     motivator_2 varchar(64),
     motivator_3 varchar(64),
@@ -93,7 +107,6 @@
     motivator_2_pts int,
     motivator_3_pts int,
     motivator_4_pts int,
-    reset_token varchar(255),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (campaign_id) REFERENCES campaign(id)
   );
@@ -113,6 +126,8 @@
     value varchar(12),
     attribute_group varchar(64),
     user_id int,
+    magic_school bool DEFAULT 0,
+    governing_school bool DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES user(id)
   );

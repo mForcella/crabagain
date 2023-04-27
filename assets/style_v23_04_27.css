@@ -120,6 +120,9 @@ html, body {
 .ui-front {
     z-index: 9999;
 }
+.ui-menu {
+	position: fixed;
+}
 
 /* detect touchscreen */
 @media (hover: none) {

@@ -215,7 +215,7 @@
 	<meta name="viewport" content="width=device-width, height=device-height,  initial-scale=1.0, user-scalable=no, user-scalable=0"/>
 	<meta name="robots" content="noindex">
 	<meta property="og:image" content="https://crabagain.com/assets/image/treasure-header-desaturated.jpg">
-	<title><?php echo $campaign['name'] ?>!</title>
+	<title><?php echo $campaign['name'].(isset($user) ? ' : '.$user['character_name'] : '') ?></title>
 	<link rel="icon" type="image/png" href="/assets/image/favicon-pentacle.ico"/>
 
 	<!-- Bootstrap -->
@@ -410,7 +410,7 @@
 						?>
 						<label class="control-label col-sm-2 col-xs-4" for="fate">Fate</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-							<input class="form-control" name="fate" id="fate" value="<?php echo $fate ?>">
+							<input class="form-control" name="fate" id="fate" value="<?php echo $fate ?>" readonly>
 						</div>
 					</div>
 				</div>
@@ -1195,7 +1195,7 @@
 					<div id="motivators" <?php echo $show_btn ? 'hidden' : '' ?>>
 						<div class="form-group no-margin">
 							<div class="col-xs-4 no-pad-mobile no-pad-left">
-								<input class="form-control" type="text" name="motivator_1" id="motivator_1" readonly value="<?php echo isset($user) ? $user['motivator_1'] : '' ?>">
+								<input class="form-control" type="text" name="motivator_1" id="motivator_1" readonly value="<?php echo isset($user) ? $user['motivator_1'] : '' ?>" onclick="editMotivators()">
 							</div>
 							<label class="control-label col-xs-1 no-pad-left align-right font-mobile-small" for="motivator_1_pts">Pts:</label>
 							<div class="col-xs-1 no-pad">
@@ -1203,7 +1203,7 @@
 							</div>
 
 							<div class="col-xs-4 no-pad-mobile pad-left-mobile">
-								<input class="form-control" type="text" name="motivator_2" id="motivator_2" readonly value="<?php echo isset($user) ? $user['motivator_2'] : '' ?>">
+								<input class="form-control" type="text" name="motivator_2" id="motivator_2" readonly value="<?php echo isset($user) ? $user['motivator_2'] : '' ?>" onclick="editMotivators()">
 							</div>
 							<label class="control-label col-xs-1 no-pad-left align-right font-mobile-small" for="motivator_2_pts">Pts:</label>
 							<div class="col-xs-1 no-pad">
@@ -1213,7 +1213,7 @@
 
 						<div class="form-group no-margin">
 							<div class="col-xs-4 no-pad-mobile no-pad-left">
-								<input class="form-control" type="text" name="motivator_3" id="motivator_3" readonly value="<?php echo isset($user) ? $user['motivator_3'] : '' ?>">
+								<input class="form-control" type="text" name="motivator_3" id="motivator_3" readonly value="<?php echo isset($user) ? $user['motivator_3'] : '' ?>" onclick="editMotivators()">
 							</div>
 							<label class="control-label col-xs-1 no-pad-left align-right font-mobile-small" for="motivator_3_pts">Pts:</label>
 							<div class="col-xs-1 no-pad">
@@ -1221,11 +1221,11 @@
 							</div>
 
 							<div class="col-xs-4 no-pad-mobile pad-left-mobile">
-								<input class="form-control" type="text" name="motivator_4" id="motivator_4" readonly value="<?php echo isset($user) ? $user['motivator_4'] : '' ?>">
+								<input class="form-control" type="text" name="motivator_4" id="motivator_4" readonly value="<?php echo isset($user) ? $user['motivator_4'] : '' ?>" onclick="editMotivators()">
 							</div>
 							<label class="control-label col-xs-1 no-pad-left align-right font-mobile-small" for="motivator_4_pts">Pts:</label>
 							<div class="col-xs-1 no-pad">
-								<input class="form-control motivator-pts" type="number" name="motivator_4_pts" id="motivator_4_pts" min="0" value="<?php echo isset($user) && $user['motivator_4'] != '' ? htmlspecialchars($user['motivator_4_pts']) : '' ?>">
+								<input class="form-control motivator-pts" type="number" name="motivator_4_pts" id="motivator_4_pts" min="0" value="<?php echo isset($user) && $user['motivator_4'] != '' ? htmlspecialchars($user['motivator_4_pts']) : '' ?>" <?php echo isset($user) && $user['motivator_4'] == '' ? 'readonly' : '' ?>>
 							</div>
 						</div>
 					</div>
@@ -1256,7 +1256,8 @@
 										'Prestige'
 									];
 								?>
-			        	<label>Primary Motivator</label>
+								<input type="hidden" id="edit_motivators">
+			        	<label>Primary Motivator (2 pts)</label>
 								<select class="form-control" id="m1" onchange="motivatorCheck(this.id)">
 									<?php 
 										foreach ($motivators as $motivator) {
@@ -1264,7 +1265,7 @@
 										}
 									?>
 								</select>
-			        	<label>Secondary Motivator</label>
+			        	<label>Secondary Motivator (1 pt)</label>
 								<select class="form-control" id="m2" onchange="motivatorCheck(this.id)">
 									<?php 
 										foreach ($motivators as $motivator) {
@@ -1272,7 +1273,7 @@
 										}
 									?>
 								</select>
-			        	<label>Turdiary Motivator</label>
+			        	<label>Tertiary Motivator (1 pt)</label>
 								<select class="form-control" id="m3" onchange="motivatorCheck(this.id)">
 									<?php 
 										foreach ($motivators as $motivator) {
@@ -1280,7 +1281,7 @@
 										}
 									?>
 								</select>
-			        	<label>Kwawdanary Motivator</label>
+			        	<label>Turdiary Motivator (Optional)</label>
 								<select class="form-control" id="m4" onchange="motivatorCheck(this.id)">
 									<?php 
 										foreach ($motivators as $motivator) {
@@ -1791,7 +1792,7 @@
         			Skill / Training Type
         		</h4>
 	        	<div class="form-check" id="magic_inputs">
-		        	<input class="form-check-input" type="radio" name="skill_type" id="school" value="4">
+		        	<input class="form-check-input" type="radio" name="skill_type" id="school" value="school">
 		        	<label class="form-check-label" for="school">Magic School (4 attribute pt)</label>
         			<select class="form-control skill-name" id="school_name">
         				<option value=""></option>
@@ -1802,17 +1803,17 @@
         			</select>
 	        	</div>
 	        	<div class="form-check">
-		        	<input class="form-check-input" type="radio" name="skill_type" id="unique" value="4">
-		        	<label class="form-check-label" for="unique">Unique Skill (4 attribute pts)</label>
+		        	<input class="form-check-input" type="radio" name="skill_type" id="unique" value="unique">
+		        	<label class="form-check-label" for="unique">Unique Skill (2 attribute pts)</label>
         			<input class="form-control skill-name clearable" type="text" id="skill_name">
 	        	</div>
 	        	<div class="form-check">
-		        	<input class="form-check-input" type="radio" name="skill_type" id="training" value="2">
+		        	<input class="form-check-input" type="radio" name="skill_type" id="training" value="training">
 		        	<label class="form-check-label" for="training">Training (2 attribute pts)</label>
         			<input class="form-control skill-name clearable" type="text" id="training_name">
 	        	</div>
 	        	<div class="form-check">
-		        	<input class="form-check-input" type="radio" name="skill_type" id="focus" value="1">
+		        	<input class="form-check-input" type="radio" name="skill_type" id="focus" value="focus">
 		        	<label class="form-check-label" for="focus">Focus (1 attribute pt)</label>
         			<input class="form-control skill-name clearable" type="text" id="focus_name">
 	        	</div>
@@ -2141,17 +2142,17 @@
 	<script src="<?php echo $keys['scripts'] ?>"></script>
 	<script type="text/javascript">
 
-		var keys = <?php echo json_encode($keys); ?>;
+		keys = <?php echo json_encode($keys); ?>;
 
 		// check for user and campaign values
-		var campaign = <?php echo json_encode(isset($campaign) ? $campaign : []); ?>;
-		var user = <?php echo json_encode(isset($user) ? $user : []); ?>;
-		var xp_awards = <?php echo json_encode(isset($awards) ? $awards : []); ?>;
+		campaign = <?php echo json_encode(isset($campaign) ? $campaign : []); ?>;
+		user = <?php echo json_encode(isset($user) ? $user : []); ?>;
+		xp_awards = <?php echo json_encode(isset($awards) ? $awards : []); ?>;
 		setAttributes(user);
 
 		// get feat list and requirements
-		var feat_list = <?php echo json_encode($feat_list); ?>;
-		var feat_reqs = <?php echo json_encode($feat_reqs); ?>;
+		feat_list = <?php echo json_encode($feat_list); ?>;
+		feat_reqs = <?php echo json_encode($feat_reqs); ?>;
 		var feat_sets = {};
 		var req_sets = [];
 		// sort requirements into sets
@@ -2208,14 +2209,14 @@
 		}
 
 		// check for user trainings
-		var trainings = <?php echo json_encode($trainings); ?>;
-		for (var i in trainings) {
-			addTrainingElements(trainings[i]['name'], trainings[i]['attribute_group'], trainings[i]['id'], trainings[i]['value']);
+		user_trainings = <?php echo json_encode($trainings); ?>;
+		for (var i in user_trainings) {
+			addTrainingElements(user_trainings[i]['name'], user_trainings[i]['governing_school'] == 1 ? user_trainings[i]['name']+" (Governing)" : user_trainings[i]['name'], user_trainings[i]['attribute_group'], user_trainings[i]['id'], user_trainings[i]['value']);
 		}
 
 		// check for user weapons
 		loadingItems = true;
-		var weapons = <?php echo json_encode($weapons); ?>;
+		weapons = <?php echo json_encode($weapons); ?>;
 		for (var i in weapons) {
 			addWeaponElements(weapons[i]['type'], weapons[i]['name'], weapons[i]['quantity'], weapons[i]['damage'], weapons[i]['max_damage'], weapons[i]['range_'], weapons[i]['rof'], weapons[i]['defend'], weapons[i]['crit'], weapons[i]['notes'], weapons[i]['weight'], weapons[i]['id']);
 		}
@@ -2249,13 +2250,13 @@
 		setToughness();
 
 		// check for user healings
-		var healings = <?php echo json_encode($healings); ?>;
+		healings = <?php echo json_encode($healings); ?>;
 		for (var i in healings) {
 			addHealingElements(healings[i]['name'], healings[i]['quantity'], healings[i]['effect'], healings[i]['weight'], healings[i]['id']);
 		}
 
 		// check for user misc items
-		var misc = <?php echo json_encode($misc); ?>;
+		misc = <?php echo json_encode($misc); ?>;
 		for (var i in misc) {
 			addMiscElements(misc[i]['name'], misc[i]['quantity'], misc[i]['notes'], misc[i]['weight'], misc[i]['id']);
 		}
@@ -2264,7 +2265,7 @@
 		updateTotalWeight(true);
 
 		// check for user notes
-		var notes = <?php echo json_encode($notes); ?>;
+		notes = <?php echo json_encode($notes); ?>;
 		for (var i in notes) {
 			addNoteElements(notes[i]['title'], notes[i]['note'], notes[i]['id']);
 		}

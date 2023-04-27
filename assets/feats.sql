@@ -23,13 +23,10 @@ INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (8, 4);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (8, 'feat', 'Keen Senses');
 
 INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (5, 'Silver Tongue', 'Any time you are making a verbal Allure or Deception roll you can always roll the other if the first roll fails. Additionally, you can never suffer an Epic Failure on either Allure or Deception. If you would, you may re-roll the Fate Die until it comes up higher than a 1.', 'feat', 4);
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (9, 5);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (9, 'allure', 2);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (9, 'deception', 2);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (10, 5);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (10, 'allure', 0);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (10, 'allure', 2);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (11, 5);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (11, 'deception', 0);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (11, 'deception', 2);
 
 INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (6, 'I\'ve Seen Worse', 'Once at the start of each session you can make an Allure or Deception roll, starting at DL 10, modified by your party\'s current Morale Level. If you succeed, you increase your party Morale by +1 for 1 Session, or by +2 for 1 Encounter. Additionally, you gain +1 Morale when this Feat is purchased, and can never be at -10 Morale.', 'feat', 4);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (12, 6);
@@ -38,6 +35,7 @@ INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (13, 6);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (13, 'deception', 2);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (14, 6);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (14, 'feat', 'Silver Tongue');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (14, 'feat', 'Inspiring Presence');
 
 INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (7, 'Eclectic Knowledge', 'Every time you fail a roll to see if you know a certain piece of information, you may roll your Percent Dice. You have a 25% chance to know the information anyway. This increases by 5% for every +1 above +2 Intellect, up to a Maximum of 75% at +12 . This will not function for information that the character could not have any conceivable way of knowing, unless an Alignment Bonus is used to declare a story point (this is always at the GMs discretion).', 'feat', 4);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (15, 7);
@@ -72,7 +70,7 @@ INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (12, 'Dual 
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (24, 12);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (24, 'agility', 4);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (25, 12);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (25, 'speed', 3);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (25, 'speed', 2);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (26, 12);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (26, 'feat', 'Defender');
 
@@ -84,10 +82,6 @@ INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (28, 'speed', 3);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (29, 13);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (29, 'feat', 'Take Aim');
 
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (14, 'Quick and the Dead', 'You reduce your Quick Action attack penalty to -1, and as long as your Weapon is Light (3 pounds or less for Medium humanoids), or a Ranged Weapon, you can Draw and Attack as a single Action, but cannot Aim if it is done as a Quick Action. This also applies to bows when Drawing an arrow. If your weapon is already drawn, you can instead apply any Aim action to all attacks taken that round. Additionally, as long as you have no Penalty in Awareness, you can now use your Speed as your primary Initiative Bonus, and Awareness as your Secondary.', 'feat', 4);
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (30, 14);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (30, 'speed', 4);
-
 INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (15, 'Gunslinger', 'You reduce loading time (or cocking time) for all guns by 1 Action step (i.e. Standard to Quick). If loading or cocking would already be a Quick Action, you can now do so as a Free Action in conjunction with any other action. If it is done in conjunction with a Quick Action attack, you cannot Aim on that Attack, and you cannot be Dual Wielding. You also double the Fire Rates on firearms, but you cannot Aim if you go above the normal Fire Rate. Other gun’s Fire Rates are not affected. Additionally, you can make trick shots using any gun with a projectile that can ricochet or reflect off of a specific surface. Whether or not a surface is acceptable is at the GMs discretion. This is always an Aimed Called Shot at +5 DL, and it allows you to completely ignore an enemy\'s Cover even if they have Full Cover. This does not go through enemy Cover, but rather around it.', 'feat', 4);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (31, 15);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (31, 'precision_', 4);
@@ -98,31 +92,25 @@ INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (33, 'feat', 'Qui
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (34, 15);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (34, 'feat', 'Take Aim');
 
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (16, 'Lightning Strike', 'As long as no one else has attacked or acted aggressively, the 1st Quick Action Attack you make during an Encounter will always count as a Surprise attack unless your opponent cannot be caught Unaware (such as with Keen Senses) or they also have Lightning Strike. You can now make Called Shots on Reaction Checks.', 'feat', 4);
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (35, 16);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (35, 'deception', 3);
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (36, 16);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (36, 'speed', 6);
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (37, 16);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (37, 'feat', 'Quick and the Dead');
-
 INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (17, 'Take Aim', 'You increase your base Aim bonus to +2 and may Aim as a Standard Action at +3. If you use a Full Action, you can declare an automatic hit at -1 Damage. You cannot make a Called Shot or score a Critical Hit. This cannot be used with Ranged attacks if the target has more than 1/5 cover, is smaller than Small size, or further than 1 Sector. This cannot be used with Melee attacks if the target has larger than a Small Shield, or Dual-Weapon Master.', 'feat', 4);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (38, 17);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (38, 'precision_', 2);
 
 INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (18, 'Sneak Attack', 'If your opponent is Surprised or Unware, you score an automatic Critical Hit at an additional +1 Damage (+2 base). This damage is increased by an additional +1 for every +3 you have to hit above +3, up to a maximum of +6 damage before any Called Shot Bonuses.', 'feat', 4);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (39, 18);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (39, 'awareness', 4);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (39, 'awareness', 2);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (40, 18);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (40, 'training', 'Stealth');
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (41, 18);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (41, 'feat', 'Take Aim');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (41, 'feat', 'Improved Critical Hit');
 
 INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (19, 'Brutal Throw', 'As long as you are throwing a weapon of 2 pounds or more, you can add half of your Strength to Damage instead of Precision. Alternately, you can add both, but cannot make Called Shots or declare automatic hits with Take Aim.', 'feat', 4);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (42, 19);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (42, 'strength', 2);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (43, 19);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (43, 'feat', 'Take Aim');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (43, 'feat', 'Improved Critical Hit');
 
 INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (20, 'Improved Critical Hit', 'You gain +1 to your Critical Threat Range and +1 Critical Damage and force your target to roll against a Knockdown every time you score a Critical as long as they are your Size or Smaller.', 'feat', 4);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (44, 20);
@@ -150,7 +138,7 @@ INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (50, 'feat', 'Ins
 INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (24, 'Anatomical Warfare', 'You know how to maximize Damage, and any time you make an Aimed Standard Action Called Shot and succeed, you can score an Automatic Critical Hit, or cause an Automatic Knockdown as long as you deal at least 1 Damage.', 'feat', 4);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (51, 24);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (51, 'intellect', 4);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (51, 'training', 'Medicine');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (51, 'training', 'First Aid');
 
 INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (25, 'Arterial Bleeding', 'If you make a Called Shot (+5 to the DL), you can cause extensive blood loss. This always deals 1 Damage only, ignoring natural Toughness, and they will then receive 1 Automatic Damage to Resilience at the end of each Round until they are Stabilized. This has no effect on Creatures Immune to Critical Hits.', 'feat', 4);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (52, 25);
@@ -169,14 +157,12 @@ INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (56, 27);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (56, 'character_creation', 'true');
 
 INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (88, 'Arcane Blood', 'Powerful Magic runs through your veins. You gain the use of Animas Magic as a Talent. You cannot cast other Magic Schools without Training (4 Skill Points). The first School you learn is your Governing School.', 'feat', 4);
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (57, 88);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (57, 'vitality', 2);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (58, 88);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (58, 'character_creation', 'true');
 
 INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (89, 'Divine Magic', 'The Gods have bestowed powerful Magic upon you. You gain the use of Animas Magic as a Talent. You cannot cast other Magic Schools without Training (4 Skill Points). You can never Train in more than 1 School, and it must be your deities favored School. You must also choose one Vow to follow in service to your God.', 'feat', 4);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (59, 89);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (59, 'vitality', 2);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (59, 'intuition', 2);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (60, 89);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (60, 'character_creation', 'true');
 
@@ -235,8 +221,165 @@ INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (74, 102);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (74, 'agility', 4);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (75, 102);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (75, 'speed', 4);
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (76, 21);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (76, 102);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (76, 'feat', 'Martial Arts');
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (77, 21);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (77, 102);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (77, 'feat', 'Lightning Reflexes');
 
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Lightning Reflexes', 'You reduce your Quick Action attack penalty to -1, and as long as your Weapon is Light (3 pounds or less for Medium humanoids), or a Ranged Weapon, you can Draw and Attack as a single Action, but cannot Aim if it is done as a Quick Action. This also applies to bows when Drawing an arrow. If your weapon is already drawn, you can instead apply any Aim action to all attacks taken that round. Additionally, as long as you have no Penalty in Awareness, you can now use your Speed as your primary Initiative Bonus, and Awareness as your Secondary.', 'feat', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'speed', 2);
+SET @feat_id := @feat_id + 1;
+SET @feat_set_id := @feat_set_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Quick and the Dead', 'As long as no one else has attacked or acted aggressively, the 1st Quick Action Attack you make during an Encounter will always count as a Surprise attack unless your opponent cannot be caught Unaware (such as with Keen Senses) or they also have Lightning Strike. You can now make Called Shots on Reaction Checks.', 'feat', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'speed', 4);
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'agility', 2);
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'feat', 'Lightning Reflexes');
+SET @feat_id := @feat_id + 1;
+SET @feat_set_id := @feat_set_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Magic Adept', 'You have honed your casting abilities beyond most. You may ready spells as a Quick Action and increase your Standard Action Ready Bonus to +3. Additionally, if you cast a Standard Action spell as a Full Round Action you may also apply your +3 Bonus to your Caster Level for the sake of determining Fatigue. This latter ability only applies to Governing and Companion Magic.', 'feat', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'vitality', 2);
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Ka');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Avani');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Nouse');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Soma');
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'feat', 'Arcane Blood');
+SET @feat_id := @feat_id + 1;
+SET @feat_set_id := @feat_set_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Master of Magic', 'There are few as good as you when it comes to slinging spells from your Governing School. You may now cast Magic from your Governing School as a Quick Action once per Encounter, and no longer need to roll to cast Cantrips. Additionally, you no longer suffer Reaction Check penalties for your School. If you also have Lightning Reflexes, you automatically win React Checks when using Magic, as long as your opponent does not also have Lightning Reflexes.', 'feat', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'vitality', 6);
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Ka');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Avani');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Nouse');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Soma');
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'feat', 'Magic Adept');
+-- SET @feat_set_id := @feat_set_id + 1;
+-- INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+-- INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'note', 'Must be trained in 2 Magic Schools');
+SET @feat_id := @feat_id + 1;
+SET @feat_set_id := @feat_set_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Time Lord', 'You have gained control over spacetime. You can slow or halt the flow of time, open portals to other places, or travel forward or back in time. DLs begin at 10 for teleporting small objects short distances, slowing time enough to enhance your Defense and Reaction Checks, or traveling backward or forward in time a few seconds. Stopping time completely for a full Round or traveling forward or back in time more than a decade would start at DL 30. This is considered a Talent for purposes of Fatigue (i.e. you are not Fatigued for casting at or below your Caster Level).', 'feat', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'vitality', 8);
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'feat', 'Master of Magic');
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Avani');
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Soma');
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Ka');
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Nouse');
+-- SET @feat_set_id := @feat_set_id + 1;
+-- INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+-- INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'note', '+4 required in all Schools');
+SET @feat_id := @feat_id + 1;
+SET @feat_set_id := @feat_set_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Blood Magic', 'You have honed your suffering into a source of power. Instead of taking a Level of Fatigue, you may instead inflict 1 Damage to your Resilience. You may do this any number of times, but the Damage you suffer must increase by 1 for each additional spell beyond the first. So, after your first spell, you would have to deal 2 Damage, then 3 Damage for the third, and so on.', 'feat', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'vitality', 2);
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'feat', 'Arcane Blood');
+SET @feat_id := @feat_id + 1;
+SET @feat_set_id := @feat_set_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Enchanter', 'You have learned how to manipulate magical energies in order to alter the properties of a non-living object for extended periods. The time an Enchantment lasts starts at 1 Minute and is multiplied by 5 for each Enchantment Level above 1. Permanently Enchanting an object requires a Soul of the recently deceased. This must be from either a person or a magical beast. If a beast is used, their Combat Level is the maximum DL of the effect that can be Enchanted. Multiple souls are cumulative. A humanoid soul is always equal to DL 26, or DL 34 for Magic Users. Permanent Enchanting requires 1 hour and always Fatigues you 1 Level. You must have a Talent in all effects you want to Enchant. The Enchantment Level is also used to determine basic costs when selling or buying Enchanted weapons (See Weapons in Character Creation).', 'feat', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'vitality', 4);
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Ka');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Avani');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Nouse');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Soma');
+SET @feat_id := @feat_id + 1;
+SET @feat_set_id := @feat_set_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Necromancer', 'You have learned how to manipulate magical energies in order to communicate with and control the dead. Communication DLs are based on the length of time the body has been dead, starting at DL 6 for someone that died within a few minutes. The DL for animating the dead is equal to the Level of the target during life +10. You may animate multiple beings with a single spell, but Levels are cumulative. This automatically Fatigues you, and you remain Fatigued for as long as you keep any beings animated. They will cease being animated when you end the spell. Permanently animating a body requires a Soul. Permanent animation requires 1 hour, and allows the Undead to operate independently of you, though they will always obey your most recent commands. Undead possess the abilities they had in life, suffer no penalties for Wounds, and are Immune to Critical Hits, disease and poison. Cold Damage deals no Damage but still Encumbers them 1 Level per Wound inflicted. Electric Damage deals no Damage but still Dazes them once per Wound inflicted.', 'feat', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'vitality', 4);
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'feat', 'Blood Magic');
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Ka');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Avani');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Nouse');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Soma');
+SET @feat_id := @feat_id + 1;
+SET @feat_set_id := @feat_set_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Lord of the Damned', 'You have achieved an ageless state of near immortality. You no longer age, you require no food, water or sleep; you suffer no penalties for being injured and are immune to critical hits, disease and poison. You can never be instantly slain and can only die from failing a Death Save. There is no limit to how much you can Heal from a Natural Healing or Soma roll. You still suffer Fatigue from Encumbrance and Casting only. Cold Damage deals no Damage but still Encumbers you 1 Level per Wound inflicted. Electric Damage deals no Damage but still Dazes you once per Wound inflicted. No roll is needed to become a Lich, but you must have the Soul of another human Caster and complete a 1-hour ceremony. To do this, you must remove your own Soul and place it in an external receptacle, which if destroyed, instantly slays you. Even if your body dies, your soul will remain intact within your receptacle.', 'feat', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'vitality', 8);
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'feat', 'Necromancer');
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'feat', 'Master of Magic');
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Avani');
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Soma');
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Ka');
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Nouse');
+-- SET @feat_set_id := @feat_set_id + 1;
+-- INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+-- INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'note', '+6 required in all Schools');
+SET @feat_id := @feat_id + 1;
+SET @feat_set_id := @feat_set_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Shapeshifter', 'You have gained incredible power over the expression of your own DNA. When this is learned, you may choose 1 Normal Animal, which you may Shapeshift into. You can change from human to animal and back again once per Session without Fatigue, and each time thereafter you suffer cumulative Fatigue. You can stay in Animal form for as long as you like and take on the Animal’s normal Physical Stats. This Talent costs 4 Skill Points plus 1 SP/Level of the Animal. You cannot Shapeshift above Giant Scale but may still choose larger Scale Animals to transform into at Giant Scale. This will alter the Animal’s Scale Modifiers appropriately (i.e. reducing Strength and Fortitude and increasing Defense). You may learn this as many times as you like for different Animals.', 'feat', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'vitality', 4);
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Avani');
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Soma');
+-- SET @feat_set_id := @feat_set_id + 1;
+-- INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+-- INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'note', 'Avani or Soma must be Governing School');
+SET @feat_id := @feat_id + 1;
+SET @feat_set_id := @feat_set_id + 1;
+
+SET @feat_id := (SELECT id FROM feat_or_trait ORDER BY id DESC LIMIT 0, 1);
+SET @feat_set_id := (SELECT id FROM feat_or_trait_req_set ORDER BY id DESC LIMIT 0, 1);
+SET @feat_id := @feat_id + 1;
+SET @feat_set_id := @feat_set_id + 1;
