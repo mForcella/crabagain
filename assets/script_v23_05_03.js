@@ -1023,9 +1023,11 @@ $(".weapon-name").each(function() {
 $(".feat-select").on("change", function() {
 	var description = "";
 	var cost = "";
+	var feat_id = "";
 	for (var i in feat_list) {
 		if (feat_list[i]['name'].replaceAll("'","") == $(this).val()) {
 			description = feat_list[i]['description'];
+			feat_id = feat_list[i]['id'];
 			// if physical trait, also show attribute point cost/bonus
 			if (feat_list[i]['type'] == "physical_trait") {
 				cost = feat_list[i]['cost'];
@@ -1038,6 +1040,7 @@ $(".feat-select").on("change", function() {
 	}
 	description += cost == "" ? "" : "\n\n"+(cost > 0 ? "Attribute Point Cost: "+cost : "Attribute Point Bonus: "+(cost*-1));
 	$("#feat_description").val(description);
+	$("#feat_id").val(feat_id);
 	$("#feat_name_val").val($(this).val());
 });
 
@@ -1060,7 +1063,7 @@ function setFeatList() {
 								for (var i in user_feats) {
 									satisfied = satisfied ? true : user_feats[i]['name'].includes(req[key]);
 								}
-								// TODO shapeshifter can be learned multiple times
+								// TODO Shapeshifter - neeed to specify shape
 								break;
 							case 'training':
 								for (var i in user_trainings) {
@@ -1232,6 +1235,7 @@ function featSourceFunction(input, add, list) {
 				var found = false;
 				for (var i in user_feats) {
 					if (user_feats[i]['name'].toLowerCase().includes(entry['value'].toLowerCase())) {
+						// TODO allow Shapeshifting to be learned multiple times
 						found = true;
 						break;
 					}
@@ -1307,13 +1311,16 @@ function featSelectFunction(ui) {
 
 		// auto fill description on feat selection
 		var description = "";
+		var feat_id = "";
 		for (var i in feat_list) {
 			if (feat_list[i]['name'] == ui.item.value) {
 				description = feat_list[i]['description'];
+				feat_id = feat_list[i]['id'];
 			}
 		}
 		$("#feat_name_val").val(ui.item.value);
 		$("#feat_description").val(description).height($("#feat_description")[0].scrollHeight);
+		$("#feat_id").val(feat_id);
 		return true;
 	}
 }
@@ -1629,66 +1636,79 @@ function forgotPassword() {
 function newFeat() {
 	var featName = $("#feat_name_val").val() == "" ? $("#feat_name").val() : $("#feat_name_val").val();
 	var featDescription = $("#feat_description").val();
+	let editing = $("#feat_modal_title").html() == "Update Feat";
 
 	// make sure we're not adding a duplicate training name
-	for (var i in user_feats) {
-		if (user_feats[i]['name'] == featName) {
-			alert("Feat name already in use");
-			return;
+	if (!editing) {
+		for (var i in user_feats) {
+			if (user_feats[i]['name'] == featName) {
+				alert("Feat name already in use");
+				return;
+			}
 		}
-	}
 
-	// only allow one profession, one compelling action, one social trait, one morale trait
-	var featType = "";
-	for (var i in feat_list) {
-		if (feat_list[i]['name'].toLowerCase() == featName.toLowerCase()) {
-			featType = feat_list[i]['type'];
+		// only allow one profession, one compelling action, one social trait, one morale trait
+		var featType = "";
+		for (var i in feat_list) {
+			if (feat_list[i]['name'].toLowerCase() == featName.toLowerCase()) {
+				featType = feat_list[i]['type'];
 
-			if (featType == "profession") {
-				for (var j in user_feats) {
-					if (user_feats[j]['type'] == "profession") {
-						alert("Only one Profession can be chosen");
-						return;
+				if (featType == "profession") {
+					for (var j in user_feats) {
+						if (user_feats[j]['type'] == "profession") {
+							alert("Only one Profession can be chosen");
+							return;
+						}
+					}
+				}
+				if (featType == "social_background") {
+					for (var j in user_feats) {
+						if (user_feats[j]['type'] == "social_background") {
+							alert("Only one Social Background can be chosen");
+							return;
+						}
+					}
+				}
+				if (featType == "compelling_action") {
+					for (var j in user_feats) {
+						if (user_feats[j]['type'] == "compelling_action") {
+							alert("Only one Compelling Action can be chosen");
+							return;
+						}
+					}
+				}
+				if (featType == "social_trait") {
+					for (var j in user_feats) {
+						if (user_feats[j]['type'] == "social_trait") {
+							alert("Only one Social Trait can be chosen");
+							return;
+						}
+					}
+				}
+				if (featType == "morale_trait") {
+					for (var j in user_feats) {
+						if (user_feats[j]['type'] == "morale_trait") {
+							alert("Only one Morale Trait can be chosen");
+							return;
+						}
 					}
 				}
 			}
-			if (featType == "social_background") {
-				for (var j in user_feats) {
-					if (user_feats[j]['type'] == "social_background") {
-						alert("Only one Social Background can be chosen");
-						return;
-					}
-				}
-			}
-			if (featType == "compelling_action") {
-				for (var j in user_feats) {
-					if (user_feats[j]['type'] == "compelling_action") {
-						alert("Only one Compelling Action can be chosen");
-						return;
-					}
-				}
-			}
-			if (featType == "social_trait") {
-				for (var j in user_feats) {
-					if (user_feats[j]['type'] == "social_trait") {
-						alert("Only one Social Trait can be chosen");
-						return;
-					}
-				}
-			}
-			if (featType == "morale_trait") {
-				for (var j in user_feats) {
-					if (user_feats[j]['type'] == "morale_trait") {
-						alert("Only one Morale Trait can be chosen");
-						return;
-					}
-				}
-			}
+		}
+
+		// check for 'Divine Magic'
+		if (featName == "Divine Magic") {
+			// prompt to choose a vow
+			$("#vows_modal").modal("show");
 		}
 	}
 
 	if (featName != "" && featDescription != " ") {
-		user_feats.push({"name":featName, "type":featType, "description":featDescription});
+		if (!editing) {
+			let feat_id = $("#feat_id").val() == "" ? uuid() : $("#feat_id").val();
+			user_feats.push({"feat_id":feat_id, "name":featName, "type":featType, "description":featDescription});
+		}
+
 		// check for talents requiring additional selection
 		var featDisplayName = "";
 		if (featName == "Elemental Master") {
@@ -1698,12 +1718,7 @@ function newFeat() {
 		} else if (featName == "Superhuman") {
 			featDisplayName = featName + " ("+$(".superhuman_select").val()+")";
 		}
-		addFeatElements(featName, featDescription.trim(), $("#feat_id").val(), featDisplayName);
-	}
-	// check for 'Divine Magic'
-	if (featName == "Divine Magic") {
-		// prompt to choose a vow
-		$("#vows_modal").modal("show");
+		addFeatElements(featName, featDisplayName, featDescription.trim(), $("#feat_id").val(), $("#user_feat_id").val());
 	}
 }
 
@@ -1721,26 +1736,36 @@ $("#vows_modal").on('hidden.bs.modal', function() {
 });
 
 // create html elements for feat
-function addFeatElements(featName, featDescription, id, featDisplayName = "") {
+function addFeatElements(featName, featDisplayName, featDescription, feat_id, user_feat_id) {
 	// check for magic talents
 	user['magic_talents'] = user['magic_talents'] || featName == "Arcane Blood" || featName == "Divine Magic";
 	if (user['magic_talents']) {
 		$("#magic_option").show();
 	}
 
-	var id_val = id == "" ? uuid() : "training_"+id;
+	// get uuid from user_feats
+	var id_val;
+	if (user_feat_id == "") {
+		for (var i in user_feats) {
+			if (user_feats[i]['name'] == featName) {
+				id_val = "feat_"+user_feats[i]['feat_id'];
+			}
+		}
+	} else {
+		id_val = "feat_"+user_feat_id;
+	}
 	var featDescription = featDescription.split("\n\n")[0]; // remove extraneous text from feat descriptions
 
 	// new or updating?
-	if ($("#feat_modal_title").html() == "Update Feat") {
-
+	let editing = $("#feat_modal_title").html() == "Update Feat";
+	if (editing) {
 		// update feat name and description
-		$("#"+id+"_name").html(featName+" : ");
-		$("#"+id+"_descrip").html(featDescription.length > 100 ? featDescription.substring(0,100)+"..." : featDescription);
+		$("#"+id_val+"_name").html(featName+" : ");
+		$("#"+id_val+"_descrip").html(featDescription.length > 100 ? featDescription.substring(0,100)+"..." : featDescription);
 
 		// update hidden input values
-		$("#"+id+"_name_val").val(featName);
-		$("#"+id+"_descrip_val").val(featDescription);
+		$("#"+id_val+"_name_val").val(featName);
+		$("#"+id_val+"_descrip_val").val(featDescription);
 
 	} else {
 		// get feat cost
@@ -1817,13 +1842,14 @@ function addFeatElements(featName, featDescription, id, featDisplayName = "") {
 	    	var description = $("#"+id_val+"_descrip_val").val();
 	    	// feat is physical trait, add cost/bonus to description
 	    	if (featType == "physical_trait_pos" || featType == "physical_trait_neg") {
-					description += "\n\n"+(cost > 0 ? "Attribute Point Cost: "+cost : "Attribute Point Bonus: "+(cost*-1));
+				description += "\n\n"+(cost > 0 ? "Attribute Point Cost: "+cost : "Attribute Point Bonus: "+(cost*-1));
 	    	}
 	    	$("#feat_description").val(description);
-	    	$("#feat_id").val(id_val);
+	    	$("#feat_id").val(feat_id);
+	    	$("#user_feat_id").val(user_feat_id);
 	    	$("#feat_modal_title").html("Update Feat");
 	    	$("#new_feat_modal").modal("show");
-				$("#feat_description").height( $("#feat_description")[0].scrollHeight );
+			$("#feat_description").height( $("#feat_description")[0].scrollHeight );
 	    });
 
 	    $("#"+id_val+"_remove").on("click", function() {
@@ -1845,7 +1871,8 @@ function addFeatElements(featName, featDescription, id, featDisplayName = "") {
 		// add hidden inputs
 	    createInput('', 'hidden', 'feat_names[]', (featDisplayName == "" ? featName : featDisplayName), feat_container, id_val+"_name_val");
 	    createInput('', 'hidden', 'feat_descriptions[]', featDescription, feat_container, id_val+"_descrip_val");
-		createInput('', 'hidden', 'feat_ids[]', id, feat_container);
+		createInput('', 'hidden', 'feat_ids[]', feat_id, feat_container);
+		createInput('', 'hidden', 'user_feat_ids[]', user_feat_id, feat_container);
 	}
 
 	// check for specific feats and adjust attributes (quick and the dead, improved crit, etc)
@@ -2145,7 +2172,6 @@ function newTraining() {
 		user_training['name'] = trainingName;
 		// TODO set starting training value?
 		// user_training['value'] = value;
-
 		// check for magic school
 		user_training['magic_school'] = trainingName.includes("Ka") || trainingName.includes("Avani") || 
 			trainingName.includes("Nouse") || trainingName.includes("Soma") ? 1 : 0;

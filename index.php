@@ -1724,6 +1724,7 @@
         	<label class="control-label">Description</label>
         	<textarea class="form-control" id="feat_description" rows="6" maxlength="2000"></textarea>
         	<input type="hidden" id="feat_id">
+        	<input type="hidden" id="user_feat_id">
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newFeat()" id="feat_submit_btn">Ok</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
@@ -2183,8 +2184,18 @@
 
 		// check for user feats
 		user_feats = <?php echo json_encode($feats); ?>;
+		// get feat description from feat_or_trait table if feat_id is present
 		for (var i in user_feats) {
-			addFeatElements(user_feats[i]['name'], user_feats[i]['description'], user_feats[i]['id']);
+			var feat_id_null = true;
+			if (user_feats[i]['feat_id'] != null) {
+				feat_id_null = false;
+				for (var j in feat_list) {
+					if (feat_list[j]['id'] == user_feats[i]['feat_id']) {
+						user_feats[i]['description'] = feat_list[j]['description'];
+					}
+				}
+			}
+			addFeatElements(user_feats[i]['name'], user_feats[i]['name'], user_feats[i]['description'], feat_id_null ? "" : user_feats[i]['feat_id'], user_feats[i]['id']);
 		}
 
 		// set feat list

@@ -85,18 +85,25 @@
 	if (isset($_POST['feat_names'])) {
 		$feat_names = $_POST['feat_names'];
 		$feat_descriptions = $_POST['feat_descriptions'];
-		$ids = $_POST['feat_ids'];
+		$feat_ids = $_POST['feat_ids'];
+		$user_feat_ids = $_POST['user_feat_ids'];
 
 		// delete feats not in ID list
-		$sql = "DELETE FROM user_feat WHERE user_id = " . $user_id . " AND id NOT IN ('" . implode("','", $ids) . "')";
+		$sql = "DELETE FROM user_feat WHERE user_id = " . $user_id . " AND id NOT IN ('" . implode("','", $user_feat_ids) . "')";
 		$db->query($sql);
 
 		for ($i = 0; $i < count($feat_names); $i++) {
 			// update where ID not empty; insert new where ID empty
-			if ($ids[$i] == "") {
-				$sql = "INSERT INTO user_feat (name, description, user_id) VALUES ('".addslashes($feat_names[$i])."', '".addslashes($feat_descriptions[$i])."', '".$user_id."')";
+			if ($user_feat_ids[$i] == "") {
+				// insert feat_id if present
+				$sql = $feat_ids[$i] == "" ?
+				"INSERT INTO user_feat (name, description, user_id) VALUES ('" :
+				"INSERT INTO user_feat (name, description, user_id, feat_id) VALUES ('";
+				$sql .= $feat_ids[$i] == "" ?
+				addslashes($feat_names[$i])."', '".addslashes($feat_descriptions[$i])."', '".$user_id."')" :
+				addslashes($feat_names[$i])."', '".addslashes($feat_descriptions[$i])."', '".$user_id."', '".$feat_ids[$i]."')";
 			} else {
-				$sql = "UPDATE user_feat SET name = '".addslashes($feat_names[$i])."', description = '".addslashes($feat_descriptions[$i])."' WHERE id = ".$ids[$i];
+				$sql = "UPDATE user_feat SET name = '".addslashes($feat_names[$i])."', description = '".addslashes($feat_descriptions[$i])."' WHERE id = ".$user_feat_ids[$i];
 			}
 			$db->query($sql);
 		}

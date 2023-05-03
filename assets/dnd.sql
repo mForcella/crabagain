@@ -111,13 +111,15 @@
     FOREIGN KEY (campaign_id) REFERENCES campaign(id)
   );
 
-  CREATE TABLE user_note (
+  CREATE TABLE user_feat (
     id int PRIMARY KEY AUTO_INCREMENT,
-    title varchar(255),
-    note varchar(2000),
+    name varchar(64),
+    description varchar(2000),
     user_id int,
+    feat_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (user_id) REFERENCES user(id)
+    FOREIGN KEY (user_id) REFERENCES user(id),
+    FOREIGN KEY (feat_id) REFERENCES feat_or_trait(id) ON DELETE CASCADE
   );
 
   CREATE TABLE user_training (
@@ -132,10 +134,10 @@
     FOREIGN KEY (user_id) REFERENCES user(id)
   );
 
-  CREATE TABLE user_feat (
+  CREATE TABLE user_note (
     id int PRIMARY KEY AUTO_INCREMENT,
-    name varchar(64),
-    description varchar(2000),
+    title varchar(255),
+    note varchar(2000),
     user_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES user(id)
