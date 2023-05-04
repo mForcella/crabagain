@@ -196,6 +196,7 @@ $(document).on('input', '.clearable', function() {
 		$(".elemental_select").hide();
 		$(".elementalist_select").hide();
 		$(".superhuman_select").hide();
+		$(".shapeshifter_select").hide();
     }
 });
 
@@ -314,6 +315,7 @@ $("#select_feat_type").on("change", function() {
 	$(".elemental_select").hide();
 	$(".elementalist_select").hide();
 	$(".superhuman_select").hide();
+	$(".shapeshifter_select").hide();
 });
 
 // show hidden inputs on skill type radio select
@@ -423,21 +425,6 @@ function endGMEdit(accept) {
 		}
 	}
 }
-
-// function for 'add' button in xp modal
-// function addXP() {
-// 	if ($("#add_xp").val() != "") {
-// 		var current = parseInt($("#xp_text").html());
-// 		$("#xp_text").html(current + parseInt($("#add_xp").val()));
-// 		$("#add_xp").val("");
-// 	}
-// }
-
-// function for 'ok' button in xp modal
-// function setXP() {
-// 	var current = parseInt($("#xp_text").html());
-// 	$("#xp").val(current).trigger("change");
-// }
 
 // show user menu
 function toggleMenu() {
@@ -962,18 +949,31 @@ $("#help_modal").on('shown.bs.modal', function() {
 // on modal shown, update modal title and clear inputs
 $("#new_feat_modal").on('shown.bs.modal', function() {
 	$("#feat_name").focus();
-	// gm edit mode - unhide select feat type elements
-	if (adminEditMode || characterCreation) {
-		$("#select_feat_type").removeClass("hidden");
-		$("#select_feat_type_label").removeClass("hidden");
-	} else {
+
+	// always hide feat type select if editing
+	if ($("#feat_modal_title").html() == "Update Feat") {
 		$("#select_feat_type").addClass("hidden");
 		$("#select_feat_type_label").addClass("hidden");
+	} else if (adminEditMode || characterCreation) {
+		// gm edit mode - unhide select feat type elements
+		$("#select_feat_type").removeClass("hidden");
+		$("#select_feat_type_label").removeClass("hidden");
+	} else if(user['magic_talents']) {
+		// check if character has magic training
+		$("#select_feat_type").removeClass("hidden");
+		$("#select_feat_type_label").removeClass("hidden");
+		// hide all options from select list other than standard and magic talents
+		$("#select_feat_type").children().each(function(){
+			if ($(this).attr("id") == undefined) {
+				$(this).hide();
+			}
+		});
 	}
 	// hide additional inputs
 	$(".elemental_select").hide();
 	$(".elementalist_select").hide();
 	$(".superhuman_select").hide();
+	$(".shapeshifter_select").hide();
 
 });
 $("#new_feat_modal").on('hidden.bs.modal', function() {
@@ -1063,12 +1063,16 @@ function setFeatList() {
 								for (var i in user_feats) {
 									satisfied = satisfied ? true : user_feats[i]['name'].includes(req[key]);
 								}
-								// TODO Shapeshifter - neeed to specify shape
+								// feat is classified as 'magic' if it requires arcane blood
+								if (req[key] == "Arcane Blood") {
+									feat['magic'] = true;
+								}
 								break;
 							case 'training':
 								for (var i in user_trainings) {
 									satisfied = satisfied ? true : user_trainings[i]['name'].includes(req[key]);
 								}
+								// feat is classified as 'magic' if it requires a school training
 								if (req[key] == "Ka" || req[key] == "Avani" || req[key] == "Nouse" || req[key] == "Soma") {
 									feat['magic'] = true;
 								}
@@ -1235,8 +1239,8 @@ function featSourceFunction(input, add, list) {
 				var found = false;
 				for (var i in user_feats) {
 					if (user_feats[i]['name'].toLowerCase().includes(entry['value'].toLowerCase())) {
-						// TODO allow Shapeshifting to be learned multiple times
-						found = true;
+						// allow Shapeshifter to be learned multiple times
+						found = user_feats[i]['name'].includes("Shapeshifter") ? false : true;
 						break;
 					}
 				}
@@ -1307,6 +1311,8 @@ function featSelectFunction(ui) {
 			$(".elementalist_select").show();
 		} else if (talent == "Superhuman") {
 			$(".superhuman_select").show();
+		} else if (talent == "Shapeshifter") {
+			$(".shapeshifter_select").show();
 		}
 
 		// auto fill description on feat selection
@@ -1641,8 +1647,8 @@ function newFeat() {
 	// make sure we're not adding a duplicate training name
 	if (!editing) {
 		for (var i in user_feats) {
-			if (user_feats[i]['name'] == featName) {
-				alert("Feat name already in use");
+			if (user_feats[i]['name'] == featName && !user_feats[i]['name'].includes("Shapeshifter")) {
+				alert("Talent name already in use");
 				return;
 			}
 		}
@@ -1717,6 +1723,13 @@ function newFeat() {
 			featDisplayName = featName + " ("+$(".elementalist_select").val()+")";
 		} else if (featName == "Superhuman") {
 			featDisplayName = featName + " ("+$(".superhuman_select").val()+")";
+		}else if (featName == "Shapeshifter") {
+			// make sure animal name isn't empty
+			if ($("#animal_name").val() == "") {
+				alert("Please enter an animal name");
+				return;
+			}
+			featName = featName + " ("+$("#animal_name").val()+")";
 		}
 		addFeatElements(featName, featDisplayName, featDescription.trim(), $("#feat_id").val(), $("#user_feat_id").val());
 	}
@@ -1747,7 +1760,7 @@ function addFeatElements(featName, featDisplayName, featDescription, feat_id, us
 	var id_val;
 	if (user_feat_id == "") {
 		for (var i in user_feats) {
-			if (user_feats[i]['name'] == featName) {
+			if (featName.includes(user_feats[i]['name'])) {
 				id_val = "feat_"+user_feats[i]['feat_id'];
 			}
 		}
@@ -1791,6 +1804,11 @@ function addFeatElements(featName, featDisplayName, featDescription, feat_id, us
 				addingNewSchool = false;
 			}
 
+			// check if we're adding shapeshifter - add animal level to cost
+			if (featName.includes("Shapeshifter")) {
+				cost = 4 + parseInt($("#animal_level").val());
+			}
+
 			// make sure we have enough points
 			if (parseInt($(".attribute-count").html().split(" Points")[0]) - cost < 0) {
 				alert("Not enough attribute points to allocate for a new feat/trait.");
@@ -1831,7 +1849,7 @@ function addFeatElements(featName, featDisplayName, featDescription, feat_id, us
 	    	// figure out what type of feat we are editing
 	    	var featType = "";
 	    	for (var i in feat_list) {
-	    		if (feat_list[i]['name'].toLowerCase() == name.toLowerCase()) {
+	    		if (name.toLowerCase().includes(feat_list[i]['name'].toLowerCase())) {
 	    			featType = feat_list[i]['type'];
 	    			featType = featType == "physical_trait" ? (cost > 0 ? "physical_trait_pos" : "physical_trait_neg") : featType;
 	    			$("#select_feat_type").val(featType+"_name").trigger("change");
@@ -2126,8 +2144,22 @@ function newTrainingModal(attribute) {
 
 	// if vitality, check for magic talents
 	if (attribute == "Vitality" && user['magic_talents'] == true) {
-		// TODO if divine magic, only one school is allowed
 		$("#magic_inputs").show();
+		// if divine magic, only one school is allowed
+		for (var i in user_feats) {
+			if (user_feats[i]['name'] == "Divine Magic") {
+				var schoolCount = 0;
+				for (var j in user_trainings) {
+					if (user_trainings[j]['magic_school'] == 1) {
+						schoolCount += 1;
+					}
+				}
+				
+				if (schoolCount > 0) {
+					$("#magic_inputs").hide();
+				}
+			}
+		}
 	} else {
 		$("#magic_inputs").hide();
 	}
@@ -2170,8 +2202,9 @@ function newTraining() {
 		var user_training = [];
 		user_training['attribute_group'] = attribute;
 		user_training['name'] = trainingName;
-		// TODO set starting training value?
+		// TODO need to set starting training value?
 		// user_training['value'] = value;
+
 		// check for magic school
 		user_training['magic_school'] = trainingName.includes("Ka") || trainingName.includes("Avani") || 
 			trainingName.includes("Nouse") || trainingName.includes("Soma") ? 1 : 0;
@@ -2214,6 +2247,7 @@ function newTraining() {
 		$(".elemental_select").hide();
 		$(".elementalist_select").hide();
 		$(".superhuman_select").hide();
+		$(".shapeshifter_select").hide();
 		$("#new_school_modal").modal("show");
 	}
 }
@@ -2272,12 +2306,15 @@ $("#magic_talents").on("change", function() {
 	$(".elemental_select").hide();
 	$(".elementalist_select").hide();
 	$(".superhuman_select").hide();
+	$(".shapeshifter_select").hide();
 	if (talent == "Elemental Master") {
 		$(".elemental_select").show();
 	} else if (talent == "Elementalist") {
 		$(".elementalist_select").show();
 	} else if (talent == "Superhuman") {
 		$(".superhuman_select").show();
+	}else if (talent == "Shapeshifter") {
+		$(".shapeshifter_select").show();
 	}
 });
 

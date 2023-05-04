@@ -1616,7 +1616,7 @@
         	<!-- show dropdown only during character creation -->
         	<label class="control-label <?php echo isset($user) && $user['xp'] != 0 ? 'hidden' : ''; ?>" id="select_feat_type_label">Type</label>
         	<select class="form-control <?php echo isset($user) && $user['xp'] != 0 ? 'hidden' : ''; ?>" id="select_feat_type">
-        		<option value="feat_name">Standard Talent</option>
+        		<option id="standard_option" value="feat_name">Standard Talent</option>
         		<!--  hide unless user has magic -->
         		<option id="magic_option" value="magic_talent_name" <?php echo isset($user) && $user['magic_talents'] == true ? '' : 'hidden'; ?>>Magical Talent</option>
         		<!-- hide options if their counts are zero -->
@@ -1720,6 +1720,17 @@
         		<option value="Power/Precision">Power (Strength/Fortitude) & Perception (Precision/Awareness)</option>
         		<option value="Dexterity/Precision">Dexterity (Speed/Agility) & Perception (Precision/Awareness)</option>
         	</select>
+
+        	<div class="row shapeshifter_select">
+        		<div class="col-sm-6">
+	        		<label class="control-label">Animal Name</label>
+	        		<input class="form-control" type="text" id="animal_name">
+	        	</div>
+        		<div class="col-sm-6">
+	        		<label class="control-label">Animal Level</label>
+	        		<input class="form-control" type="number" id="animal_level" min="1" value="1">
+	        	</div>
+        	</div>
 
         	<label class="control-label">Description</label>
         	<textarea class="form-control" id="feat_description" rows="6" maxlength="2000"></textarea>
