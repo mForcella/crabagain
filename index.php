@@ -381,7 +381,7 @@
 						<label class="control-label col-sm-2 col-xs-4 font-small smaller" for="caster_level">Caster Level</label>
 						<div class="col-sm-2 col-xs-8">
 							<?php
-								$caster_level = isset($user) ? $user['vitality'] + 10 : 0;
+								$caster_level = isset($user) ? $user['vitality'] + 10 : 10;
 							?>
 							<input class="form-control" readonly name="caster_level" id="caster_level" value="<?php echo $caster_level ?>">
 						</div>
@@ -2232,8 +2232,32 @@
 
 		// check for user trainings
 		user_trainings = <?php echo json_encode($trainings); ?>;
+		// check for governing school
+		var governing = "";
 		for (var i in user_trainings) {
-			addTrainingElements(user_trainings[i]['name'], user_trainings[i]['governing_school'] == 1 ? user_trainings[i]['name']+" (Governing)" : user_trainings[i]['name'], user_trainings[i]['attribute_group'], user_trainings[i]['id'], user_trainings[i]['value']);
+			if (user_trainings[i]['governing_school'] == 1) {
+				governing = user_trainings[i]['name'];
+			}
+		}
+		for (var i in user_trainings) {
+			var displayName = user_trainings[i]['name'];
+			// look for magic school - set label to governing/companion/opposition
+			if (user_trainings[i]['magic_school'] == 1) {
+				if (user_trainings[i]['governing_school'] == 1) {
+					displayName += " (Gov)";
+				} else if (governing != "") {
+					if (governing == "Soma") {
+						displayName += displayName == "Avani" ? " (Comp)" : " (Opp)";
+					} else if (governing == "Avani") {
+						displayName += displayName == "Soma" ? " (Comp)" : " (Opp)";
+					} else if (governing == "Nouse") {
+						displayName += displayName == "Ka" ? " (Comp)" : " (Opp)";
+					} else {
+						displayName += displayName == "Nouse" ? " (Comp)" : " (Opp)";
+					}
+				}
+			}
+			addTrainingElements(user_trainings[i]['name'], displayName, user_trainings[i]['attribute_group'], user_trainings[i]['id'], user_trainings[i]['value']);
 		}
 
 		// check for user weapons

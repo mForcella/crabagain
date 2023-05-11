@@ -1522,7 +1522,7 @@ function adjustAttribute(attribute, val) {
 			break;
 		case 'vitality':
 			// adjust fate and caster level
-			var caster_level = newVal >= 0 ? 10 + Math.floor(newVal/2) : 10 - Math.ceil(newVal/3);
+			var caster_level = 10 + newVal;
 			$("#caster_level").val(caster_level);
 			adjustFate();
 			break;
@@ -2222,7 +2222,32 @@ function newTraining() {
 			}
 		}
 		user_trainings.push(user_training);
-		var id_val = addTrainingElements(trainingName, user_training['governing_school'] == 1 ? trainingName+" (Governing)" : trainingName, attribute, '');
+
+		// check for existing governing school - add companion/opposition to training label
+		var governing = "";
+		for (var i in user_trainings) {
+			if (user_trainings[i]['governing_school'] == 1) {
+				governing = user_trainings[i]['name'];
+			}
+		}
+		var displayName = trainingName;
+		if (user_training['magic_school'] == 1) {
+			if (user_training['governing_school'] == 1) {
+				displayName += " (Gov)";
+			} else if (governing != "") {
+				if (governing == "Soma") {
+					displayName += displayName == "Avani" ? " (Comp)" : " (Opp)";
+				} else if (governing == "Avani") {
+					displayName += displayName == "Soma" ? " (Comp)" : " (Opp)";
+				} else if (governing == "Nouse") {
+					displayName += displayName == "Ka" ? " (Comp)" : " (Opp)";
+				} else {
+					displayName += displayName == "Nouse" ? " (Comp)" : " (Opp)";
+				}
+			}
+		}
+
+		var id_val = addTrainingElements(trainingName, displayName, attribute, '');
 	}
 
 	// if magic school - prompt to choose talent
@@ -2257,6 +2282,12 @@ function newSchool() {
 	addingNewSchool = true;
 	$("#feat_name_val").val($("#magic_talents").val().split(":")[1]);
 	$("#feat_description").val($("#talent_descrip").val());
+	// set feat_id value for new talent
+	for (var i in feat_list) {
+		if (feat_list[i]['name'] == $("#feat_name_val").val()) {
+			$("#feat_id").val(feat_list[i]['id']);
+		}
+	}
 	newFeat();
 }
 
@@ -2420,8 +2451,8 @@ function addTrainingElements(trainingName, trainingDisplayName, attribute, id, v
 		adjustAttribute(id_val, -1);
 	});
 
-	// GM edit mode - show plus minus icons
-	if (adminEditMode || editingSection) {
+	// GM edit mode or character creation - show plus minus icons
+	if (adminEditMode || characterCreation) {
 		up.show();
 		down.show();
 	}
