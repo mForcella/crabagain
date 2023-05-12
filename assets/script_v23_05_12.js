@@ -1050,7 +1050,7 @@ function setFeatList() {
 	var ineligible_feats = [];
 	// set autocomplete list for feats
 	$.each(feat_list, function(i, feat) {
-		if (feat['type'] == 'feat') {
+		if (feat['type'] == 'feat' || feat['type'] == 'magic_talent') {
 			var is_eligible = true;
 			// feat[requirements] is an array of arrays - each array must return true
 			$.each(feat['requirements'], function(j, requirements) {
@@ -1063,22 +1063,23 @@ function setFeatList() {
 								for (var i in user_feats) {
 									satisfied = satisfied ? true : user_feats[i]['name'].includes(req[key]);
 								}
-								// feat is classified as 'magic' if it requires arcane blood
-								if (req[key] == "Arcane Blood") {
-									feat['magic'] = true;
-								}
 								break;
 							case 'training':
 								for (var i in user_trainings) {
 									satisfied = satisfied ? true : user_trainings[i]['name'].includes(req[key]);
 								}
-								// feat is classified as 'magic' if it requires a school training
-								if (req[key] == "Ka" || req[key] == "Avani" || req[key] == "Nouse" || req[key] == "Soma") {
-									feat['magic'] = true;
-								}
 								break;
 							case 'character_creation':
 								satisfied = characterCreation;
+								break;
+							case 'governing':
+								// get user's governing magic school value
+								for (var i in user_trainings) {
+									if (user_trainings[i]['governing_school'] == 1) {
+										// TODO need to update user_trainings on the fly when allocating points
+										satisfied = satisfied ? true : user_trainings[i]['value'] >= req[key];
+									}
+								}
 								break;
 							default: // skill
 								satisfied = satisfied ? true : user[key] >= req[key];
@@ -1090,64 +1091,6 @@ function setFeatList() {
 				is_eligible = !is_eligible ? false : satisfied;
 			});
 			if (is_eligible && !eligible_feats.includes(feat)) {
-				// check for special circumstances
-				// master of magic - need to be trained in 2 schools
-				if (feat['name'] == "Master of Magic") {
-					var schoolCount = 0;
-					// var schools = ["Ka", "Avani", "Nouse", "Soma"];
-					for (var i in user_trainings) {
-						if (user_trainings[i]['magic_school'] == 1) {
-							schoolCount += 1;
-						}
-					}
-					if (schoolCount < 2) {
-						feat['satisfied'] = false;
-						ineligible_feats.push(feat);
-						return;
-					}
-				}
-				// shapeshifter - avani or soma needs to be governing school
-				if (feat['name'] == "Shapeshifter") {
-					var governing = false;
-					for (var i in user_trainings) {
-						if ((user_trainings[i]['name'] == "Avani" || user_trainings[i]['name'] == "Soma") && user_trainings[i]['governing_school'] == 1) {
-							governing = true;
-						}
-					}
-					if (!governing) {
-						feat['satisfied'] = false;
-						ineligible_feats.push(feat);
-						return;
-					}
-				}
-				// time lord - need +4 in all school
-				if (feat['name'] == "Time Lord") {
-					var valuesSatisfied = true;
-					for (var i in user_trainings) {
-						if (user_trainings[i]['magic_school'] == 1 && user_trainings[i]['value'] < 4) {
-							valuesSatisfied = false;
-						}
-					}
-					if (!valuesSatisfied) {
-						feat['satisfied'] = false;
-						ineligible_feats.push(feat);
-						return;
-					}
-				}
-				// lord of the damned - need +6 in all schools
-				if (feat['name'] == "Lord of the Damned") {
-					var valuesSatisfied = true;
-					for (var i in user_trainings) {
-						if (user_trainings[i]['magic_school'] == 1 && user_trainings[i]['value'] < 6) {
-							valuesSatisfied = false;
-						}
-					}
-					if (!valuesSatisfied) {
-						feat['satisfied'] = false;
-						ineligible_feats.push(feat);
-						return;
-					}
-				}
 				feat['satisfied'] = true;
 				eligible_feats.push(feat);
 			} else if (!ineligible_feats.includes(feat)) {
@@ -1161,7 +1104,7 @@ function setFeatList() {
 	var standard_list1 = [];
 	var magic_list1 = [];
 	for (var i in eligible_feats) {
-		if (eligible_feats[i]['magic'] == true) {
+		if (eligible_feats[i]['type'] == 'magic_talent') {
 			magic_list1.push(eligible_feats[i]['name']);
 		} else {
 			standard_list1.push(eligible_feats[i]['name']);
@@ -1172,7 +1115,7 @@ function setFeatList() {
 	var standard_list2 = [];
 	var magic_list2 = [];
 	for (var i in ineligible_feats) {
-		if (ineligible_feats[i]['magic'] == true) {
+		if (ineligible_feats[i]['type'] == 'magic_talent') {
 			magic_list2.push(ineligible_feats[i]['name']);
 		} else {
 			standard_list2.push(ineligible_feats[i]['name']);
@@ -1280,8 +1223,33 @@ function featSelectFunction(ui) {
 				for (var j in feat_list[i]['requirements']) {
 					for (var k in feat_list[i]['requirements'][j]) {
 						for (var key in feat_list[i]['requirements'][j][k]) {
+							// key types : feat, training, character_creation, governing, or attribute
+							// adjust labels for requirements
+							var item = key;
+							var req = feat_list[i]['requirements'][j][k][key];
+							item = capitalize(item);
+							item = item == "Precision_" ? "Precision" : item;
+							item = item == "Governing" ? "Governing School" : item;
+							var attributes = [
+								'governing',
+								'strength',
+								'fortitude',
+								'speed',
+								'agility',
+								'precision_',
+								'awareness',
+								'allure',
+								'deception',
+								'intellect',
+								'innovation',
+								'intuition',
+								'vitality'
+							];
+							if (attributes.includes(key)) {
+								req = "+"+req;
+							}
 							requirements += key == "character_creation" ? "*only available during character creation" : 
-							(key == "precision_" ? "Precision" : capitalize(key)) + " : " + feat_list[i]['requirements'][j][k][key];
+								item + " : " + req;
 						}
 						if (feat_list[i]['requirements'][j].length > 1 && k < feat_list[i]['requirements'][j].length-1) {
 							requirements += " OR ";
@@ -1526,6 +1494,15 @@ function adjustAttribute(attribute, val) {
 			$("#caster_level").val(caster_level);
 			adjustFate();
 			break;
+	}
+	// update user_trainings if attribute is training_x
+	if (attribute.includes("training_")) {
+		var training_id = attribute.split("training_")[1];
+		for (var i in user_trainings) {
+			if (user_trainings[i]['id'] == training_id) {
+				user_trainings[i]['value'] = parseInt(user_trainings[i]['value']) + parseInt(val);
+			}
+		}
 	}
 	// adjust eligibility of feat list
 	setFeatList();

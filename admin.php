@@ -211,7 +211,7 @@
 				$feat['active'] = true;
 			}
 		}
-		if ($feat['type'] == 'feat') {
+		if ($feat['type'] == 'feat' || $feat['type'] == 'magic_talent') {
 			$feat['requirements'] = [];
 			foreach($feat_req_sets as $req_set) {
 				if ($feat['id'] == $req_set['feat_id']) {
@@ -573,6 +573,7 @@
 
 		<select class="form-control section-select" id="section_links">
 			<option value="">Standard Feats</option>
+			<option value="#magical_talents">Magical Talents</option>
 			<option value="#section_physical_trait_pos">Physical Traits (Positive)</option>
 			<option value="#section_physical_trait_neg">Physical Traits (Negative)</option>
 			<option value="#section_social_trait">Social Traits</option>
@@ -689,6 +690,56 @@
 						foreach($feat_list as $feat) {
 							$reqs = "";
 							if ($feat['type'] == 'feat') {
+								// build requirement string
+								foreach($feat['requirements'] as $req_set) {
+									for($i = 0; $i < count($req_set); $i++) {
+										foreach($req_set[$i] as $key => $value) {
+											$reqs .= $i > 0 ? "OR " : "&#8226;";
+											if ($key == "character_creation") {
+												$reqs .= "Character Creation Only"."<br>";
+											} else {
+												$reqs .= str_replace("_", "", ucfirst($key)).": ".$value."<br>";
+											}
+										}
+									}
+								}
+								echo 
+								"<tr class='table-row' id='row_".$feat['id']."'>
+									<td class='center'><input type='checkbox' ".(isset($feat['active']) || $total_count == 0 ? 'checked' : '')." name='feat_status[]' value='".$feat['id']."'></td>
+									<td>".$feat['name']."</td>
+									<td>".$feat['description']."</td>
+									<td>".$reqs."</td>
+									<td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
+								</tr>";
+							}
+						}
+					?>
+				</table>
+			</div>
+
+			<div class="title">
+				<h4 class="table-heading" id="magical_talents">Magical Talents</h4>
+				<label class="toggle-switchy" for="magical_talents_toggle" data-size="sm" data-text="false">
+					<input checked type="checkbox" id="magical_talents_toggle" checked onclick="enable(this, 'magical-talent-check')">
+					<span class="toggle">
+						<span class="switch"></span>
+					</span>
+				</label>
+			</div>
+			<span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('magical_talent')"></span>
+			<div class="panel panel-default">
+				<table class="table" id="physical_trait_pos_table">
+					<tr>
+						<th>Available <input type='checkbox' class="magical-talent-check" checked onclick="checkAll(this, 'magical-talent-check')"></th>
+						<th>Name</th>
+						<th>Description</th>
+						<th>Requirements</th>
+						<th>Edit</th>
+					</tr>
+					<?php
+						foreach($feat_list as $feat) {
+							$reqs = "";
+							if ($feat['type'] == 'magic_talent') {
 								// build requirement string
 								foreach($feat['requirements'] as $req_set) {
 									for($i = 0; $i < count($req_set); $i++) {

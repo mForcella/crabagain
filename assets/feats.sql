@@ -156,60 +156,6 @@ INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (55, 'vitality', 
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (56, 27);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (56, 'character_creation', 'true');
 
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (88, 'Arcane Blood', 'Powerful Magic runs through your veins. You gain the use of Animas Magic as a Talent. You cannot cast other Magic Schools without Training (4 Skill Points). The first School you learn is your Governing School.', 'feat', 4);
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (58, 88);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (58, 'character_creation', 'true');
-
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (89, 'Divine Magic', 'The Gods have bestowed powerful Magic upon you. You gain the use of Animas Magic as a Talent. You cannot cast other Magic Schools without Training (4 Skill Points). You can never Train in more than 1 School, and it must be your deities favored School. You must also choose one Vow to follow in service to your God.', 'feat', 4);
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (59, 89);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (59, 'intuition', 2);
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (60, 89);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (60, 'character_creation', 'true');
-
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (90, 'Elemental Master', 'You may choose 1 type of Elemental Magic when this Talent is taken: Fire, Ice or Electricity. You can cause extreme temperature fluctuations to heat or freeze things, create protective bubbles against hot or cold, and manipulate electricity, creating lightning and force fields or disabling electronic devices. Attacking with this School deals Damage with either fire, cold, or electricity. Flammable objects stay on fire, dealing additional Damage on subsequent rounds. Cold Damage slows a target, Encumbering them. Electrical Damage is Non-lethal, Dazing targets and ignoring any armor that is completely sealed against electricity.', 'feat', 4);
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (61, 90);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (61, 'training', 'Ka');
-
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (91, 'Metal Master', 'You can control the properties of metal, as well as move metal objects with your mind by creating magnetic fields. You can magnetize or demagnetize objects, as well as weaken metal objects, animate metal statues and suits of armor or even transmute one metal into another.', 'feat', 4);
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (62, 91);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (62, 'training', 'Ka');
-
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (92, 'Nature Master', 'You are one with the beasts and the wild places. You may speak with, and sway the disposition of animals, or communicate with the land. You can use this to speak directly with animals or call upon them for help, and even bond your soul with an animal, seeing through them and speaking to them telepathically. You can alter and enhance the properties of plants, creating potions and poisons. You can purify water and even create sustenance from little more than dirt.', 'feat', 4);
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (63, 92);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (63, 'training', 'Avani');
-
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (93, 'Elementalist', 'You have become one with the elements. You may choose one type of Elemental Magic when this Talent is learned: Earth, Water or Air. You can manipulate dirt, mud, and rock, splitting the earth open, raising or shifting stone, animating stone statues or even causing violent earthquakes. You can control the movements of water, raising or lowering water levels, creating waterspouts or waves, fog, rain or snow, and walking on water. You can alter wind patterns and create powerful storms or tornados. When causing earthquakes and gusts of wind, the Agility or Strength DL to remain standing is the same as your roll, as is the Strength check for any non-living structures to remain standing.', 'feat', 4);
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (64, 93);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (64, 'training', 'Avani');
-
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (94, 'Illusionist', 'You are a master at manipulating the senses of others. You can make people see, hear, taste, smell and feel whatever you wish, however, you cannot truly control anyone’s thoughts and desires.', 'feat', 4);
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (65, 94);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (65, 'training', 'Nouse');
-
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (95, 'Psychic', 'You are a master at sensing and reading minds, thoughts, and emotions and projecting your own thoughts and feelings into theirs.', 'feat', 4);
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (66, 95);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (66, 'training', 'Nouse');
-
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (96, 'Ensi', 'Your mind is merely an extension of your body and you can move, bend and break objects or people using only your willpower.', 'feat', 4);
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (67, 96);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (67, 'training', 'Nouse');
-
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (97, 'Seer', 'Your mind is untethered by time – You can even see into the past and futures of yourself and others, catching brief glimpses of what may come to pass, within seconds or even years. The future is not set, and this will only give you hints about what may come to pass if certain actions are taken.', 'feat', 4);
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (68, 97);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (68, 'training', 'Nouse');
-
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (98, 'Healer', 'You know how to manipulate the very fabric of the human body. You can Heal yourself and others, neutralize poison, ignore Wound penalties, and fight disease. The DL for neutralizing Poison and Disease is equal to the DL to resist. For Healing, Soma replaces the Natural Healing roll, and the character may roll immediately for themselves or others without Rest.', 'feat', 4);
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (69, 98);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (69, 'training', 'Soma');
-
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (99, 'Tormentor', 'You know how to cause pain, burst blood vessels, and rupture organs with little more than a touch. This Damage is always against a Toughness of 0 plus or minus Scale Modifiers only, and bypasses all Armor as long as skin can be touched.', 'feat', 4);
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (70, 99);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (70, 'training', 'Soma');
-
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (100, 'Superhuman', 'You can accomplish incredible, physical feats with your body. Choose 2 Major Physical Attributes when this Talent is taken (i.e. Power & Dexterity, OR Dexterity & Perception). You can greatly increase your strength, speed, and abilities or alter your perception, to see, hear, smell, and taste things beyond normal human perception.', 'feat', 4);
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (71, 100);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (71, 'training', 'Soma');
-
 INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (101, 'Martial Arts', 'You have trained extensively in hand-to-hand combat and can more effectively attack and defend while Unarmed. You no longer suffer Quick Action penalties on Unarmed attacks and treat all Disarm attempts as Quick Actions and may attempt Knockdowns in conjunction with any other attack without spending an additional Quick Action. You may also apply half your Brawl bonus to Dodge. If you also have Dual Weapon Master and are Unarmed or using light weapons you reduce your Free Action Attack and Riposte penalties by 2.', 'feat', 4);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (72, 101);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (72, 'agility', 2);
@@ -244,7 +190,65 @@ INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'f
 SET @feat_id := @feat_id + 1;
 SET @feat_set_id := @feat_set_id + 1;
 
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Magic Adept', 'You have honed your casting abilities beyond most. You may ready spells as a Quick Action and increase your Standard Action Ready Bonus to +3. Additionally, if you cast a Standard Action spell as a Full Round Action you may also apply your +3 Bonus to your Caster Level for the sake of determining Fatigue. This latter ability only applies to Governing and Companion Magic.', 'feat', 4);
+
+-- MAGICAL TALENTS --
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (88, 'Arcane Blood', 'Powerful Magic runs through your veins. You gain the use of Animas Magic as a Talent. You cannot cast other Magic Schools without Training (4 Skill Points). The first School you learn is your Governing School.', 'feat', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (58, 88);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (58, 'character_creation', 'true');
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (89, 'Divine Magic', 'The Gods have bestowed powerful Magic upon you. You gain the use of Animas Magic as a Talent. You cannot cast other Magic Schools without Training (4 Skill Points). You can never Train in more than 1 School, and it must be your deities favored School. You must also choose one Vow to follow in service to your God.', 'feat', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (59, 89);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (59, 'intuition', 2);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (60, 89);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (60, 'character_creation', 'true');
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (90, 'Elemental Master', 'You may choose 1 type of Elemental Magic when this Talent is taken: Fire, Ice or Electricity. You can cause extreme temperature fluctuations to heat or freeze things, create protective bubbles against hot or cold, and manipulate electricity, creating lightning and force fields or disabling electronic devices. Attacking with this School deals Damage with either fire, cold, or electricity. Flammable objects stay on fire, dealing additional Damage on subsequent rounds. Cold Damage slows a target, Encumbering them. Electrical Damage is Non-lethal, Dazing targets and ignoring any armor that is completely sealed against electricity.', 'magic_talent', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (61, 90);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (61, 'training', 'Ka');
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (91, 'Metal Master', 'You can control the properties of metal, as well as move metal objects with your mind by creating magnetic fields. You can magnetize or demagnetize objects, as well as weaken metal objects, animate metal statues and suits of armor or even transmute one metal into another.', 'magic_talent', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (62, 91);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (62, 'training', 'Ka');
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (92, 'Nature Master', 'You are one with the beasts and the wild places. You may speak with, and sway the disposition of animals, or communicate with the land. You can use this to speak directly with animals or call upon them for help, and even bond your soul with an animal, seeing through them and speaking to them telepathically. You can alter and enhance the properties of plants, creating potions and poisons. You can purify water and even create sustenance from little more than dirt.', 'magic_talent', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (63, 92);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (63, 'training', 'Avani');
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (93, 'Elementalist', 'You have become one with the elements. You may choose one type of Elemental Magic when this Talent is learned: Earth, Water or Air. You can manipulate dirt, mud, and rock, splitting the earth open, raising or shifting stone, animating stone statues or even causing violent earthquakes. You can control the movements of water, raising or lowering water levels, creating waterspouts or waves, fog, rain or snow, and walking on water. You can alter wind patterns and create powerful storms or tornados. When causing earthquakes and gusts of wind, the Agility or Strength DL to remain standing is the same as your roll, as is the Strength check for any non-living structures to remain standing.', 'magic_talent', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (64, 93);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (64, 'training', 'Avani');
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (94, 'Illusionist', 'You are a master at manipulating the senses of others. You can make people see, hear, taste, smell and feel whatever you wish, however, you cannot truly control anyone’s thoughts and desires.', 'magic_talent', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (65, 94);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (65, 'training', 'Nouse');
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (95, 'Psychic', 'You are a master at sensing and reading minds, thoughts, and emotions and projecting your own thoughts and feelings into theirs.', 'magic_talent', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (66, 95);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (66, 'training', 'Nouse');
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (96, 'Ensi', 'Your mind is merely an extension of your body and you can move, bend and break objects or people using only your willpower.', 'magic_talent', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (67, 96);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (67, 'training', 'Nouse');
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (97, 'Seer', 'Your mind is untethered by time – You can even see into the past and futures of yourself and others, catching brief glimpses of what may come to pass, within seconds or even years. The future is not set, and this will only give you hints about what may come to pass if certain actions are taken.', 'magic_talent', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (68, 97);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (68, 'training', 'Nouse');
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (98, 'Healer', 'You know how to manipulate the very fabric of the human body. You can Heal yourself and others, neutralize poison, ignore Wound penalties, and fight disease. The DL for neutralizing Poison and Disease is equal to the DL to resist. For Healing, Soma replaces the Natural Healing roll, and the character may roll immediately for themselves or others without Rest.', 'magic_talent', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (69, 98);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (69, 'training', 'Soma');
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (99, 'Tormentor', 'You know how to cause pain, burst blood vessels, and rupture organs with little more than a touch. This Damage is always against a Toughness of 0 plus or minus Scale Modifiers only, and bypasses all Armor as long as skin can be touched.', 'magic_talent', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (70, 99);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (70, 'training', 'Soma');
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (100, 'Superhuman', 'You can accomplish incredible, physical feats with your body. Choose 2 Major Physical Attributes when this Talent is taken (i.e. Power & Dexterity, OR Dexterity & Perception). You can greatly increase your strength, speed, and abilities or alter your perception, to see, hear, smell, and taste things beyond normal human perception.', 'magic_talent', 4);
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (71, 100);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (71, 'training', 'Soma');
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Magic Adept', 'You have honed your casting abilities beyond most. You may ready spells as a Quick Action and increase your Standard Action Ready Bonus to +3. Additionally, if you cast a Standard Action spell as a Full Round Action you may also apply your +3 Bonus to your Caster Level for the sake of determining Fatigue. This latter ability only applies to Governing and Companion Magic.', 'magic_talent', 4);
+SET @feat_id := (SELECT id FROM feat_or_trait WHERE name = 'Magic Adept');
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'vitality', 2);
 SET @feat_set_id := @feat_set_id + 1;
@@ -259,25 +263,19 @@ INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'f
 SET @feat_id := @feat_id + 1;
 SET @feat_set_id := @feat_set_id + 1;
 
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Master of Magic', 'There are few as good as you when it comes to slinging spells from your Governing School. You may now cast Magic from your Governing School as a Quick Action once per Encounter, and no longer need to roll to cast Cantrips. Additionally, you no longer suffer Reaction Check penalties for your School. If you also have Lightning Reflexes, you automatically win React Checks when using Magic, as long as your opponent does not also have Lightning Reflexes.', 'feat', 4);
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Master of Magic', 'There are few as good as you when it comes to slinging spells from your Governing School. You may now cast Magic from your Governing School as a Quick Action once per Encounter, and no longer need to roll to cast Cantrips. Additionally, you no longer suffer Reaction Check penalties for your School. If you also have Lightning Reflexes, you automatically win React Checks when using Magic, as long as your opponent does not also have Lightning Reflexes.', 'magic_talent', 4);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'vitality', 6);
 SET @feat_set_id := @feat_set_id + 1;
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Ka');
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Avani');
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Nouse');
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Soma');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'governing', 2);
 SET @feat_set_id := @feat_set_id + 1;
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'feat', 'Magic Adept');
--- SET @feat_set_id := @feat_set_id + 1;
--- INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
--- INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'note', 'Must be trained in 2 Magic Schools');
 SET @feat_id := @feat_id + 1;
 SET @feat_set_id := @feat_set_id + 1;
 
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Time Lord', 'You have gained control over spacetime. You can slow or halt the flow of time, open portals to other places, or travel forward or back in time. DLs begin at 10 for teleporting small objects short distances, slowing time enough to enhance your Defense and Reaction Checks, or traveling backward or forward in time a few seconds. Stopping time completely for a full Round or traveling forward or back in time more than a decade would start at DL 30. This is considered a Talent for purposes of Fatigue (i.e. you are not Fatigued for casting at or below your Caster Level).', 'feat', 4);
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Time Lord', 'You have gained control over spacetime. You can slow or halt the flow of time, open portals to other places, or travel forward or back in time. DLs begin at 10 for teleporting small objects short distances, slowing time enough to enhance your Defense and Reaction Checks, or traveling backward or forward in time a few seconds. Stopping time completely for a full Round or traveling forward or back in time more than a decade would start at DL 30. This is considered a Talent for purposes of Fatigue (i.e. you are not Fatigued for casting at or below your Caster Level).', 'magic_talent', 4);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'vitality', 8);
 SET @feat_set_id := @feat_set_id + 1;
@@ -285,32 +283,30 @@ INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'feat', 'Master of Magic');
 SET @feat_set_id := @feat_set_id + 1;
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Avani');
-SET @feat_set_id := @feat_set_id + 1;
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Soma');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'governing', 6);
 SET @feat_set_id := @feat_set_id + 1;
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Ka');
-SET @feat_set_id := @feat_set_id + 1;
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Nouse');
--- SET @feat_set_id := @feat_set_id + 1;
--- INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
--- INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'note', '+4 required in all Schools');
 SET @feat_id := @feat_id + 1;
 SET @feat_set_id := @feat_set_id + 1;
 
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Blood Magic', 'You have honed your suffering into a source of power. Instead of taking a Level of Fatigue, you may instead inflict 1 Damage to your Resilience. You may do this any number of times, but the Damage you suffer must increase by 1 for each additional spell beyond the first. So, after your first spell, you would have to deal 2 Damage, then 3 Damage for the third, and so on.', 'feat', 4);
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Blood Magic', 'You have honed your suffering into a source of power. Instead of taking a Level of Fatigue, you may instead inflict 1 Damage to your Resilience. You may do this any number of times, but the Damage you suffer must increase by 1 for each additional spell beyond the first. So, after your first spell, you would have to deal 2 Damage, then 3 Damage for the third, and so on.', 'magic_talent', 4);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'vitality', 2);
 SET @feat_set_id := @feat_set_id + 1;
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'feat', 'Arcane Blood');
+SET @feat_set_id := @feat_set_id + 1;
+INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Ka');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Avani');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Nouse');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Soma');
 SET @feat_id := @feat_id + 1;
 SET @feat_set_id := @feat_set_id + 1;
 
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Enchanter', 'You have learned how to manipulate magical energies in order to alter the properties of a non-living object for extended periods. The time an Enchantment lasts starts at 1 Minute and is multiplied by 5 for each Enchantment Level above 1. Permanently Enchanting an object requires a Soul of the recently deceased. This must be from either a person or a magical beast. If a beast is used, their Combat Level is the maximum DL of the effect that can be Enchanted. Multiple souls are cumulative. A humanoid soul is always equal to DL 26, or DL 34 for Magic Users. Permanent Enchanting requires 1 hour and always Fatigues you 1 Level. You must have a Talent in all effects you want to Enchant. The Enchantment Level is also used to determine basic costs when selling or buying Enchanted weapons (See Weapons in Character Creation).', 'feat', 4);
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Enchanter', 'You have learned how to manipulate magical energies in order to alter the properties of a non-living object for extended periods. The time an Enchantment lasts starts at 1 Minute and is multiplied by 5 for each Enchantment Level above 1. Permanently Enchanting an object requires a Soul of the recently deceased. This must be from either a person or a magical beast. If a beast is used, their Combat Level is the maximum DL of the effect that can be Enchanted. Multiple souls are cumulative. A humanoid soul is always equal to DL 26, or DL 34 for Magic Users. Permanent Enchanting requires 1 hour and always Fatigues you 1 Level. You must have a Talent in all effects you want to Enchant. The Enchantment Level is also used to determine basic costs when selling or buying Enchanted weapons (See Weapons in Character Creation).', 'magic_talent', 4);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'vitality', 4);
 SET @feat_set_id := @feat_set_id + 1;
@@ -322,7 +318,7 @@ INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 't
 SET @feat_id := @feat_id + 1;
 SET @feat_set_id := @feat_set_id + 1;
 
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Necromancer', 'You have learned how to manipulate magical energies in order to communicate with and control the dead. Communication DLs are based on the length of time the body has been dead, starting at DL 6 for someone that died within a few minutes. The DL for animating the dead is equal to the Level of the target during life +10. You may animate multiple beings with a single spell, but Levels are cumulative. This automatically Fatigues you, and you remain Fatigued for as long as you keep any beings animated. They will cease being animated when you end the spell. Permanently animating a body requires a Soul. Permanent animation requires 1 hour, and allows the Undead to operate independently of you, though they will always obey your most recent commands. Undead possess the abilities they had in life, suffer no penalties for Wounds, and are Immune to Critical Hits, disease and poison. Cold Damage deals no Damage but still Encumbers them 1 Level per Wound inflicted. Electric Damage deals no Damage but still Dazes them once per Wound inflicted.', 'feat', 4);
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Necromancer', 'You have learned how to manipulate magical energies in order to communicate with and control the dead. Communication DLs are based on the length of time the body has been dead, starting at DL 6 for someone that died within a few minutes. The DL for animating the dead is equal to the Level of the target during life +10. You may animate multiple beings with a single spell, but Levels are cumulative. This automatically Fatigues you, and you remain Fatigued for as long as you keep any beings animated. They will cease being animated when you end the spell. Permanently animating a body requires a Soul. Permanent animation requires 1 hour, and allows the Undead to operate independently of you, though they will always obey your most recent commands. Undead possess the abilities they had in life, suffer no penalties for Wounds, and are Immune to Critical Hits, disease and poison. Cold Damage deals no Damage but still Encumbers them 1 Level per Wound inflicted. Electric Damage deals no Damage but still Dazes them once per Wound inflicted.', 'magic_talent', 4);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'vitality', 4);
 SET @feat_set_id := @feat_set_id + 1;
@@ -330,14 +326,11 @@ INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'feat', 'Blood Magic');
 SET @feat_set_id := @feat_set_id + 1;
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Ka');
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Avani');
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Nouse');
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Soma');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'governing', 1);
 SET @feat_id := @feat_id + 1;
 SET @feat_set_id := @feat_set_id + 1;
 
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Lord of the Damned', 'You have achieved an ageless state of near immortality. You no longer age, you require no food, water or sleep; you suffer no penalties for being injured and are immune to critical hits, disease and poison. You can never be instantly slain and can only die from failing a Death Save. There is no limit to how much you can Heal from a Natural Healing or Soma roll. You still suffer Fatigue from Encumbrance and Casting only. Cold Damage deals no Damage but still Encumbers you 1 Level per Wound inflicted. Electric Damage deals no Damage but still Dazes you once per Wound inflicted. No roll is needed to become a Lich, but you must have the Soul of another human Caster and complete a 1-hour ceremony. To do this, you must remove your own Soul and place it in an external receptacle, which if destroyed, instantly slays you. Even if your body dies, your soul will remain intact within your receptacle.', 'feat', 4);
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Lord of the Damned', 'You have achieved an ageless state of near immortality. You no longer age, you require no food, water or sleep; you suffer no penalties for being injured and are immune to critical hits, disease and poison. You can never be instantly slain and can only die from failing a Death Save. There is no limit to how much you can Heal from a Natural Healing or Soma roll. You still suffer Fatigue from Encumbrance and Casting only. Cold Damage deals no Damage but still Encumbers you 1 Level per Wound inflicted. Electric Damage deals no Damage but still Dazes you once per Wound inflicted. No roll is needed to become a Lich, but you must have the Soul of another human Caster and complete a 1-hour ceremony. To do this, you must remove your own Soul and place it in an external receptacle, which if destroyed, instantly slays you. Even if your body dies, your soul will remain intact within your receptacle.', 'magic_talent', 4);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'vitality', 8);
 SET @feat_set_id := @feat_set_id + 1;
@@ -348,23 +341,11 @@ INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'feat', 'Master of Magic');
 SET @feat_set_id := @feat_set_id + 1;
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Avani');
-SET @feat_set_id := @feat_set_id + 1;
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Soma');
-SET @feat_set_id := @feat_set_id + 1;
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Ka');
-SET @feat_set_id := @feat_set_id + 1;
-INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
-INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Nouse');
--- SET @feat_set_id := @feat_set_id + 1;
--- INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
--- INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'note', '+6 required in all Schools');
+INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'governing', 8);
 SET @feat_id := @feat_id + 1;
 SET @feat_set_id := @feat_set_id + 1;
 
-INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Shapeshifter', 'You have gained incredible power over the expression of your own DNA. When this is learned, you may choose 1 Normal Animal, which you may Shapeshift into. You can change from human to animal and back again once per Session without Fatigue, and each time thereafter you suffer cumulative Fatigue. You can stay in Animal form for as long as you like and take on the Animal’s normal Physical Stats. This Talent costs 4 Skill Points plus 1 SP/Level of the Animal. You cannot Shapeshift above Giant Scale but may still choose larger Scale Animals to transform into at Giant Scale. This will alter the Animal’s Scale Modifiers appropriately (i.e. reducing Strength and Fortitude and increasing Defense). You may learn this as many times as you like for different Animals.', 'feat', 4);
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Shapeshifter', 'You have gained incredible power over the expression of your own DNA. When this is learned, you may choose 1 Normal Animal, which you may Shapeshift into. You can change from human to animal and back again once per Session without Fatigue, and each time thereafter you suffer cumulative Fatigue. You can stay in Animal form for as long as you like and take on the Animal’s normal Physical Stats. This Talent costs 4 Skill Points plus 1 SP/Level of the Animal. You cannot Shapeshift above Giant Scale but may still choose larger Scale Animals to transform into at Giant Scale. This will alter the Animal’s Scale Modifiers appropriately (i.e. reducing Strength and Fortitude and increasing Defense). You may learn this as many times as you like for different Animals.', 'magic_talent', 4);
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'vitality', 4);
 SET @feat_set_id := @feat_set_id + 1;
@@ -373,9 +354,6 @@ INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 't
 SET @feat_set_id := @feat_set_id + 1;
 INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
 INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'training', 'Soma');
--- SET @feat_set_id := @feat_set_id + 1;
--- INSERT INTO feat_or_trait_req_set (id, feat_id) VALUES (@feat_set_id, @feat_id);
--- INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 'note', 'Avani or Soma must be Governing School');
 SET @feat_id := @feat_id + 1;
 SET @feat_set_id := @feat_set_id + 1;
 
