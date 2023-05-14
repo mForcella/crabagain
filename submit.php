@@ -12,7 +12,7 @@
 	  	die("Connection failed: " . $db->connect_error);
 	}
 
-	$user_columns = ['campaign_id', 'email', 'character_name', 'attribute_pts', 'xp', 'caster_level', 'morale', 'race', 'height', 'weight', 'age', 'eyes', 'hair', 'gender', 'other', 'size', 'strength', 'fortitude', 'speed', 'agility', 'precision_', 'awareness', 'allure', 'deception', 'intellect', 'innovation', 'intuition', 'vitality', 'background', 'move_penalty', 'magic', 'fear', 'poison', 'disease', 'damage', 'wounds', 'wound_penalty', 'fatigue', 'weapon_1', 'weapon_2', 'weapon_3', 'motivator_1', 'motivator_2', 'motivator_3', 'motivator_4', 'motivator_1_pts', 'motivator_2_pts', 'motivator_3_pts', 'motivator_4_pts'];
+	$user_columns = ['campaign_id', 'email', 'character_name', 'attribute_pts', 'xp', 'morale', 'race', 'height', 'weight', 'age', 'eyes', 'hair', 'gender', 'other', 'size', 'strength', 'fortitude', 'speed', 'agility', 'precision_', 'awareness', 'allure', 'deception', 'intellect', 'innovation', 'intuition', 'vitality', 'background', 'move_penalty', 'magic', 'fear', 'poison', 'disease', 'damage', 'wounds', 'wound_penalty', 'fatigue', 'motivator_1', 'motivator_2', 'motivator_3', 'motivator_4', 'motivator_1_pts', 'motivator_2_pts', 'motivator_3_pts', 'motivator_4_pts'];
 
 	// new or existing character?
 	if ($_POST['user_id'] != null) {
@@ -186,6 +186,19 @@
 		$sql = "DELETE FROM user_weapon WHERE user_id = " . $user_id . " AND id NOT IN ('" . implode("','", $ids) . "')";
 		$db->query($sql);
 
+		// get 'equipped' count for weapons
+		$equipped_1 = $_POST['weapon_1'];
+		$equipped_2 = $_POST['weapon_2'];
+		$equipped_3 = $_POST['weapon_3'];
+		$weapon_equipped = [];
+		for ($i = 0; $i < count($weapons); $i++) {
+			$equipped = 0;
+			$equipped += $weapons[$i] == $equipped_1 ? 1 : 0;
+			$equipped += $weapons[$i] == $equipped_2 ? 1 : 0;
+			$equipped += $weapons[$i] == $equipped_3 ? 1 : 0;
+			$weapon_equipped[$i] = $equipped;
+		}
+
 		for ($i = 0; $i < count($weapons); $i++) {
 			$weapon_damage[$i] = empty($weapon_damage[$i]) ? "NULL" : $weapon_damage[$i];
 			$weapon_max_damage[$i] = empty($weapon_max_damage[$i]) ? "NULL" : $weapon_max_damage[$i];
@@ -195,9 +208,9 @@
 
 			// update where ID not empty; insert new where ID empty
 			if ($ids[$i] == "") {
-				$sql = "INSERT INTO user_weapon (name, type, quantity, damage, max_damage, range_, rof, defend, crit, notes, weight, user_id) VALUES ('".addslashes($weapons[$i])."', '".$weapon_type[$i]."', '".addslashes($weapon_qty[$i])."', ".$weapon_damage[$i].", ".$weapon_max_damage[$i].", ".$weapon_range[$i].", '".addslashes($weapon_rof[$i])."', ".$weapon_defend[$i].", ".$weapon_crit[$i].", '".addslashes($weapon_notes[$i])."', ".$weapon_weight[$i].", '".$user_id."')";
+				$sql = "INSERT INTO user_weapon (name, type, quantity, equipped, damage, max_damage, range_, rof, defend, crit, notes, weight, user_id) VALUES ('".addslashes($weapons[$i])."', '".$weapon_type[$i]."', '".addslashes($weapon_qty[$i])."', '".addslashes($weapon_equipped[$i])."', ".$weapon_damage[$i].", ".$weapon_max_damage[$i].", ".$weapon_range[$i].", '".addslashes($weapon_rof[$i])."', ".$weapon_defend[$i].", ".$weapon_crit[$i].", '".addslashes($weapon_notes[$i])."', ".$weapon_weight[$i].", '".$user_id."')";
 			} else {
-				$sql = "UPDATE user_weapon SET name = '".addslashes($weapons[$i])."', type = '".$weapon_type[$i]."', quantity = '".addslashes($weapon_qty[$i])."', damage = ".$weapon_damage[$i].", max_damage = ".$weapon_max_damage[$i].", range_ = ".$weapon_range[$i].", rof = '".addslashes($weapon_rof[$i])."', defend = ".$weapon_defend[$i].", crit = ".$weapon_crit[$i].", notes = '".addslashes($weapon_notes[$i])."', weight = ".$weapon_weight[$i]." WHERE id = ".$ids[$i];
+				$sql = "UPDATE user_weapon SET name = '".addslashes($weapons[$i])."', type = '".$weapon_type[$i]."', quantity = '".addslashes($weapon_qty[$i])."', equipped = '".addslashes($weapon_equipped[$i])."', damage = ".$weapon_damage[$i].", max_damage = ".$weapon_max_damage[$i].", range_ = ".$weapon_range[$i].", rof = '".addslashes($weapon_rof[$i])."', defend = ".$weapon_defend[$i].", crit = ".$weapon_crit[$i].", notes = '".addslashes($weapon_notes[$i])."', weight = ".$weapon_weight[$i]." WHERE id = ".$ids[$i];
 			}
 			$db->query($sql);
 		}

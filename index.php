@@ -485,7 +485,7 @@
 											<option></option>
 											<?php 
 												foreach ($weapons as $weapon) {
-													echo '<option value="'.$weapon['name'].'" '.($user['weapon_1'] == $weapon['name'] ? 'selected' : '').'>'.$weapon['name'].'</option>';
+													echo '<option value="'.$weapon['name'].'">'.$weapon['name'].'</option>';
 												}
 											?>
 										</select>
@@ -527,7 +527,7 @@
 											<option></option>
 											<?php 
 												foreach ($weapons as $weapon) {
-													echo '<option value="'.$weapon['name'].'" '.($user['weapon_2'] == $weapon['name'] ? 'selected' : '').'>'.$weapon['name'].'</option>';
+													echo '<option value="'.$weapon['name'].'">'.$weapon['name'].'</option>';
 												}
 											?>
 										</select>
@@ -569,7 +569,7 @@
 											<option></option>
 											<?php 
 												foreach ($weapons as $weapon) {
-													echo '<option value="'.$weapon['name'].'" '.($user['weapon_3'] == $weapon['name'] ? 'selected' : '').'>'.$weapon['name'].'</option>';
+													echo '<option value="'.$weapon['name'].'">'.$weapon['name'].'</option>';
 												}
 											?>
 										</select>
@@ -2265,9 +2265,19 @@
 		weapons = <?php echo json_encode($weapons); ?>;
 		for (var i in weapons) {
 			addWeaponElements(weapons[i]['type'], weapons[i]['name'], weapons[i]['quantity'], weapons[i]['damage'], weapons[i]['max_damage'], weapons[i]['range_'], weapons[i]['rof'], weapons[i]['defend'], weapons[i]['crit'], weapons[i]['notes'], weapons[i]['weight'], weapons[i]['id']);
+			// look for equipped weapons
+			if (weapons[i]['equipped'] > 0) {
+				var j = 0;
+				$(".weapon-select").each(function() {
+					if ($(this).val() == "" && weapons[i]['equipped'] > j) {
+						$(this).val(weapons[i]['name']);
+						j++;
+					}
+				});
+			}
 		}
 		// trigger select weapon functions to update inputs and defend value
-		$(".weapon-select").each(function(){
+		$(".weapon-select").each(function() {
 			if ($(this).val() != '') {
 				$(this).trigger("change");
 				var name_val = $(this).attr("name");

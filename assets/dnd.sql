@@ -156,6 +156,7 @@
     crit int,
     notes varchar(255),
     weight float,
+    equipped int,
     user_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES user(id)

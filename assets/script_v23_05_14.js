@@ -434,22 +434,24 @@ function toggleMenu() {
 
 // select a weapon from the dropdown
 function selectWeapon(id) {
-	var selected = $("#weapon_select_"+id).val();
+	let selected = $("#weapon_select_"+id).val();
 	// make sure the weapon isn't already selected
 	var duplicate = false;
 	// if weapon quantity is > 1, allow multiple selections
 	$.each(weapons, function(i, weapon) {
 		var count = 0;
-		var qty = isNaN(weapon['quantity']) ? 1 : weapon['quantity'];
-		$(".weapon-select").each(function() {
-			if (this.id != "weapon_select_"+id && selected == $(this).val() && selected != "") {
-				count += 1;
-			}
-			if (count >= qty) {
-				$("#weapon_select_"+id).val("");
-				duplicate = true;
-			}
-		});
+		let qty = isNaN(weapon['quantity']) ? 1 : weapon['quantity'];
+		if (weapon['name'] == selected) {
+			$(".weapon-select").each(function() {
+				if (this.id != "weapon_select_"+id && selected == $(this).val()) {
+					count += 1;
+					if (count >= qty) {
+						$("#weapon_select_"+id).val("");
+						duplicate = true;
+					}
+				}
+			});
+		}
 	});
 	if (!duplicate && selected != "") {
 		for (var i in weapons) {
