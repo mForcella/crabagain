@@ -118,6 +118,7 @@
 
 	$feats = [];
 	$trainings = [];
+	$user_motivators = [];
 	$weapons = [];
 	$protections = [];
 	$healings = [];
@@ -157,6 +158,14 @@
 	    	if ($result) {
 		    	while($row = $result->fetch_assoc()) {
 		    		array_push($trainings, $row);
+		    	}
+	    	}
+	    	// get user motivators
+	    	$sql = "SELECT * FROM user_motivator WHERE user_id = ".$_GET["user"];
+	    	$result = $db->query($sql);
+	    	if ($result) {
+		    	while($row = $result->fetch_assoc()) {
+		    		array_push($user_motivators, $row);
 		    	}
 	    	}
 	    	// get user weapons
@@ -1169,21 +1178,18 @@
 						<div class="form-group motivator-bonus">
 							<label for="bonuses">Bonuses:</label>
 							<?php
-								// get 3 highest motivator values
 								if (isset($user)) {
-									$motivators = [];
-									array_push($motivators, $user['motivator_1_pts'] == '' ? 0 : $user['motivator_1_pts']);
-									array_push($motivators, $user['motivator_2_pts'] == '' ? 0 : $user['motivator_2_pts']);
-									array_push($motivators, $user['motivator_3_pts'] == '' ? 0 : $user['motivator_3_pts']);
-									array_push($motivators, $user['motivator_4_pts'] == '' ? 0 : $user['motivator_4_pts']);
-									arsort($motivators);
-									$total_pts = intval($motivators[0]) + intval($motivators[1]) + intval($motivators[2]);
-									$bonuses = $total_pts >= 64 ? 5 : ($total_pts >= 32 ? 4 : ($total_pts >= 16 ? 3 : ($total_pts >= 8 ? 2 : ($total_pts >= 4 ? 1 : 0))));
+									$m_pts = 0;
+									foreach ($user_motivators as $m) {
+										if ($m['primary_'] == 1) {
+											$m_pts += intval($m['points']);
+										}
+									}
+									$bonuses = $m_pts >= 64 ? 5 : ($m_pts >= 32 ? 4 : ($m_pts >= 16 ? 3 : ($m_pts >= 8 ? 2 : ($m_pts >= 4 ? 1 : 0))));
 								} else {
 									$bonuses = 0;
 								}
-
-								$show_btn = !isset($user) || $user['motivator_1'] == "" || $user['motivator_2'] == "" || $user['motivator_3'] == "";
+								$show_btn = count($user_motivators) == 0;
 							?>
 							<input class="form-control" readonly name="bonuses" id="bonuses" value="<?php echo $bonuses ?>">
 						</div>
@@ -1193,43 +1199,25 @@
 					</div>
 
 					<div id="motivators" <?php echo $show_btn ? 'hidden' : '' ?>>
-						<div class="form-group no-margin">
-							<div class="col-xs-4 no-pad-mobile no-pad-left">
-								<input class="form-control" type="text" name="motivator_1" id="motivator_1" readonly value="<?php echo isset($user) ? $user['motivator_1'] : '' ?>" onclick="editMotivators()">
-							</div>
-							<label class="control-label col-xs-1 no-pad-left align-right font-mobile-small" for="motivator_1_pts">Pts:</label>
-							<div class="col-xs-1 no-pad">
-								<input class="form-control motivator-pts" type="number" name="motivator_1_pts" id="motivator_1_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_1_pts']) : '' ?>">
-							</div>
-
-							<div class="col-xs-4 no-pad-mobile pad-left-mobile">
-								<input class="form-control" type="text" name="motivator_2" id="motivator_2" readonly value="<?php echo isset($user) ? $user['motivator_2'] : '' ?>" onclick="editMotivators()">
-							</div>
-							<label class="control-label col-xs-1 no-pad-left align-right font-mobile-small" for="motivator_2_pts">Pts:</label>
-							<div class="col-xs-1 no-pad">
-								<input class="form-control motivator-pts" type="number" name="motivator_2_pts" id="motivator_2_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_2_pts']) : '' ?>">
-							</div>
-						</div>
 
 						<div class="form-group no-margin">
-							<div class="col-xs-4 no-pad-mobile no-pad-left">
-								<input class="form-control" type="text" name="motivator_3" id="motivator_3" readonly value="<?php echo isset($user) ? $user['motivator_3'] : '' ?>" onclick="editMotivators()">
-							</div>
-							<label class="control-label col-xs-1 no-pad-left align-right font-mobile-small" for="motivator_3_pts">Pts:</label>
-							<div class="col-xs-1 no-pad">
-								<input class="form-control motivator-pts" type="number" name="motivator_3_pts" id="motivator_3_pts" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['motivator_3_pts']) : '' ?>">
-							</div>
-
-							<div class="col-xs-4 no-pad-mobile pad-left-mobile">
-								<input class="form-control" type="text" name="motivator_4" id="motivator_4" readonly value="<?php echo isset($user) ? $user['motivator_4'] : '' ?>" onclick="editMotivators()">
-							</div>
-							<label class="control-label col-xs-1 no-pad-left align-right font-mobile-small" for="motivator_4_pts">Pts:</label>
-							<div class="col-xs-1 no-pad">
-								<input class="form-control motivator-pts" type="number" name="motivator_4_pts" id="motivator_4_pts" min="0" value="<?php echo isset($user) && $user['motivator_4'] != '' ? htmlspecialchars($user['motivator_4_pts']) : '' ?>" <?php echo isset($user) && $user['motivator_4'] == '' ? 'readonly' : '' ?>>
-							</div>
+						<?php
+							for ($i = 0; $i < 4; $i++) {
+								echo $i == 2 ? '</div><div class="form-group no-margin">' : '';
+								echo '<div class="col-xs-4 no-pad-mobile '.($i == 0 || $i == 2 ? 'no-pad-left' : 'pad-left-mobile').'">';
+								echo '<input class="form-control motivator-input" type="text" name="motivators[]" id="motivator_'.$i.'" readonly value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['motivator'] : '') .'">';
+								echo '</div>';
+								echo '<label class="control-label col-xs-1 no-pad-left align-right font-mobile-small" for="motivator_pts_'.$i.'">Pts:</label>';
+								echo '<div class="col-xs-1 no-pad">';
+								echo '<input class="form-control motivator-pts" type="number" name="motivator_pts[]" id="motivator_pts_'.$i.'" min="0" value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['points'] : '') .'">';
+								echo '</div>';
+								echo '<input type="hidden" name="motivator_ids[]" value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['id'] : '') .'">';
+								echo '<input type="hidden" name="motivator_primary[]" value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['primary_'] : '') .'" id="motivator_primary_'.$i.'">';
+							}
+						?>
 						</div>
+
 					</div>
-
 				</div>
 
 			  <!-- motivators modal -->
@@ -2160,6 +2148,7 @@
 		campaign = <?php echo json_encode(isset($campaign) ? $campaign : []); ?>;
 		user = <?php echo json_encode(isset($user) ? $user : []); ?>;
 		xp_awards = <?php echo json_encode(isset($awards) ? $awards : []); ?>;
+		user_motivators = <?php echo json_encode($user_motivators); ?>;
 		setAttributes(user);
 
 		// get feat list and requirements

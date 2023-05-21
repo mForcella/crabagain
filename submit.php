@@ -12,7 +12,8 @@
 	  	die("Connection failed: " . $db->connect_error);
 	}
 
-	$user_columns = ['campaign_id', 'email', 'character_name', 'attribute_pts', 'xp', 'morale', 'race', 'height', 'weight', 'age', 'eyes', 'hair', 'gender', 'other', 'size', 'strength', 'fortitude', 'speed', 'agility', 'precision_', 'awareness', 'allure', 'deception', 'intellect', 'innovation', 'intuition', 'vitality', 'background', 'move_penalty', 'magic', 'fear', 'poison', 'disease', 'damage', 'wounds', 'wound_penalty', 'fatigue', 'motivator_1', 'motivator_2', 'motivator_3', 'motivator_4', 'motivator_1_pts', 'motivator_2_pts', 'motivator_3_pts', 'motivator_4_pts'];
+	$user_columns = ['campaign_id', 'email', 'character_name', 'attribute_pts', 'xp', 'morale', 'race', 'height', 'weight', 'age', 'eyes', 'hair', 'gender', 'other', 'size', 'strength', 'fortitude', 'speed', 'agility', 'precision_', 'awareness', 'allure', 'deception', 'intellect', 'innovation', 'intuition', 'vitality', 'background', 'move_penalty', 'magic', 'fear', 'poison', 'disease', 'damage', 'wounds', 'wound_penalty', 'fatigue'];
+	// TODO should be able to eliminate wounds - calculate from damage
 
 	// new or existing character?
 	if ($_POST['user_id'] != null) {
@@ -79,6 +80,26 @@
 		  	die($error_output);
 		}
 
+	}
+
+	// get user motivators
+	if (isset($_POST['motivators'])) {
+		$motivators = $_POST['motivators'];
+		$motivator_pts = $_POST['motivator_pts'];
+		$motivator_primary = $_POST['motivator_primary'];
+		$ids = $_POST['motivator_ids'];
+
+		// update where ID not empty; insert new where ID empty
+		for ($i = 0; $i < count($motivators); $i++) {
+			if ($motivators[$i] != "") {
+				if ($ids[$i] == "") {
+					$sql = "INSERT INTO user_motivator (motivator, points, primary_, user_id) VALUES ('".$motivators[$i]."', '".$motivator_pts[$i]."', '".$motivator_primary[$i]."', '".$user_id."')";
+				} else {
+					$sql = "UPDATE user_motivator SET motivator = '".$motivators[$i]."', points = '".$motivator_pts[$i]."', primary_ = ".$motivator_primary[$i]." WHERE id = ".$ids[$i];
+				}
+				$db->query($sql);
+			}
+		}
 	}
 
 	// look for new feats

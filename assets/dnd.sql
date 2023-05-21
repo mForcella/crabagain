@@ -203,3 +203,29 @@
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES user(id)
   );
+
+  CREATE TABLE user_motivator (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    user_id int,
+    motivator varchar(64),
+    points int,
+    primary_ bool,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+  );
+
+  -- To create user_motivators from user table
+  -- SET @user_id := 37;
+  -- SET @motivator := (SELECT motivator_1 FROM user WHERE id = @user_id LIMIT 0, 1);
+  -- SET @pts := (SELECT motivator_1_pts FROM user WHERE id = @user_id LIMIT 0, 1);
+  -- insert into user_motivator (user_id,motivator,points,primary_) values(@user_id,@motivator,@pts,1);
+  -- SET @motivator := (SELECT motivator_2 FROM user WHERE id = @user_id LIMIT 0, 1);
+  -- SET @pts := (SELECT motivator_2_pts FROM user WHERE id = @user_id LIMIT 0, 1);
+  -- insert into user_motivator (user_id,motivator,points,primary_) values(@user_id,@motivator,@pts,1);
+  -- SET @motivator := (SELECT motivator_3 FROM user WHERE id = @user_id LIMIT 0, 1);
+  -- SET @pts := (SELECT motivator_3_pts FROM user WHERE id = @user_id LIMIT 0, 1);
+  -- insert into user_motivator (user_id,motivator,points,primary_) values(@user_id,@motivator,@pts,1);
+  -- SET @motivator := (SELECT motivator_4 FROM user WHERE id = @user_id LIMIT 0, 1);
+  -- SET @pts := (SELECT motivator_4_pts FROM user WHERE id = @user_id LIMIT 0, 1);
+  -- insert into user_motivator (user_id,motivator,points,primary_) values(@user_id,@motivator,@pts,0);
+

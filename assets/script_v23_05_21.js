@@ -7,6 +7,7 @@ var feat_list;
 var feat_reqs;
 var user_feats;
 var user_trainings;
+var user_motivators;
 var weapons;
 var protections;
 var healings;
@@ -30,15 +31,13 @@ var feats = []; // holds row elements
 var skills = []; // holds row elements
 // ID of input to gain focus on modal show
 var focus_id = "";
-// equipped protections
+// equipped protections - TODO remove this array - track 'equipped' value in user_protections array
 var equipped = [];
 // show encumbered alert
 var loadingItems = false;
 var suppressAlerts = false;
-// for adjusting motivator bonuses
-var pts = [];
-var pts_prev = [];
 
+// TODO move to separate js file?
 var schoolTalents = {
 	"Ka": [
 		{
@@ -198,6 +197,10 @@ $(document).on('input', '.clearable', function() {
 		$(".superhuman_select").hide();
 		$(".shapeshifter_select").hide();
     }
+});
+
+$(".motivator-input").on("click", function() {
+	editMotivators();
 });
 
 // on hover input, show overflow text as tool tip
@@ -637,41 +640,46 @@ function endEditAttributes(accept) {
 $('.motivator-pts').on('focusin', function() {
     $(this).data('val', $(this).val());
 });
+
 // on motivator pt change, adjust bonuses
 $(".motivator-pts").on("input", function() {
-	setMotivatorBonus();
-	// adjust xp
-	var current = $(this).val();
-	var prev = $(this).data('val');
+
+	// get current and previous values and update user_motivators
+	let m_id = this.id.split("motivator_pts_")[1];
+	let current = $(this).val();
+	let prev = $(this).data('val');
 	$(this).data('val', current);
-	var up = current > prev;
-	// increasing - add xp if least value is less than current
-	if (up && pts[3] < current) {
-		$("#xp").val(parseInt($("#xp").val()) + parseInt($("#level").val())).trigger("change");
+	user_motivators[m_id]['points'] = current;
+
+	// adjust xp if primary motivator
+	if (user_motivators[m_id]['primary_'] == 1) {
+		if (current > prev) {
+			$("#xp").val(parseInt($("#xp").val()) + parseInt($("#level").val())).trigger("change");
+		} else {
+			$("#xp").val(parseInt($("#xp").val()) - parseInt($("#level").val())).trigger("change");
+		}
+	} else if (current > prev) {
+		// TODO if increasing a non-primary motivator, check if it has exceeded a primary motivator
+		for (var i in user_motivators) {
+			if (current > user_motivators[i]['points']) {
+				// alert user and prompt to change primary motivators
+				console.log("personality crisis!");
+			}
+		}
 	}
-	// decreasing - subtract xp if prev is greater than least of the prev vals
-	if (!up && prev > pts_prev[3]) {
-		$("#xp").val(parseInt($("#xp").val()) - parseInt($("#level").val())).trigger("change");
-	}
+
+	// update bonuses
+	setMotivatorBonus();
 });
 
 function setMotivatorBonus() {
-	pts = [];
-	pts_prev = [];
-	var score = 0;
-	$(".motivator-pts").each(function() {
-		pts.push($(this).val() == "" ? 0 : parseInt($(this).val()));
-		pts_prev.push($(this).data('val') != undefined ? parseInt($(this).data('val')) : parseInt($(this).val()));
-	});
-	// add the highest 3 pt values
-	pts.sort(function(a, b) {
-	  return b - a;
-	});
-	pts_prev.sort(function(a, b) {
-	  return b - a;
-	});
-	score = pts[0] + pts[1] + pts[2];
-	var bonuses = score >= 64 ? 5 : (score >= 32 ? 4 : (score >= 16 ? 3 : (score >= 8 ? 2 : (score >= 4 ? 1 : 0))));
+	var m_pts = 0;
+	for (var i in user_motivators) {
+		if (user_motivators[i]['primary_'] == 1) {
+			m_pts += parseInt(user_motivators[i]['points']);
+		}
+	}
+	var bonuses = m_pts >= 64 ? 5 : (m_pts >= 32 ? 4 : (m_pts >= 16 ? 3 : (m_pts >= 8 ? 2 : (m_pts >= 4 ? 1 : 0))));
 
 	// check for morale modifiers
 	var morale = $("#morale").val();
@@ -3298,39 +3306,46 @@ function editMotivators() {
 	// only allowed during character creation and GM mode
 	if (characterCreation || adminEditMode) {
 		// set values to current motivators
-		$("#edit_motivators").val(true);
-		$("#m1").val($("#motivator_1").val());
-		$("#m2").val($("#motivator_2").val());
-		$("#m3").val($("#motivator_3").val());
-		$("#m4").val($("#motivator_4").val());
+		$("#m1").val($("#motivator_0").val());
+		$("#m2").val($("#motivator_1").val());
+		$("#m3").val($("#motivator_2").val());
+		$("#m4").val($("#motivator_3").val());
 		$("#motivator_modal").modal("show");
 	}
 }
 
 function setMotivators() {
-	// make sure all motivators are selected
-	var m1 = $("#m1").val();
-	var m2 = $("#m2").val();
-	var m3 = $("#m3").val();
-	var m4 = $("#m4").val();
-	if (m1 == "" || m2 == "" || m3 == "") {
+
+	// make sure primary motivators are set
+	if ($("#m1").val() == "" || $("#m2").val() == "" || $("#m3").val() == "") {
 		alert("Please set required motivators");
 		return;
 	}
-	// set motivator values
-	$("#motivator_1").val(m1);
-	$("#motivator_2").val(m2);
-	$("#motivator_3").val(m3);
-	$("#motivator_4").val(m4);
-	// set point values if not editing
-	if ($("#edit_motivators").val() != 'true') {
-		$("#motivator_1_pts").val(2);
-		$("#motivator_2_pts").val(1);
-		$("#motivator_3_pts").val(1);
-		$("#motivator_4_pts").val(m4 == "" ? "" : 0).attr("readonly", m4 == "");
+
+	for (var i = 0; i < 4; i++) {
+		let motivator = $("#m"+(i+1)).val();
+		// set motivator values
+		$("#motivator_"+i).val(motivator);
+		// update values in user_motivators
+		user_motivators[i] = {
+			'motivator':motivator
+		};
+	}
+
+	// set point values and user_motivators array, only during character creation
+	if (characterCreation) {
+		for (var i = 0; i < 4; i++) {
+			let val = i == 0 ? 2 : (i == 3 ? 0 : 1);
+			$("#motivator_pts_"+i).val(val);
+			$("#motivator_primary_"+i).val(i != 3 ? 1 : 0);
+			user_motivators[i]['points'] = val;
+			user_motivators[i]['primary_'] = i != 3;
+		}
+		// leave m4 points blank if m4 name input is blank
+		$("#motivator_pts_3").attr("readonly", $("#motivator_3").val() == "");
+		$("#motivator_pts_3").val($("#motivator_3").val() == "" ? "" : 0);
 		$("#bonuses").val(1);
 	}
-	$("#edit_motivators").val("");
 	// close modal, hide and show elements
 	$("#motivator_modal").modal("hide");
 	$("#motivator_button").hide();
