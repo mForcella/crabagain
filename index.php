@@ -1,8 +1,8 @@
 <?php
 
 	// establish database connection
-	include_once('db_config.php');
-	include_once('keys.php');
+	include_once('config/db_config.php');
+	include_once('config/keys.php');
 	$db = new mysqli($db_config['servername'], $db_config['username'], $db_config['password'], $db_config['dbname']);
 
 	// check for campaign parameter in url
@@ -339,7 +339,7 @@
 		<option value="#section_notes">Notes</option>
 	</select>
 
-	<form id="user_form" method="post" action="/submit.php" novalidate>
+	<form id="user_form" method="post" action="/scripts/submit.php" novalidate>
 		<input type="hidden" id="user_id" name="user_id" value="<?php echo isset($user) ? $user['id'] : '' ?>">
 		<input type="hidden" id="campaign_id" name="campaign_id" value="<?php echo $_GET["campaign"] ?>">
 		<input type="hidden" id="user_email" name="email" value="<?php echo isset($user) ? $user["email"] : '' ?>">

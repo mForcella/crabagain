@@ -8,8 +8,8 @@
     require_once 'PHPMailer/src/SMTP.php';
 
 	// establish database connection
-	include_once('db_config.php');
-    include_once('email_config.php');
+	include_once('../config/db_config.php');
+    include_once('../config/email_config.php');
 	$db = new mysqli($db_config['servername'], $db_config['username'], $db_config['password'], $db_config['dbname']);
 
 	// check connection

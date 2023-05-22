@@ -6,7 +6,7 @@
     require_once 'PHPMailer/src/Exception.php';
     require_once 'PHPMailer/src/PHPMailer.php';
     require_once 'PHPMailer/src/SMTP.php';
-    include_once('email_config.php');
+    include_once('../config/email_config.php');
 
 	// email me with reset link
     $mail = new PHPMailer;

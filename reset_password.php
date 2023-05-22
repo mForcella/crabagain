@@ -2,7 +2,7 @@
 
 	if (isset($_GET["token"])) {
 		// establish database connection
-		include_once('db_config.php');
+		include_once('config/db_config.php');
 		$db = new mysqli($db_config['servername'], $db_config['username'], $db_config['password'], $db_config['dbname']);
 
 		$user = [];
@@ -151,7 +151,7 @@
 			}
 			// submit form data to ajax
 			$.ajax({
-				url: 'submit_new_password.php',
+				url: '/scripts/submit_new_password.php',
 				data: $("#reset_form").serialize(),
 				ContentType: "application/json",
 				type: 'POST',

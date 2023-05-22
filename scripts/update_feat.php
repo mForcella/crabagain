@@ -1,6 +1,6 @@
 <?php
 
-	include_once('db_config.php');
+	include_once('../config/db_config.php');
 	
 	// establish database connection
 	$db = new mysqli($db_config['servername'], $db_config['username'], $db_config['password'], $db_config['dbname']);

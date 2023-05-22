@@ -1,8 +1,8 @@
 <?php
 
 	// establish database connection
-	include_once('db_config.php');
-	include_once('keys.php');
+	include_once('config/db_config.php');
+	include_once('config/keys.php');
 	$db = new mysqli($db_config['servername'], $db_config['username'], $db_config['password'], $db_config['dbname']);
 
 	// make sure campaign ID is set
@@ -1745,7 +1745,7 @@
 			$("#new_feat_modal").modal("hide");
 			// send ajax request
 			$.ajax({
-				url: 'delete_feat.php',
+				url: '/scripts/delete_feat.php',
 				data: { 'feat_id' : feat_id },
 				ContentType: "application/json",
 				type: 'POST',
@@ -1833,7 +1833,7 @@
 		if (conf) {
 			// submit form via ajax
 			$.ajax({
-                url: udpate ? 'update_feat.php' : 'feat_submit.php',
+                url: udpate ? '/scripts/update_feat.php' : '/scripts/feat_submit.php',
                 type: 'POST',
                 data: $("#new_feat_form").serialize(),
                 success:function(result){
@@ -2080,7 +2080,7 @@
 
 			// add xp awards to database
 			$.ajax({
-			  url: 'set_xp_awards.php',
+			  url: '/scripts/set_xp_awards.php',
 			  data: { 'users' : users, 'awards' : awards },
 			  ContentType: "application/json",
 			  type: 'POST',
@@ -2104,7 +2104,7 @@
 		}
 		// check admin_password
 		$.ajax({
-		  url: 'check_admin_password.php',
+		  url: '/scripts/check_admin_password.php',
 		  data: { 'password' : password.toLowerCase().trim(), 'admin_password' : campaign['admin_password'], 'hashed_password' : hashed_password },
 		  ContentType: "application/json",
 		  type: 'POST',
@@ -2129,7 +2129,7 @@
 	// submit campaign settings to ajax
 	function saveCampaignSettings() {
 		$.ajax({
-		  url: 'update_campaign.php',
+		  url: '/scripts/update_campaign.php',
 		  data: $("#campaign_form").serialize(),
 		  ContentType: "application/json",
 		  type: 'POST',

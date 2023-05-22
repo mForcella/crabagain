@@ -380,7 +380,7 @@ function GMEditMode() {
 	$("#gm_password").val("");
 	// check admin_password
 	$.ajax({
-	  url: 'check_admin_password.php',
+	  url: '/scripts/check_admin_password.php',
 	  data: { 'password' : password, 'admin_password' : campaign['admin_password'], 'hashed_password': "" },
 	  ContentType: "application/json",
 	  type: 'POST',
@@ -1338,7 +1338,7 @@ function setAttributes(user) {
 		$("#xp").val(parseInt(user['xp'])+award).trigger("change");
 		// update character xp, awards, and attribute points in database
 		$.ajax({
-			url: 'update_xp.php',
+			url: '/scripts/update_xp.php',
 			data: { 'user' : user['id'], 'xp' : $("#xp").val(), 'attribute_pts' : parseInt($("#attribute_pts").val()) },
 			ContentType: "application/json",
 			type: 'POST',
@@ -1566,7 +1566,7 @@ function formSubmit() {
 // validate password via ajax
 function validatePassword() {
 	$.ajax({
-	  url: 'check_password.php',
+	  url: '/scripts/check_password.php',
 	  data: { 'password' : $("#password").val(), 'user_id' : $("#user_id").val(), 'campaign_id' : $("#campaign_id").val() },
 	  ContentType: "application/json",
 	  type: 'POST',
@@ -1615,7 +1615,7 @@ function setPassword() {
 function forgotPassword() {
 	alert("Ok fine. Hang tight and we'll be along with a reset link shortly.");
 	$.ajax({
-	  url: 'email_password_reset_link.php',
+	  url: '/scripts/email_password_reset_link.php',
 	  data: { 'user_id' : $("#user_id").val() },
 	  ContentType: "application/json",
 	  type: 'POST',
@@ -3433,7 +3433,7 @@ function submitSuggestion() {
 	}
 	// submit suggestion
 	$.ajax({
-	  url: 'submit_suggestion.php',
+	  url: '/scripts/submit_suggestion.php',
 	  data: { 'message' : $("#suggestion").val() },
 	  ContentType: "application/json",
 	  type: 'POST',

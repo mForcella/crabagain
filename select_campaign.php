@@ -1,8 +1,8 @@
 <?php
 
 	// establish database connection
-	include_once('db_config.php');
-	include_once('keys.php');
+	include_once('config/db_config.php');
+	include_once('config/keys.php');
 	$db = new mysqli($db_config['servername'], $db_config['username'], $db_config['password'], $db_config['dbname']);
 
 	// get campaign list for dropdown nav
@@ -180,7 +180,7 @@
 		if ($("#secret_word").val().toLowerCase() == keys['nerd_test']) {
 			// submit new campaign to ajax
 			$.ajax({
-			  url: 'new_campaign.php',
+			  url: '/scripts/new_campaign.php',
 			  data: { 
 			  	'name' : $("#campaign_name").val(),
 			  	'admin_password' : $("#admin_password").val()
