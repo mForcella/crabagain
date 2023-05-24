@@ -307,9 +307,6 @@ h1 {
 .form-control {
 	height: 26px;
 }
-.form-control[readonly] {
-	background-color: white;
-}
 .form-group .control-label {
 	text-align: left;
 }
@@ -697,6 +694,13 @@ select.form-control {
 	padding-top: 0;
 	padding-bottom: 0;
 	text-align: center;
+}
+select.form-control, input.form-control.pointer {
+	cursor: pointer;
+}
+.form-control[disabled], .form-control[readonly] {
+	background-color: white;
+	cursor: default;
 }
 .section {
 	position: relative;

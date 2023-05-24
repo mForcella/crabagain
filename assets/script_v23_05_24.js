@@ -770,10 +770,32 @@ $("#morale").on("input", function() {
 $("#damage").attr("max", $("#resilience").val());
 // on damage change, modify wounds
 $("#damage").on("change", function() {
+	var damage = parseInt($(this).val());
+	let resilience = parseInt($(this).attr("max"));
+	// check for wound reduction
+	if (damage == -1) {
+		damage = resilience - 1;
+		$("#damage").val(resilience - 1);
+		$("#wounds_val").val( parseInt($("#wounds_val").val())-1 <= 0 ? 0 : parseInt($("#wounds_val").val())-1 );
+		$("#wound_penalty_val").val( parseInt($("#wound_penalty_val").val())-1 <= 0 ? 0 : parseInt($("#wound_penalty_val").val())-1 );
+	}
+	// check for wound increase
 	while (parseInt($(this).val()) >= parseInt($(this).attr("max"))) {
 		$(this).val($(this).val() - $(this).attr("max")).trigger("input");
-		$("#wounds").val( parseInt($("#wounds").val())+1 >= 3 ? 3 : parseInt($("#wounds").val())+1 );
+		$("#wounds_val").val( parseInt($("#wounds_val").val())+1 >= 4 ? 4 : parseInt($("#wounds_val").val())+1 );
+		$("#wound_penalty_val").val( parseInt($("#wound_penalty_val").val())+1 >= 4 ? 4 : parseInt($("#wound_penalty_val").val())+1 );
 	}
+	let wounds = parseInt($("#wounds_val").val());
+	var totalDamage = damage + (wounds * resilience);
+	$("#damage").attr("min", wounds == 0 ? 0 : -1);
+	// check for max total damage
+	if (totalDamage >= resilience * 4) {
+		totalDamage = resilience * 4;
+		$("#damage").val(0);
+	}
+	$("#total_damage").val(totalDamage);
+	$("#wounds").val($("#wounds_val option:selected").text());
+	$("#wound_penalty").val($("#wound_penalty_val option:selected").text());
 });
 
 function editSize() {
@@ -1463,6 +1485,7 @@ function adjustAttribute(attribute, val) {
 			$("#resilience").val(resilience);
 			// adjust max damage
 			$("#damage").attr("max", resilience);
+			// TODO adjust number of wounds?
 			break;
 		case 'speed':
 			adjustInitiative();

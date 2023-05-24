@@ -364,7 +364,7 @@
 					<div class="form-group tablet-adjust">
 						<label class="control-label col-sm-2 col-xs-4" for="xp">XP</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-							<input class="form-control" readonly data-toggle="modal" data-target="#xp_modal" name="xp" id="xp" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['xp']) : 0 ?>">
+							<input class="form-control pointer" readonly data-toggle="modal" data-target="#xp_modal" name="xp" id="xp" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['xp']) : 0 ?>">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="level">Level</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
@@ -708,19 +708,28 @@
 							</div>
 							<div class="row">
 								<div class="col-xs-5 no-pad">
-									<input class="form-control" id="damage" type="number" name="damage" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['damage']) : 0 ?>">
-								</div>
-								<div class="col-xs-2 center no-pad">
-									/
-								</div>
-								<div class="col-xs-5 no-pad">
 									<?php 
 										$resilience = isset($user) ? (
 											$user['fortitude'] >= 0 ? 
 												3 + floor($user['fortitude']/2) :
 												3 + ceil($user['fortitude']/3)
 										) : 3;
+										$damage = isset($user) ? $user['damage'] : 0;
+										$wounds = 0;
+										while ($damage >= $resilience) {
+											$wounds += 1;
+											$damage -= $resilience;
+										}
+										$wound_val = $wounds == 0 ? "None" : ($wounds == 1 ? "Wounded" : ($wounds == 2 ? "Incapacitated" : ($wounds == 3 ? "Mortally Wounded" : "Yer Dead")));
+										$wound_penalty_val = $wounds == 0 ? "None" : ($wounds == 1 ? "-1" : ($wounds == 2 ? "-3" : ($wounds == 3 ? "-5" : "Yer Dead")));
 									?>
+									<input class="form-control" id="damage" type="number" min="-1" value="<?php echo $damage ?>">
+									<input type="hidden" name="damage" id="total_damage">
+								</div>
+								<div class="col-xs-2 center no-pad">
+									/
+								</div>
+								<div class="col-xs-5 no-pad">
 									<input class="form-control" readonly id="resilience" name="resilience" value="<?php echo $resilience ?>">
 								</div>
 							</div>
@@ -731,14 +740,15 @@
 								<label class="control-label col-sm-12 center full-width" for="wounds">Wounds</label>
 							</div>
 							<div class="row">
-								<div class="col-xs-5 no-pad">
-									<input class="form-control" id="wounds" type="number" name="wounds" min="0" max="3" value="<?php echo isset($user) ? htmlspecialchars($user['wounds']) : 0 ?>">
-								</div>
-								<div class="col-xs-2 center no-pad">
-									/
-								</div>
-								<div class="col-xs-5 center no-pad">
-									3
+								<div class="col-sm-12 no-pad">
+									<input type="text" class="form-control" id="wounds" readonly value="<?php echo $wound_val ?>">
+									<select id="wounds_val" class="form-control hidden">
+										<option value="0">None</option>
+										<option value="1" <?php echo $wounds == 1 ? 'selected' : '' ?>>Wounded</option>
+										<option value="2" <?php echo $wounds == 2 ? 'selected' : '' ?>>Incapacitated</option>
+										<option value="3" <?php echo $wounds == 3 ? 'selected' : '' ?>>Mortally Wounded</option>
+										<option value="4" <?php echo $wounds == 4 ? 'selected' : '' ?>>Yer Dead</option>
+									</select>
 								</div>
 							</div>
 						</div>
@@ -749,8 +759,14 @@
 							</div>
 							<div class="row">
 								<div class="col-sm-12 no-pad">
-									<input class="form-control" type="text" name="wound_penalty" id="wound_penalty_text" value="<?php echo isset($user) ? htmlspecialchars($user['wound_penalty']) : '' ?>">
-									<input class="form-control hidden-number" type="number" id="wound_penalty">
+									<input type="text" class="form-control" id="wound_penalty" readonly value="<?php echo $wound_penalty_val ?>">
+									<select id="wound_penalty_val" class="form-control hidden">
+										<option value="0">None</option>
+										<option value="1" <?php echo $wounds == 1 ? 'selected' : '' ?>>-1</option>
+										<option value="2" <?php echo $wounds == 2 ? 'selected' : '' ?>>-3</option>
+										<option value="3" <?php echo $wounds == 3 ? 'selected' : '' ?>>-5</option>
+										<option value="4" <?php echo $wounds == 4 ? 'selected' : '' ?>>Yer Dead</option>
+									</select>
 								</div>
 							</div>
 						</div>

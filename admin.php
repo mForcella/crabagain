@@ -51,31 +51,11 @@
 
 			// get defend bonus from equipped melee weapons
 			$defend_bonus = 0;
-			if ($user['weapon_1'] != NULL && $user['weapon_1'] != "") {
-				$sql = "SELECT * FROM user_weapon WHERE user_id = ".$user["id"]." AND name = '".$user['weapon_1']."'";
-				$result_w = $db->query($sql);
-				if ($result_w) {
-					while($row_w = $result_w->fetch_assoc()) {
-						$defend_bonus += $row_w['defend'] == NULL ? 0 : $row_w['defend'];
-					}
-				}
-			}
-			if ($user['weapon_2'] != NULL && $user['weapon_2'] != "") {
-				$sql = "SELECT * FROM user_weapon WHERE user_id = ".$user["id"]." AND name = '".$user['weapon_2']."'";
-				$result_w = $db->query($sql);
-				if ($result_w) {
-					while($row_w = $result_w->fetch_assoc()) {
-						$defend_bonus += $row_w['defend'] == NULL ? 0 : $row_w['defend'];
-					}
-				}
-			}
-			if ($user['weapon_3'] != NULL && $user['weapon_3'] != "") {
-				$sql = "SELECT * FROM user_weapon WHERE user_id = ".$user["id"]." AND name = '".$user['weapon_3']."'";
-				$result_w = $db->query($sql);
-				if ($result_w) {
-					while($row_w = $result_w->fetch_assoc()) {
-						$defend_bonus += $row_w['defend'] == NULL ? 0 : $row_w['defend'];
-					}
+			$sql = "SELECT bonus FROM user_weapon WHERE user_id = ".$user["id"]." AND equipped = 1";
+			$result_w = $db->query($sql);
+			if ($result_w) {
+				while($row_w = $result_w->fetch_assoc()) {
+					$defend_bonus += $row_w['defend'];
 				}
 			}
 			$user['defend_bonus'] = $defend_bonus;
@@ -621,6 +601,14 @@
 								3 + floor($user['fortitude']/2) :
 								3 + ceil($user['fortitude']/3);
 
+						// get damage and wounds
+						$damage = $user['damage'];
+						$wounds = 0;
+						while ($damage >= $resilience) {
+							$wounds += 1;
+							$damage -= $resilience;
+						}
+
 						// get size modifier
 						$size_modifier = $user['size'] == "Small" ? 2 : ($user['size'] == "Large" ? -2 : 0);
 
@@ -654,8 +642,8 @@
 									: ' ('.$user['xp_award'].')'))
 							."</td>
 							<td id='level_".$user['id']."'>".$level."</td>
-							<td><input class='short-input form-control' id='damage_".$user['id']."' min='0' type='number' value='".$user['damage']."'> / ".$resilience."</td>
-							<td><input class='short-input form-control' id='wounds_".$user['id']."' max='3' min='0' type='number' value='".$user['wounds']."'> / 3</td>
+							<td><input class='short-input form-control' id='damage_".$user['id']."' min='0' type='number' value='".$damage."'> / ".$resilience."</td>
+							<td><input class='short-input form-control' id='wounds_".$user['id']."' max='3' min='0' type='number' value='".$wounds."'> / 3</td>
 							<td>".$user['primary']."/".$user['secondary']."</td>
 							<td>".$toughness.($user['toughness_bonus'] > 0 ? ' (+'.$user['toughness_bonus'].')' : '')."</td>
 							<td>".$defend.($user['defend_bonus'] > 0 ? ' (+'.$user['defend_bonus'].')' : '')."</td>
@@ -2058,7 +2046,6 @@
 		if (conf) {
 			var users = [];
 			var awards = [];
-			// TODO two xp-checkboxes per character...
 			$(".xp-checkbox").each(function(){
 				var id = this.id.split("select_")[1];
 				if (!isNaN(id)) {
