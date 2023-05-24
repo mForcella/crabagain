@@ -12,7 +12,7 @@
 	  	die("Connection failed: " . $db->connect_error);
 	}
 
-	$user_columns = ['campaign_id', 'email', 'character_name', 'attribute_pts', 'xp', 'morale', 'race', 'height', 'weight', 'age', 'eyes', 'hair', 'gender', 'other', 'size', 'strength', 'fortitude', 'speed', 'agility', 'precision_', 'awareness', 'allure', 'deception', 'intellect', 'innovation', 'intuition', 'vitality', 'background', 'move_penalty', 'magic', 'fear', 'poison', 'disease', 'damage', 'fatigue'];
+	$user_columns = ['campaign_id', 'email', 'character_name', 'attribute_pts', 'xp', 'morale', 'race', 'height', 'weight', 'age', 'eyes', 'hair', 'gender', 'other', 'size', 'strength', 'fortitude', 'speed', 'agility', 'precision_', 'awareness', 'allure', 'deception', 'intellect', 'innovation', 'intuition', 'vitality', 'background', 'magic', 'fear', 'poison', 'disease', 'damage', 'fatigue'];
 
 	// new or existing character?
 	if ($_POST['user_id'] != null) {

@@ -714,7 +714,7 @@
 												3 + floor($user['fortitude']/2) :
 												3 + ceil($user['fortitude']/3)
 										) : 3;
-										$damage = isset($user) ? $user['damage'] : 0;
+										$damage = isset($user) && $user['damage'] != null ? $user['damage'] : 0;
 										$wounds = 0;
 										while ($damage >= $resilience) {
 											$wounds += 1;
@@ -723,7 +723,7 @@
 										$wound_val = $wounds == 0 ? "None" : ($wounds == 1 ? "Wounded" : ($wounds == 2 ? "Incapacitated" : ($wounds == 3 ? "Mortally Wounded" : "Yer Dead")));
 										$wound_penalty_val = $wounds == 0 ? "None" : ($wounds == 1 ? "-1" : ($wounds == 2 ? "-3" : ($wounds == 3 ? "-5" : "Yer Dead")));
 									?>
-									<input class="form-control" id="damage" type="number" min="-1" value="<?php echo $damage ?>">
+									<input class="form-control" id="damage" type="number" min="<?php echo $wounds == 0 ? 0 : -1 ?>" value="<?php echo $damage ?>">
 									<input type="hidden" name="damage" id="total_damage">
 								</div>
 								<div class="col-xs-2 center no-pad">
@@ -798,12 +798,6 @@
 							<div class="row">
 								<div class="col-xs-12 no-pad">
 									<input class="form-control" type="text" readonly id="encumberence">
-									<!-- <select class="form-control" id="encumberence" disabled style="background-color: white;">
-										<option value="0">Unhindered</option>
-										<option value="1">Encumbered</option>
-										<option value="2">Burdened</option>
-										<option value="3">Overburdened</option>
-									</select> -->
 								</div>
 							</div>
 						</div>
@@ -832,8 +826,7 @@
 						</div>
 						<label class="control-label col-sm-2 col-xs-4 penalty" for="action_penalty">Penalty</label>
 						<div class="col-sm-2 col-xs-8">
-							<input class="form-control" type="text" name="action_penalty" id="action_penalty_text" value="">
-							<input class="form-control hidden-number" type="number" id="action_penalty">
+							<input class="form-control" type="text" id="action_penalty" value="None" readonly>
 						</div>
 					</div>
 					<div class="form-group">
@@ -847,8 +840,7 @@
 						</div>
 						<label class="control-label col-sm-2 col-xs-4 penalty" for="move_penalty">Penalty</label>
 						<div class="col-sm-2 col-xs-8">
-							<input class="form-control" type="text" name="move_penalty" id="move_penalty_text" value="<?php echo isset($user) ? htmlspecialchars($user['move_penalty']) : '' ?>">
-							<input class="form-control hidden-number" type="number" id="move_penalty">
+							<input class="form-control" type="text" id="move_penalty" value="None" readonly>
 						</div>
 					</div>
 				</div>

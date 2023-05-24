@@ -84,10 +84,9 @@
     innovation int,
     intuition int,
     vitality int,
-    -- Damage, penalties and defense
+    -- Damage, fatigue and defense
     damage int,
     fatigue int,
-    move_penalty varchar(64),
     magic varchar(64),
     fear varchar(64),
     poison varchar(64),

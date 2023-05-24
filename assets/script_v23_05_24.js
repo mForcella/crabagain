@@ -3255,6 +3255,9 @@ function updateTotalWeight(showMsg = false) {
 	var quick = speed >= 0 ? (Math.floor(speed/2) % 2 == 0 ? 0 : 1) : (Math.ceil(speed/3) % 2 == 0 ? 0 : 1);
 	var move = user['size'] == undefined ? 40 : (user['size'] == "Small" ? 30 : (user['size'] == "Large" ? 50 : 40));
 	var fatigue = $("#fatigue").val();
+	var movePenalty = 0;
+	var actionPenalty = 0;
+	var unconcious = false;
 
 	// adjust action/move values
 	var msg = "";
@@ -3267,6 +3270,7 @@ function updateTotalWeight(showMsg = false) {
 		$("#encumbered").addClass("selected");
 		$("#encumberence").val("Encumbered");
 		move = move >= 10 ? move - 10 : 0;
+		movePenalty -= 10;
 		msg = "You are encumbered (-10 Move).<br>Reduce your item weight to remove the penalty.";
 	} else if (parseFloat(totalWeight) <= capacity/4*3) {
 		// burdened, -1 QA, -10 Move
@@ -3278,6 +3282,8 @@ function updateTotalWeight(showMsg = false) {
 			quick = quick > 0 ? quick - 1 : quick + 1;
 		}
 		move = move >= 10 ? move - 10 : 0;
+		movePenalty -= 10;
+		actionPenalty -= 1;
 		msg = "You are burdened (-1 QA, -10 Move).<br>Reduce your item weight to remove the penalty.";
 	} else {
 		// overburdened, -1 SA, -10 Move
@@ -3285,6 +3291,8 @@ function updateTotalWeight(showMsg = false) {
 		$("#encumberence").val("Overburdened");
 		standard = standard > 0 ? standard - 1 : standard;
 		move = move >= 10 ? move - 10 : 0;
+		movePenalty -= 10;
+		actionPenalty -= 2;
 		msg = "You are overburdened (-1 SA, -10 Move).<br>Reduce your item weight to remove the penalty.";
 	}
 
@@ -3294,6 +3302,7 @@ function updateTotalWeight(showMsg = false) {
 	} else if (fatigue == 1) {
 		// tired, -10 Move
 		move = move >= 10 ? move - 10 : 0;
+		movePenalty -= 10;
 	} else if (fatigue == 2) {
 		// weary, -1 QA, -10 Move
 		if (standard > 0) {
@@ -3301,18 +3310,29 @@ function updateTotalWeight(showMsg = false) {
 			quick = quick > 0 ? quick - 1 : quick + 1;
 		}
 		move = move >= 10 ? move - 10 : 0;
-	} else {
-		// overburdened, -1 SA, -10 Move
+		movePenalty -= 10;
+		actionPenalty -= 1;
+	} else if (fatigue == 3) {
+		// spent, -1 SA, -10 Move
 		standard = standard > 0 ? standard - 1 : standard;
 		move = move >= 10 ? move - 10 : 0;
+		movePenalty -= 10;
+		actionPenalty -= 2;
+	} else {
+		// exhausted
+		unconcious = true;
 	}
+
+	// update penalty inputs
+	$("#action_penalty").val(unconcious ? "Unconcious" : (actionPenalty == 0 ? "None" : actionPenalty+" QA"));
+	$("#move_penalty").val(unconcious ? "Unconcious" : (movePenalty == 0 ? "None" : movePenalty+" Move"));
 
 	// make sure user has at least one quick action
 	quick = standard == 0 && quick == 0 ? 1 : quick;
 	var run = move + speed * 5;
-	$("#standard").val(standard);
-	$("#quick").val(quick);
-	$("#move").val(move+"/"+run);
+	$("#standard").val(unconcious ? 0 : standard);
+	$("#quick").val(unconcious ? 0 : quick);
+	$("#move").val(unconcious ? 0 : move+"/"+run);
 
 	// if we are adding or editing items, show alert if character is encumbered
 	var encumbered = parseFloat(totalWeight) > capacity/4;
