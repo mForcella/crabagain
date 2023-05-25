@@ -183,6 +183,8 @@
   CREATE TABLE user_xp_award (
     id int PRIMARY KEY AUTO_INCREMENT,
     xp_award int,
+    awarded bool,
+    xp_after_award int,
     user_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES user(id)

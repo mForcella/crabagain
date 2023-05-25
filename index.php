@@ -133,8 +133,8 @@
     if ($result->num_rows === 1) {
 	    while($row = $result->fetch_assoc()) {
 	    	$user = $row;
-	    	// get user awards
-	    	$sql = "SELECT * FROM user_xp_award WHERE user_id = ".$_GET["user"];
+	    	// get pending xp awards
+	    	$sql = "SELECT * FROM user_xp_award WHERE awarded != 1 AND user_id = ".$_GET["user"];
 	    	$result = $db->query($sql);
 	    	if ($result) {
 		    	while($row = $result->fetch_assoc()) {

@@ -1380,7 +1380,12 @@ function setAttributes(user) {
 		// update character xp, awards, and attribute points in database
 		$.ajax({
 			url: '/scripts/update_xp.php',
-			data: { 'user' : user['id'], 'xp' : $("#xp").val(), 'attribute_pts' : parseInt($("#attribute_pts").val()) },
+			data: {
+				'xp_award_id' : xp_awards[i]['id'],
+				'user' : user['id'],
+				'xp' : $("#xp").val(),
+				'attribute_pts' : parseInt($("#attribute_pts").val())
+			},
 			ContentType: "application/json",
 			type: 'POST',
 			success: function(response) {

@@ -8,12 +8,13 @@
 	  	die("Connection failed: " . $db->connect_error);
 	}
 
+	$xp_award_id = $_POST['xp_award_id'];
 	$user = $_POST['user'];
 	$xp = $_POST['xp'];
 	$attribute_pts = $_POST['attribute_pts'];
 
-	// delete all awards for user
-	$sql = "DELETE FROM user_xp_award WHERE user_id = ".$user;
+	// update user_xp_award - set awarded = true, set xp_after_award value
+	$sql = "UPDATE user_xp_award SET awarded = 1, xp_after_award = ".$xp." WHERE id = ".$xp_award_id;
 	$db->query($sql);
 
 	// update user xp and attribute points
