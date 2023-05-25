@@ -691,8 +691,7 @@ ul {
 	}
 }
 select.form-control {
-	padding-top: 0;
-	padding-bottom: 0;
+	padding: 0;
 	text-align: center;
 }
 select.form-control, input.form-control.pointer {

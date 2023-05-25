@@ -448,8 +448,28 @@
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="height">Height</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">
-							<input class="form-control" type="text" name="height" id="height_text" value="<?php echo isset($user) ? htmlspecialchars($user['height']) : '' ?>">
-							<input class="form-control hidden-number" type="number" id="height">
+							<select class="form-control" name="height" id="height">
+								<?php
+									// limit range by user size - small: 36-59, medium: 60-83, large: 84-107
+									$size = "Medium";
+									$height = 0;
+									if (isset($user)) {
+										$size = $user['size'] == "" ? "Medium" : $user['size'];
+										$height = $user['height'] == "" ? 0 : $user['height'];
+									}
+									$lower = $size == "Small" ? 36 : ($size == "Large" ? 84 : 60);
+									$upper = $size == "Small" ? 60 : ($size == "Large" ? 108 : 84);
+									for ($i = $lower; $i < $upper; $i++) {
+										$feet = 0;
+										$inches = $i;
+										while ($inches > 11) {
+											$feet += 1;
+											$inches -= 12;
+										}
+										echo '<option value="'.$i.'" '.($height == $i ? 'selected' : '').'>'.$feet.'\' '.$inches.'"'.'</option>';
+									}
+								?>
+							</select>
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="weight">Weight</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">

@@ -800,14 +800,33 @@ $("#damage").on("change", function() {
 
 function editSize() {
 	// set size text
-	var size = $("#character_size_select").val();
+	let size = $("#character_size_select").val();
 	user['size'] = size;
-	var size_text = size == "Small" ? "Small; +2 Defend/Dodge/Stealth, -10 Move" : (size == "Large" ? "Large; -2 Defend/Dodge/Stealth, +10 Move" : size)
+	let size_text = size == "Small" ? "Small; +2 Defend/Dodge/Stealth, -10 Move" : (size == "Large" ? "Large; -2 Defend/Dodge/Stealth, +10 Move" : size)
 	$("#character_size_text").html(size_text);
 	$("#character_size_val").val(size);
 	setDodge();
 	setDefend();
 	updateTotalWeight(false);
+
+	// update height dropdown values
+	let height = $("#height").val();
+	$("#height").html("");
+	let lower = size == "Small" ? 36 : (size == "Large" ? 84 : 60);
+	let upper = size == "Small" ? 60 : (size == "Large" ? 108 : 84);
+	for (var i = lower; i < upper; i++) {
+		var feet = 0;
+		var inches = i;
+		while (inches > 11) {
+			feet += 1;
+			inches -= 12;
+		}
+		$('<option />', {
+			'value': i,
+		  	'text': feet+"' "+inches+"\"",
+		  	'selected': height == i ? true : false
+		}).appendTo($("#height"));
+	}
 }
 
 function setDodge() {
@@ -3492,7 +3511,7 @@ function submitSuggestion() {
 function createElement(type, className, appendTo, id=null) {
 	return $('<'+type+' />', {
 		'id': id,
-	  'class': className,
+	  	'class': className,
 	}).appendTo(appendTo);
 }
 
