@@ -10,13 +10,11 @@
 	  	die("Connection failed: " . $db->connect_error);
 	}
 
-	// insert new row
-	$hashed_password = password_hash($_POST['admin_password'], PASSWORD_DEFAULT);
-	$sql = "INSERT into campaign (name, admin_password) VALUES ('".$_POST['name']."', '".$hashed_password."')";
+	$sql = "DELETE FROM ".$_POST['table']." WHERE id = ".$_POST['id'];
 	$db->query($sql);
-
-	// return inserted id
-	echo $db->insert_id;
 	$db->close();
+	// echo $sql;
+
+	echo "delete ok";
 
 ?>

@@ -34,6 +34,7 @@
 	$token = bin2hex(random_bytes(16));
 	$sql = "UPDATE user SET reset_token = '".$token."' WHERE id = ".$user_id;
 	$db->query($sql);
+	$db->close();
 
 	// generate reset link
 	$url = "https://crabagain.com/reset_password.php?token=".$token;

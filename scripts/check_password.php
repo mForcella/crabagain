@@ -24,6 +24,7 @@
 	$campaign = [];
 	$sql = "SELECT admin_password from campaign WHERE id = ".$_POST['campaign_id'];
 	$result = $db->query($sql);
+	$db->close();
 	if ($result->num_rows === 1) {
 		while($row = $result->fetch_assoc()) {
 			$campaign = $row;

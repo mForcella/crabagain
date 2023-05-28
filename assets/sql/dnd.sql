@@ -190,6 +190,9 @@
     FOREIGN KEY (user_id) REFERENCES user(id)
   );
 
+  -- To view a list of characters and their XP progress
+  -- SELECT character_name, xp_award, awarded, xp_after_award, user_xp_award.created_at FROM user_xp_award JOIN user ON user.id = user_xp_award.user_id WHERE campaign_id = 7 ORDER BY character_name ASC;
+
   CREATE TABLE user_motivator (
     id int PRIMARY KEY AUTO_INCREMENT,
     user_id int,

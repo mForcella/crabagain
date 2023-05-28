@@ -91,7 +91,7 @@ html, body {
 	}
 }
 
-/* tooltip hvoer text */
+/* tooltip hover text */
 .tooltiptext {
 	white-space: nowrap;
 	position: absolute;
@@ -440,6 +440,9 @@ h1 {
 	/*max-height: 600px;*/
 	/*margin: 0px auto 10px auto;*/
 	margin-bottom: 10px;
+}
+.item input {
+	cursor: pointer !important;
 }
 .banner-image {
 	width: 100vw;

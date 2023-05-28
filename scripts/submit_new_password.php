@@ -23,6 +23,7 @@
 	$sql = "UPDATE user SET password = '".$hashed_password."', reset_token = 'NULL' WHERE id = ".$_POST['user_id'];
 	$db->query($sql);
 	echo $db->error == "" ? 'ok' : $db->error;
+	$db->close();
 
 	// check if email is empty - send email
 	$email = $_POST['email'];
