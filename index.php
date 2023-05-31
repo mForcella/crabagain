@@ -1577,7 +1577,7 @@
         		<option value="Large" <?php echo $size == "Large" ? 'selected' : '' ?>>Large (7’0”–8’11”)</option>
         	</select>
         	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="editSize()">Ok</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="editSize(true)">Ok</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
@@ -2283,12 +2283,10 @@
 
 		// check for user protections
 		user_protections = <?php echo json_encode($protections); ?>;
-		console.log(user_protections);
 		for (var i in user_protections) {
-			addProtectionElements(user_protections[i]['name'], user_protections[i]['bonus'], user_protections[i]['notes'], user_protections[i]['weight'], user_protections[i]['equipped'], user_protections[i]['id']);
+			addProtectionElements(user_protections[i]);
 			// check if protection is equipped
 			if (user_protections[i]['equipped'] == 1) {
-				equipped.push(user_protections[i]['name']);
 				$("#protection_"+user_protections[i]['id']+"_equip_ban").toggle();
 			}
 		}
@@ -2296,24 +2294,24 @@
 		setToughness();
 
 		// check for user healings
-		healings = <?php echo json_encode($healings); ?>;
-		for (var i in healings) {
-			addHealingElements(healings[i]['name'], healings[i]['quantity'], healings[i]['effect'], healings[i]['weight'], healings[i]['id']);
+		user_healings = <?php echo json_encode($healings); ?>;
+		for (var i in user_healings) {
+			addHealingElements(user_healings[i]);
 		}
 
 		// check for user misc items
-		misc = <?php echo json_encode($misc); ?>;
-		for (var i in misc) {
-			addMiscElements(misc[i]['name'], misc[i]['quantity'], misc[i]['notes'], misc[i]['weight'], misc[i]['id']);
+		user_misc = <?php echo json_encode($misc); ?>;
+		// console.log(user_healings);
+		for (var i in user_misc) {
+			addMiscElements(user_misc[i]);
 		}
 		// show encumbered alert after all items are loaded
 		loadingItems = false;
-		updateTotalWeight(true);
 
 		// check for user notes
-		notes = <?php echo json_encode($notes); ?>;
-		for (var i in notes) {
-			addNoteElements(notes[i]['title'], notes[i]['note'], notes[i]['id']);
+		user_notes = <?php echo json_encode($notes); ?>;
+		for (var i in user_notes) {
+			addNoteElements(user_notes[i]);
 		}
 
 	</script>
