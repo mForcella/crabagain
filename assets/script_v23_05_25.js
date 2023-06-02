@@ -19,7 +19,6 @@ var hiddenEnabled = [];
 var allocatingAttributePts = false;
 var characterCreation = false;
 var adminEditMode = false;
-var unsavedChanges = false;
 var addingNewSchool = false;
 // show encumbered alert
 var loadingItems = false;
@@ -72,10 +71,14 @@ var columns = {
 	"user_note": [
 		'title',
 		'note'
+	],
+	"user_motivator": [
+		'motivator',
+		'points',
+		'primary_'
 	]
 };
 
-// TODO move to separate js file?
 var schoolTalents = {
 	"Ka": [
 		{
@@ -161,6 +164,164 @@ var schoolTalents = {
 	]
 };
 
+var skillAutocompletes = {
+	'Strength':
+	{
+		'skill':[
+			'Swimming'
+		],
+		'training':[],
+		'focus':[
+			'Climb',
+			'Jump',
+			'Lift'
+		],
+	},
+	'Fortitude':
+	{
+		'skill':[
+			'Swimming'
+		],
+		'training':[],
+		'focus':[
+			'Resist Poison',
+			'Resist Disease'
+		],
+	},
+	'Speed':
+	{
+		'skill':[],
+		'training':[],
+		'focus':[
+			'Run',
+			'React'
+		],
+	},
+	'Agility':
+	{
+		'skill':[
+			'Ride Animal'
+		],
+		'training':[],
+		'focus':[
+			// 'Attack - specific weapon'
+		],
+	},
+	'Awareness':
+	{
+		'skill':[
+			'Stealth'
+		],
+		'training':[],
+		'focus':[
+			'Search',
+			'Listen',
+			'Smell',
+			'Taste'
+		],
+	},
+	'Precision':
+	{
+		'skill':[
+			'Demolitions',
+			'Security',
+			'Drive',
+			'Pilot',
+			'Sleight of Hand'
+		],
+		'training':[],
+		'focus':[
+			// 'Shoot - specific weapon',
+			// 'Throw - specific weapon'
+		],
+	},
+	'Allure':
+	{
+		'skill':[
+			'Train Animal',
+			'Perform'
+		],
+		'training':[],
+		'focus':[
+			'Seduce',
+			'Diplomacy',
+			'Barter'
+		],
+	},
+	'Deception':
+	{
+		'skill':[
+			'Hacking',
+			'Perform',
+			'Sleight of Hand',
+			'Stealth'
+		],
+		'training':[],
+		'focus':[
+			'Disguise'
+		],
+	},
+	'Innovation':
+	{
+		'skill':[
+			'Engineering',
+			'Hacking',
+			'First Aid',
+			'Tactics',
+			'Security',
+			'Drive',
+			'Pilot',
+			'Sail'
+		],
+		'training':[],
+		'focus':[
+			// 'Craft - specific item'
+		],
+	},
+	'Intellect':
+	{
+		'skill':[
+			'Engineering',
+			'First Aid',
+			'Survival',
+			'Demolitions',
+			'Sail'
+		],
+		'training':[],
+		'focus':[
+			'Appraise',
+			// 'Academia - specific area',
+			// 'Culture - specific area',
+			'Languages',
+			// 'Religion - specific religion',
+			'Magic',
+			// 'Profession - specific profession'
+		],
+	},
+	'Intuition':
+	{
+		'skill':[
+			'Survival',
+			'Tactics',
+			'Ride Animal'
+		],
+		'training':[],
+		'focus':[
+			'Sense Motive',
+			'Interrogate'
+		],
+	},
+	'Vitality':
+	{
+		'skill':[],
+		'training':[],
+		'focus':[
+			'Intimidate',
+			'Willpower'
+		],
+	},
+};
+
 var attributes = [
 	'strength',
 	'fortitude',
@@ -174,6 +335,34 @@ var attributes = [
 	'innovation',
 	'intuition',
 	'vitality',
+];
+
+var exclamations = [
+	"Huzzah!",
+	"Shazam!",
+	"Booyah!",
+	"Boom!",
+	"Crabcakes!",
+	"Fruit on the bottom!",
+	"Jumpin' Jehoshaphat!",
+	"Crom!",
+	"Fish on a stick!",
+	"Oingo Boingo!",
+	"Abracadabra!",
+	"Hootie McBoobs!",
+	"Poop-a-doodle-doo!",
+	"Dancin' Danzig!",
+	"Leapin' linguine!",
+	"Dorka Dorka Dorkass!",
+	"Rock'em Sock'em Robots!",
+	"Toaster Pastry Pop Tarts!",
+	"Testicular torsion!",
+	"Potato pancakes!",
+	"Yahtzee!",
+	"Fart on a forklift!",
+	"Blammo!",
+	"Kapow!",
+	"Excelsior!",
 ];
 
 var banners = [
@@ -204,7 +393,7 @@ var slide = window.setInterval(function() {
 			});
 		}
 	});
-}, 10000);
+}, 15000);
 
 // detect if we're on a touchscreen
 var is_mobile = $('#is_mobile').css('display')=='none';
@@ -238,7 +427,7 @@ $(document).on('input', '.clearable', function() {
 });
 
 function deleteDatabaseObject(table, id) {
-	if ($("#user_id").val() == "") {
+	if ($("#user_id").val() == "" || adminEditMode) {
 		return;
 	}
 	console.log("deleteDatabaseObject");
@@ -254,7 +443,7 @@ function deleteDatabaseObject(table, id) {
 }
 
 function insertDatabaseObject(table, object, columns) {
-	if ($("#user_id").val() == "") {
+	if ($("#user_id").val() == "" || adminEditMode) {
 		return;
 	}
 	console.log("insertDatabaseObject");
@@ -272,7 +461,7 @@ function insertDatabaseObject(table, object, columns) {
 
 // send updated object to database
 function updateDatabaseObject(table, object, columns) {
-	if ($("#user_id").val() == "") {
+	if ($("#user_id").val() == "" || adminEditMode) {
 		return;
 	}
 	console.log("updateDatabaseObject");
@@ -289,7 +478,7 @@ function updateDatabaseObject(table, object, columns) {
 
 // send updated value to database
 function updateDatabaseTable(table, column, value, id) {
-	if ($("#user_id").val() == "") {
+	if ($("#user_id").val() == "" || adminEditMode) {
 		return;
 	}
 	console.log("updateDatabaseTable");
@@ -367,22 +556,11 @@ $("input").on("focus", function() {
 });
 
 // trigger 'unsaved changes' alert when leaving the page
-$("input").on("change", function() {
-	if (this.id != "gm_password") {
-		unsavedChanges = true;
-	}
-});
-$("textarea").on("input propertychange", function() {
-	unsavedChanges = true;
-});
-$("#user_form").on("submit", function() {
-	unsavedChanges = false;
-});
 $(window).on("beforeunload", function(e) {
 	// TODO saving only required during character creation
-	if (unsavedChanges) {
-  		return "Unsaved changes will be lost."; // custom message will not be displayed; message is browser specific
-	}
+	// if (unsavedChanges) {
+  	// 	return "Unsaved changes will be lost."; // custom message will not be displayed; message is browser specific
+	// }
 });
 
 // enable size edit button
@@ -527,6 +705,7 @@ function GMEditMode() {
 			// enable edit attribute pts input, enable edit xp input
 			$("#attribute_pts").attr("readonly", false).attr("type", "number");
 			$("#xp").attr("readonly", false).attr("type", "number").attr("data-toggle", null);
+			$(".motivator-input").addClass("pointer");
 	  	} else {
 			alert("Sorry sucker, that ain't it.");
 	  	}
@@ -538,7 +717,6 @@ function GMEditMode() {
 function endGMEdit(accept) {
 	if (!accept) {
 		// reload page
-		unsavedChanges = false;
 		window.location.reload();
 	} else {
 		// confirm and save
@@ -797,10 +975,12 @@ $(".motivator-pts").on("input", function() {
 		for (var i in user_motivators) {
 			if (current > user_motivators[i]['points']) {
 				// alert user and prompt to change primary motivators
-				console.log("personality crisis!");
+				// console.log("personality crisis!");
 			}
 		}
 	}
+	// update value in database
+	updateDatabaseTable('user_motivator', 'points', current, user_motivators[m_id]['id']);
 
 	// update bonuses
 	setMotivatorBonus();
@@ -844,33 +1024,6 @@ $("#xp").change(function() {
 		$("#level").val(level);
 		// alert if increased
 		if (level > current) {
-			var exclamations = [
-				"Huzzah!",
-				"Shazam!",
-				"Booyah!",
-				"Boom!",
-				"Crabcakes!",
-				"Fruit on the bottom!",
-				"Jumpin' Jehoshaphat!",
-				"Crom!",
-				"Fish on a stick!",
-				"Oingo Boingo!",
-				"Abracadabra!",
-				"Hootie McBoobs!",
-				"Poop-a-doodle-doo!",
-				"Dancin' Danzig!",
-				"Leapin' linguine!",
-				"Dorka Dorka Dorkass!",
-				"Rock'em Sock'em Robots!",
-				"Toaster Pastry Pop Tarts!",
-				"Testicular torsion!",
-				"Potato pancakes!",
-				"Yahtzee!",
-				"Fart on a forklift!",
-				"Blammo!",
-				"Kapow!",
-				"Excelsior!",
-			];
 			var index = Math.floor(Math.random() * (exclamations.length));
 			alert(exclamations[index]+" You made it to level "+level+"!");
 			// increase attribute points
@@ -1576,7 +1729,6 @@ function adjustFate() {
 
 // adjust attribute value
 function adjustAttribute(attribute, val) {
-	unsavedChanges = true;
 	var originalVal = parseInt($("#"+attribute+"_val").val());
 	var newVal = originalVal+parseInt(val);
 	// check if we are allocating attribute points
@@ -2086,7 +2238,6 @@ function removeFeatFunction(id_val, featName, cost, feat_container=null) {
 	}
 
 	// remove elements and update arrays
-	unsavedChanges = true;
 	$("#"+id_val).remove();
 	for (var i in user_feats) {
 		if (user_feats[i]['name'] == featName) {
@@ -2129,163 +2280,6 @@ function adjustInitiative() {
 }
 
 function newTrainingModal(attribute) {
-	var skillAutocompletes = {
-		'Strength':
-		{
-			'skill':[
-				'Swimming'
-			],
-			'training':[],
-			'focus':[
-				'Climb',
-				'Jump',
-				'Lift'
-			],
-		},
-		'Fortitude':
-		{
-			'skill':[
-				'Swimming'
-			],
-			'training':[],
-			'focus':[
-				'Resist Poison',
-				'Resist Disease'
-			],
-		},
-		'Speed':
-		{
-			'skill':[],
-			'training':[],
-			'focus':[
-				'Run',
-				'React'
-			],
-		},
-		'Agility':
-		{
-			'skill':[
-				'Ride Animal'
-			],
-			'training':[],
-			'focus':[
-				// 'Attack - specific weapon'
-			],
-		},
-		'Awareness':
-		{
-			'skill':[
-				'Stealth'
-			],
-			'training':[],
-			'focus':[
-				'Search',
-				'Listen',
-				'Smell',
-				'Taste'
-			],
-		},
-		'Precision':
-		{
-			'skill':[
-				'Demolitions',
-				'Security',
-				'Drive',
-				'Pilot',
-				'Sleight of Hand'
-			],
-			'training':[],
-			'focus':[
-				// 'Shoot - specific weapon',
-				// 'Throw - specific weapon'
-			],
-		},
-		'Allure':
-		{
-			'skill':[
-				'Train Animal',
-				'Perform'
-			],
-			'training':[],
-			'focus':[
-				'Seduce',
-				'Diplomacy',
-				'Barter'
-			],
-		},
-		'Deception':
-		{
-			'skill':[
-				'Hacking',
-				'Perform',
-				'Sleight of Hand',
-				'Stealth'
-			],
-			'training':[],
-			'focus':[
-				'Disguise'
-			],
-		},
-		'Innovation':
-		{
-			'skill':[
-				'Engineering',
-				'Hacking',
-				'First Aid',
-				'Tactics',
-				'Security',
-				'Drive',
-				'Pilot',
-				'Sail'
-			],
-			'training':[],
-			'focus':[
-				// 'Craft - specific item'
-			],
-		},
-		'Intellect':
-		{
-			'skill':[
-				'Engineering',
-				'First Aid',
-				'Survival',
-				'Demolitions',
-				'Sail'
-			],
-			'training':[],
-			'focus':[
-				'Appraise',
-				// 'Academia - specific area',
-				// 'Culture - specific area',
-				'Languages',
-				// 'Religion - specific religion',
-				'Magic',
-				// 'Profession - specific profession'
-			],
-		},
-		'Intuition':
-		{
-			'skill':[
-				'Survival',
-				'Tactics',
-				'Ride Animal'
-			],
-			'training':[],
-			'focus':[
-				'Sense Motive',
-				'Interrogate'
-			],
-		},
-		'Vitality':
-		{
-			'skill':[],
-			'training':[],
-			'focus':[
-				'Intimidate',
-				'Willpower'
-			],
-		},
-	};
 
 	// launch modal
 	$("#training_modal_title").html("New "+attribute+" Training");
@@ -2628,7 +2622,6 @@ function addTrainingElements(trainingName, trainingDisplayName, attribute, id, v
 function removeTrainingFunction(trainingName, row, skill_pts) {
 	var conf = confirm("Remove training '"+trainingName+"'?");
 	if (conf) {
-		unsavedChanges = true;
 		// if allocating points, increase point count
 		if (allocatingAttributePts) {
 			var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
@@ -2823,6 +2816,12 @@ function addWeaponElements(weapon) {
 	dmg_input.attr("readonly", true);
 	note_input.attr("readonly", true);
 	wgt_input.attr("readonly", true);
+	enableHighlight(name_input, "weapons[]");
+	enableHighlight(qty_input, "weapon_qty[]");
+	enableHighlight(dmg_input, "weapon_damage[]");
+	enableHighlight(note_input, "weapon_notes[]");
+	enableHighlight(wgt_input, "weapon_weight[]");
+
 	name_input.click(function() {
 		editWeapon(id_val, "name");
 	});
@@ -3009,6 +3008,10 @@ function addProtectionElements(protection) {
 	bonus_input.attr("readonly", true);
 	notes_input.attr("readonly", true);
 	weight_input.attr("readonly", true);
+	enableHighlight(name_input, "protections[]");
+	enableHighlight(bonus_input, "protection_bonus[]");
+	enableHighlight(notes_input, "protection_notes[]");
+	enableHighlight(weight_input, "protection_weight[]");
 	name_input.click(function() {
 		editProtection(id_val, "name");
 	});
@@ -3168,6 +3171,10 @@ function addHealingElements(healing) {
 	qty_input.attr("readonly", true);
 	effect_input.attr("readonly", true);
 	weight_input.attr("readonly", true);
+	enableHighlight(name_input, "healings[]");
+	enableHighlight(qty_input, "healing_quantity[]");
+	enableHighlight(effect_input, "healing_effect[]");
+	enableHighlight(weight_input, "healing_weight[]");
 	name_input.click(function() {
 		editHealing(id_val, "name");
 	});
@@ -3284,6 +3291,10 @@ function addMiscElements(misc) {
 	qty_input.attr("readonly", true);
 	notes_input.attr("readonly", true);
 	weight_input.attr("readonly", true);
+	enableHighlight(name_input, "misc[]");
+	enableHighlight(qty_input, "misc_quantity[]");
+	enableHighlight(notes_input, "misc_notes[]");
+	enableHighlight(weight_input, "misc_weight[]");
 	name_input.click(function() {
 		editMisc(id_val, "name");
 	});
@@ -3378,8 +3389,6 @@ function newNote() {
 
 // create note elements
 function addNoteElements(note) {
-	console.log(note);
-
 	var id_val = note['id'] == "" ? uuid() : "note_"+note['id'];
 
 	var li = $('<li />', {
@@ -3543,7 +3552,7 @@ function updateTotalWeight(showMsg = false) {
 // launch edit motivators modal
 function editMotivators() {
 	// only allowed during character creation and GM mode
-	if (characterCreation || adminEditMode) {
+	if (user_motivators.length == 0 || adminEditMode) {
 		// set values to current motivators
 		$("#m1").val($("#motivator_0").val());
 		$("#m2").val($("#motivator_1").val());
@@ -3571,20 +3580,25 @@ function setMotivators() {
 		};
 	}
 
-	// set point values and user_motivators array, only during character creation
-	if (characterCreation) {
+	// set point values and user_motivators array, only during character creation (NOT in admin edit mode)
+	if (!adminEditMode) {
 		for (var i = 0; i < 4; i++) {
 			let val = i == 0 ? 2 : (i == 3 ? 0 : 1);
 			$("#motivator_pts_"+i).val(val);
 			$("#motivator_primary_"+i).val(i != 3 ? 1 : 0);
 			user_motivators[i]['points'] = val;
-			user_motivators[i]['primary_'] = i != 3;
+			user_motivators[i]['primary_'] = i != 3 ? 1 : 0;
+			// insert motivators into database
+			if (user_motivators[i]['motivator'] != "") {
+				insertDatabaseObject('user_motivator', user_motivators[i], columns['user_motivator']);
+			}
 		}
 		// leave m4 points blank if m4 name input is blank
 		$("#motivator_pts_3").attr("readonly", $("#motivator_3").val() == "");
 		$("#motivator_pts_3").val($("#motivator_3").val() == "" ? "" : 0);
 		$("#bonuses").val(1);
 	}
+
 	// close modal, hide and show elements
 	$("#motivator_modal").modal("hide");
 	$("#motivator_button").hide();
@@ -3619,6 +3633,23 @@ function enableHighlighting(selector) {
 			});
 		}
 	});
+}
+
+function enableHighlight(input, label) {
+		if (is_mobile) {
+			$(input).on("focus", function(){
+				$("label[for='"+label+"']").addClass("highlight");
+			});
+			$(input).on("focusout", function(){
+				$("label[for='"+label+"']").removeClass("highlight");
+			});
+		} else {
+			$(input).hover(function(){
+				$("label[for='"+label+"']").addClass("highlight");
+			}, function(){
+				$("label[for='"+label+"']").removeClass("highlight");
+			});
+		}
 }
 
 // hidden number inputs - to trigger the number keypad for text inputs (mobile)

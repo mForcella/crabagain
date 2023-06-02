@@ -1203,35 +1203,29 @@
 								} else {
 									$bonuses = 0;
 								}
-								$show_btn = count($user_motivators) == 0;
+								$set_motivators = count($user_motivators) == 0;
 							?>
 							<input class="form-control" readonly name="bonuses" id="bonuses" value="<?php echo $bonuses ?>">
 						</div>
 					</div>
-					<div class="center" id="motivator_button" <?php echo $show_btn ? '' : 'hidden' ?>>
-						<button class="btn btn-primary" type="button" data-toggle="modal" data-target="#motivator_modal" style="position: relative;">Set Motivators</button>
+
+					<div class="form-group no-margin">
+					<?php
+						for ($i = 0; $i < 4; $i++) {
+							echo $i == 2 ? '</div><div class="form-group no-margin">' : '';
+							echo '<div class="col-xs-4 no-pad-mobile '.($i == 0 || $i == 2 ? 'no-pad-left' : 'pad-left-mobile').'">';
+							echo '<input class="form-control motivator-input '. ($set_motivators ? 'pointer' : '') .'" type="text" name="motivators[]" id="motivator_'.$i.'" readonly value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['motivator'] : '') .'">';
+							echo '</div>';
+							echo '<label class="control-label col-xs-1 no-pad-left align-right font-mobile-small" for="motivator_pts_'.$i.'">Pts:</label>';
+							echo '<div class="col-xs-1 no-pad">';
+							echo '<input class="form-control motivator-pts" type="number" name="motivator_pts[]" id="motivator_pts_'.$i.'" min="0" value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['points'] : '') .'" '. ($set_motivators ? 'readonly' : '') .'>';
+							echo '</div>';
+							echo '<input type="hidden" name="motivator_ids[]" value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['id'] : '') .'">';
+							echo '<input type="hidden" name="motivator_primary[]" value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['primary_'] : '') .'" id="motivator_primary_'.$i.'">';
+						}
+					?>
 					</div>
 
-					<div id="motivators" <?php echo $show_btn ? 'hidden' : '' ?>>
-
-						<div class="form-group no-margin">
-						<?php
-							for ($i = 0; $i < 4; $i++) {
-								echo $i == 2 ? '</div><div class="form-group no-margin">' : '';
-								echo '<div class="col-xs-4 no-pad-mobile '.($i == 0 || $i == 2 ? 'no-pad-left' : 'pad-left-mobile').'">';
-								echo '<input class="form-control motivator-input" type="text" name="motivators[]" id="motivator_'.$i.'" readonly value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['motivator'] : '') .'">';
-								echo '</div>';
-								echo '<label class="control-label col-xs-1 no-pad-left align-right font-mobile-small" for="motivator_pts_'.$i.'">Pts:</label>';
-								echo '<div class="col-xs-1 no-pad">';
-								echo '<input class="form-control motivator-pts" type="number" name="motivator_pts[]" id="motivator_pts_'.$i.'" min="0" value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['points'] : '') .'">';
-								echo '</div>';
-								echo '<input type="hidden" name="motivator_ids[]" value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['id'] : '') .'">';
-								echo '<input type="hidden" name="motivator_primary[]" value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['primary_'] : '') .'" id="motivator_primary_'.$i.'">';
-							}
-						?>
-						</div>
-
-					</div>
 				</div>
 
 			  <!-- motivators modal -->
@@ -1242,7 +1236,7 @@
 			          <h4 class="modal-title">Motivators</h4>
 			        </div>
 			        <div class="modal-body">
-			        	<h4 class="control-label center">Please select your motivators</h4>
+			        	<h4 class="control-label center">Please set your motivators</h4>
 								<?php 
 									$motivators = [
 										'',
@@ -1259,7 +1253,7 @@
 									];
 								?>
 								<input type="hidden" id="edit_motivators">
-			        	<label>Primary Motivator (2 pts)</label>
+			        	<label>*Primary Motivator (2 pts)</label>
 								<select class="form-control" id="m1" onchange="motivatorCheck(this.id)">
 									<?php 
 										foreach ($motivators as $motivator) {
@@ -1267,7 +1261,7 @@
 										}
 									?>
 								</select>
-			        	<label>Secondary Motivator (1 pt)</label>
+			        	<label>*Secondary Motivator (1 pt)</label>
 								<select class="form-control" id="m2" onchange="motivatorCheck(this.id)">
 									<?php 
 										foreach ($motivators as $motivator) {
@@ -1275,7 +1269,7 @@
 										}
 									?>
 								</select>
-			        	<label>Tertiary Motivator (1 pt)</label>
+			        	<label>*Tertiary Motivator (1 pt)</label>
 								<select class="form-control" id="m3" onchange="motivatorCheck(this.id)">
 									<?php 
 										foreach ($motivators as $motivator) {
