@@ -16,6 +16,7 @@ var user_notes;
 // arrays to make sure elements are not assigned redundant functions - TODO can probably be removed?
 var hiddenEnabled = [];
 // bools to determine rules and element visibility for various operating modes
+var inputChanges = false;
 var allocatingAttributePts = false;
 var characterCreation = false;
 var adminEditMode = false;
@@ -76,6 +77,18 @@ var columns = {
 		'motivator',
 		'points',
 		'primary_'
+	],
+	"user_feat": [
+		'name',
+		'description',
+		'feat_id'
+	],
+	"user_training": [
+		'name',
+		'value',
+		'attribute_group',
+		'magic_school',
+		'governing_school'
 	]
 };
 
@@ -430,7 +443,7 @@ function deleteDatabaseObject(table, id) {
 	if ($("#user_id").val() == "" || adminEditMode) {
 		return;
 	}
-	console.log("deleteDatabaseObject");
+	// console.log("deleteDatabaseObject");
 	$.ajax({
 		url: '/scripts/delete_database_object.php',
 		data: { 'table' : table, 'id' : id },
@@ -446,7 +459,7 @@ function insertDatabaseObject(table, object, columns) {
 	if ($("#user_id").val() == "" || adminEditMode) {
 		return;
 	}
-	console.log("insertDatabaseObject");
+	// console.log("insertDatabaseObject");
 	$.ajax({
 		url: '/scripts/insert_database_object.php',
 		data: { 'table' : table, 'data' : object, 'columns' : columns, 'user_id' : $("#user_id").val() },
@@ -464,14 +477,14 @@ function updateDatabaseObject(table, object, columns) {
 	if ($("#user_id").val() == "" || adminEditMode) {
 		return;
 	}
-	console.log("updateDatabaseObject");
+	// console.log("updateDatabaseObject");
 	$.ajax({
 		url: '/scripts/update_database_object.php',
 		data: { 'table' : table, 'data' : object, 'columns' : columns },
 		ContentType: "application/json",
 		type: 'POST',
 		success: function(response) {
-			console.log(response);
+			// console.log(response);
 		}
 	});
 }
@@ -481,7 +494,7 @@ function updateDatabaseTable(table, column, value, id) {
 	if ($("#user_id").val() == "" || adminEditMode) {
 		return;
 	}
-	console.log("updateDatabaseTable");
+	// console.log("updateDatabaseTable");
 	$.ajax({
 		url: '/scripts/update_database_column.php',
 		data: { 'table' : table, 'column' : column, 'value': value, 'id': id },
@@ -545,6 +558,10 @@ $("input").each(function() {
 	}
 });
 
+$("input").on("change", function() {
+	inputChanges = true;
+});
+
 // hide overflow text on input focus; and disallow focus on readonly inputs
 $("input").on("focus", function() {
 	if (!$(this).is("[readonly]")) {
@@ -557,10 +574,9 @@ $("input").on("focus", function() {
 
 // trigger 'unsaved changes' alert when leaving the page
 $(window).on("beforeunload", function(e) {
-	// TODO saving only required during character creation
-	// if (unsavedChanges) {
-  	// 	return "Unsaved changes will be lost."; // custom message will not be displayed; message is browser specific
-	// }
+	if (characterCreation && inputChanges) {
+  		return "Unsaved changes will be lost."; // custom message will not be displayed; message is browser specific
+	}
 });
 
 // enable size edit button
@@ -648,7 +664,6 @@ $("#school").on("click", function() {
 
 // make sure school isn't already trained
 $("#school_name").on("change", function() {
-	// strip out (Governing) for name comparison
 	for (var i in user_trainings) {
 		if (user_trainings[i]['name'] == $(this).val()) {
 			$(this).val("");
@@ -905,6 +920,7 @@ function endEditAttributes(accept) {
 			$("#attribute_pts_span").addClass("disabled");
 		}
 	} else {
+		// cancel edit attributes - restore old values and remove new trainings/talents
 		// restore attribute values
 		for (var i in attributes) {
 			$("#"+attributes[i]+"_val").val(attributeVals[i]);
@@ -921,6 +937,7 @@ function endEditAttributes(accept) {
 			var training = trainings[i].text().split("+0")[0];
 			for (var j in user_trainings) {
 				if (user_trainings[j]['name'] == training) {
+					deleteDatabaseObject('user_training', user_trainings[j]['id']);
 					user_trainings.splice(j, 1);
 				}
 			}
@@ -930,6 +947,7 @@ function endEditAttributes(accept) {
 			var training = skills[i].text().split("+0")[0];
 			for (var j in user_trainings) {
 				if (user_trainings[j]['name'] == training) {
+					deleteDatabaseObject('user_training', user_trainings[j]['id']);
 					user_trainings.splice(j, 1);
 				}
 			}
@@ -940,6 +958,7 @@ function endEditAttributes(accept) {
 			var feat = feats[i].text().split(" : ")[0];
 			for (var j in user_feats) {
 				if (user_feats[j]['name'] == feat) {
+					deleteDatabaseObject('user_feat', user_feats[j]['id']);
 					user_feats.splice(j, 1);
 				}
 			}
@@ -1415,7 +1434,6 @@ function setFeatList() {
 								// get user's governing magic school value
 								for (var i in user_trainings) {
 									if (user_trainings[i]['governing_school'] == 1) {
-										// TODO need to update user_trainings on the fly when allocating points
 										satisfied = satisfied ? true : user_trainings[i]['value'] >= req[key];
 									}
 								}
@@ -1516,19 +1534,20 @@ function featSourceFunction(input, add, list) {
 						entry.satisfied = adminEditMode ? true : feat_vals['satisfied'];
 					});
 				}
-				});
-				// check if user is already trained in the feat
-				var found = false;
-				for (var i in user_feats) {
-					if (user_feats[i]['name'].toLowerCase().includes(entry['value'].toLowerCase())) {
-						// allow Shapeshifter to be learned multiple times
-						found = user_feats[i]['name'].includes("Shapeshifter") ? false : true;
-						break;
-					}
+			});
+			// check if user is already trained in the feat
+			var found = false;
+			for (var i in user_feats) {
+				if (user_feats[i]['name'].toLowerCase().includes(entry['value'].toLowerCase())) {
+					// allow Shapeshifter to be learned multiple times
+					// TODO allow elementalist, etc to be learned multiple times?
+					found = user_feats[i]['name'].includes("Shapeshifter") ? false : true;
+					break;
 				}
-				if (!found) {
-					suggestions.push(entry);
-				}
+			}
+			if (!found) {
+				suggestions.push(entry);
+			}
 		}
 	});
 	add(suggestions);
@@ -1835,6 +1854,7 @@ function adjustAttribute(attribute, val) {
 		for (var i in user_trainings) {
 			if (user_trainings[i]['id'] == training_id) {
 				user_trainings[i]['value'] = parseInt(user_trainings[i]['value']) + parseInt(val);
+				updateDatabaseTable('user_training', 'value', user_trainings[i]['value'], user_trainings[i]['id']);
 			}
 		}
 	}
@@ -2023,7 +2043,14 @@ function newFeat() {
 	if (featName != "" && featDescription != " ") {
 		if (!editing) {
 			let feat_id = $("#feat_id").val() == "" ? uuid() : $("#feat_id").val();
-			user_feats.push({"feat_id":feat_id, "name":featName, "type":featType, "description":featDescription});
+			let newFeat = {
+				"feat_id":feat_id,
+				"name":featName,
+				"type":featType,
+				"description":featDescription
+			};
+			user_feats.push(newFeat);
+			insertDatabaseObject('user_feat', newFeat, columns['user_feat']);
 		}
 
 		// check for talents requiring additional selection
@@ -2241,6 +2268,7 @@ function removeFeatFunction(id_val, featName, cost, feat_container=null) {
 	$("#"+id_val).remove();
 	for (var i in user_feats) {
 		if (user_feats[i]['name'] == featName) {
+		  deleteDatabaseObject('user_feat', user_feats[i]['id']);
 		  user_feats.splice(i, 1);
 		  break;
 		}
@@ -2337,10 +2365,15 @@ function newTrainingModal(attribute) {
 // add a new training from modal values
 function newTraining() {
 	// check inputs - skill_name, training_name, focus_name, school_name - get value from non-hidden input
+	// TODO simplify this by adding hidden 'training_type' input
 	var trainingName = $("#skill_name").is(":visible") ? $("#skill_name").val() : 
 	( $("#training_name").is(":visible") ? $("#training_name").val() : 
 		( $("#focus_name").is(":visible") ? $("#focus_name").val() : 
 			($("#school_name").is(":visible") ? $("#school_name").val() : "" ) ) );
+	var trainingType = $("#skill_name").is(":visible") ? "unique_skill" : 
+	( $("#training_name").is(":visible") ? "training" : 
+		( $("#focus_name").is(":visible") ? "focus" : 
+			($("#school_name").is(":visible") ? "magic_school" : "" ) ) );
 	var attribute = $("#attribute_type").val();
 
 	if (trainingName != "") {
@@ -2352,11 +2385,11 @@ function newTraining() {
 			}
 		}
 
-		var user_training = [];
+		var user_training = {};
 		user_training['attribute_group'] = attribute;
 		user_training['name'] = trainingName;
-		// TODO need to set starting training value?
-		// user_training['value'] = value;
+		// if focus or training, value = 1, otherwise value = 0
+		user_training['value'] = trainingType == "training" || trainingType == "focus" ? 1 : 0;
 
 		// check for magic school
 		user_training['magic_school'] = trainingName.includes("Ka") || trainingName.includes("Avani") || 
@@ -2375,6 +2408,7 @@ function newTraining() {
 			}
 		}
 		user_trainings.push(user_training);
+		insertDatabaseObject('user_training', user_training, columns['user_training']);
 
 		// check for existing governing school - add companion/opposition to training label
 		var governing = "";
@@ -2462,6 +2496,7 @@ function cancelMagic() {
 		var training = skills[i].text().split("+0")[0];
 		for (var j in user_trainings) {
 			if (user_trainings[j]['name'] == training) {
+				deleteDatabaseObject('user_training', user_trainings[j]['id']);
 				user_trainings.splice(j, 1);
 			}
 		}
@@ -2645,6 +2680,7 @@ function removeTrainingFunction(trainingName, row, skill_pts) {
 			if (user_trainings[i]['name'] == trainingName) {
 				schoolRemoval = user_trainings[i]['magic_school'] == 1;
 				schoolName = user_trainings[i]['name'];
+				deleteDatabaseObject('user_training', user_trainings[i]['id']);
 				user_trainings.splice(i, 1);
 			}
 		}

@@ -29,7 +29,7 @@
 
 			// get xp awards
 			$xp_award = 0;
-			$sql = "SELECT xp_award FROM user_xp_award WHERE user_id = ".$user["id"];
+			$sql = "SELECT xp_award FROM user_xp_award WHERE user_id = ".$user["id"]." AND awarded IS NULL";
 			$result_xp = $db->query($sql);
 			if ($result_xp) {
 				while($row_xp = $result_xp->fetch_assoc()) {

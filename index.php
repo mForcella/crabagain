@@ -252,9 +252,15 @@
 	<nav class="navbar">
 
 	  <div class="nav-menu">
-	    <div class="nav-item">
-	       <span class="glyphicon" onclick="formSubmit()"><span class="nav-item-label"><i class="fa-solid fa-floppy-disk nav-icon"></i> Save Character Data</span></span>
-	    </div>
+	    <?php
+	    	if (!isset($user)) {
+	    		echo '
+				    <div class="nav-item">
+				      <span class="glyphicon" onclick="formSubmit()"><span class="nav-item-label"><i class="fa-solid fa-floppy-disk nav-icon"></i> Save Character Data</span></span>
+				    </div>
+				   ';
+	    	}
+	    ?>
 	    <div class="nav-item">
 	       <span id="attribute_pts_span" class="glyphicon <?php echo isset($user) && $user['attribute_pts'] == 0 ? 'disabled' : ''; ?>" onclick="allocateAttributePts(this)"><span class="nav-item-label"><i class="fa-solid fa-shield-heart nav-icon"></i> Allocate Attribute Points</span></span>
 	    </div>
@@ -2203,6 +2209,7 @@
 					}
 				}
 			}
+			// TODO update function to accept object
 			addFeatElements(user_feats[i]['name'], user_feats[i]['name'], user_feats[i]['description'], feat_id_null ? "" : user_feats[i]['feat_id'], user_feats[i]['id']);
 		}
 
@@ -2254,6 +2261,7 @@
 					}
 				}
 			}
+			// TODO update function to accept object
 			addTrainingElements(user_trainings[i]['name'], displayName, user_trainings[i]['attribute_group'], user_trainings[i]['id'], user_trainings[i]['value']);
 		}
 
