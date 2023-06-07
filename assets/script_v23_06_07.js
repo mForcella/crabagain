@@ -531,8 +531,8 @@ $("input").each(function() {
 	    class: 'tooltiptext'
 	}).appendTo($(this).parents()[0]);
 	
-	// make sure input element has an ID assigned
-	if ($(this).attr("id") != undefined) {
+	// make sure input element has an ID assigned and make sure it's not a radio button
+	if ($(this).attr("id") != undefined && $(this).attr("type") != "radio") {
 		$(this).hover(
 			// mousein - show overflow text
 			function() {
@@ -990,11 +990,25 @@ $(".motivator-pts").on("input", function() {
 			$("#xp").val(parseInt($("#xp").val()) - parseInt($("#level").val())).trigger("change");
 		}
 	} else if (current > prev) {
-		// TODO if increasing a non-primary motivator, check if it has exceeded a primary motivator
+		// if increasing a non-primary motivator, check if it has exceeded a primary motivator
 		for (var i in user_motivators) {
 			if (current > user_motivators[i]['points']) {
 				// alert user and prompt to change primary motivators
-				// console.log("personality crisis!");
+				let motivator = user_motivators[m_id]['motivator'];
+				$("#crisis_name").html(motivator);
+				$("#crisis_modal").modal("show");
+				// get other three motivators and set labels for the next modal
+				var iter = 0;
+				$(".motivator-row").hide();
+				for (var j in user_motivators) {
+					if (user_motivators[j]['points'] < current) {
+						$("#remove_motivator_"+iter).val(user_motivators[j]['motivator']);
+						$("#motivator_"+iter+"_label").html(user_motivators[j]['motivator'] + " ("+user_motivators[j]['points']+" Pts)");
+						$("#motivator_"+iter+"_row").show();
+						iter++;
+					}
+				}
+				break;
 			}
 		}
 	}
@@ -1004,6 +1018,37 @@ $(".motivator-pts").on("input", function() {
 	// update bonuses
 	setMotivatorBonus();
 });
+
+function updateMotivators() {
+	// get selected motivator to set primary_ to false
+	let remove = $('input[name="update_motivators"]:checked').val();
+	// get new motivator to set primary_ to true
+	let add = $("#crisis_name").html();
+	// update motivators in database
+	for (var i in user_motivators) {
+		if (user_motivators[i]['motivator'] == add) {
+			user_motivators[i]['primary_'] = 1;
+			updateDatabaseTable('user_motivator', 'primary_', 1, user_motivators[i]['id']);
+		}
+		if (user_motivators[i]['motivator'] == remove) {
+			user_motivators[i]['primary_'] = 0;
+			updateDatabaseTable('user_motivator', 'primary_', 0, user_motivators[i]['id']);
+		}
+	}
+	alert("Your Primary Motivators have been updated. And remember, NO Motivator bonuses for your next session!");
+	// reduce morale by -2
+	$("#morale").val($("#morale").val()-2).trigger("change");
+	// add / remove 'bold' class from labels
+	$(".motivator-input").each(function(){
+		if ($(this).val() == remove) {
+			$(this).removeClass("bold");
+		}
+		if ($(this).val() == add) {
+			$(this).addClass("bold");
+		}
+	});
+	setMotivatorBonus();
+}
 
 function setMotivatorBonus() {
 	var m_pts = 0;
@@ -1017,7 +1062,6 @@ function setMotivatorBonus() {
 	// check for morale modifiers
 	var morale = $("#morale").val();
 	bonuses += morale >= 4 ? 1 : (morale <= -4 ? -1 : 0);
-
 	$("#bonuses").val(bonuses);
 }
 
@@ -1085,13 +1129,13 @@ $("#damage").on("change", function() {
 		$("#wounds_val").val( parseInt($("#wounds_val").val())-1 <= 0 ? 0 : parseInt($("#wounds_val").val())-1 );
 		$("#wound_penalty_val").val( parseInt($("#wound_penalty_val").val())-1 <= 0 ? 0 : parseInt($("#wound_penalty_val").val())-1 );
 	}
+	let wounds = parseInt($("#wounds_val").val());
 	// check for wound increase
 	while (parseInt($(this).val()) >= parseInt($(this).attr("max"))) {
 		$(this).val($(this).val() - $(this).attr("max")).trigger("input");
 		$("#wounds_val").val( parseInt($("#wounds_val").val())+1 >= 4 ? 4 : parseInt($("#wounds_val").val())+1 );
 		$("#wound_penalty_val").val( parseInt($("#wound_penalty_val").val())+1 >= 4 ? 4 : parseInt($("#wound_penalty_val").val())+1 );
 	}
-	let wounds = parseInt($("#wounds_val").val());
 	var totalDamage = damage + (wounds * resilience);
 	$("#damage").attr("min", wounds == 0 ? 0 : -1);
 	// check for max total damage
@@ -1099,7 +1143,7 @@ $("#damage").on("change", function() {
 		totalDamage = resilience * 4;
 		$("#damage").val(0);
 	}
-	$("#total_damage").val(totalDamage);
+	$("#total_damage").val(totalDamage).trigger("change");
 	$("#wounds").val($("#wounds_val option:selected").text());
 	$("#wound_penalty").val($("#wound_penalty_val option:selected").text());
 });
@@ -1539,9 +1583,10 @@ function featSourceFunction(input, add, list) {
 			var found = false;
 			for (var i in user_feats) {
 				if (user_feats[i]['name'].toLowerCase().includes(entry['value'].toLowerCase())) {
-					// allow Shapeshifter to be learned multiple times
-					// TODO allow elementalist, etc to be learned multiple times?
+					// allow Shapeshifter, Elementalist, and Elemental Master to be learned multiple times
 					found = user_feats[i]['name'].includes("Shapeshifter") ? false : true;
+					found = user_feats[i]['name'].includes("Elementalist") ? false : true;
+					found = user_feats[i]['name'].includes("Elemental Master") ? false : true;
 					break;
 				}
 			}
@@ -1810,7 +1855,6 @@ function adjustAttribute(attribute, val) {
 			$("#resilience").val(resilience);
 			// adjust max damage
 			$("#damage").attr("max", resilience);
-			// TODO adjust number of wounds?
 			break;
 		case 'speed':
 			adjustInitiative();

@@ -735,8 +735,8 @@
 										$wound_val = $wounds == 0 ? "None" : ($wounds == 1 ? "Wounded" : ($wounds == 2 ? "Incapacitated" : ($wounds == 3 ? "Mortally Wounded" : "Yer Dead")));
 										$wound_penalty_val = $wounds == 0 ? "None" : ($wounds == 1 ? "-1" : ($wounds == 2 ? "-3" : ($wounds == 3 ? "-5" : "Yer Dead")));
 									?>
-									<input class="form-control track-changes" id="damage" type="number" min="<?php echo $wounds == 0 ? 0 : -1 ?>" value="<?php echo $damage ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user" data-column="damage">
-									<input type="hidden" name="damage" id="total_damage">
+									<input class="form-control" id="damage" type="number" min="<?php echo $wounds == 0 ? 0 : -1 ?>" value="<?php echo $damage ?>">
+									<input type="hidden" class="track-changes" name="damage" id="total_damage" data-table="user" data-column="damage" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>">
 								</div>
 								<div class="col-xs-2 center no-pad">
 									/
@@ -1220,7 +1220,7 @@
 						for ($i = 0; $i < 4; $i++) {
 							echo $i == 2 ? '</div><div class="form-group no-margin">' : '';
 							echo '<div class="col-xs-4 no-pad-mobile '.($i == 0 || $i == 2 ? 'no-pad-left' : 'pad-left-mobile').'">';
-							echo '<input class="form-control motivator-input '. ($set_motivators ? 'pointer' : '') .'" type="text" name="motivators[]" id="motivator_'.$i.'" readonly value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['motivator'] : '') .'">';
+							echo '<input class="form-control motivator-input '. (isset($user_motivators[$i]) && $user_motivators[$i]['primary_'] ? 'bold' : '') .' '. ($set_motivators ? 'pointer' : '') .'" type="text" name="motivators[]" id="motivator_'.$i.'" readonly value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['motivator'] : '') .'">';
 							echo '</div>';
 							echo '<label class="control-label col-xs-1 no-pad-left align-right font-mobile-small" for="motivator_pts_'.$i.'">Pts:</label>';
 							echo '<div class="col-xs-1 no-pad">';
@@ -1506,6 +1506,59 @@
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Learn Magic!</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="cancelMagic()">Cancel</button>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+	<!-- personality crisis modal -->
+  <div class="modal" id="crisis_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Oh No! My Personality!</h4>
+        </div>
+        <div class="modal-body">
+        	<p>It looks like you might be having a bit of a <strong>Personality Crisis</strong>.<br><br>Would you like to make <strong><span id="crisis_name"></span></strong> one of your primary motivators?</p>
+        	<p class="smaller"><br>NOTE: A Personality Crisis will result in a -2 penalty to your Morale and NO Motivator bonuses for your next session.<br></p>
+        	<div class="button-bar">
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#crisis_modal_2">Yeah that sounds right</button>
+	        	<p></p>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">No thanks</button>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+	<!-- personality crisis modal #2 -->
+  <div class="modal" id="crisis_modal_2" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Update Primary Motivators</h4>
+        </div>
+        <div class="modal-body">
+        	<label class="control-label">Select a Motivator to <strong>remove</strong> from your Primary Motivators</label>
+
+        	<div class="row motivator-row" id="motivator_0_row">
+	        	<input class="form-check-input" type="radio" name="update_motivators" id="remove_motivator_0" checked="checked">
+			      <label class="form-check-label" for="remove_motivator_0" id="motivator_0_label"></label>
+        	</div>
+        	<div class="row motivator-row" id="motivator_1_row">
+	        	<input class="form-check-input" type="radio" name="update_motivators" id="remove_motivator_1">
+			      <label class="form-check-label" for="remove_motivator_1" id="motivator_1_label"></label>
+        	</div>
+        	<div class="row motivator-row" id="motivator_2_row">
+	        	<input class="form-check-input" type="radio" name="update_motivators" id="remove_motivator_2">
+			      <label class="form-check-label" for="remove_motivator_2" id="motivator_2_label"></label>
+        	</div>
+
+        	<div class="button-bar">
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="updateMotivators()">Update Motivators</button>
+	        	<p></p>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
       </div>
@@ -2303,7 +2356,6 @@
 
 		// check for user misc items
 		user_misc = <?php echo json_encode($misc); ?>;
-		// console.log(user_healings);
 		for (var i in user_misc) {
 			addMiscElements(user_misc[i]);
 		}
