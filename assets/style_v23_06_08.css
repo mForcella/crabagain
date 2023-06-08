@@ -236,6 +236,7 @@ h1 {
 .attribute-name {
 	width: 80px;
 	display: inline-block;
+	font-weight: bold;
 }
 .btn-default {
 	border: none;
@@ -309,6 +310,14 @@ h1 {
 }
 .form-group .control-label {
 	text-align: left;
+}
+@media screen and (max-width:767px) {
+	[class^="col-"] .control-label {
+		padding: 0 10px;
+	}
+	[class^="col-"] .control-label.resize-mobile, [class^="col-"] .control-label.no-pad-left {
+		padding: 0;
+	}
 }
 .form-group {
 	margin-bottom: 5px;

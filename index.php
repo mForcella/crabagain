@@ -371,7 +371,7 @@
 					<div class="form-group tablet-adjust">
 						<label class="control-label col-sm-2 col-xs-4" for="xp">XP</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-							<input class="form-control pointer" readonly data-toggle="modal" data-target="#xp_modal" name="xp" id="xp" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['xp']) : 0 ?>">
+							<input class="form-control pointer track-changes" readonly data-toggle="modal" data-target="#xp_modal" name="xp" id="xp" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['xp']) : 0 ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="level">Level</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
@@ -1224,7 +1224,7 @@
 							echo '</div>';
 							echo '<label class="control-label col-xs-1 no-pad-left align-right font-mobile-small" for="motivator_pts_'.$i.'">Pts:</label>';
 							echo '<div class="col-xs-1 no-pad">';
-							echo '<input class="form-control motivator-pts" type="number" name="motivator_pts[]" id="motivator_pts_'.$i.'" min="0" value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['points'] : '') .'" '. ($set_motivators ? 'readonly' : '') .'>';
+							echo '<input class="form-control motivator-pts" type="number" name="motivator_pts[]" id="motivator_pts_'.$i.'" min="0" value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['points'] : '') .'" '. ($set_motivators ? 'readonly' : '') .' data-val="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['points'] : '') .'">';
 							echo '</div>';
 							echo '<input type="hidden" name="motivator_ids[]" value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['id'] : '') .'">';
 							echo '<input type="hidden" name="motivator_primary[]" value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['primary_'] : '') .'" id="motivator_primary_'.$i.'">';
@@ -2330,7 +2330,8 @@
 					$("#weapon_select_"+select_id).val(user_weapons[i]['name']);
 					selectWeapon(select_id++, false);
 					if (is_mobile) {
-						$("#weapon_"+(select_id-1)).trigger("click");
+						// TODO make these auto-expanded on load on mobile
+						// $("#weapon_"+(select_id-1)).trigger("click");
 					}
 				}
 			}

@@ -612,7 +612,7 @@ $(document).mouseup(function(e) {
 // resize character background textarea to fit text
 $("#background").height( $("#background")[0].scrollHeight );
 
-$("#attribute_pts").on("input", function() {
+$("#attribute_pts").on("input change", function() {
 	if (parseInt($(this).val()) == 0) {
 		$("#attribute_pts_span").addClass("disabled");
 	} else {
@@ -973,22 +973,22 @@ $('.motivator-pts').on('focusin', function() {
 });
 
 // on motivator pt change, adjust bonuses
-$(".motivator-pts").on("input", function() {
+$(".motivator-pts").on("change touchend", function() {
 
 	// get current and previous values and update user_motivators
 	let m_id = this.id.split("motivator_pts_")[1];
 	let current = $(this).val();
+	if (current == "") {
+		current = 0;
+		$(this).val(0);
+	}
 	let prev = $(this).data('val');
 	$(this).data('val', current);
 	user_motivators[m_id]['points'] = current;
 
 	// adjust xp if primary motivator
 	if (user_motivators[m_id]['primary_'] == 1) {
-		if (current > prev) {
-			$("#xp").val(parseInt($("#xp").val()) + parseInt($("#level").val())).trigger("change");
-		} else {
-			$("#xp").val(parseInt($("#xp").val()) - parseInt($("#level").val())).trigger("change");
-		}
+		$("#xp").val( parseInt($("#xp").val()) + parseInt($("#level").val()) * (current - prev) ).trigger("change");
 	} else if (current > prev) {
 		// if increasing a non-primary motivator, check if it has exceeded a primary motivator
 		for (var i in user_motivators) {
@@ -1111,7 +1111,7 @@ $("#xp").change(function() {
 });
 
 // on morale change, set morale effect
-$("#morale").on("input", function() {
+$("#morale").on("input change", function() {
 	setMoraleEffect(parseInt($(this).val()));
 	setMotivatorBonus();
 });
@@ -1222,11 +1222,11 @@ function setToughness() {
 }
 
 // penalty inputs - if val is zero, clear input
-$(".penalty-val").on("input", function() {
-	if ($(this).val() == 0) {
-		$(this).val("");
-	}
-});
+// $(".penalty-val").on("input", function() {
+// 	if ($(this).val() == 0) {
+// 		$(this).val("");
+// 	}
+// });
 
 // anchor link dropdown
 $("#anchor_links").on("change", function() {
