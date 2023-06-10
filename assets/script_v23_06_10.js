@@ -759,25 +759,30 @@ function getDamageMod(weapon_type, damage, max_damage) {
 			Math.floor(parseInt($("#precision__val").val())/2) : Math.ceil(parseInt($("#precision__val").val())/3);
 	}
 	// make sure damage doesn't exceed max
-	if (max_damage != 0 && damage + damage_mod > max_damage) {
+	if (max_damage != 0 && parseInt(damage)+parseInt(damage_mod) > max_damage) {
 		damage_mod = max_damage - damage;
 	}
 	return damage_mod;
 }
 
 // select a weapon from the dropdown
+// param: id - dropdown ID
+// param: equip - only true if we are making a selection from the dropdown
 function selectWeapon(id, equip=true) {
 	let selected = $("#weapon_select_"+id).val();
+
+	// get weapon object from array
 	var user_weapon;
 	for (var i in user_weapons) {
 		if (selected == user_weapons[i]['name']) {
 			user_weapon = user_weapons[i];
 		}
 	}
-	let duplicate = selected == "" || user_weapon['equipped'] == user_weapon['quantity'];
-	// if selected is empty we need to unequip weapon
+	let clearSelection = selected == "" || user_weapon['equipped'] == user_weapon['quantity'];
+
+	// if selected is empty we need to unequip the weapon
 	if (selected == "") {
-		let unequipped = equipped_weapons[id-1];
+		let unequipped = equipped_weapons[id-1]['name'];
 		equipped_weapons[id-1] = null;
 		for (var i in user_weapons) {
 			if (unequipped == user_weapons[i]['name']) {
@@ -788,16 +793,17 @@ function selectWeapon(id, equip=true) {
 		}
 	}
 
-	// check if selection is allowed; number equipped cannot exceed quantity
-	if (!equip || !duplicate) {
-		// update equipped array
-		equipped_weapons[id-1] = selected;
+	// // check if selection is allowed; number equipped cannot exceed quantity
+	if (!equip || !clearSelection) {
+
 		// update equipped value on user weapon
 		if (equip) {
+			equipped_weapons[id-1] = user_weapon;
 			user_weapon['equipped'] = parseInt(user_weapon['equipped']) + 1;
 			// update equipped value in database
 			updateDatabaseTable('user_weapon', 'equipped', user_weapon['equipped'], user_weapon['id']);
 		}
+
 		// get weapon damage
 		let damage = user_weapon['damage'];
 		let max_damage = user_weapon['max_damage'] == null || user_weapon['max_damage'] == "" ? 0 : user_weapon['max_damage'];
@@ -805,16 +811,7 @@ function selectWeapon(id, equip=true) {
 		$("#weapon_damage_"+id).val(damage_mod != 0 ? damage+" (+"+damage_mod+")" : damage);
 
 		// look for crit modifiers
-		var crit = 6;
-		if (user_weapon['crit'] != null && user_weapon['crit'] != '') {
-			crit -= parseInt(user_weapon['crit']);
-		}
-		for (var j in user_feats) {
-			if (user_feats[j]['name'].toLowerCase() == "improved critical hit") {
-				crit -= 1;
-				break;
-			}
-		}
+		let crit = getCritModifier(user_weapon);
 		$("#weapon_crit_"+id).val(crit);
 		$("#weapon_range_"+id).val(user_weapon['range_'] == null || user_weapon['range_'] == "" ? "-" : user_weapon['range_']);
 		$("#weapon_rof_"+id).val(user_weapon['rof'] == "" ? "-" : user_weapon['rof']);
@@ -830,6 +827,21 @@ function selectWeapon(id, equip=true) {
 
 	// update user defend value
 	setDefend();
+}
+
+// calculate crit modifier based on weapon and user feats
+function getCritModifier(weapon) {
+	var crit = 6;
+	if (weapon['crit'] != null && weapon['crit'] != '') {
+		crit -= parseInt(weapon['crit']);
+	}
+	for (var i in user_feats) {
+		if (user_feats[i]['name'].toLowerCase() == "improved critical hit") {
+			crit -= 1;
+			break;
+		}
+	}
+	return crit;
 }
 
 // start point allocation mode
@@ -2085,17 +2097,6 @@ function newFeat() {
 	}
 
 	if (featName != "" && featDescription != " ") {
-		if (!editing) {
-			let feat_id = $("#feat_id").val() == "" ? uuid() : $("#feat_id").val();
-			let newFeat = {
-				"feat_id":feat_id,
-				"name":featName,
-				"type":featType,
-				"description":featDescription
-			};
-			user_feats.push(newFeat);
-			insertDatabaseObject('user_feat', newFeat, columns['user_feat']);
-		}
 
 		// check for talents requiring additional selection
 		var featDisplayName = "";
@@ -2113,6 +2114,19 @@ function newFeat() {
 			}
 			featName = featName + " ("+$("#animal_name").val()+")";
 		}
+
+		if (!editing) {
+			let feat_id = $("#feat_id").val() == "" ? uuid() : $("#feat_id").val();
+			let newFeat = {
+				"feat_id":feat_id,
+				"name":featDisplayName == "" ? featName : featDisplayName,
+				"type":featType,
+				"description":featDescription
+			};
+			user_feats.push(newFeat);
+			insertDatabaseObject('user_feat', newFeat, columns['user_feat']);
+		}
+
 		addFeatElements(featName, featDisplayName, featDescription.trim(), $("#feat_id").val(), $("#user_feat_id").val());
 	}
 }
@@ -2277,10 +2291,10 @@ function addFeatElements(featName, featDisplayName, featDescription, feat_id, us
 
 	// check for specific feats and adjust attributes (quick and the dead, improved crit, etc)
 	if (featName.toLowerCase() == "improved critical hit") {
-		// adjust weapon crit values
-		selectWeapon(1);
-		selectWeapon(2);
-		selectWeapon(3);
+		for (var i in equipped_weapons) {
+			let crit = getCritModifier(equipped_weapons[i]);
+			$("#weapon_crit_"+(parseInt(i)+1)).val(crit);
+		}
 	}
 	if (featName.toLowerCase() == "quick and the dead") {
 		// adjust initiative value
@@ -2320,9 +2334,11 @@ function removeFeatFunction(id_val, featName, cost, feat_container=null) {
 
 	// check if we're removing feats that affect attributes
 	if (featName.toLowerCase() == "improved critical hit") {
-		selectWeapon(1);
-		selectWeapon(2);
-		selectWeapon(3);
+		// adjust crit value for equipped weapons
+		for (var i in equipped_weapons) {
+			let crit = getCritModifier(equipped_weapons[i]);
+			$("#weapon_crit_"+(parseInt(i)+1)).val(crit);
+		}
 	}
 	if (featName.toLowerCase() == "quick and the dead") {
 		adjustInitiative();
@@ -2795,6 +2811,10 @@ function newWeapon() {
 		$("#"+weapon_id+"_defend").val(defend);
 		$("#"+weapon_id+"_crit").val(crit);
 		$("#"+weapon_id+"_qty").val(qty);
+		// update mobile row
+		$("#"+weapon_id+"_mobile_title").html(name+" : ");
+		$("#"+weapon_id+"_mobile_details").html("Damage: "+damage_text+"; Weight: "+weight+"lbs; Qty: "+qty+"; "+noteMod+notes);
+
 		updateTotalWeight(true);
 		// check if this weapon is selected - update stats
 		for (var i in user_weapons) {
@@ -2810,7 +2830,7 @@ function newWeapon() {
 						user_weapons[i]['range_'] = range;
 						user_weapons[i]['rof'] = rof;
 						user_weapons[i]['notes'] = notes;
-						selectWeapon(this.id.slice(-1));
+						selectWeapon(this.id.slice(-1), false);
 						// update weapon in database
 						updateDatabaseObject('user_weapon', user_weapons[i], columns['user_weapon']);
 					}
@@ -2857,13 +2877,18 @@ function newWeapon() {
 function addWeaponElements(weapon) {
 	let id_val = weapon['id'] == "" ? uuid() : "weapon_"+weapon['id'];
 
-	let div = createElement('div', 'form-group item', '#weapons', id_val);
-	let div1 = createElement('div', 'col-xs-3 no-pad-mobile', div);
-	let div2 = createElement('div', 'col-xs-1 no-pad-mobile', div);
-	let div3 = createElement('div', 'col-xs-1 no-pad-mobile', div);
-	let div4 = createElement('div', 'col-xs-5 no-pad-mobile', div);
-	let div5 = createElement('div', 'col-xs-1 no-pad-mobile', div);
-	let div6 = createElement('div', 'col-xs-1 no-pad-mobile center', div);
+	let div = createElement('div', '', '#weapons', id_val);
+	let div0 = createElement('div', 'form-group item', div); // desktop row container
+	let div1 = createElement('div', 'col-xs-3 no-pad-mobile', div0); // name
+	let div3 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // damage
+	let div4 = createElement('div', 'col-xs-5 no-pad-mobile', div0); // notes
+	let div5 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // weight
+	let div2 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // qty
+	let div6 = createElement('div', 'col-xs-1 no-pad-mobile center remove-btn', div); // delete btn
+	let remove = createElement('span', 'glyphicon glyphicon-remove', div6);
+	remove.on("click", function() {
+		removeWeapon(id_val);
+	});
 
 	let name_input = createInput('', 'text', 'weapons[]', weapon['name'], div1, id_val+"_name");
 	let qty_input = createInput('qty', 'text', 'weapon_qty[]', weapon['quantity'], div2, id_val+"_qty");
@@ -2877,7 +2902,8 @@ function addWeaponElements(weapon) {
 	noteMod += weapon['rof'] != null && weapon['rof'] != "" ? "RoF: "+weapon['rof']+"; " : "";
 	noteMod += weapon['defend'] != null && weapon['defend'] != "" ? "+"+weapon['defend']+" Defend; " : "";
 	noteMod += weapon['crit'] != null && weapon['crit'] != "" ? "+"+weapon['crit']+" Critical Threat Range; " : "";
-	let note_input = createInput('', 'text', '', noteMod+weapon['notes'], div4, id_val+"_notes");
+	let notesText = noteMod != "" && weapon['notes'] != "" ? noteMod+weapon['notes'] : "";
+	let note_input = createInput('', 'text', '', notesText, div4, id_val+"_notes");
 	let wgt_input = createInput('wgt', 'text', 'weapon_weight[]', weapon['weight'], div5, id_val+"_weight");
 	createInput('', 'hidden', 'weapon_damage[]', weapon['damage'], div5, id_val+"_damage_val");
 	createInput('', 'hidden', 'weapon_notes[]', weapon['notes'], div5, id_val+"_notes_val");
@@ -2889,6 +2915,19 @@ function addWeaponElements(weapon) {
 	createInput('', 'hidden', 'weapon_crit[]', weapon['crit'], div5, id_val+"_crit");
 	createInput('', 'hidden', 'weapon_ids[]', weapon['id'], div5);
 	updateTotalWeight(true);
+
+	// mobile item layout
+	let mobileItemRow = createElement('span', 'item-mobile', div, id_val+'_mobile');
+	let itemText = createElement('span', 'note item-label', mobileItemRow);
+	itemText.hover(function() {
+		$(this).addClass("highlight");
+	}, function() {
+		$(this).removeClass("highlight");
+	});
+	let itemTitle = createElement('span', 'note-title', itemText, id_val+"_mobile_title");
+	itemTitle.html(weapon['name']+" : ");
+	let itemDetails = createElement('span', 'note-content', itemText, id_val+"_mobile_details");
+	itemDetails.html("Damage: "+damageText+"; Weight: "+weapon['weight']+"lbs; Qty: "+weapon['quantity']+"; "+notesText);
 
 	// add click and hover functions
 	name_input.attr("readonly", true);
@@ -2921,39 +2960,8 @@ function addWeaponElements(weapon) {
 	wgt_input.click(function() {
 		editWeapon(id_val, "weight");
 	});
-
-	// add remove button
-	createElement('span', 'glyphicon glyphicon-remove', div6, id_val+"_remove");
-	$("#"+id_val+"_remove").on("click", function() {
-		let item = $("#"+id_val+"_name").val();
-		let conf = confirm("Remove item '"+item+"'?");
-		if (conf) {
-			$("#"+id_val).remove();
-			for (var i in user_weapons) {
-				if (user_weapons[i]['name'] == weapon['name']) {
-					deleteDatabaseObject('user_weapon', weapon['id']);
-					user_weapons.splice(i, 1);
-					break;
-				}
-			}
-		  // clear inputs if weapon is selected
-		  $(".weapon-select").find("option").each(function() {
-		  	if ($(this).val() == weapon['name']) {
-			  	if ($(this).is(":selected")) {
-			  		// clear inputs
-			  		let id = $(this).parent().attr("id").split("weapon_select_")[1];
-						$("#weapon_damage_"+id).val("");
-						$("#weapon_crit_"+id).val("");
-						$("#weapon_range_"+id).val("");
-						$("#weapon_rof_"+id).val("");
-						setDefend();
-			  	}
-		  		$(this).remove();
-		  	}
-		  });
-		  // update total weight
-		  updateTotalWeight(false);
-		}
+	itemText.click(function() {
+		editWeapon(id_val, "name");
 	});
 
 	// add to dropdown
@@ -2966,6 +2974,40 @@ function addWeaponElements(weapon) {
 
 	enableHiddenNumbers();
 
+}
+
+// remove item layout elements and delete from database
+function removeWeapon(id_val) {
+	let item = $("#"+id_val+"_name").val();
+	let conf = confirm("Remove item '"+item+"'?");
+	if (conf) {
+		$("#"+id_val).remove();
+		$("#"+id_val+"_mobile").remove();
+		for (var i in user_weapons) {
+			if (user_weapons[i]['name'] == item) {
+				deleteDatabaseObject('user_weapon', user_weapons[i]['id']);
+				user_weapons.splice(i, 1);
+				break;
+			}
+		}
+	  // clear inputs if weapon is selected
+	  $(".weapon-select").find("option").each(function() {
+	  	if ($(this).val() == item) {
+		  	if ($(this).is(":selected")) {
+		  		// clear inputs
+		  		let id = $(this).parent().attr("id").split("weapon_select_")[1];
+					$("#weapon_damage_"+id).val("");
+					$("#weapon_crit_"+id).val("");
+					$("#weapon_range_"+id).val("");
+					$("#weapon_rof_"+id).val("");
+					setDefend();
+		  	}
+	  		$(this).remove();
+	  	}
+	  });
+	  // update total weight
+	  updateTotalWeight(false);
+	}
 }
 
 function editWeapon(weapon_id, input_id) {
@@ -3030,6 +3072,9 @@ function newProtection() {
 		$("#"+protection_id+"_bonus").val(bonus);
 		$("#"+protection_id+"_notes").val(notes);
 		$("#"+protection_id+"_weight").val(weight);
+		// update mobile row
+		$("#"+protection_id+"_mobile_title").html(name+" : ");
+		$("#"+protection_id+"_mobile_details").html("Bonus: +"+bonus+"; Weight: "+weight+"lbs; "+notes);
 
 		// update protections array bonus value
 		for (var i in user_protections) {
@@ -3069,20 +3114,35 @@ function newProtection() {
 function addProtectionElements(protection) {
 	var id_val = protection['id'] == "" ? uuid() : "protection_"+protection['id'];
 
-	var div = createElement('div', 'form-group item', '#protections', id_val);
-	var div3 = createElement('div', 'col-xs-1 no-pad-mobile col-icon', div);
-	var div1 = createElement('div', 'col-xs-3 no-pad-mobile col-icon-right', div);
-	var div2 = createElement('div', 'col-xs-1 no-pad-mobile', div);
-	var div4 = createElement('div', 'col-xs-5 no-pad-mobile', div);
-	var div5 = createElement('div', 'col-xs-1 no-pad-mobile', div);
-	var div6 = createElement('div', 'col-xs-1 no-pad-mobile center', div);
+	var div = createElement('div', '', '#protections', id_val);
+	var div0 = createElement('div', 'form-group item item-protection', div); // desktop row container
+	var div3 = createElement('div', 'col-xs-1 no-pad-mobile col-icon equip-btn', div); // equip btn
+	var div1 = createElement('div', 'col-xs-3 no-pad-mobile col-icon-right', div0); // name
+	var div2 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // bonus
+	var div4 = createElement('div', 'col-xs-5 no-pad-mobile', div0); // notes
+	var div5 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // weight
+	var div6 = createElement('div', 'col-xs-1 no-pad-mobile center remove-btn', div); // remove btn
 
 	var name_input = createInput('', 'text', 'protections[]', protection['name'], div1, id_val+"_name");
 	var bonus_input = createInput('', 'text', 'protection_bonus[]', protection['bonus'], div2, id_val+"_bonus");
-	var notes_input = createInput('', 'text', 'protection_notes[]', protection['notes'], div4, id_val+"_notes");
+	let notesText = protection['notes'] == null ? "" : protection['notes'];
+	var notes_input = createInput('', 'text', 'protection_notes[]', notesText, div4, id_val+"_notes");
 	var weight_input = createInput('wgt', 'text', 'protection_weight[]', protection['weight'], div5, id_val+"_weight");
 	createInput('', 'hidden', 'protection_ids[]', protection['id'], div6);
 	updateTotalWeight(true);
+
+	// mobile item layout
+	let mobileItemRow = createElement('span', 'item-mobile item-protection', div);
+	let itemText = createElement('span', 'note item-label-mobile', mobileItemRow);
+	itemText.hover(function() {
+		$(this).addClass("highlight");
+	}, function() {
+		$(this).removeClass("highlight");
+	});
+	let itemTitle = createElement('span', 'note-title', itemText, id_val+"_mobile_title");
+	itemTitle.html(protection['name']+" : ");
+	let itemDetails = createElement('span', 'note-content', itemText, id_val+"_mobile_details");
+	itemDetails.html("Bonus: +"+protection['bonus']+"; Weight: "+protection['weight']+"lbs; "+notesText);
 
 	name_input.attr("readonly", true);
 	bonus_input.attr("readonly", true);
@@ -3103,6 +3163,9 @@ function addProtectionElements(protection) {
 	});
 	weight_input.click(function() {
 		editProtection(id_val, "weight");
+	});
+	itemText.click(function() {
+		editProtection(id_val, "name");
 	});
 
 	// add equip button
@@ -3126,8 +3189,8 @@ function addProtectionElements(protection) {
 	});
 
 	// add remove button
-	createElement('span', 'glyphicon glyphicon-remove', div6, id_val+"_remove");
-	$("#"+id_val+"_remove").on("click", function() {
+	let removeBtn = createElement('span', 'glyphicon glyphicon-remove', div6);
+	removeBtn.on("click", function() {
 		var item = $("#"+id_val+"_name").val();
 		var conf = confirm("Remove item '"+item+"'?");
 		if (conf) {
@@ -3197,6 +3260,9 @@ function newHealing() {
 		$("#"+healing_id+"_quantity").val(quantity);
 		$("#"+healing_id+"_effect").val(effect);
 		$("#"+healing_id+"_weight").val(weight);
+		// update mobile row
+		$("#"+healing_id+"_mobile_title").html(name+" : ");
+		$("#"+healing_id+"_mobile_details").html("Effect: "+effect+"; Weight: "+weight+"lbs; Qty: "+quantity);
 		updateTotalWeight(true);
 		// update healing in database
 		for (var i in user_healings) {
@@ -3233,12 +3299,13 @@ function newHealing() {
 function addHealingElements(healing) {
 	var id_val = healing['id'] == "" ? uuid() : "healing_"+healing['id'];
 
-	var div = createElement('div', 'form-group item', '#healings', id_val);
-	var div1 = createElement('div', 'col-xs-4 no-pad-mobile', div);
-	var div2 = createElement('div', 'col-xs-1 no-pad-mobile', div);
-	var div3 = createElement('div', 'col-xs-5 no-pad-mobile', div);
-	var div4 = createElement('div', 'col-xs-1 no-pad-mobile', div);
-	var div5 = createElement('div', 'col-xs-1 no-pad-mobile center', div);
+	var div = createElement('div', '', '#healings', id_val);
+	let div0 = createElement('div', 'form-group item', div); // desktop row container
+	var div1 = createElement('div', 'col-xs-4 no-pad-mobile', div0); // name
+	var div3 = createElement('div', 'col-xs-5 no-pad-mobile', div0); // notes
+	var div4 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // weight
+	var div2 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // qty
+	var div5 = createElement('div', 'col-xs-1 no-pad-mobile center remove-btn', div); // remove btn
 
 	var name_input = createInput('', 'text', 'healings[]', healing['name'], div1, id_val+"_name");
 	var qty_input = createInput('qty', 'text', 'healing_quantity[]', healing['quantity'], div2, id_val+"_quantity");
@@ -3246,6 +3313,19 @@ function addHealingElements(healing) {
 	var weight_input = createInput('wgt', 'text', 'healing_weight[]', healing['weight'], div4, id_val+"_weight");
 	createInput('', 'hidden', 'healing_ids[]', healing['id'], div4);
 	updateTotalWeight(true);
+
+	// mobile item layout
+	let mobileItemRow = createElement('span', 'item-mobile', div);
+	let itemText = createElement('span', 'note item-label', mobileItemRow);
+	itemText.hover(function() {
+		$(this).addClass("highlight");
+	}, function() {
+		$(this).removeClass("highlight");
+	});
+	let itemTitle = createElement('span', 'note-title', itemText, id_val+"_mobile_title");
+	itemTitle.html(healing['name']+" : ");
+	let itemDetails = createElement('span', 'note-content', itemText, id_val+"_mobile_details");
+	itemDetails.html("Effect: "+healing['effect']+"; Weight: "+healing['weight']+"lbs; Qty: "+healing['quantity']);
 
 	name_input.attr("readonly", true);
 	qty_input.attr("readonly", true);
@@ -3266,6 +3346,9 @@ function addHealingElements(healing) {
 	});
 	weight_input.click(function() {
 		editHealing(id_val, "weight");
+	});
+	mobileItemRow.click(function() {
+		editHealing(id_val, "name");
 	});
 
 	// add remove button
@@ -3324,6 +3407,9 @@ function newMisc() {
 		$("#"+misc_id+"_quantity").val(quantity);
 		$("#"+misc_id+"_notes").val(notes);
 		$("#"+misc_id+"_weight").val(weight);
+		// update mobile row
+		$("#"+misc_id+"_mobile_title").html(name+" : ");
+		$("#"+misc_id+"_mobile_details").html( (notes == "" ? "" : "Notes: "+notes+"; ")+"Weight: "+weight+"lbs; Qty: "+quantity);
 		updateTotalWeight(true);
 		// update misc in database
 		for (var i in user_misc) {
@@ -3353,19 +3439,34 @@ function newMisc() {
 function addMiscElements(misc) {
 	var id_val = misc['id'] == "" ? uuid() : "misc_"+misc['id'];
 
-	var div = createElement('div', 'form-group item', '#misc', id_val);
-	var div1 = createElement('div', 'col-xs-4 no-pad-mobile', div);
-	var div2 = createElement('div', 'col-xs-1 no-pad-mobile', div);
-	var div3 = createElement('div', 'col-xs-5 no-pad-mobile', div);
-	var div4 = createElement('div', 'col-xs-1 no-pad-mobile', div);
-	var div5 = createElement('div', 'col-xs-1 no-pad-mobile center', div);
+	var div = createElement('div', '', '#misc', id_val);
+	let div0 = createElement('div', 'form-group item', div); // desktop row container
+	var div1 = createElement('div', 'col-xs-4 no-pad-mobile', div0); // name
+	var div3 = createElement('div', 'col-xs-5 no-pad-mobile', div0); // notes
+	var div4 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // weight
+	var div2 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // qty
+	var div5 = createElement('div', 'col-xs-1 no-pad-mobile center remove-btn', div);
 
 	var name_input = createInput('', 'text', 'misc[]', misc['name'], div1, id_val+"_name");
 	var qty_input = createInput('qty', 'text', 'misc_quantity[]', misc['quantity'], div2, id_val+"_quantity");
-	var notes_input = createInput('', 'text', 'misc_notes[]', misc['notes'], div3, id_val+"_notes");
+	let notesText = misc['notes'] == null ? "" : misc['notes'];
+	var notes_input = createInput('', 'text', 'misc_notes[]', notesText, div3, id_val+"_notes");
 	var weight_input = createInput('wgt', 'text', 'misc_weight[]', misc['weight'], div4, id_val+"_weight");
 	createInput('', 'hidden', 'misc_ids[]', misc['id'], div4);
 	updateTotalWeight(true);
+
+	// mobile item layout
+	let mobileItemRow = createElement('span', 'item-mobile', div);
+	let itemText = createElement('span', 'note item-label', mobileItemRow);
+	itemText.hover(function() {
+		$(this).addClass("highlight");
+	}, function() {
+		$(this).removeClass("highlight");
+	});
+	let itemTitle = createElement('span', 'note-title', itemText, id_val+"_mobile_title");
+	itemTitle.html(misc['name']+" : ");
+	let itemDetails = createElement('span', 'note-content', itemText, id_val+"_mobile_details");
+	itemDetails.html( (notesText == "" ? "" : "Notes: "+notesText+"; ")+"Weight: "+misc['weight']+"lbs; Qty: "+misc['quantity']);
 
 	name_input.attr("readonly", true);
 	qty_input.attr("readonly", true);
@@ -3386,6 +3487,9 @@ function addMiscElements(misc) {
 	});
 	weight_input.click(function() {
 		editMisc(id_val, "weight");
+	});
+	mobileItemRow.click(function() {
+		editMisc(id_val, "name");
 	});
 
 	// add remove button

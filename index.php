@@ -354,7 +354,7 @@
 			<div class="col-md-6">
 
 				<!-- section: name, level, xp -->
-				<div class="section form-horizontal">
+				<div class="section form-horizontal two-column">
 
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="character_name">Name</label>
@@ -436,7 +436,7 @@
 			<div class="col-md-6">
 
 				<!-- section: characteristics -->
-				<div class="section form-horizontal">
+				<div class="section form-horizontal two-column">
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="race">Race</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">
@@ -515,7 +515,8 @@
 
 							<div class="col-sm-4">
 								<div class="form-group">
-									<label class="control-label col-md-12 center full-width" for="weapon_select_1">Weapon 1<span class="glyphicon glyphicon-chevron-down" id="weapon_1" onclick="toggleWeapon(this.id, this)"></span></label>
+									<!-- TODO label 'for' value forces focus on input on chevron click -->
+									<label class="control-label col-md-12 center full-width" for="">Weapon 1<span class="glyphicon glyphicon-chevron-down" id="weapon_1" onclick="toggleWeapon(this.id, this)"></span></label>
 									<div class="col-md-12">
 										<select class="form-control weapon-select" id="weapon_select_1" name="weapon_1" onchange="selectWeapon(1)">
 											<option></option>
@@ -552,7 +553,7 @@
 
 							<div class="col-sm-4">
 								<div class="form-group">
-									<label class="control-label col-md-12 center full-width" for="weapon_select_2">Weapon 2<span class="glyphicon glyphicon-chevron-down" id="weapon_2" onclick="toggleWeapon(this.id, this)"></span></label>
+									<label class="control-label col-md-12 center full-width" for="">Weapon 2<span class="glyphicon glyphicon-chevron-down" id="weapon_2" onclick="toggleWeapon(this.id, this)"></span></label>
 									<div class="col-md-12">
 										<select class="form-control weapon-select" id="weapon_select_2" name="weapon_2" onchange="selectWeapon(2)">
 											<option></option>
@@ -589,7 +590,7 @@
 
 							<div class="col-sm-4">
 								<div class="form-group">
-									<label class="control-label col-md-12 center full-width" for="weapon_select_3">Weapon 3<span class="glyphicon glyphicon-chevron-down" id="weapon_3" onclick="toggleWeapon(this.id, this)"></span></label>
+									<label class="control-label col-md-12 center full-width" for="">Weapon 3<span class="glyphicon glyphicon-chevron-down" id="weapon_3" onclick="toggleWeapon(this.id, this)"></span></label>
 									<div class="col-md-12">
 										<select class="form-control weapon-select" id="weapon_select_3" name="weapon_3" onchange="selectWeapon(3)">
 											<option></option>
@@ -633,7 +634,7 @@
 			<div class="col-md-6">
 
 				<!-- section: defense -->
-				<div class="section form-horizontal">
+				<div class="section form-horizontal two-column">
 					<div class="section-title" id="section_defense"><span>Defense</span> <i class="fa-solid fa-shield-halved"></i></div>
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="toughness">Toughness</label>
@@ -825,7 +826,7 @@
 			<div class="col-md-6">
 
 				<!-- section: actions, move -->
-				<div class="section form-horizontal">
+				<div class="section form-horizontal two-column">
 					<div class="section-title" id="section_actions"><span>Actions, Move, Initiative</span> <i class="fa-solid fa-hourglass"></i></div>
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="standard">Standard</label>
@@ -1215,22 +1216,22 @@
 						</div>
 					</div>
 
-					<div class="form-group no-margin">
+					<div class="form-group no-margin"><div class="row">
 					<?php
 						for ($i = 0; $i < 4; $i++) {
-							echo $i == 2 ? '</div><div class="form-group no-margin">' : '';
-							echo '<div class="col-xs-4 no-pad-mobile '.($i == 0 || $i == 2 ? 'no-pad-left' : 'pad-left-mobile').'">';
+							echo $i == 2 ? '</div></div><div class="form-group no-margin"><div class="row">' : '';
+							echo '<div class="col-sm-6 no-pad '. ($i == 0 || $i == 2 ? 'bottom-pad-mobile' : '' ) .'"><div class="row"><div class="col-xs-8">';
 							echo '<input class="form-control motivator-input '. (isset($user_motivators[$i]) && $user_motivators[$i]['primary_'] ? 'bold' : '') .' '. ($set_motivators ? 'pointer' : '') .'" type="text" name="motivators[]" id="motivator_'.$i.'" readonly value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['motivator'] : '') .'">';
 							echo '</div>';
-							echo '<label class="control-label col-xs-1 no-pad-left align-right font-mobile-small" for="motivator_pts_'.$i.'">Pts:</label>';
-							echo '<div class="col-xs-1 no-pad">';
+							echo '<label class="control-label col-xs-2 no-pad align-right font-mobile-small" for="motivator_pts_'.$i.'">Pts:</label>';
+							echo '<div class="col-xs-2 no-pad">';
 							echo '<input class="form-control motivator-pts" type="number" name="motivator_pts[]" id="motivator_pts_'.$i.'" min="0" value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['points'] : '') .'" '. ($set_motivators ? 'readonly' : '') .' data-val="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['points'] : '') .'">';
 							echo '</div>';
 							echo '<input type="hidden" name="motivator_ids[]" value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['id'] : '') .'">';
-							echo '<input type="hidden" name="motivator_primary[]" value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['primary_'] : '') .'" id="motivator_primary_'.$i.'">';
+							echo '<input type="hidden" name="motivator_primary[]" value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['primary_'] : '') .'" id="motivator_primary_'.$i.'"></div></div>';
 						}
 					?>
-					</div>
+					</div></div>
 
 				</div>
 
@@ -1330,12 +1331,12 @@
 				<div class="section form-horizontal">
 					<div class="section-title" id="section_items"><span>Weapons</span> <i class="fa-solid icon-sword custom-icon"></i></div>
 					<div class="form-group">
-						<label class="control-label col-xs-3 resize-mobile center" for="weapons[]">Item</label>
-						<label class="control-label col-xs-1 resize-mobile center" for="weapon_qty[]">Qty</label>
-						<label class="control-label col-xs-1 resize-mobile center" id="weapon_dmg_label" for="weapon_damage[]">Damage</label>
-						<label class="control-label col-xs-5 resize-mobile center" id="weapon_note_label" for="weapon_notes[]">Notes</label>
-						<label class="control-label col-xs-1 resize-mobile center" for="weapon_weight[]">Weight</label>
-						<label class="control-label col-xs-1 resize-mobile center" for=""></label>
+						<label class="control-label col-xs-3 mobile-hide center" for="weapons[]">Item</label>
+						<label class="control-label col-xs-1 mobile-hide center" id="weapon_dmg_label" for="weapon_damage[]">Damage</label>
+						<label class="control-label col-xs-5 mobile-hide center" id="weapon_note_label" for="weapon_notes[]">Notes</label>
+						<label class="control-label col-xs-1 mobile-hide center" for="weapon_weight[]">Weight</label>
+						<label class="control-label col-xs-1 mobile-hide center" for="weapon_qty[]">Qty</label>
+						<label class="control-label col-xs-1 mobile-hide center" for=""></label>
 					</div>
 					<div id="weapons"></div>
 					<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" data-toggle="modal" data-target="#new_weapon_modal"></span></button>
@@ -1348,12 +1349,12 @@
 				<div class="section form-horizontal">
 					<div class="section-title"><span>Protection</span> <i class="fa-solid icon-protection custom-icon"></i></div>
 					<div class="form-group">
-						<label class="control-label col-xs-1 col-icon resize-mobile" for="_eqip"></label>
-						<label class="control-label col-xs-3 col-icon-right resize-mobile center" for="protections[]">Item</label>
-						<label class="control-label col-xs-1 resize-mobile center" for="protection_bonus[]">Bonus</label>
-						<label class="control-label col-xs-5 resize-mobile center" for="protection_notes[]">Notes</label>
-						<label class="control-label col-xs-1 resize-mobile center" for="protection_weight[]">Weight</label>
-						<label class="control-label col-xs-1 resize-mobile center" for=""></label>
+						<label class="control-label col-xs-1 col-icon mobile-hide" for="_eqip"></label>
+						<label class="control-label col-xs-3 col-icon-right mobile-hide center" for="protections[]">Item</label>
+						<label class="control-label col-xs-1 mobile-hide center" for="protection_bonus[]">Bonus</label>
+						<label class="control-label col-xs-5 mobile-hide center" for="protection_notes[]">Notes</label>
+						<label class="control-label col-xs-1 mobile-hide center" for="protection_weight[]">Weight</label>
+						<label class="control-label col-xs-1 mobile-hide center" for=""></label>
 					</div>
 					<div id="protections"></div>
 					<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" data-toggle="modal" data-target="#new_protection_modal"></span></button>
@@ -1366,11 +1367,11 @@
 				<div class="section form-horizontal">
 					<div class="section-title"><span>Healings, Potions, & Drugs</span> <i class="fa-solid fa-flask"></i></div>
 					<div class="form-group">
-						<label class="control-label col-xs-4 resize-mobile center" for="healings[]">Item</label>
-						<label class="control-label col-xs-1 resize-mobile center" for="healing_quantity[]">Qty</label>
-						<label class="control-label col-xs-5 resize-mobile center" for="healing_effect[]">Effect</label>
-						<label class="control-label col-xs-1 resize-mobile center" for="healing_weight[]">Weight</label>
-						<label class="control-label col-xs-1 resize-mobile center" for=""></label>
+						<label class="control-label col-xs-4 mobile-hide center" for="healings[]">Item</label>
+						<label class="control-label col-xs-5 mobile-hide center" for="healing_effect[]">Effect</label>
+						<label class="control-label col-xs-1 mobile-hide center" for="healing_weight[]">Weight</label>
+						<label class="control-label col-xs-1 mobile-hide center" for="healing_quantity[]">Qty</label>
+						<label class="control-label col-xs-1 mobile-hide center" for=""></label>
 					</div>
 					<div id="healings"></div>
 					<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" data-toggle="modal" data-target="#new_healing_modal"></span></button>
@@ -1383,11 +1384,11 @@
 				<div class="section form-horizontal">
 					<div class="section-title"><span>Misc & Special Items</span> <i class="fa-solid icon-misc custom-icon"></i></div>
 					<div class="form-group">
-						<label class="control-label col-xs-4 resize-mobile center" for="misc[]">Item</label>
-						<label class="control-label col-xs-1 resize-mobile center" for="misc_quantity[]">Qty</label>
-						<label class="control-label col-xs-5 resize-mobile center" for="misc_notes[]">Notes</label>
-						<label class="control-label col-xs-1 resize-mobile center" for="misc_weight[]">Weight</label>
-						<label class="control-label col-xs-1 resize-mobile center" for=""></label>
+						<label class="control-label col-xs-4 mobile-hide center" for="misc[]">Item</label>
+						<label class="control-label col-xs-5 mobile-hide center" for="misc_notes[]">Notes</label>
+						<label class="control-label col-xs-1 mobile-hide center" for="misc_weight[]">Weight</label>
+						<label class="control-label col-xs-1 mobile-hide center" for="misc_quantity[]">Qty</label>
+						<label class="control-label col-xs-1 mobile-hide center" for=""></label>
 					</div>
 					<div id="misc"></div>
 					<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" data-toggle="modal" data-target="#new_misc_modal"></span></button>
@@ -2211,16 +2212,23 @@
 
 		keys = <?php echo json_encode($keys); ?>;
 
-		// check for user and campaign values
+		// get all database values
 		campaign = <?php echo json_encode(isset($campaign) ? $campaign : []); ?>;
 		user = <?php echo json_encode(isset($user) ? $user : []); ?>;
 		xp_awards = <?php echo json_encode(isset($awards) ? $awards : []); ?>;
 		user_motivators = <?php echo json_encode($user_motivators); ?>;
+		feat_list = <?php echo json_encode($feat_list); ?>;
+		feat_reqs = <?php echo json_encode($feat_reqs); ?>;
+		user_feats = <?php echo json_encode($feats); ?>;
+		user_trainings = <?php echo json_encode($trainings); ?>;
+		user_weapons = <?php echo json_encode($weapons); ?>;
+		user_protections = <?php echo json_encode($protections); ?>;
+		user_healings = <?php echo json_encode($healings); ?>;
+		user_misc = <?php echo json_encode($misc); ?>;
+		user_notes = <?php echo json_encode($notes); ?>;
 		setAttributes(user);
 
 		// get feat list and requirements
-		feat_list = <?php echo json_encode($feat_list); ?>;
-		feat_reqs = <?php echo json_encode($feat_reqs); ?>;
 		var feat_sets = {};
 		var req_sets = [];
 		// sort requirements into sets
@@ -2250,7 +2258,6 @@
 		}
 
 		// check for user feats
-		user_feats = <?php echo json_encode($feats); ?>;
 		// get feat description from feat_or_trait table if feat_id is present
 		for (var i in user_feats) {
 			var feat_id_null = true;
@@ -2288,7 +2295,6 @@
 		}
 
 		// check for user trainings
-		user_trainings = <?php echo json_encode($trainings); ?>;
 		// check for governing school
 		var governing = "";
 		for (var i in user_trainings) {
@@ -2320,25 +2326,24 @@
 
 		// check for user weapons
 		loadingItems = true;
-		user_weapons = <?php echo json_encode($weapons); ?>;
 		var select_id = 1;
 		for (var i in user_weapons) {
 			addWeaponElements(user_weapons[i]);
 			// look for equipped weapons
 			if (user_weapons[i]['equipped'] > 0) {
 				for (var j = 1; j <= user_weapons[i]['equipped']; j++) {
+					equipped_weapons.push(user_weapons[i]);
 					$("#weapon_select_"+select_id).val(user_weapons[i]['name']);
 					selectWeapon(select_id++, false);
+					// auto expand weapon section on mobile
 					if (is_mobile) {
-						// TODO make these auto-expanded on load on mobile
-						// $("#weapon_"+(select_id-1)).trigger("click");
+						$("#weapon_"+(select_id-1)).trigger("click");
 					}
 				}
 			}
 		}
 
 		// check for user protections
-		user_protections = <?php echo json_encode($protections); ?>;
 		for (var i in user_protections) {
 			addProtectionElements(user_protections[i]);
 			// check if protection is equipped
@@ -2350,21 +2355,19 @@
 		setToughness();
 
 		// check for user healings
-		user_healings = <?php echo json_encode($healings); ?>;
 		for (var i in user_healings) {
 			addHealingElements(user_healings[i]);
 		}
 
 		// check for user misc items
-		user_misc = <?php echo json_encode($misc); ?>;
 		for (var i in user_misc) {
 			addMiscElements(user_misc[i]);
 		}
-		// show encumbered alert after all items are loaded
+		// show encumbered alert after all items have been loaded
 		loadingItems = false;
+		updateTotalWeight(true);
 
 		// check for user notes
-		user_notes = <?php echo json_encode($notes); ?>;
 		for (var i in user_notes) {
 			addNoteElements(user_notes[i]);
 		}
