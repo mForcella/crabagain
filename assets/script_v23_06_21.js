@@ -1736,26 +1736,26 @@ function setAttributes(user) {
 
 	// check for pending xp awards
 	if (xp_awards.length > 0) {
-		var award = 0;
 		for (var i in xp_awards) {
-			award += parseInt(xp_awards[i]['xp_award']);
+			user['xp'] = parseInt(user['xp']) + parseInt(xp_awards[i]['xp_award']);
+			$("#xp").val(parseInt(user['xp']));
+			// update character xp, awards, and attribute points in database
+			$.ajax({
+				url: '/scripts/update_xp.php',
+				data: {
+					'xp_award_id' : xp_awards[i]['id'],
+					'user' : user['id'],
+					'xp' : $("#xp").val()
+				},
+				ContentType: "application/json",
+				type: 'POST',
+				success: function(response) {
+					// no action
+				}
+			});
 		}
-		$("#xp").val(parseInt(user['xp'])+award).trigger("change");
-		// update character xp, awards, and attribute points in database
-		$.ajax({
-			url: '/scripts/update_xp.php',
-			data: {
-				'xp_award_id' : xp_awards[i]['id'],
-				'user' : user['id'],
-				'xp' : $("#xp").val(),
-				'attribute_pts' : parseInt($("#attribute_pts").val())
-			},
-			ContentType: "application/json",
-			type: 'POST',
-			success: function(response) {
-				// no action
-			}
-		});
+		// TODO this should auto update datbase value?
+		$("#xp").trigger("change");
 	}
 }
 
@@ -3895,8 +3895,8 @@ function createInput(additionalClass, type, name, value, appendTo, id=null) {
 		'id': id,
 		'class': 'form-control '+additionalClass,
 		'type': type,
-  	'name': name,
-  	'value': value
+	  	'name': name,
+	  	'value': value
 	}).appendTo(appendTo);
 	return input;
 }
