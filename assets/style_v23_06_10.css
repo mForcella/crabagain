@@ -447,13 +447,8 @@ h1 {
    	visibility: hidden;
 }
 .header {
-	/*background-image: url('image/banners/dnd-banner-5.jpeg');*/
-	background-size: contain;
-	/*width: 100vw;*/
+/*	width: 61.15vw;*/
 	height: 31.25vw;
-	/*max-width: 1920px;*/
-	/*max-height: 600px;*/
-	/*margin: 0px auto 10px auto;*/
 	margin-bottom: 10px;
 }
 .item input {
@@ -488,7 +483,7 @@ h1 {
 }
 
 .banner-image {
-	width: 100vw;
+/*	width: 61.15vw;*/
 	height: 31.25vw;
 	position: absolute;
 	top: 0;

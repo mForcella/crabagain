@@ -468,6 +468,10 @@ function insertDatabaseObject(table, object, columns) {
 		success: function(response) {
 			// get back insert ID and update object
 			object['id'] = response;
+			// check for callback function
+			if (object.postInsertCallback != undefined) {
+				object.postInsertCallback(response);
+			}
 		}
 	});
 }
@@ -1754,7 +1758,7 @@ function setAttributes(user) {
 				}
 			});
 		}
-		// TODO this should auto update datbase value?
+		// TODO this should auto update database value?
 		$("#xp").trigger("change");
 	}
 }
@@ -2252,13 +2256,12 @@ function addFeatElements(featName, featDisplayName, featDescription, feat_id, us
 	    			$("#"+featType+"_name").val(feat_list[i]['name']).attr("disabled", !characterCreation && !adminEditMode);
 	    		}
 	    	}
-	    	$("#feat_name").val(name);
 	    	var description = $("#"+id_val+"_descrip_val").val();
-	    	// feat is physical trait, add cost/bonus to description
+	    	// if feat is physical trait, add cost/bonus to description
 	    	if (featType == "physical_trait_pos" || featType == "physical_trait_neg") {
 				description += "\n\n"+(cost > 0 ? "Attribute Point Cost: "+cost : "Attribute Point Bonus: "+(cost*-1));
 	    	}
-	    	$("#feat_description").val(description);
+	    	$("#feat_description").val(description).attr("disabled", !adminEditMode && !characterCreation);
 	    	$("#feat_id").val(feat_id);
 	    	$("#user_feat_id").val(user_feat_id);
 	    	$("#feat_modal_title").html("Update Feat");
@@ -3567,6 +3570,16 @@ function newNote() {
 		}
 		user_notes.push(newNote);
 		addNoteElements(newNote);
+		newNote.postInsertCallback = function(insert_id) {
+			if (insert_id != undefined) {
+				let uuid = $("#uuid").val();
+				// update element IDs with returned insert ID
+				$("#"+uuid+"_title").attr("id", "note_"+insert_id+"_title");
+				$("#"+uuid+"_content").attr("id", "note_"+insert_id+"_content");
+				$("#"+uuid+"_title_val").attr("id", "note_"+insert_id+"_title_val");
+				$("#"+uuid+"_content_val").attr("id", "note_"+insert_id+"_content_val");
+			}
+		};
 		insertDatabaseObject('user_note', newNote, columns['user_note']);
 	}
 }
@@ -3612,7 +3625,7 @@ function addNoteElements(note) {
 
 	// edit on click
 	span.click(function() {
-		editNote(id_val);
+		editNote(note);
 	});
 
 	// enable remove button
@@ -3632,12 +3645,12 @@ function addNoteElements(note) {
 	});
 }
 
-function editNote(note_id) {
+function editNote(note) {
 	// set modal values and launch
 	$("#note_modal_title").html("Edit Note");
-	$("#note_title").val($("#"+note_id+"_title_val").val());
-	$("#note_content").val($("#"+note_id+"_content_val").val());
-	$("#note_id").val(note_id);
+	$("#note_title").val($("#note_"+note['id']+"_title_val").val());
+	$("#note_content").val($("#note_"+note['id']+"_content_val").val());
+	$("#note_id").val("note_"+note['id']);
 	$("#new_note_modal").modal("show");
 }
 
@@ -3901,11 +3914,13 @@ function createInput(additionalClass, type, name, value, appendTo, id=null) {
 	return input;
 }
 
-// generate a uuid
+// generate a new uuid
 function uuid() {
-  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-  );
+	let uuid = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+		(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+	);
+	$("#uuid").val(uuid);
+	return uuid;
 }
 
 // check an array for a string - non-case sensitive comparison
