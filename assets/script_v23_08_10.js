@@ -1809,8 +1809,8 @@ function adjustFate() {
 
 // adjust attribute value
 function adjustAttribute(attribute, val) {
-	var originalVal = parseInt($("#"+attribute+"_val").val());
-	var newVal = originalVal+parseInt(val);
+	var originalVal = parseInt($("#" + attribute+"_val").val());
+	var newVal = originalVal + parseInt(val);
 	// check if we are allocating attribute points
 	if (allocatingAttributePts) {
 		// only allow +1 increase from saved val
@@ -1821,20 +1821,22 @@ function adjustAttribute(attribute, val) {
 			}
 		}
 		var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
-		// increasing attribute; reduce points by newVal, if newVal > 0, else reduce by originalVal
 		if (val == 1) {
-			var newPts = pts-Math.abs(newVal > 0 ? newVal : originalVal);
-		// make sure we have enough points to allocate
+			// increasing attribute; reduce points by newVal, if newVal > 0, else reduce by originalVal
+			let cost = originalVal >= 8 ? newVal + Math.round(newVal/2) : newVal;
+			var newPts = pts - Math.abs(newVal > 0 ? cost : originalVal);
+			// make sure we have enough points to allocate
 			if (newPts >= 0) {
-				$(".attribute-count").html(newPts+" Points");
+				$(".attribute-count").html(newPts + " Points");
 			} else {
-				$("#"+attribute+"_text").html(originalVal >= 0 ? "+"+originalVal : originalVal);
+				$("#"+attribute+"_text").html(originalVal >= 0 ? "+" + originalVal : originalVal);
 				$("#"+attribute+"_val").val(originalVal).trigger("change");
 				return;
 			}
-			// decreasing attribute; increase points by originalVal, if original > 0, else increase by newVal
 		} else {
-			$(".attribute-count").html(pts+Math.abs(originalVal > 0 ? originalVal : newVal)+" Points");
+			// decreasing attribute; increase points by originalVal, if original > 0, else increase by newVal
+			let cost = originalVal > 8 ? originalVal + Math.round(originalVal/2) : originalVal;
+			$(".attribute-count").html(pts + Math.abs(originalVal > 0 ? cost : newVal)+" Points");
 		}
 	}
 	$("#"+attribute+"_text").html(newVal >= 0 ? "+"+newVal : newVal);
@@ -1914,6 +1916,7 @@ function adjustAttribute(attribute, val) {
 		for (var i in user_trainings) {
 			if (user_trainings[i]['id'] == training_id) {
 				user_trainings[i]['value'] = parseInt(user_trainings[i]['value']) + parseInt(val);
+				// TODO if allocating, don't update database value until 'accept'
 				updateDatabaseTable('user_training', 'value', user_trainings[i]['value'], user_trainings[i]['id']);
 			}
 		}
