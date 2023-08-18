@@ -719,7 +719,13 @@
 
 						<div class="col-sm-4">
 							<div class="row">
-								<label class="control-label col-sm-12 center full-width" for="damage">Resilience</label>
+								<label class="control-label col-sm-12 center full-width" for="damage">
+									Resilience
+									<div id="resilience_adjust">
+										<span class="fa-solid fa-circle-plus" onclick="adjustResilience(1)"></span>
+										<span class="fa-solid fa-circle-minus" onclick="adjustResilience(-1)"></span>
+									</div>
+								</label>
 							</div>
 							<div class="row">
 								<div class="col-xs-5 no-pad">

@@ -1132,6 +1132,14 @@ $("#morale").on("input change", function() {
 	setMotivatorBonus();
 });
 
+// mobile damage adjustment button functions
+function adjustResilience(val) {
+	if (parseInt($("#damage").val()) + parseInt(val) < $("#damage").attr("min")) {
+		return;
+	}
+	$("#damage").val( parseInt($("#damage").val()) + parseInt(val) ).trigger("change");
+}
+
 // set max damage to resilience
 $("#damage").attr("max", $("#resilience").val());
 // on damage change, modify wounds
@@ -1145,13 +1153,13 @@ $("#damage").on("change", function() {
 		$("#wounds_val").val( parseInt($("#wounds_val").val())-1 <= 0 ? 0 : parseInt($("#wounds_val").val())-1 );
 		$("#wound_penalty_val").val( parseInt($("#wound_penalty_val").val())-1 <= 0 ? 0 : parseInt($("#wound_penalty_val").val())-1 );
 	}
-	let wounds = parseInt($("#wounds_val").val());
 	// check for wound increase
 	while (parseInt($(this).val()) >= parseInt($(this).attr("max"))) {
 		$(this).val($(this).val() - $(this).attr("max")).trigger("input");
 		$("#wounds_val").val( parseInt($("#wounds_val").val())+1 >= 4 ? 4 : parseInt($("#wounds_val").val())+1 );
 		$("#wound_penalty_val").val( parseInt($("#wound_penalty_val").val())+1 >= 4 ? 4 : parseInt($("#wound_penalty_val").val())+1 );
 	}
+	let wounds = parseInt($("#wounds_val").val());
 	var totalDamage = damage + (wounds * resilience);
 	$("#damage").attr("min", wounds == 0 ? 0 : -1);
 	// check for max total damage

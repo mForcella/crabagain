@@ -289,6 +289,10 @@ h1 {
 		display: none;
 	}
 }
+.fa-circle-plus, .fa-circle-minus {
+	font-size: 1.3em;
+	padding: 0 10px;
+}
 .feat {
 	cursor: pointer;
 	margin-bottom: 3px;
@@ -415,7 +419,7 @@ h1 {
 		margin-left: 10px;
 	}
 }
-.glyphicon-plus, .glyphicon-minus, .hidden-icon {
+.glyphicon-plus.hidden-icon, .glyphicon-minus.hidden-icon, .hidden-icon {
 	display: none;
 }
 .glyphicon.spinning {
@@ -747,6 +751,15 @@ ul {
 	.equip-btn {
 		left: 20px;
 		transform: translateY(9px);
+	}
+}
+#resilience_adjust {
+	display: none;
+	margin-left: 20px;
+}
+@media (hover: none) {
+	#resilience_adjust {
+		display: inline-block;
 	}
 }
 .row {
