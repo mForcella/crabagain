@@ -15,7 +15,7 @@ var user_misc;
 var user_notes;
 // arrays to make sure elements are not assigned redundant functions - TODO can probably be removed?
 var hiddenEnabled = [];
-// bools to determine rules and element visibility for various operating modes
+// booleans to determine rules and element visibility for various operating modes
 var inputChanges = false;
 var allocatingAttributePts = false;
 var characterCreation = false;
@@ -376,6 +376,8 @@ var exclamations = [
 	"Blammo!",
 	"Kapow!",
 	"Excelsior!",
+	"Party on!",
+	"Cowabunga!",
 ];
 
 var banners = [
@@ -947,6 +949,12 @@ function endEditAttributes(accept) {
 		for (var key in trainingVals) {
 			$("#"+key+"_val").val(trainingVals[key]);
 			$("#"+key+"_text").html(trainingVals[key] >= 0 ? "+"+trainingVals[key] : trainingVals[key]);
+			for (var i in user_trainings) {
+				if (user_trainings[i]['id'] == key.split("training_")[1]) {
+					user_trainings[i]['value'] = trainingVals[key];
+				}
+			}
+			adjustAttribute(key, 0);
 		}
 		// remove training names and remove training elements
 		for (var i in trainings) {
@@ -1405,8 +1413,9 @@ $("#new_feat_modal").on('shown.bs.modal', function() {
 $("#new_feat_modal").on('hidden.bs.modal', function() {
 	$("#feat_modal_title").html("New Feat");
 	$("#feat_name").val("").removeClass("x onX").attr("disabled", false);
-	$("#feat_description").val("").height("125px");
+	$("#feat_description").val("").height("125px").attr("disabled", false);
 	$("#feat_id").val("");
+	$("#user_feat_id").val("");
 	// reset all dropdowns
 	$("#select_feat_type").val("feat_name").trigger("change");
 	$("#social_trait_name").val("").attr("disabled", false);
@@ -1924,7 +1933,6 @@ function adjustAttribute(attribute, val) {
 		for (var i in user_trainings) {
 			if (user_trainings[i]['id'] == training_id) {
 				user_trainings[i]['value'] = parseInt(user_trainings[i]['value']) + parseInt(val);
-				// TODO if allocating, don't update database value until 'accept'
 				updateDatabaseTable('user_training', 'value', user_trainings[i]['value'], user_trainings[i]['id']);
 			}
 		}
@@ -2131,7 +2139,8 @@ function newFeat() {
 		}
 
 		if (!editing) {
-			let feat_id = $("#feat_id").val() == "" ? uuid() : $("#feat_id").val();
+			// feat_id for custom feats = 0
+			let feat_id = $("#feat_id").val() == "" ? 0 : $("#feat_id").val();
 			let newFeat = {
 				"feat_id":feat_id,
 				"name":featDisplayName == "" ? featName : featDisplayName,
@@ -2192,8 +2201,8 @@ function addFeatElements(featName, featDisplayName, featDescription, feat_id, us
 		$("#"+id_val+"_descrip_val").val(featDescription);
 
 	} else {
-		// get feat cost
-		var cost = 0;
+		// get feat cost - default cost = 4
+		var cost = 4;
 		for (var i in feat_list) {
 			if (feat_list[i]['name'].toLowerCase() == featName.toLowerCase()) {
 				cost = parseInt(feat_list[i]['cost']);
@@ -2259,13 +2268,19 @@ function addFeatElements(featName, featDisplayName, featDescription, feat_id, us
 	    	var name = $("#"+id_val+"_name").html().split(" : ")[0];
 	    	// figure out what type of feat we are editing
 	    	var featType = "";
+	    	let custom = true;
 	    	for (var i in feat_list) {
 	    		if (name.toLowerCase().includes(feat_list[i]['name'].toLowerCase())) {
 	    			featType = feat_list[i]['type'];
 	    			featType = featType == "physical_trait" ? (cost > 0 ? "physical_trait_pos" : "physical_trait_neg") : featType;
 	    			$("#select_feat_type").val(featType+"_name").trigger("change");
 	    			$("#"+featType+"_name").val(feat_list[i]['name']).attr("disabled", !characterCreation && !adminEditMode);
+	    			custom = false;
 	    		}
+	    	}
+	    	// check for custom non-db feat
+	    	if (custom) {
+	    		$("#feat_name").val(name).attr("disabled", !characterCreation && !adminEditMode);
 	    	}
 	    	var description = $("#"+id_val+"_descrip_val").val();
 	    	// if feat is physical trait, add cost/bonus to description
@@ -2916,7 +2931,7 @@ function addWeaponElements(weapon) {
 	noteMod += weapon['rof'] != null && weapon['rof'] != "" ? "RoF: "+weapon['rof']+"; " : "";
 	noteMod += weapon['defend'] != null && weapon['defend'] != "" ? "+"+weapon['defend']+" Defend; " : "";
 	noteMod += weapon['crit'] != null && weapon['crit'] != "" ? "+"+weapon['crit']+" Critical Threat Range; " : "";
-	let notesText = noteMod != "" && weapon['notes'] != "" ? noteMod+weapon['notes'] : "";
+	let notesText = noteMod + weapon['notes'];
 	let note_input = createInput('', 'text', '', notesText, div4, id_val+"_notes");
 	let wgt_input = createInput('wgt', 'text', 'weapon_weight[]', weapon['weight'], div5, id_val+"_weight");
 	createInput('', 'hidden', 'weapon_damage[]', weapon['damage'], div5, id_val+"_damage_val");

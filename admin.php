@@ -88,7 +88,7 @@
   
 	// get feat list
 	$feats = [];
-	$sql = "SELECT * FROM feat_or_trait ORDER BY name";
+	$sql = "SELECT * FROM feat_or_trait WHERE id != 0 ORDER BY name";
 	$result = $db->query($sql);
 	if ($result) {
 		while($row = $result->fetch_assoc()) {

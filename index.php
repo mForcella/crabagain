@@ -85,9 +85,9 @@
   
   // get feat list
 	$feat_list = [];
-	$sql = "SELECT * FROM feat_or_trait";
+	$sql = "SELECT * FROM feat_or_trait WHERE id != 0";
 	if (count($feat_ids) > 0) {
-		$sql .= " WHERE id IN (".implode(',',$feat_ids).")";
+		$sql .= " AND id IN (".implode(',',$feat_ids).")";
 	}
 	$result = $db->query($sql);
   if ($result) {

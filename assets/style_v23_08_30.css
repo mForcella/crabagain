@@ -459,7 +459,7 @@ h1 {
 	cursor: pointer !important;
 }
 .item-protection {
-	transform: translateX(5vw);
+	transform: translateX(4%);
 }
 .item-mobile {
 	display: none;
@@ -468,9 +468,9 @@ h1 {
 	position: relative;
 	margin: 10px 0;
 }
-.note.item-label, .item-protection {
+/*.note.item-label, .item-protection {
 	width: calc(100vw - 98px);
-}
+}*/
 .note.item-label-mobile {
 	width: calc(100vw - 118px);
 }
@@ -481,9 +481,9 @@ h1 {
 	.form-group.item {
 		display: none;
 	}
-	.item-protection {
+	/*.item-protection {
 		width: calc(95vw - 118px);
-	}
+	}*/
 }
 
 .banner-image {
