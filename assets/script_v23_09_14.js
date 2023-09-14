@@ -33,6 +33,7 @@ var skills = []; // holds row elements
 var equipped_weapons = []; // needed for unequipping weapons from dropdowns
 // ID of input to gain focus on modal show
 var focus_id = "";
+var submitForm = false;
 
 // database columns for inserting/updating objects
 var columns = {
@@ -217,6 +218,7 @@ var skillAutocompletes = {
 		],
 		'training':[],
 		'focus':[
+			'Brawl'
 			// 'Attack - specific weapon'
 		],
 	},
@@ -580,7 +582,7 @@ $("input").on("focus", function() {
 
 // trigger 'unsaved changes' alert when leaving the page
 $(window).on("beforeunload", function(e) {
-	if (characterCreation && inputChanges) {
+	if (characterCreation && inputChanges && !submitForm) {
   		return "Unsaved changes will be lost."; // custom message will not be displayed; message is browser specific
 	}
 });
@@ -1217,9 +1219,25 @@ function editSize(modify_user) {
 
 function setDodge() {
 	// get size value and agility value
-	var size = $("#character_size_select").val();
-	var agility = parseInt($("#agility_val").val());
+	let size = $("#character_size_select").val();
+	let agility = parseInt($("#agility_val").val());
 	var dodge = (agility >= 0 ? Math.floor(agility/2) : Math.ceil(agility/3)) + (size == "Small" ? 2 : (size == "Large" ? -2 : 0));
+	// check for feats - Lightning Reflexes and Relentless Defense
+	for (var i in user_feats) {
+		if (user_feats[i]['name'] == "Lightning Reflexes") {
+			let speed = parseInt($("#speed_val").val());
+			dodge += Math.floor(speed/2);
+		}
+		if (user_feats[i]['name'] == "Relentless Defense") {
+			// check for Brawl focus
+			for (var j in user_trainings) {
+				if (user_trainings[j]['name'] == "Brawl") {
+					let brawl = parseInt(user_trainings[j]['value']);
+					dodge += Math.floor(brawl/2);
+				}
+			}
+		}
+	}
 	$("#dodge").val(dodge);
 }
 
@@ -1228,13 +1246,20 @@ function setDefend() {
 	var size = $("#character_size_select").val();
 	var agility = parseInt($("#agility_val").val());
 	var defend = 10 + agility + (size == "Small" ? 2 : (size == "Large" ? -2 : 0));
-	// check for weapon defend mofifier
+	// check for weapon defend modifier
 	var bonus = 0;
 	for (var i in user_weapons) {
 		if (user_weapons[i]['equipped'] > 0 && user_weapons[i]['defend'] != null) {
 			for (var j = 0; j < parseInt(user_weapons[i]['equipped']); j++) {
 				bonus += parseInt(user_weapons[i]['defend']);
 			}
+		}
+	}
+	// check for feat - Relentless Defense
+	for (var i in user_feats) {
+		if (user_feats[i]['name'] == "Relentless Defense") {
+			let speed = parseInt($("#speed_val").val());
+			defend += Math.floor(speed/2);
 		}
 	}
 	$("#defend").val(bonus > 0 ? defend + " (+"+bonus+")" : defend);
@@ -1928,6 +1953,7 @@ function adjustAttribute(attribute, val) {
 			break;
 	}
 	// update user_trainings if attribute is training_x
+	// TODO if updating Brawl, might need to update Dodge
 	if (attribute.includes("training_")) {
 		var training_id = attribute.split("training_")[1];
 		for (var i in user_trainings) {
@@ -1979,7 +2005,7 @@ function formSubmit() {
 	}
 	if ($("#user_id").val() == "") {
 		// new user, set password
-		$("#new_password_modal").modal("show");
+		$("#new_password_modal_2").modal("show");
 	} else {
 		// prompt for password
 		$("#password_modal").modal("show");
@@ -2029,6 +2055,26 @@ function setPassword() {
 			grecaptcha.execute('6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi', { action: 'new_user' }).then(function (token) {
 				$("#recaptcha_response").val(token);
 				$("#password_val").val($("#new_password").val());
+				submitForm = true;
+				$("#user_form").submit();
+			});
+		});
+	}
+}
+
+// validate the form
+function setPasswordV2() {
+	if ($("#nerd_test").val().toLowerCase() != keys['nerd_test']) {
+		alert("That's not the secret word, nerd");
+	} else {
+		// show submitting message
+		$("#submit_load_modal").modal("show");
+		// get recaptcha token before submit
+		grecaptcha.ready(function () {
+			grecaptcha.execute('6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi', { action: 'new_user' }).then(function (token) {
+				$("#recaptcha_response").val(token);
+				$("#password_val").val("");
+				submitForm = true;
 				$("#user_form").submit();
 			});
 		});
@@ -2329,6 +2375,13 @@ function addFeatElements(featName, featDisplayName, featDescription, feat_id, us
 		// adjust initiative value
 		adjustInitiative();
 	}
+	if (featName.toLowerCase() == "lightning reflexes") {
+		setDodge();
+	}
+	if (featName.toLowerCase() == "relentless defense") {
+		setDodge();
+		setDefend();
+	}
 
 	// adjust feat eligibility
 	setFeatList();
@@ -2371,6 +2424,13 @@ function removeFeatFunction(id_val, featName, cost, feat_container=null) {
 	}
 	if (featName.toLowerCase() == "quick and the dead") {
 		adjustInitiative();
+	}
+	if (featName.toLowerCase() == "lightning reflexes") {
+		setDodge();
+	}
+	if (featName.toLowerCase() == "relentless defense") {
+		setDodge();
+		setDefend();
 	}
 }
 

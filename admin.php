@@ -60,6 +60,40 @@
 			}
 			$user['defend_bonus'] = $defend_bonus;
 
+			// check for user feat Lightning Reflexes
+			$sql = "SELECT count(*) as count FROM user_feat WHERE user_id = ".$user["id"]." AND LOWER(name) = 'lightning reflexes'";
+			$result = $db->query($sql);
+			$user['dodge_mod'] = 0;
+			if ($result) {
+				while($row = $result->fetch_assoc()) {
+					if ($row['count'] > 0) {
+						// update dodge with speed bonus
+						$user['dodge_mod'] += floor($user['speed']/2);
+					}
+				}
+			}
+
+			// check for user feat Relentless Defense
+			$sql = "SELECT count(*) as count FROM user_feat WHERE user_id = ".$user["id"]." AND LOWER(name) = 'relentless defense'";
+			$result = $db->query($sql);
+			$user['defend_mod'] = 0;
+			if ($result) {
+				while($row = $result->fetch_assoc()) {
+					if ($row['count'] > 0) {
+						// update defend with speed bonus
+						$user['defend_mod'] += floor($user['speed']/2);
+						// update dodge with brawl bonus
+						$sql = "SELECT value FROM user_training WHERE user_id = ".$user["id"]." AND LOWER(name) = 'brawl'";
+						$result = $db->query($sql);
+						if ($result) {
+							while($row = $result->fetch_assoc()) {
+								$user['dodge_mod'] += floor($row['value']/2);
+							}
+						}
+					}
+				}
+			}
+
 			// get primary / secondary initiative
 			$user['primary'] = $user['awareness'] >= 0 ? 6 - floor($user['awareness']/2) : 6 - ceil($user['awareness']/3);
 			$user['secondary'] = $user['speed'] >= 0 ? 6 - floor($user['speed']/2) : 6 - ceil($user['speed']/3);
@@ -617,6 +651,7 @@
 								floor($user['agility']/2) :
 								(ceil($user['agility']/3) == 0 ? 0 : ceil($user['agility']/3));
 						$dodge += $size_modifier;
+						$dodge += $user['dodge_mod'];
 
 						// get toughness
 						$toughness = $user['strength'] >= 0 ?
@@ -626,6 +661,7 @@
 						// get defend
 						$defend = isset($user) ? 10 + $user['agility'] : 10;
 						$defend += $size_modifier;
+						$defend += $user['defend_mod'];
 
 						echo 
 						"<tr class='mobile-name-row'>

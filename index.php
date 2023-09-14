@@ -145,6 +145,7 @@
 	    	// get user feats
 	    	$sql = "SELECT * FROM user_feat WHERE user_id = ".$_GET["user"];
 	    	$result = $db->query($sql);
+		    $user['magic_talents'] = false;
 	    	if ($result) {
 		    	while($row = $result->fetch_assoc()) {
 		    		array_push($feats, $row);
@@ -2060,7 +2061,7 @@
         	<h5 class="center">Before we can let you pass, we just need to make sure you're not a robot, or a Russki, or both. Please enter the most secret of the secret codes.</h5>
         	<input class="form-control" type="text" name="nerd_test" id="nerd_test">
         	<div class="button-bar">
-		        <button type="button" class="btn btn-primary" id="password_btn_2" data-dismiss="modal" onclick="setPassword()">Ok</button>
+		        <button type="button" class="btn btn-primary" id="password_btn_2" data-dismiss="modal" onclick="setPasswordV2()">Ok</button>
 		      </div>
         </div>
       </div>
