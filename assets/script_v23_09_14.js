@@ -380,6 +380,7 @@ var exclamations = [
 	"Excelsior!",
 	"Party on!",
 	"Cowabunga!",
+	"Puddin' pops!"
 ];
 
 var banners = [
@@ -789,7 +790,7 @@ function selectWeapon(id, equip=true) {
 	let clearSelection = selected == "" || user_weapon['equipped'] == user_weapon['quantity'];
 
 	// if selected is empty we need to unequip the weapon
-	if (selected == "") {
+	if (equip && equipped_weapons[id-1] != null) {
 		let unequipped = equipped_weapons[id-1]['name'];
 		equipped_weapons[id-1] = null;
 		for (var i in user_weapons) {
