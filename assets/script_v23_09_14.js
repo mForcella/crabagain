@@ -9,6 +9,7 @@ var user_feats;
 var user_trainings;
 var user_motivators;
 var user_weapons;
+// var userWeapons;
 var user_protections;
 var user_healings;
 var user_misc;
@@ -34,6 +35,8 @@ var equipped_weapons = []; // needed for unequipping weapons from dropdowns
 // ID of input to gain focus on modal show
 var focus_id = "";
 var submitForm = false;
+	// TODO cancelMagic was being called twice, once from the modal hidden function
+var cancel_magic = false;
 
 // database columns for inserting/updating objects
 var columns = {
@@ -961,7 +964,7 @@ function endEditAttributes(accept) {
 		}
 		// remove training names and remove training elements
 		for (var i in trainings) {
-			var training = trainings[i].text().split("+0")[0];
+			var training = trainings[i].text().split("+1")[0];
 			for (var j in user_trainings) {
 				if (user_trainings[j]['name'] == training) {
 					deleteDatabaseObject('user_training', user_trainings[j]['id']);
@@ -971,7 +974,18 @@ function endEditAttributes(accept) {
 			trainings[i].remove();
 		}
 		for (var i in skills) {
-			var training = skills[i].text().split("+0")[0];
+			let text = skills[i].text();
+			var training;
+			// TODO not efficient; find a better way to detect/delete magic school; separate list?
+			if (text.includes(" (Gov)")) {
+				training = text.split(" (Gov)")[0];
+			} else if (text.includes(" (Comp)")) {
+				training = text.split(" (Comp)")[0];
+			} else if (text.includes(" (Opp)")) {
+				training = text.split(" (Opp)")[0];
+			} else {
+				training = skills[i].text().split("+0")[0];
+			}
 			for (var j in user_trainings) {
 				if (user_trainings[j]['name'] == training) {
 					deleteDatabaseObject('user_training', user_trainings[j]['id']);
@@ -2227,7 +2241,7 @@ function addFeatElements(featName, featDisplayName, featDescription, feat_id, us
 	var id_val;
 	if (user_feat_id == "") {
 		for (var i in user_feats) {
-			if (featName.includes(user_feats[i]['name'])) {
+			if (user_feats[i]['name'].includes(featName)) {
 				id_val = "feat_"+user_feats[i]['feat_id'];
 			}
 		}
@@ -2632,6 +2646,10 @@ function newSchool() {
 $("#new_school_modal").on('hidden.bs.modal', function() {
 	// make sure that a talent has been selected
 	if ($("#magic_talents").val() == "") {
+		if (cancel_magic) {
+			cancel_magic = false;
+			return;
+		}
 		cancelMagic();
 	} else {
 		newSchool();
@@ -2641,9 +2659,19 @@ $("#new_school_modal").on('hidden.bs.modal', function() {
 // add new magic school canceled without selecting starting talent
 function cancelMagic() {
 	$("#magic_talents").val("");
+	cancel_magic = true;
 	// remove the last added school training
 	for (var i in skills) {
-		var training = skills[i].text().split("+0")[0];
+		let text = skills[i].text();
+		var training;
+		// TODO not efficient; find a better way to detect/delete magic school; separate list?
+		if (text.includes(" (Gov)")) {
+			training = text.split(" (Gov)")[0];
+		} else if (text.includes(" (Comp)")) {
+			training = text.split(" (Comp)")[0];
+		} else {
+			training = text.split(" (Opp)")[0];
+		}
 		for (var j in user_trainings) {
 			if (user_trainings[j]['name'] == training) {
 				deleteDatabaseObject('user_training', user_trainings[j]['id']);
@@ -4024,4 +4052,24 @@ function includesIgnoreCase(array, string) {
 // capitalize a string
 function capitalize(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+
+// Database Models
+
+class UserWeapon {
+	
+    // name varchar(64),
+    // type varchar(64),
+    // quantity varchar(64),
+    // damage int,
+    // max_damage int,
+    // range_ float,
+    // rof varchar(64),
+    // defend int,
+    // crit int,
+    // notes varchar(255),
+    // weight float,
+    // equipped int,
+
 }

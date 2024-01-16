@@ -2116,6 +2116,7 @@
 
 	// check admin password for settings page
 	function GMModalClose() {
+		// TODO modal close function not firing on 'esc' key
 		// check password
 		var password =  $("#gm_password").val();
 		var hashed_password = $("#admin_password").val();

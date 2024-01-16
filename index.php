@@ -2337,6 +2337,7 @@
 		loadingItems = true;
 		var select_id = 1;
 		for (var i in user_weapons) {
+			// let weapon = new UserWeapon();
 			addWeaponElements(user_weapons[i]);
 			// look for equipped weapons
 			if (user_weapons[i]['equipped'] > 0) {
