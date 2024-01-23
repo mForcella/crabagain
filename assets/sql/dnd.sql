@@ -95,6 +95,32 @@
     FOREIGN KEY (campaign_id) REFERENCES campaign(id)
   );
 
+  -- Add delete cascade to user foreign keys
+
+  -- ALTER TABLE user_feat drop CONSTRAINT user_feat_ibfk_1;
+  -- ALTER TABLE user_feat ADD CONSTRAINT user_feat_ibfk_1 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
+
+  -- ALTER TABLE user_healing drop CONSTRAINT user_healing_ibfk_1;
+  -- ALTER TABLE user_healing ADD CONSTRAINT user_healing_ibfk_1 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
+
+  -- ALTER TABLE user_misc drop CONSTRAINT user_misc_ibfk_1;
+  -- ALTER TABLE user_misc ADD CONSTRAINT user_misc_ibfk_1 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
+
+  -- ALTER TABLE user_note drop CONSTRAINT user_note_ibfk_1;
+  -- ALTER TABLE user_note ADD CONSTRAINT user_note_ibfk_1 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
+
+  -- ALTER TABLE user_protection drop CONSTRAINT user_protection_ibfk_1;
+  -- ALTER TABLE user_protection ADD CONSTRAINT user_protection_ibfk_1 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
+
+  -- ALTER TABLE user_training drop CONSTRAINT user_training_ibfk_1;
+  -- ALTER TABLE user_training ADD CONSTRAINT user_training_ibfk_1 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
+
+  -- ALTER TABLE user_weapon drop CONSTRAINT user_weapon_ibfk_1;
+  -- ALTER TABLE user_weapon ADD CONSTRAINT user_weapon_ibfk_1 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
+
+  -- ALTER TABLE user_xp_award drop CONSTRAINT user_xp_award_ibfk_1;
+  -- ALTER TABLE user_xp_award ADD CONSTRAINT user_xp_award_ibfk_1 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
+
   CREATE TABLE user_feat (
     id int PRIMARY KEY AUTO_INCREMENT,
     name varchar(64),
@@ -102,7 +128,7 @@
     user_id int,
     feat_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (user_id) REFERENCES user(id),
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
     FOREIGN KEY (feat_id) REFERENCES feat_or_trait(id) ON DELETE CASCADE
   );
 
@@ -115,7 +141,7 @@
     magic_school bool DEFAULT 0,
     governing_school bool DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (user_id) REFERENCES user(id)
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
   );
 
   CREATE TABLE user_note (
@@ -124,7 +150,7 @@
     note varchar(2000),
     user_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (user_id) REFERENCES user(id)
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
   );
 
   CREATE TABLE user_weapon (
@@ -143,7 +169,7 @@
     equipped int,
     user_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (user_id) REFERENCES user(id)
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
   );
 
   CREATE TABLE user_protection (
@@ -155,7 +181,7 @@
     equipped bool,
     user_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (user_id) REFERENCES user(id)
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
   );
 
   CREATE TABLE user_healing (
@@ -166,7 +192,7 @@
     weight float,
     user_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (user_id) REFERENCES user(id)
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
   );
 
   CREATE TABLE user_misc (
@@ -177,7 +203,7 @@
     weight float,
     user_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (user_id) REFERENCES user(id)
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
   );
 
   CREATE TABLE user_xp_award (
@@ -187,7 +213,7 @@
     xp_after_award int,
     user_id int,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (user_id) REFERENCES user(id)
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
   );
 
   -- To view a list of characters and their XP progress

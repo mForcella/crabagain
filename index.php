@@ -2216,6 +2216,7 @@
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js" async defer></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+	<!-- <script src="/assets/Models.js"></script> -->
 	<script src="<?php echo $keys['scripts'] ?>"></script>
 	<script type="text/javascript">
 
@@ -2230,8 +2231,6 @@
 		feat_reqs = <?php echo json_encode($feat_reqs); ?>;
 		user_feats = <?php echo json_encode($feats); ?>;
 		user_trainings = <?php echo json_encode($trainings); ?>;
-		user_weapons = <?php echo json_encode($weapons); ?>;
-		user_protections = <?php echo json_encode($protections); ?>;
 		user_healings = <?php echo json_encode($healings); ?>;
 		user_misc = <?php echo json_encode($misc); ?>;
 		user_notes = <?php echo json_encode($notes); ?>;
@@ -2336,37 +2335,37 @@
 		// check for user weapons
 		loadingItems = true;
 		var select_id = 1;
+		let user_weapons = <?php echo json_encode($weapons); ?>;
 		for (var i in user_weapons) {
-			// let weapon = new UserWeapon();
-			addWeaponElements(user_weapons[i]);
-			// look for equipped weapons
-			if (user_weapons[i]['equipped'] > 0) {
-				for (var j = 1; j <= user_weapons[i]['equipped']; j++) {
-					equipped_weapons.push(user_weapons[i]);
-					$("#weapon_select_"+select_id).val(user_weapons[i]['name']);
-					selectWeapon(select_id++, false);
-					// auto expand weapon section on mobile
-					if (is_mobile) {
-						$("#weapon_"+(select_id-1)).trigger("click");
-					}
-				}
+			let weapon = new UserWeapon(user_weapons[i]);
+			userWeapons.push(weapon);
+			addWeaponElements(weapon);
+
+			// select from dropdown if weapon is equipped
+			for (var j = 0; j < weapon.equipped; j++) {
+				$("#weapon_select_"+select_id).val(weapon.name);
+				selectWeapon(select_id, false);
+				weapon.equipped_index.push(select_id++);
+				// TODO auto expand weapon section on mobile?
 			}
+
 		}
 
 		// check for user protections
+		let user_protections = <?php echo json_encode($protections); ?>;
 		for (var i in user_protections) {
-			addProtectionElements(user_protections[i]);
-			// check if protection is equipped
-			if (user_protections[i]['equipped'] == 1) {
-				$("#protection_"+user_protections[i]['id']+"_equip_ban").toggle();
-			}
+			let protection = new UserProtection(user_protections[i]);
+			userProtections.push(protection);
+			addProtectionElements(protection, false);
 		}
 		// update toughness for equipped protections
 		setToughness();
 
 		// check for user healings
 		for (var i in user_healings) {
-			addHealingElements(user_healings[i]);
+			let healing = new UserHealing(user_healings[i]);
+			userHealings.push(healing);
+			addHealingElements(healing);
 		}
 
 		// check for user misc items
