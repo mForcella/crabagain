@@ -1659,7 +1659,7 @@
         	<label class="control-label">Title</label>
         	<input class="form-control" type="text" id="note_title">
         	<label class="control-label">Note</label>
-        	<textarea class="form-control" id="note_content" rows="10" maxlength="2000"></textarea>
+        	<textarea class="form-control" id="note_note" rows="10" maxlength="2000"></textarea>
         	<input type="hidden" id="note_id">
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newNote()">Ok</button>
@@ -1921,13 +1921,13 @@
         	<label class="control-label">Weapon Name*</label>
         	<input class="form-control" type="text" id="weapon_name">
         	<label class="control-label">Quantity</label>
-        	<input class="form-control" type="text" id="weapon_qty">
+        	<input class="form-control" type="text" id="weapon_quantity">
         	<label class="control-label">Damage*</label>
         	<input class="form-control" type="number" min="0" id="weapon_damage">
         	<label class="control-label">Max Damage</label>
         	<input class="form-control" type="number" min="0" id="weapon_max_damage">
         	<label class="control-label">Range</label>
-        	<input class="form-control" type="number" min="0" id="weapon_range">
+        	<input class="form-control" type="number" min="0" id="weapon_range_">
         	<label class="control-label">Rate of Fire</label>
         	<input class="form-control" type="text" id="weapon_rof">
         	<label class="control-label">Defend Bonus</label>
@@ -2225,15 +2225,13 @@
 		// get all database values
 		campaign = <?php echo json_encode(isset($campaign) ? $campaign : []); ?>;
 		user = <?php echo json_encode(isset($user) ? $user : []); ?>;
-		xp_awards = <?php echo json_encode(isset($awards) ? $awards : []); ?>;
-		user_motivators = <?php echo json_encode($user_motivators); ?>;
 		feat_list = <?php echo json_encode($feat_list); ?>;
 		feat_reqs = <?php echo json_encode($feat_reqs); ?>;
+		
+		xp_awards = <?php echo json_encode(isset($awards) ? $awards : []); ?>;
+		user_motivators = <?php echo json_encode($user_motivators); ?>;
 		user_feats = <?php echo json_encode($feats); ?>;
 		user_trainings = <?php echo json_encode($trainings); ?>;
-		user_healings = <?php echo json_encode($healings); ?>;
-		user_misc = <?php echo json_encode($misc); ?>;
-		user_notes = <?php echo json_encode($notes); ?>;
 		setAttributes(user);
 
 		// get feat list and requirements
@@ -2362,6 +2360,7 @@
 		setToughness();
 
 		// check for user healings
+		let user_healings = <?php echo json_encode($healings); ?>;
 		for (var i in user_healings) {
 			let healing = new UserHealing(user_healings[i]);
 			userHealings.push(healing);
@@ -2369,16 +2368,23 @@
 		}
 
 		// check for user misc items
+		let user_misc = <?php echo json_encode($misc); ?>;
 		for (var i in user_misc) {
-			addMiscElements(user_misc[i]);
+			let misc = new UserMisc(user_misc[i]);
+			userMisc.push(misc);
+			addMiscElements(misc);
 		}
+
 		// show encumbered alert after all items have been loaded
 		loadingItems = false;
 		updateTotalWeight(true);
 
 		// check for user notes
+		let user_notes = <?php echo json_encode($notes); ?>;
 		for (var i in user_notes) {
-			addNoteElements(user_notes[i]);
+			let note = new UserNote(user_notes[i]);
+			userNotes.push(note);
+			addNoteElements(note);
 		}
 
 	</script>

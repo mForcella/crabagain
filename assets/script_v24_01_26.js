@@ -10,9 +10,9 @@ var user_trainings;
 var user_motivators;
 let userWeapons = [];
 let userProtections = [];
-var userHealings = [];
-var user_misc;
-var user_notes;
+let userHealings = [];
+let userMisc = [];
+let userNotes = [];
 // arrays to make sure elements are not assigned redundant functions - TODO can probably be removed?
 var hiddenEnabled = [];
 // booleans to determine rules and element visibility for various operating modes
@@ -462,8 +462,8 @@ function deleteDatabaseObject(table, id) {
 	});
 }
 
-function insertDatabaseObject(table, object, columns) {
-	if ($("#user_id").val() == "" || adminEditMode) {
+function insertDatabaseObject(table, object, columns, override=false) {
+	if (!override && ($("#user_id").val() == "" || adminEditMode)) {
 		return;
 	}
 	// console.log("insertDatabaseObject");
@@ -473,6 +473,7 @@ function insertDatabaseObject(table, object, columns) {
 		ContentType: "application/json",
 		type: 'POST',
 		success: function(response) {
+			// console.log(response);
 			// get back insert ID and update object
 			object['id'] = response;
 			// check for callback function
@@ -488,14 +489,14 @@ function updateDatabaseObject(table, object, columns) {
 	if ($("#user_id").val() == "" || adminEditMode) {
 		return;
 	}
-	console.log("updateDatabaseObject");
+	// console.log("updateDatabaseObject");
 	$.ajax({
 		url: '/scripts/update_database_object.php',
 		data: { 'table' : table, 'data' : object, 'columns' : columns },
 		ContentType: "application/json",
 		type: 'POST',
 		success: function(response) {
-			console.log(response);
+			// console.log(response);
 		}
 	});
 }
@@ -748,6 +749,13 @@ function endGMEdit(accept) {
 		// confirm and save
 		var conf = confirm("Save changes?");
 		if (conf) {
+			// TODO start tracking unsaved changes on objects
+			// TODO would need to track deletes and updates as well...??
+			// for (var i in userNotes) {
+			// 	if (userNotes[i].requires_save) {
+			// 		userNotes[i].save();
+			// 	}
+			// }
 			$("#user_form").submit();
 		}
 	}
@@ -1252,13 +1260,13 @@ $("#new_weapon_modal").on('hidden.bs.modal', function() {
 	$("#weapon_name").val("");
 	$("#weapon_damage").val("");
 	$("#weapon_max_damage").val("");
-	$("#weapon_range").val("");
+	$("#weapon_range_").val("");
 	$("#weapon_rof").val("");
 	$("#weapon_defend").val("");
 	$("#weapon_crit").val("");
 	$("#weapon_notes").val("");
 	$("#weapon_weight").val("");
-	$("#weapon_qty").val("");
+	$("#weapon_quantity").val("");
 });
 $("#new_protection_modal").on('shown.bs.modal', function() {
 	$(focus_id == "" ? "#protection_name" : focus_id).focus();
@@ -1299,7 +1307,7 @@ $("#new_note_modal").on('shown.bs.modal', function() {
 $("#new_note_modal").on('hidden.bs.modal', function() {
 	$("#note_modal_title").html("New Note");
 	$("#note_title").val("");
-	$("#note_content").val("");
+	$("#note_note").val("");
 });
 $("#xp_modal").on('shown.bs.modal', function() {
 	$("#add_xp").focus();
@@ -1943,7 +1951,7 @@ function validatePassword() {
 	  		// close modal
 	  		$("#password_modal").modal("hide");
 	  		// submit form
-				$("#user_form").submit();
+			$("#user_form").submit();
 	  	} else {
 	  		alert("Password does not match our records");
 	  	}
@@ -1953,7 +1961,8 @@ function validatePassword() {
 
 // validate the form
 function setPassword() {
-  var regex = /\S+@\S+\.\S+/;
+	console.log("setPassword");
+  	var regex = /\S+@\S+\.\S+/;
 	// make sure passwords match
 	if ($("#new_password").val() != $("#password_conf").val()) {
 		alert("Passwords must match, nerd");
@@ -1982,6 +1991,7 @@ function setPassword() {
 
 // validate the form
 function setPasswordV2() {
+	console.log("setPasswordV2");
 	if ($("#nerd_test").val().toLowerCase() != keys['nerd_test']) {
 		alert("That's not the secret word, nerd");
 	} else {
@@ -2788,881 +2798,6 @@ function removeTrainingFunction(trainingName, row, skill_pts) {
 	}
 }
 
-// add a new weapon from modal values - or edit existing weapon
-function newWeapon() {
-	// check if we are editing
-	var editing = $("#weapon_modal_title").html() == "Edit Weapon";
-	var type = $("#weapon_type").val();
-	var name = $("#weapon_name").val();
-	var damage = $("#weapon_damage").val();
-	var max_damage = $("#weapon_max_damage").val();
-	var range = $("#weapon_range").val();
-	var rof = $("#weapon_rof").val();
-	var defend = $("#weapon_defend").val();
-	var crit = $("#weapon_crit").val();
-	var notes = $("#weapon_notes").val();
-	var weight = $("#weapon_weight").val() == "" ? 0 : $("#weapon_weight").val();
-	var qty = $("#weapon_qty").val() == "" ? 1 : $("#weapon_qty").val();
-	if (name == "") {
-		alert("Name is required");
-		return;
-	} else if (damage == "") {
-		alert("Damage is required");
-		return;
-	}
-	$("#new_weapon_modal").modal("hide");
-	if (editing) {
-		// update weapon inputs
-		var weapon_id = $("#weapon_id").val();
-		$("#"+weapon_id+"_type").val(type);
-		var originalName = $("#"+weapon_id+"_name").val();
-		$("#"+weapon_id+"_name").val(name);
-		$("#"+weapon_id+"_weight").val(weight);
-		$("#"+weapon_id+"_damage_val").val(damage);
-		var damage_text = max_damage != "" ? damage +" ("+max_damage+")" : damage;
-		$("#"+weapon_id+"_damage").val(damage_text);
-		$("#"+weapon_id+"_max_damage").val(max_damage);
-		var noteMod = "";
-		noteMod += range != "" ? "Range: "+range+"; " : "";
-		noteMod += rof != "" ? "RoF: "+rof+"; " : "";
-		noteMod += defend != "" ? "+"+defend+" Defend; " : "";
-		noteMod += crit != "" ? "+"+crit+" Critical Threat Range; " : "";
-		$("#"+weapon_id+"_notes").val(noteMod+notes);
-		$("#"+weapon_id+"_notes_val").val(notes);
-		$("#"+weapon_id+"_range").val(range);
-		$("#"+weapon_id+"_rof").val(rof);
-		$("#"+weapon_id+"_defend").val(defend);
-		$("#"+weapon_id+"_crit").val(crit);
-		$("#"+weapon_id+"_qty").val(qty);
-		// update mobile row
-		$("#"+weapon_id+"_mobile_title").html(name+" : ");
-		$("#"+weapon_id+"_mobile_details").html("Damage: "+damage_text+"; Weight: "+weight+"lbs; Qty: "+qty+"; "+noteMod+notes);
-
-		updateTotalWeight(true);
-
-		// update weapon object
-		let weapon = getWeapon(originalName);
-		weapon.type = type;
-		weapon.damage = parseInt(damage);
-		weapon.defend = defend == "" ? null : parseInt(defend);
-		weapon.crit = crit == "" ? null : parseInt(crit);
-		weapon.max_damage = max_damage == "" ? null : parseInt(max_damage);
-		weapon.quantity = qty;
-		weapon.name = name;
-		// TODO range_ not recorded for melee weapons; needed for thrown weapons
-		weapon.range_ = range == "" ? null : parseInt(range);
-		weapon.rof = rof;
-		weapon.notes = notes;
-		updateDatabaseObject('user_weapon', weapon, columns['user_weapon']);
-
-		// update weapon dropdowns
-		$($(".weapon-select").get().reverse()).each(function() {
-			$(this).find("option").each(function() {
-				if ($(this).val() == originalName) {
-					$(this).val(name);
-					$(this).html(name);
-				}
-			});
-			// re-select if equipped to update inputs
-			if ($(this).val() == originalName) {
-				selectWeapon(this.id.slice(-1), false);
-			}
-		});
-	} else {
-		// check to make sure name is not a duplicate
-		for (var i in userWeapons) {
-			if (userWeapons[i].name == name) {
-				alert("Weapon name already in use");
-				return;
-			}
-		}
-		let newWeapon = new UserWeapon({
-			type:type,
-			name:name,
-			quantity:1,
-			damage:damage,
-			max_damage:max_damage,
-			range_:range,
-			rof:rof,
-			defend:defend,
-			crit:crit,
-			notes:notes,
-			weight:weight,
-			equipped:0
-		});
-		// insert into database and get back id
-		insertDatabaseObject('user_weapon', newWeapon, columns['user_weapon']);
-
-		// post insert callback function - assign ID and add inputs
-		newWeapon.postInsertCallback = function(insert_id) {
-			this.postInsertCallback = null;
-			if (insert_id != undefined) {
-				newWeapon.id = insert_id;
-			}
-			userWeapons.push(newWeapon);
-			addWeaponElements(newWeapon);
-		};
-	}
-}
-
-// create html elements for weapon
-function addWeaponElements(weapon) {
-	let id_val = "weapon_"+weapon.id;
-
-	let div = createElement('div', '', '#weapons', id_val);
-	let div0 = createElement('div', 'form-group item', div); // desktop row container
-	let div1 = createElement('div', 'col-xs-3 no-pad-mobile', div0); // name
-	let div3 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // damage
-	let div4 = createElement('div', 'col-xs-5 no-pad-mobile', div0); // notes
-	let div5 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // weight
-	let div2 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // qty
-	let div6 = createElement('div', 'col-xs-1 no-pad-mobile center remove-btn', div); // delete btn
-	let remove = createElement('span', 'glyphicon glyphicon-remove', div6);
-	remove.on("click", function() {
-		weapon.delete(id_val);
-	});
-
-	let name_input = createInput('', 'text', 'weapons[]', weapon.name, div1, id_val+"_name");
-	let qty_input = createInput('qty', 'text', 'weapon_qty[]', weapon.quantity, div2, id_val+"_qty");
-	// check for max damage
-	let damageText = weapon.max_damage != null ? weapon.damage +" ("+weapon.max_damage+")" : weapon.damage;
-	let dmg_input = createInput('', 'text', '', damageText, div3, id_val+"_damage");
-	// add range, rof & defend bonus to notes
-	var noteMod = "";
-	weapon.notes = weapon.notes == null ? "" : weapon.notes;
-	noteMod += weapon.range_ != null && weapon.range_ != "" ? "Range: "+weapon.range_+"; " : "";
-	noteMod += weapon.rof != null && weapon.rof != "" ? "RoF: "+weapon.rof+"; " : "";
-	noteMod += weapon.defend != null && weapon.defend != "" ? "+"+weapon.defend+" Defend; " : "";
-	noteMod += weapon.crit != null && weapon.crit != "" ? "+"+weapon.crit+" Critical Threat Range; " : "";
-	let notesText = noteMod + weapon.notes;
-	let note_input = createInput('', 'text', '', notesText, div4, id_val+"_notes");
-	let wgt_input = createInput('wgt', 'text', 'weapon_weight[]', weapon.weight, div5, id_val+"_weight");
-	createInput('', 'hidden', 'weapon_damage[]', weapon.damage, div5, id_val+"_damage_val");
-	createInput('', 'hidden', 'weapon_notes[]', weapon.notes, div5, id_val+"_notes_val");
-	createInput('', 'hidden', 'weapon_type[]', weapon.type, div5, id_val+"_type");
-	createInput('', 'hidden', 'weapon_max_damage[]', weapon.max_damage, div5, id_val+"_max_damage");
-	createInput('', 'hidden', 'weapon_range[]', weapon.range_, div5, id_val+"_range");
-	createInput('', 'hidden', 'weapon_rof[]', weapon.rof, div5, id_val+"_rof");
-	createInput('', 'hidden', 'weapon_defend[]', weapon.defend, div5, id_val+"_defend");
-	createInput('', 'hidden', 'weapon_crit[]', weapon.crit, div5, id_val+"_crit");
-	createInput('', 'hidden', 'weapon_ids[]', weapon.id, div5);
-	updateTotalWeight(true);
-
-	// mobile item layout
-	let mobileItemRow = createElement('span', 'item-mobile', div, id_val+'_mobile');
-	let itemText = createElement('span', 'note item-label', mobileItemRow);
-	itemText.hover(function() {
-		$(this).addClass("highlight");
-	}, function() {
-		$(this).removeClass("highlight");
-	});
-	let itemTitle = createElement('span', 'note-title', itemText, id_val+"_mobile_title");
-	itemTitle.html(weapon.name+" : ");
-	let itemDetails = createElement('span', 'note-content', itemText, id_val+"_mobile_details");
-	itemDetails.html("Damage: "+damageText+"; Weight: "+weapon.weight+"lbs; Qty: "+weapon.quantity+"; "+notesText);
-
-	// add click and hover functions
-	name_input.attr("readonly", true);
-	qty_input.attr("readonly", true);
-	dmg_input.attr("readonly", true);
-	note_input.attr("readonly", true);
-	wgt_input.attr("readonly", true);
-	enableHighlight(name_input, "weapons[]");
-	enableHighlight(qty_input, "weapon_qty[]");
-	enableHighlight(dmg_input, "weapon_damage[]");
-	enableHighlight(note_input, "weapon_notes[]");
-	enableHighlight(wgt_input, "weapon_weight[]");
-
-	name_input.click(function() {
-		editWeapon(id_val, "name");
-	});
-	qty_input.click(function() {
-		editWeapon(id_val, "qty");
-	});
-	dmg_input.click(function() {
-		editWeapon(id_val, "damage");
-	});
-	note_input.click(function() {
-		// look for range, rof, defend, and crit values
-		let note_val = note_input.val();
-		let focus = note_val.includes("Range") ? "range" : 
-			(note_val.includes("RoF") ? "rof" : (note_val.includes("Defend") ? "defend" : (note_val.includes("Critical") ? "crit" : "notes")));
-		editWeapon(id_val, focus);
-	});
-	wgt_input.click(function() {
-		editWeapon(id_val, "weight");
-	});
-	itemText.click(function() {
-		editWeapon(id_val, "name");
-	});
-
-	// add weapon option to dropdown
-	let option1 = $('<option />', {
-  	'text': weapon.name,
-  	'value': weapon.name
-	}).appendTo("#weapon_select_1");
-	let option2 = option1.clone().appendTo("#weapon_select_2");
-	let option3 = option1.clone().appendTo("#weapon_select_3");
-
-	enableHiddenNumbers();
-
-}
-
-// select a weapon from the dropdown
-// param: dropdownID - the selected dropdown ID
-// param: updateDatabase - true if we are making a selection from the dropdown; requires object/database update
-function selectWeapon(dropdownID, updateDatabase=true) {
-	let selectedVal = $("#weapon_select_"+dropdownID).val();
-
-	// get selected and de-selected weapon from array
-	var selectedWeapon;
-	var deselectedWeapon;
-	for (var i in userWeapons) {
-
-		// find the de-selected weapon
-		if (userWeapons[i].equipped_index.includes(dropdownID)) {
-			deselectedWeapon = userWeapons[i];
-		}
-
-		// find the newly selected weapon
-		if (selectedVal == userWeapons[i].name) {
-			selectedWeapon = userWeapons[i];
-		}
-	}
-			
-	// check if equip is allowable (weapon quantity)
-	let allowable = selectedVal == "" || !updateDatabase || selectedWeapon.equipped < selectedWeapon.quantity;
-	if (!allowable) {
-		// restore original selection name and return
-		$("#weapon_select_"+dropdownID).val(deselectedWeapon == undefined ? "" : deselectedWeapon.name);
-		return;
-	}
-
-	if (deselectedWeapon != undefined) {
-		deselectedWeapon.equip(false, updateDatabase, dropdownID);
-	}
-	if (selectedWeapon != undefined) {
-		selectedWeapon.equip(true, updateDatabase, dropdownID);
-	}
-
-	setDefend();
-}
-
-// set modal values and launch
-function editWeapon(weapon_id, input_id) {
-	focus_id = "#weapon_"+input_id;
-	// set input values
-	let weapon = getWeapon($("#"+weapon_id+"_name").val());
-	$("#weapon_modal_title").html("Edit Weapon");
-	$("#weapon_type").val(weapon.type);
-	$("#weapon_name").val(weapon.name);
-	$("#weapon_damage").val(weapon.damage);
-	$("#weapon_max_damage").val(weapon.max_damage == null ? '' : weapon.max_damage);
-	$("#weapon_range").val(weapon.range_ == null ? '' : weapon.range_);
-	$("#weapon_rof").val(weapon.rof == null ? '' : weapon.rof);
-	$("#weapon_defend").val(weapon.defend == null ? '' : weapon.defend);
-	$("#weapon_crit").val(weapon.crit == null ? '' : weapon.crit);
-	$("#weapon_qty").val(weapon.qty);
-	$("#weapon_notes").val(weapon.notes);
-	$("#weapon_weight").val(weapon.weight);
-	$("#weapon_id").val(weapon_id);
-	$("#new_weapon_modal").modal("show");
-}
-
-// don't allow ";" in RoF inputs; used for parsing note value
-$("#weapon_rof").on('keypress', function(e) {
-	if (e.charCode == 59) {
-		e.preventDefault();
-		return false;
-	}
-});
-
-// add a new protection from modal values
-function newProtection() {
-	// check if we are editing
-	var editing = $("#protection_modal_title").html() == "Edit Protection";
-	var name = $("#protection_name").val();
-	var bonus = $("#protection_bonus").val() == "" ? 0 : $("#protection_bonus").val();
-	var notes = $("#protection_notes").val();
-	var weight = $("#protection_weight").val() == "" ? 0 : $("#protection_weight").val();
-	if (name == "") {
-		alert("Name is required");
-		return;
-	}
-	$("#new_protection_modal").modal("hide");
-	if (editing) {
-		// update protection inputs
-		var protection_id = $("#protection_id").val();
-		var originalName = $("#"+protection_id+"_name").val();
-		$("#"+protection_id+"_name").val(name);
-		$("#"+protection_id+"_bonus").val(bonus);
-		$("#"+protection_id+"_notes").val(notes);
-		$("#"+protection_id+"_weight").val(weight);
-		// update mobile row
-		$("#"+protection_id+"_mobile_title").html(name+" : ");
-		$("#"+protection_id+"_mobile_details").html("Bonus: +"+bonus+"; Weight: "+weight+"lbs; "+notes);
-
-		// update user protection object
-		let protection = getProtection(originalName);
-		protection.bonus = parseInt(bonus);
-		protection.name = name;
-		protection.notes = notes;
-		protection.weight = parseInt(weight);
-		// update database entry
-		updateDatabaseObject('user_protection', protection, columns['user_protection']);
-		setToughness();
-		updateTotalWeight(true);
-	} else {
-		// check to make sure name is not a duplicate
-		for (var i in userProtections) {
-			if (userProtections[i].name ==  name) {
-				alert("Protection name already in use");
-				return;
-			}
-		}
-		let newProtection = new UserProtection({
-			'name':name,
-			'bonus':bonus,
-			'notes':notes,
-			'weight':weight,
-			'equipped':0
-		});
-		// insert protection into database
-		insertDatabaseObject('user_protection', newProtection, columns['user_protection']);
-
-		// post insert callback function
-		newProtection.postInsertCallback = function(insert_id) {
-			this.postInsertCallback = null;
-			if (insert_id != undefined) {
-				this.id = insert_id;
-			}
-			userProtections.push(this);
-			addProtectionElements(this, true);
-		};
-
-	}
-}
-
-// create html elements for protection
-function addProtectionElements(protection, newProtection) {
-	var id_val = "protection_"+protection.id;
-
-	// TODO create elements using cloning?
-	var div = createElement('div', '', '#protections', id_val);
-	var div0 = createElement('div', 'form-group item item-protection', div); // desktop row container
-	var div3 = createElement('div', 'col-xs-1 no-pad-mobile col-icon equip-btn', div); // equip btn
-	var div1 = createElement('div', 'col-xs-3 no-pad-mobile col-icon-right', div0); // name
-	var div2 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // bonus
-	var div4 = createElement('div', 'col-xs-5 no-pad-mobile', div0); // notes
-	var div5 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // weight
-	var div6 = createElement('div', 'col-xs-1 no-pad-mobile center remove-btn', div); // remove btn
-
-	var name_input = createInput('', 'text', 'protections[]', protection.name, div1, id_val+"_name");
-	var bonus_input = createInput('', 'text', 'protection_bonus[]', protection.bonus, div2, id_val+"_bonus");
-	let notesText = protection.notes == null ? "" : protection.notes;
-	var notes_input = createInput('', 'text', 'protection_notes[]', notesText, div4, id_val+"_notes");
-	var weight_input = createInput('wgt', 'text', 'protection_weight[]', protection.weight, div5, id_val+"_weight");
-	name_input.attr("readonly", true);
-	bonus_input.attr("readonly", true);
-	notes_input.attr("readonly", true);
-	weight_input.attr("readonly", true);
-	createInput('', 'hidden', 'protection_ids[]', protection.id, div6);
-
-	// mobile item layout
-	let mobileItemRow = createElement('span', 'item-mobile item-protection', div);
-	let itemText = createElement('span', 'note item-label-mobile', mobileItemRow);
-	itemText.hover(function() {
-		$(this).addClass("highlight");
-	}, function() {
-		$(this).removeClass("highlight");
-	});
-	let itemTitle = createElement('span', 'note-title', itemText, id_val+"_mobile_title");
-	itemTitle.html(protection.name+" : ");
-	let itemDetails = createElement('span', 'note-content', itemText, id_val+"_mobile_details");
-	itemDetails.html("Bonus: +"+protection.bonus+"; Weight: "+protection.weight+"lbs; "+notesText);
-
-	// enable highlighting and click functions for newly created elements
-	enableHighlight(name_input, "protections[]");
-	enableHighlight(bonus_input, "protection_bonus[]");
-	enableHighlight(notes_input, "protection_notes[]");
-	enableHighlight(weight_input, "protection_weight[]");
-	name_input.click(function() {
-		editProtection(id_val, "name");
-	});
-	bonus_input.click(function() {
-		editProtection(id_val, "bonus");
-	});
-	notes_input.click(function() {
-		editProtection(id_val, "notes");
-	});
-	weight_input.click(function() {
-		editProtection(id_val, "weight");
-	});
-	itemText.click(function() {
-		editProtection(id_val, "name");
-	});
-
-	// add equip button
-	createElement('span', 'glyphicon svg fa-solid icon-armor custom-icon', div3, id_val+"_equip");
-	createElement('span', 'glyphicon glyphicon-ban-circle', div3, id_val+"_equip_ban");
-	createInput('', 'hidden', 'protection_equipped[]', protection.equipped == 1, div3, id_val+"_equipped");
-	$(div3).on("click", function() {
-		protection.equip(id_val);
-	});
-
-	// check if protection is currently equipped
-	if (protection.equipped) {
-		$("#protection_"+protection.id+"_equip_ban").toggle();
-	}
-
-	// add remove button
-	let removeBtn = createElement('span', 'glyphicon glyphicon-remove', div6);
-	removeBtn.on("click", function() {
-		protection.delete(id_val);
-	});
-
-	enableHiddenNumbers();
-	updateTotalWeight(true);
-
-	// prompt user to equip new protection
-	if (newProtection) {
-		protection.equip(id_val);
-	}
-}
-
-// set edit protection modal values and launch
-function editProtection(protection_id, input_id) {
-	focus_id = "#protection_"+input_id;
-	$("#protection_modal_title").html("Edit Protection");
-	$("#protection_name").val($("#"+protection_id+"_name").val());
-	$("#protection_bonus").val($("#"+protection_id+"_bonus").val());
-	$("#protection_notes").val($("#"+protection_id+"_notes").val());
-	$("#protection_weight").val($("#"+protection_id+"_weight").val());
-	$("#protection_id").val(protection_id);
-	$("#new_protection_modal").modal("show");
-}
-
-// add a new healing/potion/drug from modal values
-function newHealing() {
-	// check if we are editing
-	let editing = $("#healing_modal_title").html() == "Edit Healing/Potion/Drug";
-	let name = $("#healing_name").val();
-	let quantity = $("#healing_quantity").val() == "" ? 1 : $("#healing_quantity").val();
-	let effect = $("#healing_effect").val();
-	let weight = $("#healing_weight").val() == "" ? 0 : $("#healing_weight").val();
-	if (name == "") {
-		alert("Name is required");
-		return;
-	}
-	$("#new_healing_modal").modal("hide");
-	if (editing) {
-		// update healing inputs
-		let healing_id = $("#healing_id").val();
-		let originalName = $("#"+healing_id+"_name").val();
-		$("#"+healing_id+"_name").val(name);
-		$("#"+healing_id+"_quantity").val(quantity);
-		$("#"+healing_id+"_effect").val(effect);
-		$("#"+healing_id+"_weight").val(weight);
-		// update mobile row
-		$("#"+healing_id+"_mobile_title").html(name+" : ");
-		$("#"+healing_id+"_mobile_details").html("Effect: "+effect+"; Weight: "+weight+"lbs; Qty: "+quantity);
-		updateTotalWeight(true);
-		// update healing in database
-		let healing = getHealing(originalName);
-		healing.name = name;
-		healing.quantity = quantity;
-		healing.effect = effect;
-		healing.weight = weight;
-		updateDatabaseObject('user_healing', healing, columns['user_healing']);
-	} else {
-		// check to make sure name is not a duplicate
-		for (var i in user_healings) {
-			if (user_healings[i]['name'] ==  name) {
-				alert("Item name already in use");
-				return;
-			}
-		}
-		// insert new healing into database and user array
-		let newHealing = new UserHealing({
-			'name':name,
-			'quantity':quantity,
-			'effect':effect,
-			'weight':weight,
-			'id':""
-		});
-		insertDatabaseObject('user_healing', newHealing, columns['user_healing']);
-
-		// post insert callback function
-		newHealing.postInsertCallback = function(insert_id) {
-			this.postInsertCallback = null;
-			if (insert_id != undefined) {
-				this.id = insert_id;
-			}
-			userHealings.push(this);
-			addHealingElements(this);
-		};
-
-	}
-}
-
-// create html elements for healing
-function addHealingElements(healing) {
-	var id_val = healing['id'] == "" ? uuid() : "healing_"+healing['id'];
-
-	var div = createElement('div', '', '#healings', id_val);
-	let div0 = createElement('div', 'form-group item', div); // desktop row container
-	var div1 = createElement('div', 'col-xs-4 no-pad-mobile', div0); // name
-	var div3 = createElement('div', 'col-xs-5 no-pad-mobile', div0); // notes
-	var div4 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // weight
-	var div2 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // qty
-	var div5 = createElement('div', 'col-xs-1 no-pad-mobile center remove-btn', div); // remove btn
-
-	var name_input = createInput('', 'text', 'healings[]', healing['name'], div1, id_val+"_name");
-	var qty_input = createInput('qty', 'text', 'healing_quantity[]', healing['quantity'], div2, id_val+"_quantity");
-	var effect_input = createInput('', 'text', 'healing_effect[]', healing['effect'], div3, id_val+"_effect");
-	var weight_input = createInput('wgt', 'text', 'healing_weight[]', healing['weight'], div4, id_val+"_weight");
-	createInput('', 'hidden', 'healing_ids[]', healing['id'], div4);
-	updateTotalWeight(true);
-
-	// mobile item layout
-	let mobileItemRow = createElement('span', 'item-mobile', div);
-	let itemText = createElement('span', 'note item-label', mobileItemRow);
-	itemText.hover(function() {
-		$(this).addClass("highlight");
-	}, function() {
-		$(this).removeClass("highlight");
-	});
-	let itemTitle = createElement('span', 'note-title', itemText, id_val+"_mobile_title");
-	itemTitle.html(healing['name']+" : ");
-	let itemDetails = createElement('span', 'note-content', itemText, id_val+"_mobile_details");
-	itemDetails.html("Effect: "+healing['effect']+"; Weight: "+healing['weight']+"lbs; Qty: "+healing['quantity']);
-
-	name_input.attr("readonly", true);
-	qty_input.attr("readonly", true);
-	effect_input.attr("readonly", true);
-	weight_input.attr("readonly", true);
-	enableHighlight(name_input, "healings[]");
-	enableHighlight(qty_input, "healing_quantity[]");
-	enableHighlight(effect_input, "healing_effect[]");
-	enableHighlight(weight_input, "healing_weight[]");
-	name_input.click(function() {
-		editHealing(id_val, "name");
-	});
-	qty_input.click(function() {
-		editHealing(id_val, "quantity");
-	});
-	effect_input.click(function() {
-		editHealing(id_val, "effect");
-	});
-	weight_input.click(function() {
-		editHealing(id_val, "weight");
-	});
-	mobileItemRow.click(function() {
-		editHealing(id_val, "name");
-	});
-
-	// add remove button
-	createElement('span', 'glyphicon glyphicon-remove', div5, id_val+"_remove");
-	$("#"+id_val+"_remove").on("click", function() {
-		healing.delete(id_val);
-
-		// var item = $("#"+id_val+"_name").val();
-		// var conf = confirm("Remove item '"+item+"'?");
-		// if (conf) {
-		// 	$("#"+id_val).remove();
-		// 	// update total weight
-		// 	updateTotalWeight(false);
-		// 	// delete healing from database
-		// 	for (var i in user_healings) {
-		// 		if (user_healings[i]['name'] == item) {
-		// 			deleteDatabaseObject('user_healing', user_healings[i]['id']);
-		// 			user_healings.splice(i, 1);
-		// 			break;
-		// 		}
-		// 	}
-		// }
-	});
-
-	enableHiddenNumbers();
-
-}
-
-function editHealing(healing_id, input_id) {
-	focus_id = "#healing_"+input_id;
-	// set modal values and launch
-	$("#healing_modal_title").html("Edit Healing/Potion/Drug");
-	$("#healing_name").val($("#"+healing_id+"_name").val());
-	$("#healing_quantity").val($("#"+healing_id+"_quantity").val());
-	$("#healing_effect").val($("#"+healing_id+"_effect").val());
-	$("#healing_weight").val($("#"+healing_id+"_weight").val());
-	$("#healing_id").val(healing_id);
-	$("#new_healing_modal").modal("show");
-}
-
-// add a new misc item from modal values
-function newMisc() {
-	// check if we are editing
-	var editing = $("#misc_modal_title").html() == "Edit Miscellaneous Item";
-	var name = $("#misc_name").val();
-	var quantity = $("#misc_quantity").val() == "" ? 1 : $("#misc_quantity").val();
-	var notes = $("#misc_notes").val();
-	var weight = $("#misc_weight").val() == "" ? 0 : $("#misc_weight").val();
-	if (name == "") {
-		alert("Name is required");
-		return;
-	}
-	$("#new_misc_modal").modal("hide");
-	if (editing) {
-		// update misc inputs
-		var misc_id = $("#misc_id").val();
-		$("#"+misc_id+"_name").val(name);
-		$("#"+misc_id+"_quantity").val(quantity);
-		$("#"+misc_id+"_notes").val(notes);
-		$("#"+misc_id+"_weight").val(weight);
-		// update mobile row
-		$("#"+misc_id+"_mobile_title").html(name+" : ");
-		$("#"+misc_id+"_mobile_details").html( (notes == "" ? "" : "Notes: "+notes+"; ")+"Weight: "+weight+"lbs; Qty: "+quantity);
-		updateTotalWeight(true);
-		// update misc in database
-		for (var i in user_misc) {
-			if (user_misc[i]['name'] == name) {
-				user_misc[i]['quantity'] = quantity;
-				user_misc[i]['notes'] = notes;
-				user_misc[i]['weight'] = weight;
-				updateDatabaseObject('user_misc', user_misc[i], columns['user_misc']);
-			}
-		}
-	} else {
-		// insert new misc into database and user array
-		var newMisc = {
-			'name':name,
-			'quantity':quantity,
-			'notes':notes,
-			'weight':weight,
-			'id':""
-		}
-		user_misc.push(newMisc);
-		addMiscElements(newMisc);
-		insertDatabaseObject('user_misc', newMisc, columns['user_misc']);
-	}
-}
-
-// create html elements for misc item
-function addMiscElements(misc) {
-	var id_val = misc['id'] == "" ? uuid() : "misc_"+misc['id'];
-
-	var div = createElement('div', '', '#misc', id_val);
-	let div0 = createElement('div', 'form-group item', div); // desktop row container
-	var div1 = createElement('div', 'col-xs-4 no-pad-mobile', div0); // name
-	var div3 = createElement('div', 'col-xs-5 no-pad-mobile', div0); // notes
-	var div4 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // weight
-	var div2 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // qty
-	var div5 = createElement('div', 'col-xs-1 no-pad-mobile center remove-btn', div);
-
-	var name_input = createInput('', 'text', 'misc[]', misc['name'], div1, id_val+"_name");
-	var qty_input = createInput('qty', 'text', 'misc_quantity[]', misc['quantity'], div2, id_val+"_quantity");
-	let notesText = misc['notes'] == null ? "" : misc['notes'];
-	var notes_input = createInput('', 'text', 'misc_notes[]', notesText, div3, id_val+"_notes");
-	var weight_input = createInput('wgt', 'text', 'misc_weight[]', misc['weight'], div4, id_val+"_weight");
-	createInput('', 'hidden', 'misc_ids[]', misc['id'], div4);
-	updateTotalWeight(true);
-
-	// mobile item layout
-	let mobileItemRow = createElement('span', 'item-mobile', div);
-	let itemText = createElement('span', 'note item-label', mobileItemRow);
-	itemText.hover(function() {
-		$(this).addClass("highlight");
-	}, function() {
-		$(this).removeClass("highlight");
-	});
-	let itemTitle = createElement('span', 'note-title', itemText, id_val+"_mobile_title");
-	itemTitle.html(misc['name']+" : ");
-	let itemDetails = createElement('span', 'note-content', itemText, id_val+"_mobile_details");
-	itemDetails.html( (notesText == "" ? "" : "Notes: "+notesText+"; ")+"Weight: "+misc['weight']+"lbs; Qty: "+misc['quantity']);
-
-	name_input.attr("readonly", true);
-	qty_input.attr("readonly", true);
-	notes_input.attr("readonly", true);
-	weight_input.attr("readonly", true);
-	enableHighlight(name_input, "misc[]");
-	enableHighlight(qty_input, "misc_quantity[]");
-	enableHighlight(notes_input, "misc_notes[]");
-	enableHighlight(weight_input, "misc_weight[]");
-	name_input.click(function() {
-		editMisc(id_val, "name");
-	});
-	qty_input.click(function() {
-		editMisc(id_val, "quantity");
-	});
-	notes_input.click(function() {
-		editMisc(id_val, "notes");
-	});
-	weight_input.click(function() {
-		editMisc(id_val, "weight");
-	});
-	mobileItemRow.click(function() {
-		editMisc(id_val, "name");
-	});
-
-	// add remove button
-	createElement('span', 'glyphicon glyphicon-remove', div5, id_val+"_remove");
-	$("#"+id_val+"_remove").on("click", function() {
-		var item = $("#"+id_val+"_name").val();
-		var conf = confirm("Remove item '"+item+"'?");
-		if (conf) {
-			$("#"+id_val).remove();
-			// update total weight
-			updateTotalWeight(false);
-			// delete misc from database
-			for (var i in user_misc) {
-				if (user_misc[i]['name'] == item) {
-					deleteDatabaseObject('user_misc', user_misc[i]['id']);
-					user_misc.splice(i, 1);
-					break;
-				}
-			}
-		}
-	});
-
-	enableHiddenNumbers();
-
-}
-
-function editMisc(misc_id, input_id) {
-	focus_id = "#misc_"+input_id;
-	// set modal values and launch
-	$("#misc_modal_title").html("Edit Miscellaneous Item");
-	$("#misc_name").val($("#"+misc_id+"_name").val());
-	$("#misc_quantity").val($("#"+misc_id+"_quantity").val());
-	$("#misc_notes").val($("#"+misc_id+"_notes").val());
-	$("#misc_weight").val($("#"+misc_id+"_weight").val());
-	$("#misc_id").val(misc_id);
-	$("#new_misc_modal").modal("show");
-}
-
-// get note values from modal
-function newNote() {
-	// check if we are editing
-	var editing = $("#note_modal_title").html() == "Edit Note";
-	var title = $("#note_title").val();
-	var note = $("#note_content").val();
-	if (note == "" && title == "") {
-		return;
-	}
-	if (editing) {
-		// update note text
-		var note_id = $("#note_id").val();
-		// title could be empty
-		if (title == "") {
-			$("#"+note_id+"_title").html("");
-		} else {
-			$("#"+note_id+"_title").html(title+": ");
-		}
-		// $("#"+note_id+"_content").html(note.length > 90 ? note.substring(0,90)+"..." : note);
-		$("#"+note_id+"_content").html(note);
-		$("#"+note_id+"_title_val").val(title);
-		$("#"+note_id+"_content_val").val(note);
-		// update note in database
-		for (var i in user_notes) {
-			if (user_notes[i]['id'] == note_id.split("note_")[1]) {
-				user_notes[i]['title'] = title;
-				user_notes[i]['note'] = note;
-				updateDatabaseObject('user_note', user_notes[i], columns['user_note']);
-			}
-		}
-	} else {
-		// insert new note into database and user array
-		var newNote = {
-			'title':title,
-			'note':note,
-			'id':""
-		}
-		user_notes.push(newNote);
-		addNoteElements(newNote);
-		newNote.postInsertCallback = function(insert_id) {
-			if (insert_id != undefined) {
-				let uuid = $("#uuid").val();
-				// update element IDs with returned insert ID
-				$("#"+uuid+"_title").attr("id", "note_"+insert_id+"_title");
-				$("#"+uuid+"_content").attr("id", "note_"+insert_id+"_content");
-				$("#"+uuid+"_title_val").attr("id", "note_"+insert_id+"_title_val");
-				$("#"+uuid+"_content_val").attr("id", "note_"+insert_id+"_content_val");
-			}
-		};
-		insertDatabaseObject('user_note', newNote, columns['user_note']);
-	}
-}
-
-// create note elements
-function addNoteElements(note) {
-	var id_val = note['id'] == "" ? uuid() : "note_"+note['id'];
-
-	var li = $('<li />', {
-	}).appendTo("#notes");
-
-	var span = $('<span />', {
-	  'class': 'note',
-	}).appendTo(li);
-
-	$('<span />', {
-		'id': id_val+"_title",
-		'html': note['title'] == null || note['title'] == "" ? "" : note['title']+": ",
-	  'class': 'note-title',
-	}).appendTo(span);
-	createInput('', 'hidden', 'titles[]', note['title'], span, id_val+"_title_val");
-
-	$('<span />', {
-		'id': id_val+"_content",
-		// 'html': note.length > 90 ? note.substring(0,90)+"..." : note,
-		'html': note['note'],
-	  'class': 'note-content',
-	}).appendTo(span);
-
-	var remove = $('<span />', {
-	  'class': 'glyphicon glyphicon-remove',
-	}).appendTo(li);
-
-	createInput('', 'hidden', 'notes[]', note['note'], span, id_val+"_content_val");
-	createInput('', 'hidden', 'note_ids[]', note['id'], span);
-
-	// highlight on hover
-	span.hover(function() {
-		$(this).addClass("highlight");
-	}, function() {
-		$(this).removeClass("highlight");
-	});
-
-	// edit on click
-	span.click(function() {
-		editNote(note);
-	});
-
-	// enable remove button
-	remove.click(function() {
-		var conf = confirm("Delete note, " + (note['title'] == "" ? "[no title]" : note['title']) + "?");
-		if (conf) {
-			li.remove();
-			// delete note from database
-			for (var i in user_notes) {
-				if (user_notes[i]['note'] == note['note']) {
-					deleteDatabaseObject('user_note', user_notes[i]['id']);
-					user_notes.splice(i, 1);
-					break;
-				}
-			}
-		}
-	});
-}
-
-function editNote(note) {
-	// set modal values and launch
-	$("#note_modal_title").html("Edit Note");
-	$("#note_title").val($("#note_"+note['id']+"_title_val").val());
-	$("#note_content").val($("#note_"+note['id']+"_content_val").val());
-	$("#note_id").val("note_"+note['id']);
-	$("#new_note_modal").modal("show");
-}
-
 function updateTotalWeight(showMsg = false) {
 	var totalWeight = 0
 	// find all wgt inputs
@@ -3960,9 +3095,8 @@ function deleteArrayObject(array, target_id) {
 }
 
 
-// Model get methods
+// UserWeapon
 
-// find a weapon by name or ID
 function getWeapon(weapon_id) {
 	for (var i in userWeapons) {
 		if (userWeapons[i]['id'] == weapon_id || userWeapons[i]['name'] == weapon_id) {
@@ -3972,7 +3106,274 @@ function getWeapon(weapon_id) {
 	return false;
 }
 
-// find a protection by name or ID
+// add a new weapon from modal values - or edit existing weapon
+function newWeapon() {
+	// check if we are editing
+	var editing = $("#weapon_modal_title").html() == "Edit Weapon";
+	var type = $("#weapon_type").val();
+	var name = $("#weapon_name").val();
+	var damage = $("#weapon_damage").val();
+	var max_damage = $("#weapon_max_damage").val();
+	var range = $("#weapon_range_").val();
+	var rof = $("#weapon_rof").val();
+	var defend = $("#weapon_defend").val();
+	var crit = $("#weapon_crit").val();
+	var notes = $("#weapon_notes").val();
+	var weight = $("#weapon_weight").val() == "" ? 0 : $("#weapon_weight").val();
+	var qty = $("#weapon_quantity").val() == "" ? 1 : $("#weapon_quantity").val();
+	if (name == "") {
+		alert("Name is required");
+		return;
+	} else if (damage == "") {
+		alert("Damage is required");
+		return;
+	}
+	$("#new_weapon_modal").modal("hide");
+	if (editing) {
+		// update weapon inputs
+		var weapon_id = "weapon_"+$("#weapon_id").val();
+		$("#"+weapon_id+"_type").val(type);
+		var originalName = $("#"+weapon_id+"_name").val();
+		$("#"+weapon_id+"_name").val(name);
+		$("#"+weapon_id+"_weight").val(weight);
+		$("#"+weapon_id+"_damage_val").val(damage);
+		var damage_text = max_damage != "" ? damage +" ("+max_damage+")" : damage;
+		$("#"+weapon_id+"_damage").val(damage_text);
+		$("#"+weapon_id+"_max_damage").val(max_damage);
+		var noteMod = "";
+		noteMod += range != "" ? "Range: "+range+"; " : "";
+		noteMod += rof != "" ? "RoF: "+rof+"; " : "";
+		noteMod += defend != "" ? "+"+defend+" Defend; " : "";
+		noteMod += crit != "" ? "+"+crit+" Critical Threat Range; " : "";
+		$("#"+weapon_id+"_notes").val(noteMod+notes);
+		$("#"+weapon_id+"_notes_val").val(notes);
+		$("#"+weapon_id+"_range").val(range);
+		$("#"+weapon_id+"_rof").val(rof);
+		$("#"+weapon_id+"_defend").val(defend);
+		$("#"+weapon_id+"_crit").val(crit);
+		$("#"+weapon_id+"_qty").val(qty);
+		// update mobile row
+		$("#"+weapon_id+"_mobile_title").html(name+" : ");
+		$("#"+weapon_id+"_mobile_details").html("Damage: "+damage_text+"; Weight: "+weight+"lbs; Qty: "+qty+"; "+noteMod+notes);
+
+		updateTotalWeight(true);
+
+		// update weapon object
+		let weapon = getWeapon(originalName);
+		weapon.type = type;
+		weapon.damage = parseInt(damage);
+		weapon.defend = defend == "" ? null : parseInt(defend);
+		weapon.crit = crit == "" ? null : parseInt(crit);
+		weapon.max_damage = max_damage == "" ? null : parseInt(max_damage);
+		weapon.quantity = qty;
+		weapon.name = name;
+		// TODO range_ not recorded for melee weapons; needed for thrown weapons
+		weapon.range_ = range == "" ? null : parseInt(range);
+		weapon.rof = rof;
+		weapon.notes = notes;
+		weapon.weight = weight;
+		updateDatabaseObject('user_weapon', weapon, columns['user_weapon']);
+
+		// update weapon dropdowns
+		$($(".weapon-select").get().reverse()).each(function() {
+			$(this).find("option").each(function() {
+				if ($(this).val() == originalName) {
+					$(this).val(name);
+					$(this).html(name);
+				}
+			});
+			// re-select if equipped to update inputs
+			if ($(this).val() == originalName) {
+				selectWeapon(this.id.slice(-1), false);
+			}
+		});
+	} else {
+		// check to make sure name is not a duplicate
+		for (var i in userWeapons) {
+			if (userWeapons[i].name == name) {
+				alert("Weapon name already in use");
+				return;
+			}
+		}
+		let newWeapon = new UserWeapon({
+			'type':type,
+			'name':name,
+			'quantity':1,
+			'damage':damage,
+			'max_damage':max_damage,
+			'range_':range,
+			'rof':rof,
+			'defend':defend,
+			'crit':crit,
+			'notes':notes,
+			'weight':weight,
+			'equipped':0,
+			// 'requires_save':true
+		});
+		userWeapons.push(newWeapon);
+		addWeaponElements(newWeapon);
+		insertDatabaseObject('user_weapon', newWeapon, columns['user_weapon']);
+		newWeapon.postInsertCallback = function(insert_id) {
+			this.postInsertCallback = null;
+			// this.requires_save = null;
+		};
+	}
+}
+
+// create html elements for weapon
+function addWeaponElements(weapon) {
+	let id_val = weapon.id == null ? uuid() : "weapon_"+weapon.id;
+
+	let div = createElement('div', '', '#weapons', id_val);
+	let div0 = createElement('div', 'form-group item', div); // desktop row container
+	let div1 = createElement('div', 'col-xs-3 no-pad-mobile', div0); // name
+	let div3 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // damage
+	let div4 = createElement('div', 'col-xs-5 no-pad-mobile', div0); // notes
+	let div5 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // weight
+	let div2 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // qty
+	let div6 = createElement('div', 'col-xs-1 no-pad-mobile center remove-btn', div); // delete btn
+	let remove = createElement('span', 'glyphicon glyphicon-remove', div6);
+	remove.on("click", function() {
+		weapon.delete(id_val);
+	});
+
+	let name_input = createInput('', 'text', 'weapons[]', weapon.name, div1, id_val+"_name");
+	let qty_input = createInput('qty', 'text', 'weapon_qty[]', weapon.quantity, div2, id_val+"_qty");
+	// check for max damage
+	let damageText = weapon.max_damage != null ? weapon.damage +" ("+weapon.max_damage+")" : weapon.damage;
+	let dmg_input = createInput('', 'text', '', damageText, div3, id_val+"_damage");
+	// add range, rof & defend bonus to notes
+	var noteMod = "";
+	weapon.notes = weapon.notes == null ? "" : weapon.notes;
+	noteMod += weapon.range_ != null && weapon.range_ != "" ? "Range: "+weapon.range_+"; " : "";
+	noteMod += weapon.rof != null && weapon.rof != "" ? "RoF: "+weapon.rof+"; " : "";
+	noteMod += weapon.defend != null && weapon.defend != "" ? "+"+weapon.defend+" Defend; " : "";
+	noteMod += weapon.crit != null && weapon.crit != "" ? "+"+weapon.crit+" Critical Threat Range; " : "";
+	let notesText = noteMod + weapon.notes;
+	let note_input = createInput('', 'text', '', notesText, div4, id_val+"_notes");
+	let wgt_input = createInput('wgt', 'text', 'weapon_weight[]', weapon.weight, div5, id_val+"_weight");
+	createInput('', 'hidden', 'weapon_damage[]', weapon.damage, div5, id_val+"_damage_val");
+	createInput('', 'hidden', 'weapon_notes[]', weapon.notes, div5, id_val+"_notes_val");
+	createInput('', 'hidden', 'weapon_type[]', weapon.type, div5, id_val+"_type");
+	createInput('', 'hidden', 'weapon_max_damage[]', weapon.max_damage, div5, id_val+"_max_damage");
+	createInput('', 'hidden', 'weapon_range[]', weapon.range_, div5, id_val+"_range");
+	createInput('', 'hidden', 'weapon_rof[]', weapon.rof, div5, id_val+"_rof");
+	createInput('', 'hidden', 'weapon_defend[]', weapon.defend, div5, id_val+"_defend");
+	createInput('', 'hidden', 'weapon_crit[]', weapon.crit, div5, id_val+"_crit");
+	createInput('', 'hidden', 'weapon_ids[]', weapon.id, div5);
+	updateTotalWeight(true);
+
+	// mobile item layout
+	let mobileItemRow = createElement('span', 'item-mobile', div, id_val+'_mobile');
+	let itemText = createElement('span', 'note item-label', mobileItemRow);
+	itemText.hover(function() {
+		$(this).addClass("highlight");
+	}, function() {
+		$(this).removeClass("highlight");
+	});
+	let itemTitle = createElement('span', 'note-title', itemText, id_val+"_mobile_title");
+	itemTitle.html(weapon.name+" : ");
+	let itemDetails = createElement('span', 'note-content', itemText, id_val+"_mobile_details");
+	itemDetails.html("Damage: "+damageText+"; Weight: "+weapon.weight+"lbs; Qty: "+weapon.quantity+"; "+notesText);
+
+	// add click and hover functions
+	name_input.attr("readonly", true);
+	qty_input.attr("readonly", true);
+	dmg_input.attr("readonly", true);
+	note_input.attr("readonly", true);
+	wgt_input.attr("readonly", true);
+	enableHighlight(name_input, "weapons[]");
+	enableHighlight(qty_input, "weapon_qty[]");
+	enableHighlight(dmg_input, "weapon_damage[]");
+	enableHighlight(note_input, "weapon_notes[]");
+	enableHighlight(wgt_input, "weapon_weight[]");
+
+	name_input.click(function() {
+		weapon.edit("name");
+	});
+	qty_input.click(function() {
+		weapon.edit("quantity");
+	});
+	dmg_input.click(function() {
+		weapon.edit("damage");
+	});
+	note_input.click(function() {
+		// look for range, rof, defend, and crit values
+		let note_val = note_input.val();
+		let focus = note_val.includes("Range") ? "range_" : 
+			(note_val.includes("RoF") ? "rof" : (note_val.includes("Defend") ? "defend" : (note_val.includes("Critical") ? "crit" : "notes")));
+		weapon.edit(focus);
+	});
+	wgt_input.click(function() {
+		weapon.edit("weight");
+	});
+	itemText.click(function() {
+		weapon.edit("name");
+	});
+
+	// add weapon option to dropdown
+	let option1 = $('<option />', {
+  	'text': weapon.name,
+  	'value': weapon.name
+	}).appendTo("#weapon_select_1");
+	let option2 = option1.clone().appendTo("#weapon_select_2");
+	let option3 = option1.clone().appendTo("#weapon_select_3");
+
+	enableHiddenNumbers();
+
+}
+
+// select a weapon from the dropdown
+// param: dropdownID - the selected dropdown ID
+// param: updateDatabase - true if we are making a selection from the dropdown; requires object/database update
+function selectWeapon(dropdownID, updateDatabase=true) {
+	let selectedVal = $("#weapon_select_"+dropdownID).val();
+
+	// get selected and de-selected weapon from array
+	var selectedWeapon;
+	var deselectedWeapon;
+	for (var i in userWeapons) {
+
+		// find the de-selected weapon
+		if (userWeapons[i].equipped_index.includes(dropdownID)) {
+			deselectedWeapon = userWeapons[i];
+		}
+
+		// find the newly selected weapon
+		if (selectedVal == userWeapons[i].name) {
+			selectedWeapon = userWeapons[i];
+		}
+	}
+			
+	// check if equip is allowable (weapon quantity)
+	let allowable = selectedVal == "" || !updateDatabase || selectedWeapon.equipped < selectedWeapon.quantity;
+	if (!allowable) {
+		// restore original selection name and return
+		$("#weapon_select_"+dropdownID).val(deselectedWeapon == undefined ? "" : deselectedWeapon.name);
+		return;
+	}
+
+	if (deselectedWeapon != undefined) {
+		deselectedWeapon.equip(false, updateDatabase, dropdownID);
+	}
+	if (selectedWeapon != undefined) {
+		selectedWeapon.equip(true, updateDatabase, dropdownID);
+	}
+
+	setDefend();
+}
+
+// don't allow ";" in RoF inputs; used for parsing note value
+$("#weapon_rof").on('keypress', function(e) {
+	if (e.charCode == 59) {
+		e.preventDefault();
+		return false;
+	}
+});
+
+
+// UserProtection
+
 function getProtection(protection_id) {
 	for (var i in userProtections) {
 		if (userProtections[i]['id'] == protection_id || userProtections[i]['name'] == protection_id) {
@@ -3982,7 +3383,158 @@ function getProtection(protection_id) {
 	return false;
 }
 
-// find a healing by name or ID
+// add a new protection from modal values
+function newProtection() {
+	// check if we are editing
+	var editing = $("#protection_modal_title").html() == "Edit Protection";
+	var name = $("#protection_name").val();
+	var bonus = $("#protection_bonus").val() == "" ? 0 : $("#protection_bonus").val();
+	var notes = $("#protection_notes").val();
+	var weight = $("#protection_weight").val() == "" ? 0 : $("#protection_weight").val();
+	if (name == "") {
+		alert("Name is required");
+		return;
+	}
+	$("#new_protection_modal").modal("hide");
+	if (editing) {
+		// update protection inputs
+		var protection_id = "protection_"+$("#protection_id").val();
+		var originalName = $("#"+protection_id+"_name").val();
+		$("#"+protection_id+"_name").val(name);
+		$("#"+protection_id+"_bonus").val(bonus);
+		$("#"+protection_id+"_notes").val(notes);
+		$("#"+protection_id+"_weight").val(weight);
+		// update mobile row
+		$("#"+protection_id+"_mobile_title").html(name+" : ");
+		$("#"+protection_id+"_mobile_details").html("Bonus: +"+bonus+"; Weight: "+weight+"lbs; "+notes);
+
+		// update user protection object
+		let protection = getProtection(originalName);
+		protection.bonus = parseInt(bonus);
+		protection.name = name;
+		protection.notes = notes;
+		protection.weight = parseInt(weight);
+		// update database entry
+		updateDatabaseObject('user_protection', protection, columns['user_protection']);
+		setToughness();
+		updateTotalWeight(true);
+	} else {
+		// check to make sure name is not a duplicate
+		for (var i in userProtections) {
+			if (userProtections[i].name ==  name) {
+				alert("Protection name already in use");
+				return;
+			}
+		}
+		let newProtection = new UserProtection({
+			'name':name,
+			'bonus':bonus,
+			'notes':notes,
+			'weight':weight,
+			'equipped':0,
+			// 'requires_save':true
+		});
+		userProtections.push(newProtection);
+		addProtectionElements(newProtection, true);
+		insertDatabaseObject('user_protection', newProtection, columns['user_protection']);
+		newProtection.postInsertCallback = function(insert_id) {
+			this.postInsertCallback = null;
+			// this.requires_save = null;
+		};
+
+	}
+}
+
+// create html elements for protection
+function addProtectionElements(protection, newProtection) {
+	var id_val = protection.id == null ? uuid() : "protection_"+protection.id;
+
+	// TODO create elements using cloning?
+	var div = createElement('div', '', '#protections', id_val);
+	var div0 = createElement('div', 'form-group item item-protection', div); // desktop row container
+	var div3 = createElement('div', 'col-xs-1 no-pad-mobile col-icon equip-btn', div); // equip btn
+	var div1 = createElement('div', 'col-xs-3 no-pad-mobile col-icon-right', div0); // name
+	var div2 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // bonus
+	var div4 = createElement('div', 'col-xs-5 no-pad-mobile', div0); // notes
+	var div5 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // weight
+	var div6 = createElement('div', 'col-xs-1 no-pad-mobile center remove-btn', div); // remove btn
+
+	var name_input = createInput('', 'text', 'protections[]', protection.name, div1, id_val+"_name");
+	var bonus_input = createInput('', 'text', 'protection_bonus[]', protection.bonus, div2, id_val+"_bonus");
+	let notesText = protection.notes == null ? "" : protection.notes;
+	var notes_input = createInput('', 'text', 'protection_notes[]', notesText, div4, id_val+"_notes");
+	var weight_input = createInput('wgt', 'text', 'protection_weight[]', protection.weight, div5, id_val+"_weight");
+	name_input.attr("readonly", true);
+	bonus_input.attr("readonly", true);
+	notes_input.attr("readonly", true);
+	weight_input.attr("readonly", true);
+	createInput('', 'hidden', 'protection_ids[]', protection.id, div6);
+
+	// mobile item layout
+	let mobileItemRow = createElement('span', 'item-mobile item-protection', div);
+	let itemText = createElement('span', 'note item-label-mobile', mobileItemRow);
+	itemText.hover(function() {
+		$(this).addClass("highlight");
+	}, function() {
+		$(this).removeClass("highlight");
+	});
+	let itemTitle = createElement('span', 'note-title', itemText, id_val+"_mobile_title");
+	itemTitle.html(protection.name+" : ");
+	let itemDetails = createElement('span', 'note-content', itemText, id_val+"_mobile_details");
+	itemDetails.html("Bonus: +"+protection.bonus+"; Weight: "+protection.weight+"lbs; "+notesText);
+
+	// enable highlighting and click functions for newly created elements
+	enableHighlight(name_input, "protections[]");
+	enableHighlight(bonus_input, "protection_bonus[]");
+	enableHighlight(notes_input, "protection_notes[]");
+	enableHighlight(weight_input, "protection_weight[]");
+	name_input.click(function() {
+		protection.edit("name");
+	});
+	bonus_input.click(function() {
+		protection.edit("bonus");
+	});
+	notes_input.click(function() {
+		protection.edit("notes");
+	});
+	weight_input.click(function() {
+		protection.edit("weight");
+	});
+	itemText.click(function() {
+		protection.edit("name");
+	});
+
+	// add equip button
+	createElement('span', 'glyphicon svg fa-solid icon-armor custom-icon', div3, id_val+"_equip");
+	createElement('span', 'glyphicon glyphicon-ban-circle', div3, id_val+"_equip_ban");
+	createInput('', 'hidden', 'protection_equipped[]', protection.equipped == 1, div3, id_val+"_equipped");
+	$(div3).on("click", function() {
+		protection.equip(id_val);
+	});
+
+	// check if protection is currently equipped
+	if (protection.equipped) {
+		$("#protection_"+protection.id+"_equip_ban").toggle();
+	}
+
+	// add remove button
+	let removeBtn = createElement('span', 'glyphicon glyphicon-remove', div6);
+	removeBtn.on("click", function() {
+		protection.delete(id_val);
+	});
+
+	enableHiddenNumbers();
+	updateTotalWeight(true);
+
+	// prompt user to equip new protection
+	if (newProtection) {
+		protection.equip(id_val);
+	}
+}
+
+
+// UserHealing
+
 function getHealing(healing_id) {
 	for (var i in userHealings) {
 		if (userHealings[i]['id'] == healing_id || userHealings[i]['name'] == healing_id) {
@@ -3990,6 +3542,367 @@ function getHealing(healing_id) {
 		}
 	}
 	return false;
+}
+
+// add a new healing/potion/drug from modal values
+function newHealing() {
+	// check if we are editing
+	let editing = $("#healing_modal_title").html() == "Edit Healing/Potion/Drug";
+	let name = $("#healing_name").val();
+	let quantity = $("#healing_quantity").val() == "" ? 1 : $("#healing_quantity").val();
+	let effect = $("#healing_effect").val();
+	let weight = $("#healing_weight").val() == "" ? 0 : $("#healing_weight").val();
+	if (name == "") {
+		alert("Name is required");
+		return;
+	}
+	$("#new_healing_modal").modal("hide");
+	if (editing) {
+		// update healing inputs
+		let healing_id = "healing_"+$("#healing_id").val();
+		let originalName = $("#"+healing_id+"_name").val();
+		$("#"+healing_id+"_name").val(name);
+		$("#"+healing_id+"_quantity").val(quantity);
+		$("#"+healing_id+"_effect").val(effect);
+		$("#"+healing_id+"_weight").val(weight);
+		// update mobile row
+		$("#"+healing_id+"_mobile_title").html(name+" : ");
+		$("#"+healing_id+"_mobile_details").html("Effect: "+effect+"; Weight: "+weight+"lbs; Qty: "+quantity);
+		updateTotalWeight(true);
+		// update healing in database
+		let healing = getHealing(originalName);
+		healing.name = name;
+		healing.quantity = quantity;
+		healing.effect = effect;
+		healing.weight = weight;
+		updateDatabaseObject('user_healing', healing, columns['user_healing']);
+	} else {
+		// check to make sure name is not a duplicate
+		for (var i in userHealings) {
+			if (userHealings[i].name ==  name) {
+				alert("Item name already in use");
+				return;
+			}
+		}
+		// insert new healing into database and user array
+		let newHealing = new UserHealing({
+			'name':name,
+			'quantity':quantity,
+			'effect':effect,
+			'weight':weight,
+			// 'requires_save':true
+		});
+		userHealings.push(newHealing);
+		addHealingElements(newHealing);
+		insertDatabaseObject('user_healing', newHealing, columns['user_healing']);
+
+		// post insert callback function
+		newHealing.postInsertCallback = function(insert_id) {
+			this.postInsertCallback = null;
+			// this.requires_save = null;
+		};
+
+	}
+}
+
+// create html elements for healing
+function addHealingElements(healing) {
+	var id_val = healing.id == null ? uuid() : "healing_"+healing.id;
+
+	var div = createElement('div', '', '#healings', id_val);
+	let div0 = createElement('div', 'form-group item', div); // desktop row container
+	var div1 = createElement('div', 'col-xs-4 no-pad-mobile', div0); // name
+	var div3 = createElement('div', 'col-xs-5 no-pad-mobile', div0); // notes
+	var div4 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // weight
+	var div2 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // qty
+	var div5 = createElement('div', 'col-xs-1 no-pad-mobile center remove-btn', div); // remove btn
+
+	var name_input = createInput('', 'text', 'healings[]', healing.name, div1, id_val+"_name");
+	var qty_input = createInput('qty', 'text', 'healing_quantity[]', healing.quantity, div2, id_val+"_quantity");
+	var effect_input = createInput('', 'text', 'healing_effect[]', healing.effect, div3, id_val+"_effect");
+	var weight_input = createInput('wgt', 'text', 'healing_weight[]', healing.weight, div4, id_val+"_weight");
+	createInput('', 'hidden', 'healing_ids[]', healing.id, div4);
+	updateTotalWeight(true);
+
+	// mobile item layout
+	let mobileItemRow = createElement('span', 'item-mobile', div);
+	let itemText = createElement('span', 'note item-label', mobileItemRow);
+	itemText.hover(function() {
+		$(this).addClass("highlight");
+	}, function() {
+		$(this).removeClass("highlight");
+	});
+	let itemTitle = createElement('span', 'note-title', itemText, id_val+"_mobile_title");
+	itemTitle.html(healing.name+" : ");
+	let itemDetails = createElement('span', 'note-content', itemText, id_val+"_mobile_details");
+	itemDetails.html("Effect: "+healing.effect+"; Weight: "+healing.weight+"lbs; Qty: "+healing.quantity);
+
+	name_input.attr("readonly", true);
+	qty_input.attr("readonly", true);
+	effect_input.attr("readonly", true);
+	weight_input.attr("readonly", true);
+	enableHighlight(name_input, "healings[]");
+	enableHighlight(qty_input, "healing_quantity[]");
+	enableHighlight(effect_input, "healing_effect[]");
+	enableHighlight(weight_input, "healing_weight[]");
+	name_input.click(function() {
+		healing.edit("name");
+	});
+	qty_input.click(function() {
+		healing.edit("quantity");
+	});
+	effect_input.click(function() {
+		healing.edit("effect");
+	});
+	weight_input.click(function() {
+		healing.edit("weight");
+	});
+	mobileItemRow.click(function() {
+		healing.edit("name");
+	});
+
+	// add remove button
+	createElement('span', 'glyphicon glyphicon-remove', div5, id_val+"_remove");
+	$("#"+id_val+"_remove").on("click", function() {
+		healing.delete(id_val);
+	});
+
+	enableHiddenNumbers();
+
+}
+
+
+// UserMisc
+
+function getMisc(misc_id) {
+	for (var i in userMisc) {
+		if (userMisc[i]['id'] == misc_id || userMisc[i]['name'] == misc_id) {
+			return userMisc[i];
+		}
+	}
+	return false;
+}
+
+// add a new misc item from modal values
+function newMisc() {
+	// check if we are editing
+	var editing = $("#misc_modal_title").html() == "Edit Miscellaneous Item";
+	var name = $("#misc_name").val();
+	var quantity = $("#misc_quantity").val() == "" ? 1 : $("#misc_quantity").val();
+	var notes = $("#misc_notes").val();
+	var weight = $("#misc_weight").val() == "" ? 0 : $("#misc_weight").val();
+	if (name == "") {
+		alert("Name is required");
+		return;
+	}
+	$("#new_misc_modal").modal("hide");
+	if (editing) {
+		// update misc inputs
+		var misc_id = "misc_"+$("#misc_id").val();
+		$("#"+misc_id+"_name").val(name);
+		$("#"+misc_id+"_quantity").val(quantity);
+		$("#"+misc_id+"_notes").val(notes);
+		$("#"+misc_id+"_weight").val(weight);
+		// update mobile row
+		$("#"+misc_id+"_mobile_title").html(name+" : ");
+		$("#"+misc_id+"_mobile_details").html( (notes == "" ? "" : "Notes: "+notes+"; ")+"Weight: "+weight+"lbs; Qty: "+quantity);
+		updateTotalWeight(true);
+		// update misc in database
+		let misc = getMisc(name);
+		misc.name = name;
+		misc.quantity = quantity;
+		misc.notes = notes;
+		misc.weight = weight;
+		updateDatabaseObject('user_misc', misc, columns['user_misc']);
+	} else {
+		// check to make sure name is not a duplicate
+		for (var i in userMisc) {
+			if (userMisc[i].name ==  name) {
+				alert("Item name already in use");
+				return;
+			}
+		}
+		// insert new misc into database and user array
+		var newMisc = new UserMisc({
+			'name':name,
+			'quantity':quantity,
+			'notes':notes,
+			'weight':weight,
+			// 'requires_save':true
+		});
+		userMisc.push(newMisc);
+		addMiscElements(newMisc);
+		insertDatabaseObject('user_misc', newMisc, columns['user_misc']);
+		newMisc.postInsertCallback = function(insert_id) {
+			this.postInsertCallback = null;
+			// this.requires_save = null;
+		};
+	}
+}
+
+// create html elements for misc item
+function addMiscElements(misc) {
+	var id_val = misc.id == null ? uuid() : "misc_"+misc.id;
+
+	var div = createElement('div', '', '#misc', id_val);
+	let div0 = createElement('div', 'form-group item', div); // desktop row container
+	var div1 = createElement('div', 'col-xs-4 no-pad-mobile', div0); // name
+	var div3 = createElement('div', 'col-xs-5 no-pad-mobile', div0); // notes
+	var div4 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // weight
+	var div2 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // qty
+	var div5 = createElement('div', 'col-xs-1 no-pad-mobile center remove-btn', div);
+
+	var name_input = createInput('', 'text', 'misc[]', misc.name, div1, id_val+"_name");
+	var qty_input = createInput('qty', 'text', 'misc_quantity[]', misc.quantity, div2, id_val+"_quantity");
+	let notesText = misc.notes == null ? "" : misc.notes;
+	var notes_input = createInput('', 'text', 'misc_notes[]', notesText, div3, id_val+"_notes");
+	var weight_input = createInput('wgt', 'text', 'misc_weight[]', misc.weight, div4, id_val+"_weight");
+	createInput('', 'hidden', 'misc_ids[]', misc.id, div4);
+	updateTotalWeight(true);
+
+	// mobile item layout
+	let mobileItemRow = createElement('span', 'item-mobile', div);
+	let itemText = createElement('span', 'note item-label', mobileItemRow);
+	itemText.hover(function() {
+		$(this).addClass("highlight");
+	}, function() {
+		$(this).removeClass("highlight");
+	});
+	let itemTitle = createElement('span', 'note-title', itemText, id_val+"_mobile_title");
+	itemTitle.html(misc.name+" : ");
+	let itemDetails = createElement('span', 'note-content', itemText, id_val+"_mobile_details");
+	itemDetails.html( (notesText == "" ? "" : "Notes: "+notesText+"; ")+"Weight: "+misc.weight+"lbs; Qty: "+misc.quantity);
+
+	name_input.attr("readonly", true);
+	qty_input.attr("readonly", true);
+	notes_input.attr("readonly", true);
+	weight_input.attr("readonly", true);
+	enableHighlight(name_input, "misc[]");
+	enableHighlight(qty_input, "misc_quantity[]");
+	enableHighlight(notes_input, "misc_notes[]");
+	enableHighlight(weight_input, "misc_weight[]");
+	name_input.click(function() {
+		misc.edit("name");
+	});
+	qty_input.click(function() {
+		misc.edit("quantity");
+	});
+	notes_input.click(function() {
+		misc.edit("notes");
+	});
+	weight_input.click(function() {
+		misc.edit("weight");
+	});
+	mobileItemRow.click(function() {
+		misc.edit("name");
+	});
+
+	// add remove button
+	createElement('span', 'glyphicon glyphicon-remove', div5, id_val+"_remove");
+	$("#"+id_val+"_remove").on("click", function() {
+		misc.delete(id_val);
+	});
+
+	enableHiddenNumbers();
+
+}
+
+
+// UserNote
+
+function getNote(note_id) {
+	for (var i in userNotes) {
+		if (userNotes[i]['id'] == note_id || userNotes[i]['name'] == note_id) {
+			return userNotes[i];
+		}
+	}
+	return false;
+}
+
+// get note values from modal
+function newNote() {
+	// check if we are editing
+	var editing = $("#note_modal_title").html() == "Edit Note";
+	var title = $("#note_title").val();
+	var note = $("#note_note").val();
+	if (note == "" && title == "") {
+		return;
+	}
+
+	if (editing) {
+		// update note inputs values
+		var note_id = "note_"+$("#note_id").val(); // ID value is set when a user opens the note modal
+		$("#"+note_id+"_title").html(title == "" ? "" : title+": ");
+		$("#"+note_id+"_content").html(note);
+		$("#"+note_id+"_title_val").val(title);
+		$("#"+note_id+"_content_val").val(note);
+
+		// update note in database
+		let userNote = getNote($("#note_id").val());
+		userNote.title = title;
+		userNote.note = note;
+		updateDatabaseObject('user_note', userNote, columns['user_note']);
+	} else {
+		// insert new note into database and user array
+		var newNote = new UserNote({
+			'title':title,
+			'note':note,
+			// 'requires_save':true
+		});
+		userNotes.push(newNote);
+		addNoteElements(newNote);
+		insertDatabaseObject('user_note', newNote, columns['user_note']);
+		newNote.postInsertCallback = function(insert_id) {
+			this.postInsertCallback = null;
+			// this.requires_save = null;
+		};
+	}
+}
+
+// create note elements
+function addNoteElements(note) {
+	let id_val = note.id == null ? uuid() : "note_"+note.id;
+
+	let li = $('<li />', {
+		'id': id_val,
+	}).appendTo("#notes");
+
+	let span = $('<span />', {
+	  'class': 'note',
+	}).appendTo(li);
+
+	$('<span />', {
+		'id': id_val+"_title",
+		'html': note.title == null || note.title == "" ? "" : note.title+": ",
+	  'class': 'note-title',
+	}).appendTo(span);
+
+	$('<span />', {
+		'id': id_val+"_content",
+		// 'html': note.length > 90 ? note.substring(0,90)+"..." : note,
+		'html': note.note,
+	  'class': 'note-content',
+	}).appendTo(span);
+
+	let remove = $('<span />', {
+	  'class': 'glyphicon glyphicon-remove',
+	}).appendTo(li);
+
+	// create hidden inputs to hold submit values
+	createInput('', 'hidden', 'titles[]', note['title'], span, id_val+"_title_val");
+	createInput('', 'hidden', 'notes[]', note['note'], span, id_val+"_content_val");
+	createInput('', 'hidden', 'note_ids[]', note['id'], span);
+
+	// highlight on hover
+	span.hover(function() {
+		$(this).addClass("highlight");
+	}, function() {
+		$(this).removeClass("highlight");
+	});
+
+	// enable edit and delete
+	span.click(function() { note.edit(); });
+	remove.click(function() { note.delete(id_val); });
 }
 
 
@@ -4011,6 +3924,7 @@ class UserWeapon {
 	weight;
 	equipped;
 	equipped_index;
+	// requires_save;
 
 	constructor(weapon) {
 		this.id = weapon['id'] == null ? uuid() : parseInt(weapon['id']);
@@ -4027,11 +3941,12 @@ class UserWeapon {
 		this.weight = parseInt(weapon['weight']);
 		this.equipped = parseInt(weapon['equipped']);
 		this.equipped_index = [];
+		// this.requires_save = weapon['requires_save'];
 	}
 
 	delete(element_id) {
 		let weapon = this;
-		let conf = confirm("Remove item '"+weapon.name+"'?");
+		let conf = confirm("Remove item, '"+weapon.name+"'?");
 		if (conf) {
 			$("#"+element_id).remove();
 			$("#"+element_id+"_mobile").remove();
@@ -4095,6 +4010,16 @@ class UserWeapon {
 		}
 	}
 
+	// set modal values and launch
+	edit(input_id) {
+		for (let [key,val] of Object.entries(this)) {
+			$("#weapon_"+key).val(val);
+		}
+		focus_id = "#weapon_"+input_id;
+		$("#weapon_modal_title").html("Edit Weapon");
+		$("#new_weapon_modal").modal("show");
+	}
+
 	// calculate critical threat range modifier based on weapon and user feats
 	getCritModifier() {
 		var crit = 6;
@@ -4138,6 +4063,7 @@ class UserProtection {
 	notes;
 	weight;
 	equipped;
+	// requires_save;
 
 	constructor(protection) {
 		this.id = protection['id'] == null ? uuid() : parseInt(protection['id']);
@@ -4146,11 +4072,12 @@ class UserProtection {
 		this.notes = protection['notes'];
 		this.weight = parseInt(protection['weight']);
 		this.equipped = protection['equipped'] == "1" ? 1 : 0;
+		// this.requires_save = protection['requires_save'];
 	}
 
 	delete(element_id) {
 		let protection_name = $("#"+element_id+"_name").val();
-		let conf = confirm("Remove item '"+protection_name+"'?");
+		let conf = confirm("Remove item, '"+protection_name+"'?");
 		if (conf) {
 			$("#"+element_id).remove();
 		  	deleteDatabaseObject('user_protection', this.id);
@@ -4175,6 +4102,16 @@ class UserProtection {
 		}
 	}
 
+	// set edit protection modal values and launch
+	edit(input_id) {
+		for (let [key,val] of Object.entries(this)) {
+			$("#protection_"+key).val(val);
+		}
+		focus_id = "#protection_"+input_id;
+		$("#protection_modal_title").html("Edit Protection");
+		$("#new_protection_modal").modal("show");
+	}
+
 }
 
 class UserHealing {
@@ -4184,6 +4121,7 @@ class UserHealing {
 	effect;
 	weight;
 	quantity;
+	// requires_save;
 
 	constructor(healing) {
 		this.id = healing['id'] == null ? uuid() : parseInt(healing['id']);
@@ -4191,17 +4129,100 @@ class UserHealing {
 		this.effect = healing['effect'];
 		this.quantity = healing['quantity'];
 		this.weight = parseInt(healing['weight']);
+		// this.requires_save = healing['requires_save'];
 	}
 
 	delete(element_id) {
 		let healing_name = $("#"+element_id+"_name").val();
-		let conf = confirm("Remove item '"+healing_name+"'?");
+		let conf = confirm("Remove item, '"+healing_name+"'?");
 		if (conf) {
 			$("#"+element_id).remove();
 		  	deleteDatabaseObject('user_healing', this.id);
 			deleteArrayObject(userHealings, this.id);
 		  	updateTotalWeight(false);
 		}
+	}
+
+	edit(input_id) {
+		for (let [key,val] of Object.entries(this)) {
+			$("#healing_"+key).val(val);
+		}
+		focus_id = "#healing_"+input_id;
+		$("#healing_modal_title").html("Edit Healing/Potion/Drug");
+		$("#new_healing_modal").modal("show");
+	}
+
+}
+
+class UserMisc {
+
+	id;
+	name;
+	notes;
+	weight;
+	quantity;
+	// requires_save;
+
+	constructor(misc) {
+		this.id = misc['id'] == null ? uuid() : parseInt(misc['id']);
+		this.name = misc['name'];
+		this.notes = misc['notes'];
+		this.quantity = misc['quantity'];
+		this.weight = parseInt(misc['weight']);
+		// this.requires_save = misc['requires_save'];
+	}
+
+	delete(element_id) {
+		let misc_name = $("#"+element_id+"_name").val();
+		let conf = confirm("Remove item, '"+misc_name+"'?");
+		if (conf) {
+			$("#"+element_id).remove();
+		  	deleteDatabaseObject('user_misc', this.id);
+			deleteArrayObject(userMisc, this.id);
+		  	updateTotalWeight(false);
+		}
+	}
+
+	edit(input_id) {
+		for (let [key,val] of Object.entries(this)) {
+			$("#misc_"+key).val(val);
+		}
+		focus_id = "#misc_"+input_id;
+		$("#misc_modal_title").html("Edit Miscellaneous Item");
+		$("#new_misc_modal").modal("show");
+	}
+
+}
+
+class UserNote {
+
+	id;
+	title;
+	note;
+	// requires_save;
+
+	constructor(note) {
+		this.id = note['id'] == null ? uuid() : parseInt(note['id']);
+		this.title = note['title'];
+		this.note = note['note'];
+		// this.requires_save = note['requires_save'];
+	}
+
+	delete(element_id) {
+		let conf = confirm("Delete note, '"+(this.title == null ? '[untitled]' : this.title)+"'?");
+		if (conf) {
+			$("#"+element_id).remove();
+		  	deleteDatabaseObject('user_note', this.id);
+			deleteArrayObject(userNotes, this.id);
+		}
+	}
+
+	edit() {
+		for (let [key,val] of Object.entries(this)) {
+			$("#note_"+key).val(val);
+		}
+		$("#note_modal_title").html("Edit Note");
+		$("#new_note_modal").modal("show");
 	}
 
 }
