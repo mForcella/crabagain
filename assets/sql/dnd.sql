@@ -1,12 +1,4 @@
 
-  -- To get foreign key names
-  -- SHOW CREATE TABLE `yourtable`;
-
-  -- To add on delete cascade
-  -- ALTER TABLE feat_or_trait_req_set DROP FOREIGN KEY `feat_or_trait_req_set_ibfk_1`;
-  -- ALTER TABLE feat_or_trait_req_set ADD CONSTRAINT `feat_or_trait_req_set_ibfk_1`
-  -- FOREIGN KEY (`feat_id`) REFERENCES feat_or_trait(`id`) ON DELETE CASCADE;
-
   CREATE TABLE feat_or_trait (
     id int PRIMARY KEY AUTO_INCREMENT,
     name varchar(255),
@@ -56,9 +48,9 @@
     reset_token varchar(255),
     campaign_id int,
     -- XP, morale and leveling
-    xp int,
-    attribute_pts int,
-    morale int,
+    xp int DEFAULT 0,
+    attribute_pts int DEFAULT 0,
+    morale int DEFAULT 0,
     -- Physical characteristics and descriptors
     character_name varchar(64),
     race varchar(64),
@@ -94,32 +86,6 @@
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (campaign_id) REFERENCES campaign(id)
   );
-
-  -- Add delete cascade to user foreign keys
-
-  -- ALTER TABLE user_feat drop CONSTRAINT user_feat_ibfk_1;
-  -- ALTER TABLE user_feat ADD CONSTRAINT user_feat_ibfk_1 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
-
-  -- ALTER TABLE user_healing drop CONSTRAINT user_healing_ibfk_1;
-  -- ALTER TABLE user_healing ADD CONSTRAINT user_healing_ibfk_1 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
-
-  -- ALTER TABLE user_misc drop CONSTRAINT user_misc_ibfk_1;
-  -- ALTER TABLE user_misc ADD CONSTRAINT user_misc_ibfk_1 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
-
-  -- ALTER TABLE user_note drop CONSTRAINT user_note_ibfk_1;
-  -- ALTER TABLE user_note ADD CONSTRAINT user_note_ibfk_1 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
-
-  -- ALTER TABLE user_protection drop CONSTRAINT user_protection_ibfk_1;
-  -- ALTER TABLE user_protection ADD CONSTRAINT user_protection_ibfk_1 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
-
-  -- ALTER TABLE user_training drop CONSTRAINT user_training_ibfk_1;
-  -- ALTER TABLE user_training ADD CONSTRAINT user_training_ibfk_1 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
-
-  -- ALTER TABLE user_weapon drop CONSTRAINT user_weapon_ibfk_1;
-  -- ALTER TABLE user_weapon ADD CONSTRAINT user_weapon_ibfk_1 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
-
-  -- ALTER TABLE user_xp_award drop CONSTRAINT user_xp_award_ibfk_1;
-  -- ALTER TABLE user_xp_award ADD CONSTRAINT user_xp_award_ibfk_1 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
 
   CREATE TABLE user_feat (
     id int PRIMARY KEY AUTO_INCREMENT,
@@ -216,9 +182,6 @@
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
   );
 
-  -- To view a list of characters and their XP progress
-  -- SELECT character_name, xp_award, awarded, xp_after_award, user_xp_award.created_at FROM user_xp_award JOIN user ON user.id = user_xp_award.user_id WHERE campaign_id = 7 ORDER BY character_name ASC;
-
   CREATE TABLE user_motivator (
     id int PRIMARY KEY AUTO_INCREMENT,
     user_id int,
@@ -229,18 +192,52 @@
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
   );
 
+  -- To get foreign key names
+  -- SHOW CREATE TABLE `yourtable`;
+
+  -- To view a list of characters and their XP progress
+  -- SELECT character_name, xp_award, awarded, xp_after_award, user_xp_award.created_at FROM user_xp_award JOIN user ON user.id = user_xp_award.user_id WHERE campaign_id = 7 ORDER BY character_name ASC;
+
+  -- To add on delete cascade
+  -- ALTER TABLE feat_or_trait_req_set DROP FOREIGN KEY `feat_or_trait_req_set_ibfk_1`;
+  -- ALTER TABLE feat_or_trait_req_set ADD CONSTRAINT `feat_or_trait_req_set_ibfk_1`
+  -- FOREIGN KEY (`feat_id`) REFERENCES feat_or_trait(`id`) ON DELETE CASCADE;
+
+  -- Add default values to user table
+  -- ALTER TABLE `user` ALTER COLUMN xp SET DEFAULT 0;
+  -- ALTER TABLE `user` ALTER COLUMN attribute_pts SET DEFAULT 0;
+  -- ALTER TABLE `user` ALTER COLUMN morale SET DEFAULT 0;
+
+  -- Add delete cascade to user foreign keys
+  -- ALTER TABLE `user_feat` DROP FOREIGN KEY `user_feat_ibfk_1`;
+  -- ALTER TABLE `user_feat` ADD CONSTRAINT `user_feat_ibfk_1` FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
+  -- ALTER TABLE `user_healing` DROP FOREIGN KEY `user_healing_ibfk_1`;
+  -- ALTER TABLE `user_healing` ADD CONSTRAINT `user_healing_ibfk_1` FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
+  -- ALTER TABLE `user_misc` DROP FOREIGN KEY `user_misc_ibfk_1`;
+  -- ALTER TABLE `user_misc` ADD CONSTRAINT `user_misc_ibfk_1` FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
+  -- ALTER TABLE `user_note` DROP FOREIGN KEY `user_note_ibfk_1`;
+  -- ALTER TABLE `user_note` ADD CONSTRAINT `user_note_ibfk_1` FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
+  -- ALTER TABLE `user_protection` DROP FOREIGN KEY `user_protection_ibfk_1`;
+  -- ALTER TABLE `user_protection` ADD CONSTRAINT `user_protection_ibfk_1` FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
+  -- ALTER TABLE `user_training` DROP FOREIGN KEY `user_training_ibfk_1`;
+  -- ALTER TABLE `user_training` ADD CONSTRAINT `user_training_ibfk_1` FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
+  -- ALTER TABLE `user_weapon` DROP FOREIGN KEY `user_weapon_ibfk_1`;
+  -- ALTER TABLE `user_weapon` ADD CONSTRAINT `user_weapon_ibfk_1` FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
+  -- ALTER TABLE `user_xp_award` DROP FOREIGN KEY `user_xp_award_ibfk_1`;
+  -- ALTER TABLE `user_xp_award` ADD CONSTRAINT `user_xp_award_ibfk_1` FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE;
+
   -- To create user_motivators from user table
   -- SET @user_id := 37;
   -- SET @motivator := (SELECT motivator_1 FROM user WHERE id = @user_id LIMIT 0, 1);
   -- SET @pts := (SELECT motivator_1_pts FROM user WHERE id = @user_id LIMIT 0, 1);
-  -- insert into user_motivator (user_id,motivator,points,primary_) values(@user_id,@motivator,@pts,1);
+  -- INSERT INTO user_motivator (user_id,motivator,points,primary_) values(@user_id,@motivator,@pts,1);
   -- SET @motivator := (SELECT motivator_2 FROM user WHERE id = @user_id LIMIT 0, 1);
   -- SET @pts := (SELECT motivator_2_pts FROM user WHERE id = @user_id LIMIT 0, 1);
-  -- insert into user_motivator (user_id,motivator,points,primary_) values(@user_id,@motivator,@pts,1);
+  -- INSERT INTO user_motivator (user_id,motivator,points,primary_) values(@user_id,@motivator,@pts,1);
   -- SET @motivator := (SELECT motivator_3 FROM user WHERE id = @user_id LIMIT 0, 1);
   -- SET @pts := (SELECT motivator_3_pts FROM user WHERE id = @user_id LIMIT 0, 1);
-  -- insert into user_motivator (user_id,motivator,points,primary_) values(@user_id,@motivator,@pts,1);
+  -- INSERT INTO user_motivator (user_id,motivator,points,primary_) values(@user_id,@motivator,@pts,1);
   -- SET @motivator := (SELECT motivator_4 FROM user WHERE id = @user_id LIMIT 0, 1);
   -- SET @pts := (SELECT motivator_4_pts FROM user WHERE id = @user_id LIMIT 0, 1);
-  -- insert into user_motivator (user_id,motivator,points,primary_) values(@user_id,@motivator,@pts,0);
+  -- INSERT INTO user_motivator (user_id,motivator,points,primary_) values(@user_id,@motivator,@pts,0);
 

@@ -11,6 +11,10 @@
 		header('Location: /select_campaign.php');
 	}
 
+	// delete any unnamed (unsaved) users
+	$sql = "DELETE FROM user WHERE character_name IS NULL";
+	$db->query($sql);
+
 	// get user list for dropdown nav
 	$users = [];
 	$sql = "SELECT * FROM user WHERE campaign_id = ".$_GET["campaign"]." ORDER BY character_name";
@@ -133,6 +137,7 @@
     if ($result->num_rows === 1) {
 	    while($row = $result->fetch_assoc()) {
 	    	$user = $row;
+	    	$user['is_new'] = false;
 
 	    	// get pending xp awards
 	    	$sql = "SELECT * FROM user_xp_award WHERE awarded IS NULL AND user_id = ".$_GET["user"];
@@ -213,6 +218,18 @@
 
 			}
     }
+	} else {
+		// if no user set, create a new user entry
+		$sql = "INSERT INTO user VALUES ()";
+		$db->query($sql);
+    $sql = "SELECT * FROM user WHERE id = ".$db->insert_id;
+    $result = $db->query($sql);
+    if ($result->num_rows === 1) {
+	    while($row = $result->fetch_assoc()) {
+	    	$user = $row;
+	    	$user['is_new'] = true;
+	    }
+	  }
 	}
 
 	$db->close();
@@ -226,7 +243,7 @@
 	<meta name="viewport" content="width=device-width, height=device-height,  initial-scale=1.0, user-scalable=no, user-scalable=0"/>
 	<meta name="robots" content="noindex">
 	<meta property="og:image" content="https://crabagain.com/assets/image/treasure-header-desaturated.jpg">
-	<title><?php echo $campaign['name'].(isset($user) ? ' : '.$user['character_name'] : '') ?></title>
+	<title><?php echo $campaign['name'].($user['is_new'] ? '' : ' : '.$user['character_name']) ?></title>
 	<link rel="icon" type="image/png" href="/assets/image/favicon-pentacle.ico"/>
 
 	<!-- Bootstrap -->
@@ -254,8 +271,9 @@
 	<nav class="navbar">
 
 	  <div class="nav-menu">
+	  	<!-- show 'Save' option for new characters -->
 	    <?php
-	    	if (!isset($user)) {
+	    	if ($user['is_new']) {
 	    		echo '
 				    <div class="nav-item">
 				      <span class="glyphicon" onclick="formSubmit()"><span class="nav-item-label"><i class="fa-solid fa-floppy-disk nav-icon"></i> Save Character Data</span></span>
@@ -266,8 +284,9 @@
 	    <div class="nav-item">
 	       <span id="attribute_pts_span" class="glyphicon <?php echo isset($user) && $user['attribute_pts'] == 0 ? 'disabled' : ''; ?>" onclick="allocateAttributePts(this)"><span class="nav-item-label"><i class="fa-solid fa-shield-heart nav-icon"></i> Allocate Attribute Points</span></span>
 	    </div>
+	    <!-- show 'GM Mode' option for existing characters -->
 	    <?php
-	    	if (isset($user) && $user['xp'] != 0) {
+	    	if (!$user['is_new']) {
 	    		echo '
 				    <div class="nav-item">
 				       <span class="glyphicon" data-toggle="modal" data-target="#gm_modal"><span class="nav-item-label"><i class="fa-solid fa-dice-d20 nav-icon"></i> GM Edit Mode</span></span>
@@ -292,8 +311,9 @@
 
 	  <!-- GM edit menu -->
 	  <div class="gm-menu">
-	    <div><span class="glyphicon glyphicon-ok" onclick="endGMEdit(true)"><span class="nav-item-label"> Accept Changes</span></span></div>
-	    <div><span class="glyphicon glyphicon-remove" onclick="endGMEdit(false)"><span class="nav-item-label"> Discard Changes</span></span></div>
+	    <div><span class="glyphicon glyphicon-ok" onclick="endGMEdit()"><span class="nav-item-label"> Exit GM Mode</span></span></div>
+	    <!-- <div><span class="glyphicon glyphicon-ok" onclick="endGMEdit(true)"><span class="nav-item-label"> Accept Changes</span></span></div> -->
+	    <!-- <div><span class="glyphicon glyphicon-remove" onclick="endGMEdit(false)"><span class="nav-item-label"> Discard Changes</span></span></div> -->
 	  </div>
 
 	  <!-- hamburger menu -->
@@ -301,7 +321,7 @@
 
 	  <!-- user help menu - visible only on character creation -->
 	    <?php
-	    	if (!isset($user) || $user['xp'] == 0) {
+	    	if ($user['is_new']) {
 	    		echo '
 	  				<span class="glyphicon glyphicon-info-sign help-menu" data-toggle="modal" data-target="#help_modal"></span>
 	    		';
@@ -362,9 +382,9 @@
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="character_name">Name</label>
 						<div class="col-sm-6 col-xs-8 mobile-pad-bottom">
-							<input class="form-control track-changes" type="text" id="character_name" name="character_name" value="<?php echo isset($user) ? htmlspecialchars($user['character_name']) : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+							<input class="form-control <?php echo $user['is_new'] ? '' : 'track-changes' ?>" type="text" id="character_name" name="character_name" value="<?php echo isset($user) ? htmlspecialchars($user['character_name']) : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
 						</div>
-						<!-- readonly, unless new character -->
+						<!-- unlock on character creation -->
 						<label class="control-label col-sm-2 col-xs-4 font-small smaller" for="attribute_pts">Attribute Pts</label>
 						<div class="col-sm-2 col-xs-8">
 							<input class="form-control track-changes" <?php echo isset($user) && $user['xp'] != 0 ? 'readonly' : 'type="number"' ?> min="0" id="attribute_pts" name="attribute_pts" value="<?php echo isset($user) ? htmlspecialchars($user['attribute_pts']) : 12 ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
@@ -376,6 +396,7 @@
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 							<input class="form-control pointer track-changes" readonly data-toggle="modal" data-target="#xp_modal" name="xp" id="xp" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['xp']) : 0 ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
 						</div>
+						<!-- TODO unlock level on character creation and adjust attribute points on change -->
 						<label class="control-label col-sm-2 col-xs-4" for="level">Level</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 							<?php
@@ -2216,7 +2237,7 @@
 	<script src="bootstrap/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js" async defer></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-	<!-- <script src="/assets/Models.js"></script> -->
+	<script src="/assets/Models.js"></script>
 	<script src="<?php echo $keys['scripts'] ?>"></script>
 	<script type="text/javascript">
 
@@ -2225,13 +2246,21 @@
 		// get all database values
 		campaign = <?php echo json_encode(isset($campaign) ? $campaign : []); ?>;
 		user = <?php echo json_encode(isset($user) ? $user : []); ?>;
+		console.log(user);
 		feat_list = <?php echo json_encode($feat_list); ?>;
 		feat_reqs = <?php echo json_encode($feat_reqs); ?>;
 		
 		xp_awards = <?php echo json_encode(isset($awards) ? $awards : []); ?>;
-		user_motivators = <?php echo json_encode($user_motivators); ?>;
 		user_feats = <?php echo json_encode($feats); ?>;
 		user_trainings = <?php echo json_encode($trainings); ?>;
+
+		// set user motivators
+		let user_motivators = <?php echo json_encode($user_motivators); ?>;
+		for (var i in user_motivators) {
+			let motivator = new UserMotivator(user_motivators[i]);
+			userMotivators.push(motivator);
+		}
+		user['motivators'] = userMotivators;
 		setAttributes(user);
 
 		// get feat list and requirements
@@ -2283,7 +2312,7 @@
 		setFeatList();
 		
 		// character creation mode
-		if (user.length == 0 || user['xp'] == 0) {
+		if (user['is_new'] || user['xp'] == 0) {
 			characterCreation = true;
 			// show new feat btn
 			$("#new_feat_btn").show();
@@ -2348,6 +2377,7 @@
 			}
 
 		}
+		user['weapons'] = userWeapons;
 
 		// check for user protections
 		let user_protections = <?php echo json_encode($protections); ?>;
@@ -2356,6 +2386,7 @@
 			userProtections.push(protection);
 			addProtectionElements(protection, false);
 		}
+		user['protections'] = userProtections;
 		// update toughness for equipped protections
 		setToughness();
 
@@ -2366,6 +2397,7 @@
 			userHealings.push(healing);
 			addHealingElements(healing);
 		}
+		user['healings'] = userHealings;
 
 		// check for user misc items
 		let user_misc = <?php echo json_encode($misc); ?>;
@@ -2374,6 +2406,7 @@
 			userMisc.push(misc);
 			addMiscElements(misc);
 		}
+		user['misc'] = userMisc;
 
 		// show encumbered alert after all items have been loaded
 		loadingItems = false;
@@ -2386,6 +2419,7 @@
 			userNotes.push(note);
 			addNoteElements(note);
 		}
+		user['notes'] = userNotes;
 
 	</script>
 
