@@ -1,9 +1,564 @@
 
+// UserTraining
+
+function newTrainingModal(attribute) {
+
+	// launch modal
+	$("#training_modal_title").html("New "+attribute+" Training");
+	$("#attribute_type").val(attribute);
+	$("#training_name").val("");
+
+	// deselect radios and hide and clear inputs
+	$("input:radio[name='skill_type']").each(function(i) {
+	      this.checked = false;
+	});
+	$("#skill_name").val("").hide();
+	$("#training_name").val("").hide();
+	$("#focus_name").val("").hide();
+	$("#school_name").val("").hide();
+
+	// if vitality, check for magic talents
+	if (attribute == "Vitality" && user['magic_talents'] == true) {
+		$("#magic_inputs").show();
+
+		// if divine magic, only one school is allowed
+		if (hasTalent("Divine Magic")) {
+			var schoolCount = 0;
+			for (var j in userTrainings) {
+				if (userTrainings[j].magic_school == 1) {
+					schoolCount += 1;
+				}
+			}
+			if (schoolCount > 0) {
+				$("#magic_inputs").hide();
+			}
+		}
+	} else {
+		$("#magic_inputs").hide();
+	}
+
+	// set autocomplete values to inputs - skill_name, training_name, focus_name
+	var skill = skillAutocompletes[attribute]['skill'];
+	var training = skillAutocompletes[attribute]['training'];
+	var focus = skillAutocompletes[attribute]['focus'];
+	$("#skill_name").autocomplete({
+		source: skill
+	});
+	$("#training_name").autocomplete({
+		source: training
+	});
+	$("#focus_name").autocomplete({
+		source: focus
+	});
+
+	$("#new_training_modal").modal("show");
+}
+
+// add a new training from modal values
+function newTraining() {
+
+	// make sure skill type is selected
+	var skillType = $('input[name=skill_type]:checked').val();
+	if (skillType == undefined) {
+		alert("Please select a skill type");
+		return;
+	}
+
+	var trainingName = $("#"+skillType+"_name").val();
+	var attribute = $("#attribute_type").val();
+
+	if (trainingName != "") {
+		// check if user is already trained
+		for (var i in userTrainings) {
+			if (userTrainings[i]['name'] == trainingName) {
+				alert("Training name already in use");
+				return;
+			}
+		}
+
+		// if Arcane Blood - check if first (governing) school
+		var schoolCount = 0;
+		if (hasTalent("Arcane Blood")) {
+			for (var j in userTrainings) {
+				if (userTrainings[j].magic_school == 1) {
+					schoolCount += 1;
+				}
+			}
+		}
+
+		// allocating attribute points, make sure we are allowed to add the skill
+		if (allocatingAttributePts) {
+			let skillPts = (skillType == "skill" || skillType == "training") ? 2 : (skillType == "school" ? 4 : 1);
+			for (var i in userTrainings) {
+				if (userTrainings[i].is_new 
+					&& (skillType == "skill" || skillType == "school") 
+					&& (userTrainings[i].skill_type == "skill" || userTrainings[i].skill_type == "school")) {
+					alert("Only one new feat or unique skill can be added per level.");
+					return;
+				}
+				if (userTrainings[i].is_new 
+					&& (skillType == "focus" || skillType == "training") 
+					&& (userTrainings[i].skill_type == "focus" || userTrainings[i].skill_type == "training")) {
+					alert("Only one new focus or training can be added per level.");
+					return;
+				}
+			}
+			var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
+			if (pts - skillPts < 0) {
+				alert("Not enough attribute points to allocate for a new skill training.");
+				return;
+			}
+			// decrease attribute points if training is allowed
+			$(".attribute-count").html(pts - skillPts +" Points");
+		}
+
+		// create new training object
+		let newTraining = new UserTraining({
+			'attribute_group':attribute,
+			'name':trainingName,
+			'value':skillType == "skill" || skillType == "school" ? 0 : 1,
+			'magic_school':skillType == "school",
+			'governing_school':skillType == "school" && schoolCount == 0 ? 1 : 0
+		});
+
+		insertDatabaseObject('user_training', newTraining, columns['user_training']);
+		newTraining.postInsertCallback = function(insert_id) {
+			this.postInsertCallback = null;
+			userTrainings.push(newTraining);
+			addTrainingElements(newTraining, skillType);
+		};
+
+	}
+
+}
+
+// add new magic school with starting talent
+function newSchool() {
+	addingNewSchool = true;
+	$("#feat_name_val").val($("#magic_talents").val().split(":")[1]);
+	$("#feat_description").val($("#talent_descrip").val());
+	// set feat_id value for new talent
+	for (var i in feat_list) {
+		if (feat_list[i]['name'] == $("#feat_name_val").val()) {
+			$("#feat_id").val(feat_list[i]['id']);
+		}
+	}
+	newFeat();
+}
+
+// add new magic school canceled without selecting starting talent
+function cancelMagic() {
+	$("#magic_talents").val("");
+	cancel_magic = true;
+	// remove the newly added school training
+	for (var i in userTrainings) {
+		if (userTrainings[i].is_new && userTrainings[i].magic_school == 1) {
+			deleteDatabaseObject('user_training', userTrainings[i].id);
+			userTrainings[i].DOM_element.remove();
+			userTrainings.splice(i, 1);
+		}
+	}
+	// if allocating points, reset point count
+	if (allocatingAttributePts) {
+		var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
+		$(".attribute-count").html(pts + 4 +" Points");
+	}
+	setFeatList();
+}
+
+// create html elements for training
+function addTrainingElements(training, skillType) {
+
+	var id_val = "training_"+training.id;
+
+	// determine skill point cost and starting skill value if new training
+	let skillPts = (skillType == "skill" || skillType == "training") ? 2 : (skillType == "school" ? 4 : 1);
+
+	var row = createElement('div', 'row training-row', '#'+training.attribute_group, id_val+"_row");
+	training.DOM_element = row;
+	training.skill_type = skillType;
+	if (allocatingAttributePts) {
+		training.is_new = true;
+	}
+	var div_left = createElement('div', 'col-md-7 col-xs-8', row);
+
+	var label_left = $('<label />', {
+	  'class': 'control-label with-hidden',
+	  'for': id_val,
+	  'text': getDisplayName(training),
+	  'id': id_val+"_label"
+	}).appendTo(div_left);
+
+	// highlight training on hover
+	if (!is_mobile) {
+		row.hover(function() {
+			$(this).addClass("highlight");
+		}, function() {
+			$(this).removeClass("highlight");
+		});
+	}
+
+	// add remove button
+	// if allocating points, make sure remove button is visible
+	var removeBtn = createElement('span', 'glyphicon glyphicon-remove hidden-icon', label_left, id_val+"_text"+"_remove");
+	var editingSection = $("#"+training.attribute_group+"_btn").find(".glyphicon-plus-sign").is(":visible");
+	if (allocatingAttributePts || adminEditMode || editingSection) {
+		removeBtn.show();
+	}
+	removeBtn.on("click", function() {
+		removeTrainingFunction(training.name, row, skillPts, skillType);
+	});
+
+	var div_right = createElement('div', 'col-md-5 col-xs-4', row);
+
+	var label_right = $('<label />', {
+	  'class': 'control-label'
+	}).appendTo(div_right);
+
+	$('<span />', {
+		'id': id_val+"_text",
+	  'class': 'attribute-val',
+	  'html': training.value == '' ? '+0' : (training.value >= 0 ? "+"+training.value : training.value),
+	}).appendTo(label_right);
+
+	createInput('', 'hidden', 'training[]', training.name+":"+training.attribute_group, label_right, id_val+"_name");
+	createInput('', 'hidden', 'training_val[]', training.value == '' ? 0 : training.value, label_right, id_val+"_val");
+	createInput('', 'hidden', 'training_magic[]', 0, label_right, id_val+"_magic");
+	createInput('', 'hidden', 'training_governing[]', 0, label_right, id_val+"_governing");
+	createInput('', 'hidden', 'training_ids[]', training.id, label_right);
+
+	var up = createElement('span', 'glyphicon glyphicon-plus hidden-icon', label_right, id_val+"_up");
+	$("#"+id_val+"_up").on("click", function() {
+		adjustAttribute(id_val, 1);
+	});
+
+	var down = createElement('span', 'glyphicon glyphicon-minus hidden-icon', label_right, id_val+"_down");
+	$("#"+id_val+"_down").on("click", function() {
+		adjustAttribute(id_val, -1);
+	});
+
+	// GM edit mode or character creation - show plus minus icons
+	if (adminEditMode || characterCreation) {
+		up.show();
+		down.show();
+	}
+
+	enableHiddenNumbers();
+
+	// adjust feat eligibility
+	setFeatList();
+
+	// if magic school - prompt to choose talent
+	if (training.is_new && training.magic_school == 1) {
+		// use id_val to update hidden input values
+		$("#"+id_val+"_magic").val(1);
+		$("#"+id_val+"_governing").val(training.governing_school);
+
+		// update talent dropdown on new_school_modal
+		var talents = schoolTalents[training.name];
+		$("#magic_talents").html("");
+		$('<option />', {
+		  'value': '',
+		}).appendTo($("#magic_talents"));
+		for (var i in talents) {
+			$('<option />', {
+			  'value': training.name+":"+talents[i]['name'],
+			  'text': talents[i]['name'],
+			}).appendTo($("#magic_talents"));
+		}
+		$("#talent_descrip").height(54).val("");
+		$(".elemental_select").hide();
+		$(".elementalist_select").hide();
+		$(".superhuman_select").hide();
+		$(".shapeshifter_select").hide();
+		$("#new_school_modal").modal("show");
+	}
+}
+
+// remove a training element
+function removeTrainingFunction(trainingName, row, skillPts, skillType) {
+	var conf = confirm("Remove training '"+trainingName+"'?");
+	if (conf) {
+		// if allocating points, increase point count
+		if (allocatingAttributePts) {
+			var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
+			$(".attribute-count").html(pts + skillPts +" Points");
+		}
+		row.remove();
+		var schoolRemoval = false;
+		var schoolName = "";
+		for (var i in userTrainings) {
+			if (userTrainings[i].name == trainingName) {
+				schoolRemoval = userTrainings[i].magic_school == 1;
+				schoolName = userTrainings[i].name;
+				deleteDatabaseObject('user_training', userTrainings[i].id);
+				userTrainings.splice(i, 1);
+			}
+		}
+		// check if we're removing a magic school and delete any associated talents
+		if (schoolRemoval) {
+			var talents = schoolTalents[schoolName];
+			for (var i in talents) {
+				for (var j in user_feats) {
+					if (user_feats[j]["name"].includes(talents[i]["name"])) {
+						$(".feat-title").each(function() {
+							if ($(this).html().split(" : ")[0].includes(talents[i]["name"])) {
+								var id_val = $(this).attr("id").split("_name")[0];
+								removeFeatFunction(id_val, talents[i]["name"], 0);
+							}
+						});
+					}
+				}
+			}
+		}
+		// update feat list
+		setFeatList();
+	}
+}
+
+// get the modified display name for a magic school
+function getDisplayName(training) {
+
+	// make sure we have a magic school
+	if (training.magic_school != 1) {
+		return training.name;
+	}
+
+	var displayName = training.name;
+
+	// get governing school name
+	var governing = "";
+	for (var i in userTrainings) {
+		if (userTrainings[i].governing_school == 1) {
+			governing = userTrainings[i]['name'];
+		}
+	}
+
+	// look for magic school - set label to governing/companion/opposition
+	if (training.governing_school == 1) {
+		displayName += " (Gov)";
+	} else if (governing != "") {
+		if (governing == "Soma") {
+			displayName += displayName == "Avani" ? " (Comp)" : " (Opp)";
+		} else if (governing == "Avani") {
+			displayName += displayName == "Soma" ? " (Comp)" : " (Opp)";
+		} else if (governing == "Nouse") {
+			displayName += displayName == "Ka" ? " (Comp)" : " (Opp)";
+		} else {
+			displayName += displayName == "Nouse" ? " (Comp)" : " (Opp)";
+		}
+	}
+	return displayName;
+}
+
+// check if user has training/skill/focus
+function isTrained(training) {
+	for (var i in userTrainings) {
+		if (userTrainings[i].name == training) {
+			return true;
+		}
+	}
+	return false;
+}
+
+// get a training by name or id
+function getTraining(training_id) {
+	for (var i in userTrainings) {
+		if (userTrainings[i].id == training_id || userTrainings[i].name == training_id) {
+			return userTrainings[i];
+		}
+	}
+	return false;
+}
+
+// make sure school isn't already trained
+$("#school_name").on("change", function() {
+	for (var i in userTrainings) {
+		if (userTrainings[i].name == $(this).val()) {
+			$(this).val("");
+		}
+	}
+});
+
+class UserTraining {
+
+	id;
+    name;
+    value;
+    attribute_group;
+    magic_school;
+    governing_school;
+    display_name;
+    DOM_element;
+    is_new;
+    skill_type;
+
+	constructor(training) {
+		this.id = parseInt(training['id']);
+		this.name = training['name'];
+		this.value = parseInt(training['value']);
+		this.attribute_group = training['attribute_group'];
+		this.magic_school = training['magic_school'] == "1" ? 1 : 0;
+		this.governing_school = training['governing_school'] == "1" ? 1 : 0;
+		this.is_new = false;
+	}
+
+}
+
+
+// UserMotivator
+
+// change primary motivators (personality crisis)
+function updateMotivators() {
+	// get selected motivator to set primary_ to false
+	let remove = $('input[name="update_motivators"]:checked').val();
+	// get new motivator to set primary_ to true
+	let add = $("#crisis_name").html();
+	// update motivators in database
+	for (var i in userMotivators) {
+		if (userMotivators[i]['motivator'] == add) {
+			userMotivators[i]['primary_'] = 1;
+			updateDatabaseColumn('user_motivator', 'primary_', 1, userMotivators[i]['id']);
+		}
+		if (userMotivators[i]['motivator'] == remove) {
+			userMotivators[i]['primary_'] = 0;
+			updateDatabaseColumn('user_motivator', 'primary_', 0, userMotivators[i]['id']);
+		}
+	}
+	alert("Your Primary Motivators have been updated. And remember, NO Motivator bonuses for your next session!");
+	// reduce morale by -2
+	$("#morale").val($("#morale").val()-2).trigger("change");
+	// add / remove 'bold' class from labels
+	$(".motivator-input").each(function(){
+		if ($(this).val() == remove) {
+			$(this).removeClass("bold");
+		}
+		if ($(this).val() == add) {
+			$(this).addClass("bold");
+		}
+	});
+	setMotivatorBonus();
+}
+
+// set motivator bonuses based on primary motivator points
+function setMotivatorBonus() {
+	var m_pts = 0;
+	for (var i in userMotivators) {
+		if (userMotivators[i]['primary_'] == 1) {
+			m_pts += parseInt(userMotivators[i]['points']);
+		}
+	}
+	var bonuses = m_pts >= 64 ? 5 : (m_pts >= 32 ? 4 : (m_pts >= 16 ? 3 : (m_pts >= 8 ? 2 : (m_pts >= 4 ? 1 : 0))));
+
+	// check for morale modifiers
+	var morale = $("#morale").val();
+	bonuses += morale >= 4 ? 1 : (morale <= -4 ? -1 : 0);
+	$("#bonuses").val(bonuses);
+}
+
+// launch edit motivators modal
+function editMotivators() {
+	// check if editing is allowed
+	if (characterCreation || adminEditMode || userMotivators.length == 0) {
+		// set values to current motivators
+		$("#m1").val($("#motivator_0").val());
+		$("#m2").val($("#motivator_1").val());
+		$("#m3").val($("#motivator_2").val());
+		$("#m4").val($("#motivator_3").val());
+		$("#motivator_modal").modal("show");
+	}
+}
+
+// set motivators on modal close
+function setMotivators() {
+
+	// make sure primary motivators are set
+	if ($("#m1").val() == "" || $("#m2").val() == "" || $("#m3").val() == "") {
+		alert("Please set required motivators");
+		return;
+	}
+
+	// iterate through userMotivators and update/insert/delete
+	for (var i = 0; i < 4; i++) {
+		let motivator = [];
+
+		// get motivator name
+		let motivator_name = $("#m"+(i+1)).val();
+		$("#motivator_"+i).val(motivator_name);
+		motivator['motivator'] = motivator_name;
+
+		// get point values
+		let val = i == 0 ? 2 : (i == 3 ? 0 : 1);
+		$("#motivator_pts_"+i).val(val);
+		$("#motivator_primary_"+i).val(i != 3 ? 1 : 0);
+		motivator['points'] = val;
+		motivator['primary_'] = i != 3 ? 1 : 0;
+
+		// delete if userMotivators[i] exists and motivator_name is ""
+		if (userMotivators[i] != null && motivator_name == "") {
+			deleteDatabaseObject('user_motivator', userMotivators[i].id);
+			userMotivators.splice(i, 1);
+		}
+		// update if userMotivators[i] exists and motivator_name is not ""
+		else if (userMotivators[i] != null && motivator_name != "") {
+			// update name and primary_ only
+			updateDatabaseColumn('user_motivator', 'motivator', motivator_name, userMotivators[i].id);
+			updateDatabaseColumn('user_motivator', 'primary_', motivator['primary_'], userMotivators[i].id);
+		}
+		// insert if userMotivators[i] does not exist and motivator_name is not ""
+		else if (userMotivators[i] == null && motivator_name != "") {
+			let userMotivator = new UserMotivator(motivator);
+			userMotivators.push(userMotivator);
+			insertDatabaseObject('user_motivator', userMotivator, columns['user_motivator']);
+		}
+	}
+
+	// leave m4 points blank if m4 name input is blank
+	$("#motivator_pts_3").attr("readonly", $("#motivator_3").val() == "");
+	$("#motivator_pts_3").val($("#motivator_3").val() == "" ? "" : 0);
+	// set bonus value if needed
+	$("#bonuses").val($("#bonuses").val() == 0 ? 1 : $("#bonuses").val());
+
+	// close modal, hide and show elements
+	$("#motivator_modal").modal("hide");
+	$("#motivator_button").hide();
+	$("#motivators").show();
+}
+
+/// makes sure motivator is only selected once
+function motivatorCheck(id) {
+	var ids = ['m1', 'm2', 'm3', 'm4']
+	for (var i in ids) {
+		if (ids[i] != id) {
+			if ($("#"+ids[i]).val() == $("#"+id).val()) {
+				$("#"+id).val("");
+			}
+		}
+	}
+}
+
+class UserMotivator {
+
+	id;
+    motivator;
+    points;
+    primary_;
+
+	constructor(motivator) {
+		this.id = parseInt(motivator['id']);
+		this.motivator = motivator['motivator'];
+		this.points = parseInt(motivator['points']);
+		this.primary_ = motivator['primary_'] == "1" ? 1 : 0;
+	}
+
+}
+
+
 // UserWeapon
 
 function getWeapon(weapon_id) {
 	for (var i in userWeapons) {
-		if (userWeapons[i]['id'] == weapon_id || userWeapons[i]['name'] == weapon_id) {
+		if (userWeapons[i].id == weapon_id || userWeapons[i].name == weapon_id) {
 			return userWeapons[i];
 		}
 	}

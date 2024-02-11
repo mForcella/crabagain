@@ -37,53 +37,24 @@
 
 	// get active counts for each feat type
 	$counts = [];
-	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'physical_trait' AND cost > 0";
+	$sql = "SELECT * FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"];
 	$result = $db->query($sql);
 	if ($result) {
+		$counts['physical_pos_count'] = 0;
+		$counts['physical_neg_count'] = 0;
+		$counts['social_count'] = 0;
+		$counts['morale_count'] = 0;
+		$counts['compelling_count'] = 0;
+		$counts['profession_count'] = 0;
+		$counts['social_background_count'] = 0;
 		while($row = $result->fetch_assoc()) {
-			$counts['physical_pos_count'] = $row['count'];
-		}
-	}
-	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'physical_trait' AND cost < 0";
-	$result = $db->query($sql);
-	if ($result) {
-		while($row = $result->fetch_assoc()) {
-			$counts['physical_neg_count'] = $row['count'];
-		}
-	}
-	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'social_trait'";
-	$result = $db->query($sql);
-	if ($result) {
-		while($row = $result->fetch_assoc()) {
-			$counts['social_count'] = $row['count'];
-		}
-	}
-	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'morale_trait'";
-	$result = $db->query($sql);
-	if ($result) {
-		while($row = $result->fetch_assoc()) {
-			$counts['morale_count'] = $row['count'];
-		}
-	}
-	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'compelling_action'";
-	$result = $db->query($sql);
-	if ($result) {
-		while($row = $result->fetch_assoc()) {
-			$counts['compelling_count'] = $row['count'];
-		}
-	}
-	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'profession'";
-	$result = $db->query($sql);
-	if ($result) {
-		while($row = $result->fetch_assoc()) {
-			$counts['profession_count'] = $row['count'];
-		}
-	}
-	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'social_background'";
-	$result = $db->query($sql);
-	if ($result) {
-		while($row = $result->fetch_assoc()) {
-			$counts['social_background_count'] = $row['count'];
+			$counts['physical_pos_count'] += $row['type'] == 'physical_trait' && $row['cost'] > 0 ? 1 : 0;
+			$counts['physical_neg_count'] += $row['type'] == 'physical_trait' && $row['cost'] < 0 ? 1 : 0;
+			$counts['social_count'] += $row['type'] == 'social_trait' ? 1 : 0;
+			$counts['morale_count'] += $row['type'] == 'morale_trait' ? 1 : 0;
+			$counts['compelling_count'] += $row['type'] == 'compelling_action' ? 1 : 0;
+			$counts['profession_count'] += $row['type'] == 'profession' ? 1 : 0;
+			$counts['social_background_count'] += $row['type'] == 'social_background' ? 1 : 0;
 		}
 	}
   
@@ -228,6 +199,7 @@
 	    while($row = $result->fetch_assoc()) {
 	    	$user = $row;
 	    	$user['is_new'] = true;
+		    $user['magic_talents'] = false;
 	    }
 	  }
 	}
@@ -836,11 +808,11 @@
 
 						<div class="col-sm-6">
 							<div class="row">
-								<label class="control-label col-sm-12 center full-width" for="encumberence">Encumberence</label>
+								<label class="control-label col-sm-12 center full-width" for="encumbrance">Encumbrance</label>
 							</div>
 							<div class="row">
 								<div class="col-xs-12 no-pad">
-									<input class="form-control" type="text" readonly id="encumberence">
+									<input class="form-control" type="text" readonly id="encumbrance">
 								</div>
 							</div>
 						</div>
@@ -1901,8 +1873,8 @@
         			</select>
 	        	</div>
 	        	<div class="form-check">
-		        	<input class="form-check-input" type="radio" name="skill_type" id="unique" value="unique">
-		        	<label class="form-check-label" for="unique">Unique Skill (2 attribute pts)</label>
+		        	<input class="form-check-input" type="radio" name="skill_type" id="skill" value="skill">
+		        	<label class="form-check-label" for="skill">Unique Skill (2 attribute pts)</label>
         			<input class="form-control skill-name clearable" type="text" id="skill_name">
 	        	</div>
 	        	<div class="form-check">
@@ -2233,12 +2205,12 @@
 
 	<!-- JavaScript -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js" async defer></script> -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 	<script async src="https://www.google.com/recaptcha/api.js?render=6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js" async defer></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-	<script src="/assets/Models.js"></script>
-	<script src="<?php echo $keys['scripts'] ?>"></script>
+	<script src="/assets/font-awesome-6.1.1-all.min.js"></script>
+	<?php echo $keys['scripts'] ?>
 	<script type="text/javascript">
 
 		keys = <?php echo json_encode($keys); ?>;
@@ -2252,7 +2224,11 @@
 		
 		xp_awards = <?php echo json_encode(isset($awards) ? $awards : []); ?>;
 		user_feats = <?php echo json_encode($feats); ?>;
-		user_trainings = <?php echo json_encode($trainings); ?>;
+		let user_trainings = <?php echo json_encode($trainings); ?>;
+		for (var i in user_trainings) {
+			let training = new UserTraining(user_trainings[i]);
+			userTrainings.push(training);
+		}
 
 		// set user motivators
 		let user_motivators = <?php echo json_encode($user_motivators); ?>;
@@ -2330,34 +2306,10 @@
 		}
 
 		// check for user trainings
-		// check for governing school
-		var governing = "";
-		for (var i in user_trainings) {
-			if (user_trainings[i]['governing_school'] == 1) {
-				governing = user_trainings[i]['name'];
-			}
+		for (var i in userTrainings) {
+			addTrainingElements(userTrainings[i], null);
 		}
-		for (var i in user_trainings) {
-			var displayName = user_trainings[i]['name'];
-			// look for magic school - set label to governing/companion/opposition
-			if (user_trainings[i]['magic_school'] == 1) {
-				if (user_trainings[i]['governing_school'] == 1) {
-					displayName += " (Gov)";
-				} else if (governing != "") {
-					if (governing == "Soma") {
-						displayName += displayName == "Avani" ? " (Comp)" : " (Opp)";
-					} else if (governing == "Avani") {
-						displayName += displayName == "Soma" ? " (Comp)" : " (Opp)";
-					} else if (governing == "Nouse") {
-						displayName += displayName == "Ka" ? " (Comp)" : " (Opp)";
-					} else {
-						displayName += displayName == "Nouse" ? " (Comp)" : " (Opp)";
-					}
-				}
-			}
-			// TODO update function to accept object
-			addTrainingElements(user_trainings[i]['name'], displayName, user_trainings[i]['attribute_group'], user_trainings[i]['id'], user_trainings[i]['value']);
-		}
+		user['trainings'] = userTrainings;
 
 		// check for user weapons
 		loadingItems = true;
