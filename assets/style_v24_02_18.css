@@ -297,6 +297,9 @@ h1 {
 	cursor: pointer;
 	margin-bottom: 3px;
 }
+.feat.cursor-auto {
+	cursor: default;
+}
 .feat p, .feat div {
 	display: inline;
 	/*font-size: 0.9em;*/
@@ -822,7 +825,7 @@ select.form-control, input.form-control.pointer {
 .section-title span {
 	text-decoration: underline;
 }
-.skill-name, #magic_inputs, .elemental_select, .elementalist_select, .superhuman_select {
+.skill-name, #magic_inputs {
 	display: none;
 }
 .smaller {

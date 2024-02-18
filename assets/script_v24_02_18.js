@@ -5,17 +5,6 @@ var user;
 var xp_awards;
 var feat_list;
 var feat_reqs;
-var user_feats;
-let userFeats = [];
-let userTrainings = [];
-let userMotivators = [];
-let userWeapons = [];
-let userProtections = [];
-let userHealings = [];
-let userMisc = [];
-let userNotes = [];
-// arrays to make sure elements are not assigned redundant functions - TODO can probably be removed?
-var hiddenEnabled = [];
 // booleans to determine rules and element visibility for various operating modes
 var inputChanges = false;
 var allocatingAttributePts = false;
@@ -25,74 +14,14 @@ var addingNewSchool = false;
 // show encumbered alert
 var loadingItems = false;
 var suppressAlerts = false;
-// arrays used to restore attribute values, feats, and trainings on cancel allocate points
+// arrays used to restore attribute/training values on cancel allocate points
 var attributeVals = [];
 var trainingVals = [];
-var feats = []; // holds row elements
 // ID of input to gain focus on modal show
 var focus_id = "";
 var submitForm = false;
-	// TODO cancelMagic was being called twice, once from the modal hidden function
-var cancel_magic = false;
 
-// database columns for inserting/updating objects
-var columns = {
-	"user_weapon": [
-		'name',
-		'type',
-		'quantity',
-		'damage',
-		'max_damage',
-		'range_',
-		'rof',
-		'defend',
-		'crit',
-		'notes',
-		'weight',
-		'equipped'
-	],
-	"user_protection": [
-		'name',
-		'bonus',
-		'notes',
-		'weight',
-		'equipped'
-	],
-	"user_healing": [
-		'name',
-		'quantity',
-		'effect',
-		'weight'
-	],
-	"user_misc": [
-		'name',
-		'quantity',
-		'notes',
-		'weight'
-	],
-	"user_note": [
-		'title',
-		'note'
-	],
-	"user_motivator": [
-		'motivator',
-		'points',
-		'primary_'
-	],
-	"user_feat": [
-		'name',
-		'description',
-		'feat_id'
-	],
-	"user_training": [
-		'name',
-		'value',
-		'attribute_group',
-		'magic_school',
-		'governing_school'
-	]
-};
-
+// TODO get this list from json?
 var schoolTalents = {
 	"Ka": [
 		{
@@ -437,10 +366,7 @@ $(document).on('input', '.clearable', function() {
     if (this.id == "magic_talent_name") {
     	$("#feat_description").val("").height("125px");
 		// hide additional inputs
-		$(".elemental_select").hide();
-		$(".elementalist_select").hide();
-		$(".superhuman_select").hide();
-		$(".shapeshifter_select").hide();
+		hideMagicSelects("", "");
     }
 });
 
@@ -572,7 +498,7 @@ $("input").on("focus", function() {
 
 // trigger 'unsaved changes' alert when leaving the page
 $(window).on("beforeunload", function(e) {
-	if (characterCreation && inputChanges && !submitForm) {
+	if (user['is_new'] && inputChanges && !submitForm) {
   		return "Unsaved changes will be lost."; // custom message will not be displayed; message is browser specific
 	}
 });
@@ -616,21 +542,6 @@ $("#attribute_pts").on("input change", function() {
 	} else {
 		$("#attribute_pts_span").removeClass("disabled");
 	}
-});
-
-$("#select_feat_type").on("change", function() {
-	$(".feat-type").addClass("hidden");
-	$("#"+$(this).val()).removeClass("hidden").trigger("change");
-	if ($(this).val() == "feat_name") {
-		$("#feat_name").val("").removeClass("x onX");
-		$("#feat_name_val").val("");
-		$("#feat_description").val("");
-	}
-	// hide additional inputs
-	$(".elemental_select").hide();
-	$(".elementalist_select").hide();
-	$(".superhuman_select").hide();
-	$(".shapeshifter_select").hide();
 });
 
 // show hidden inputs on skill type radio select
@@ -709,6 +620,8 @@ function GMEditMode() {
 			$("#attribute_pts").attr("readonly", false).attr("type", "number");
 			$("#xp").attr("readonly", false).attr("type", "number").attr("data-toggle", null);
 			$(".motivator-input").addClass("pointer");
+			$("#size").attr("data-toggle", "modal").removeClass("cursor-auto");
+
 	  	} else {
 			alert("Sorry sucker, that ain't it.");
 	  	}
@@ -729,6 +642,7 @@ function endGMEdit() {
 	$("#attribute_pts").attr("readonly", true).attr("type", "");
 	$("#xp").attr("readonly", true).attr("type", "").attr("data-toggle", "modal");
 	$(".motivator-input").removeClass("pointer");
+	$("#size").attr("data-toggle", null).addClass("cursor-auto");
 }
 
 // show user menu
@@ -774,7 +688,6 @@ function allocateAttributePts(e) {
 	$(".attribute-pts").toggleClass("active");
 	// reset arrays
 	allocatingAttributePts = true;
-	feats = [];
 	attributeVals = [];
 	trainingVals = [];
 	// save attribute values
@@ -822,9 +735,12 @@ function endEditAttributes(accept) {
 		if (parseInt($("#attribute_pts").val()) == 0) {
 			$("#attribute_pts_span").addClass("disabled");
 		}
-		// mark all trainings as not new
+		// mark all trainings and talents as not new
 		for (var i in userTrainings) {
 			userTrainings[i].is_new = false;
+		}
+		for (var i in userTalents) {
+			userTalents[i].is_new = false;
 		}
 	} else {
 
@@ -847,35 +763,29 @@ function endEditAttributes(accept) {
 			adjustAttribute(key, 0);
 		}
 
-		// remove new skill trainings - need to loop twice to avoid splicing in loop
+		// remove new skill trainings
 		for (var i in userTrainings) {
-			if (userTrainings[i].is_new && (userTrainings[i].skill_type == "focus" || userTrainings[i].skill_type == "training")) {
+			if (userTrainings[i].is_new) {
 				userTrainings[i].DOM_element.remove();
 				deleteDatabaseObject('user_training', userTrainings[i].id);
-				userTrainings.splice(i, 1);
-				break;
+				userTrainings[i] = null;
 			}
 		}
-		for (var i in userTrainings) {
-			if (userTrainings[i].is_new && (userTrainings[i].skill_type == "skill" || userTrainings[i].skill_type == "school")) {
-				userTrainings[i].DOM_element.remove();
-				deleteDatabaseObject('user_training', userTrainings[i].id);
-				userTrainings.splice(i, 1);
-				break;
-			}
-		}
+		userTrainings = userTrainings.filter(function (el) {
+		 	return el != null;
+		});
 
-		// remove feat names and remove feat elements
-		for (var i in feats) {
-			var feat = feats[i].text().split(" : ")[0];
-			for (var j in user_feats) {
-				if (user_feats[j]['name'] == feat) {
-					deleteDatabaseObject('user_feat', user_feats[j]['id']);
-					user_feats.splice(j, 1);
-				}
+		// remove new talents
+		for (var i in userTalents) {
+			if (userTalents[i].is_new) {
+				userTalents[i].DOM_element.remove();
+				deleteDatabaseObject('user_feat', userTalents[i].id);
+				userTalents[i] = null;
 			}
-			feats[i].remove();
 		}
+		userTalents = userTalents.filter(function (el) {
+		 	return el != null;
+		});
 	}
 }
 
@@ -1090,8 +1000,8 @@ function setDefend() {
 		}
 	}
 	// check for feat - Relentless Defense
-	for (var i in user_feats) {
-		if (user_feats[i]['name'] == "Relentless Defense") {
+	for (var i in userTalents) {
+		if (userTalents[i]['name'] == "Relentless Defense") {
 			let speed = parseInt($("#speed_val").val());
 			defend += Math.floor(speed/2);
 		}
@@ -1232,54 +1142,6 @@ $("#help_modal").on('shown.bs.modal', function() {
 	// toggleMenu();
 });
 
-// on modal shown, update modal title and clear inputs
-$("#new_feat_modal").on('shown.bs.modal', function() {
-	$("#feat_name").focus();
-
-	// always hide feat type select if editing
-	if ($("#feat_modal_title").html() == "Update Feat") {
-		$("#select_feat_type").addClass("hidden");
-		$("#select_feat_type_label").addClass("hidden");
-	} else if (adminEditMode || characterCreation) {
-		// gm edit mode - unhide select feat type elements
-		$("#select_feat_type").removeClass("hidden");
-		$("#select_feat_type_label").removeClass("hidden");
-	} else if(user['magic_talents']) {
-		// check if character has magic training
-		$("#select_feat_type").removeClass("hidden");
-		$("#select_feat_type_label").removeClass("hidden");
-		// hide all options from select list other than standard and magic talents
-		$("#select_feat_type").children().each(function(){
-			if ($(this).attr("id") == undefined) {
-				$(this).hide();
-			}
-		});
-	}
-	// hide additional inputs
-	$(".elemental_select").hide();
-	$(".elementalist_select").hide();
-	$(".superhuman_select").hide();
-	$(".shapeshifter_select").hide();
-
-});
-$("#new_feat_modal").on('hidden.bs.modal', function() {
-	$("#feat_modal_title").html("New Feat");
-	$("#feat_name").val("").removeClass("x onX").attr("disabled", false);
-	$("#magic_talent_name").val("").removeClass("x onX").attr("disabled", false);
-	$("#feat_description").val("").height("125px").attr("disabled", false);
-	$("#feat_id").val("");
-	$("#user_feat_id").val("");
-	// reset all dropdowns
-	$("#select_feat_type").val("feat_name").trigger("change");
-	$("#social_trait_name").val("").attr("disabled", false);
-	$("#social_background_name").val("").attr("disabled", false);
-	$("#physical_trait_pos_name").val("").attr("disabled", false);
-	$("#physical_trait_neg_name").val("").attr("disabled", false);
-	$("#compelling_action_name").val("").attr("disabled", false);
-	$("#profession_name").val("").attr("disabled", false);
-	$("#morale_trait_name").val("").attr("disabled", false);
-});
-
 $("#encumbered_modal").on('hidden.bs.modal', function() {
 	// check if we should suppress encumbered alerts
 	if ($("#suppress_alert").is(":checked")) {
@@ -1306,287 +1168,6 @@ $(".weapon-name").each(function() {
 		}
 	});
 });
-
-// autofill feat description on option select
-$(".feat-select").on("change", function() {
-	var description = "";
-	var cost = "";
-	var feat_id = "";
-	for (var i in feat_list) {
-		if (feat_list[i]['name'].replaceAll("'","") == $(this).val()) {
-			description = feat_list[i]['description'];
-			feat_id = feat_list[i]['id'];
-			// if physical trait, also show attribute point cost/bonus
-			if (feat_list[i]['type'] == "physical_trait") {
-				cost = feat_list[i]['cost'];
-			}
-			// if morale trait, add \n between positive/negative states
-			if (feat_list[i]['type'] == "morale_trait") {
-				description = description.replace('; ', '.\n');
-			}
-		}
-	}
-	description += cost == "" ? "" : "\n\n"+(cost > 0 ? "Attribute Point Cost: "+cost : "Attribute Point Bonus: "+(cost*-1));
-	$("#feat_description").val(description);
-	$("#feat_id").val(feat_id);
-	$("#feat_name_val").val($(this).val());
-});
-
-// set feats as eligible/ineligible and set autocomplete list
-function setFeatList() {
-	var eligible_feats = [];
-	var ineligible_feats = [];
-	// set autocomplete list for feats
-	$.each(feat_list, function(i, feat) {
-		if (feat['type'] == 'feat' || feat['type'] == 'magic_talent') {
-			var is_eligible = true;
-			// feat[requirements] is an array of arrays - each array must return true
-			$.each(feat['requirements'], function(j, requirements) {
-				var satisfied = false;
-				// requirements is an array of dictionaries (req) - one req within requirements needs to return true
-				$.each(requirements, function(k, req) {
-					for (key in req) {
-						switch (key) {
-							case 'feat':
-								for (var i in user_feats) {
-									satisfied = satisfied ? true : user_feats[i]['name'].includes(req[key]);
-								}
-								break;
-							case 'training':
-								for (var i in userTrainings) {
-									satisfied = satisfied ? true : userTrainings[i].name.includes(req[key]);
-								}
-								break;
-							case 'character_creation':
-								satisfied = characterCreation;
-								break;
-							case 'governing':
-								// get user's governing magic school value
-								for (var i in userTrainings) {
-									if (userTrainings[i].governing_school == 1) {
-										satisfied = satisfied ? true : userTrainings[i].value >= req[key];
-									}
-								}
-								break;
-							default: // skill
-								satisfied = satisfied ? true : user[key] >= req[key];
-								break;
-						}
-					}
-				});
-				// if a previous requirement wasn't satisfied, feat is not eligible
-				is_eligible = !is_eligible ? false : satisfied;
-			});
-			if (is_eligible && !eligible_feats.includes(feat)) {
-				feat['satisfied'] = true;
-				eligible_feats.push(feat);
-			} else if (!ineligible_feats.includes(feat)) {
-				feat['satisfied'] = false;
-				ineligible_feats.push(feat);
-			}
-		}
-	});
-
-	// sort and merge feat lists
-	var standard_list1 = [];
-	var magic_list1 = [];
-	for (var i in eligible_feats) {
-		if (eligible_feats[i]['type'] == 'magic_talent') {
-			magic_list1.push(eligible_feats[i]['name']);
-		} else {
-			standard_list1.push(eligible_feats[i]['name']);
-		}
-	}
-	standard_list1.sort();
-	magic_list1.sort();
-	var standard_list2 = [];
-	var magic_list2 = [];
-	for (var i in ineligible_feats) {
-		if (ineligible_feats[i]['type'] == 'magic_talent') {
-			magic_list2.push(ineligible_feats[i]['name']);
-		} else {
-			standard_list2.push(ineligible_feats[i]['name']);
-		}
-	}
-	standard_list2.sort();
-	magic_list2.sort();
-	var standardList = standard_list1.concat(standard_list2);
-	var magicList = magic_list1.concat(magic_list2);
-
-	$("#feat_name").autocomplete({
-		source: function(input, add) {
-			featSourceFunction(input, add, standardList);
-		},
-		create: function (event, ui) {
-			$(this).data("ui-autocomplete")._renderItem = function(ul, item) {
-				return featCreateFunction(ul, item);
-			};
-		},
-		select: function(event, ui) {
-			return featSelectFunction(ui);
-		}
-	});
-
-	$("#magic_talent_name").autocomplete({
-		source: function(input, add) {
-			featSourceFunction(input, add, magicList);
-		},
-		create: function (event, ui) {
-			$(this).data("ui-autocomplete")._renderItem = function(ul, item) {
-				return featCreateFunction(ul, item);
-			};
-		},
-		select: function(event, ui) {
-			return featSelectFunction(ui);
-		}
-	});
-}
-
-function featSourceFunction(input, add, list) {
-	var suggestions = [];
-	$.each(list, function(i, feat_name) {
-		if (feat_name.toLowerCase().includes(input['term'].toLowerCase())) {
-			var entry = new Object();
-			entry.value = feat_name;
-			// check if attribute requirements are satisfied
-			entry.satisfied = true;
-			$.each(feat_list, function(j, feat_vals) {
-				if (feat_vals['name'] == feat_name) {
-					$.each(feat_vals['requirements'], function(k, reqs) {
-						$.each(reqs, function(l, req) {
-							for (key in req) {
-								if (key == "character_creation") {
-									entry.hidden = adminEditMode ? false : !characterCreation;
-								}
-							}
-						});
-						// set satisfied value to list entry - satisfied always true in GM edit mode
-						entry.satisfied = adminEditMode ? true : feat_vals['satisfied'];
-					});
-				}
-			});
-			// check if user is already trained in the feat
-			var found = false;
-			for (var i in user_feats) {
-				if (user_feats[i]['name'].toLowerCase().includes(entry['value'].toLowerCase())) {
-					// allow Shapeshifter, Elementalist, and Elemental Master to be learned multiple times
-					found = user_feats[i]['name'].includes("Shapeshifter") ? false : true;
-					found = user_feats[i]['name'].includes("Elementalist") ? false : true;
-					found = user_feats[i]['name'].includes("Elemental Master") ? false : true;
-					break;
-				}
-			}
-			if (!found) {
-				suggestions.push(entry);
-			}
-		}
-	});
-	add(suggestions);
-}
-
-function featCreateFunction(ul, item) {
-	var listItem = $("<li></li>")
-	.data("item.autocomplete", item)
-	.append("<a>" + item.label + "</a>")
-	.appendTo(ul);
-
-	// adjust class based on whether requirements are satisfied or not
-	if (!item.satisfied) {
-		listItem.addClass("italic");
-	} else {
-		listItem.addClass("bold");
-	}
-	if (item.hidden) {
-		listItem.addClass("hidden");
-	}
-
-	return listItem;
-}
-
-function featSelectFunction(ui) {
-	// build user message if requirements aren't satisfied
-	if (!ui.item.satisfied) {
-		var requirements = "";
-		for (var i in feat_list) {
-			if (feat_list[i]['name'] == ui.item.value) {
-				for (var j in feat_list[i]['requirements']) {
-					for (var k in feat_list[i]['requirements'][j]) {
-						for (var key in feat_list[i]['requirements'][j][k]) {
-							// key types : feat, training, character_creation, governing, or attribute
-							// adjust labels for requirements
-							var item = key;
-							var req = feat_list[i]['requirements'][j][k][key];
-							item = capitalize(item);
-							item = item == "Precision_" ? "Precision" : item;
-							item = item == "Governing" ? "Governing School" : item;
-							var attributes = [
-								'governing',
-								'strength',
-								'fortitude',
-								'speed',
-								'agility',
-								'precision_',
-								'awareness',
-								'allure',
-								'deception',
-								'intellect',
-								'innovation',
-								'intuition',
-								'vitality'
-							];
-							if (attributes.includes(key)) {
-								req = "+"+req;
-							}
-							requirements += key == "character_creation" ? "*only available during character creation" : 
-								item + " : " + req;
-						}
-						if (feat_list[i]['requirements'][j].length > 1 && k < feat_list[i]['requirements'][j].length-1) {
-							requirements += " OR ";
-						}
-					}
-					requirements += "\n";
-				}
-				requirements += "\n";
-				requirements += feat_list[i]['name']+"\n";
-				requirements += feat_list[i]['description'];
-			}
-		}
-		alert("Requirements not met for "+ui.item.value+":\n\n"+requirements);
-		$("#feat_name").val("").removeClass("x onX");
-		$("#feat_description").val("");
-		return false;
-	} else {
-
-		// check for talents requiring additional selection
-		var talent = ui.item.value;
-		$(".elemental_select").hide();
-		$(".elementalist_select").hide();
-		$(".superhuman_select").hide();
-		if (talent == "Elemental Master") {
-			$(".elemental_select").show();
-		} else if (talent == "Elementalist") {
-			$(".elementalist_select").show();
-		} else if (talent == "Superhuman") {
-			$(".superhuman_select").show();
-		} else if (talent == "Shapeshifter") {
-			$(".shapeshifter_select").show();
-		}
-
-		// auto fill description on feat selection
-		var description = "";
-		var feat_id = "";
-		for (var i in feat_list) {
-			if (feat_list[i]['name'] == ui.item.value) {
-				description = feat_list[i]['description'];
-				feat_id = feat_list[i]['id'];
-			}
-		}
-		$("#feat_name_val").val(ui.item.value);
-		$("#feat_description").val(description).height($("#feat_description")[0].scrollHeight);
-		$("#feat_id").val(feat_id);
-		return true;
-	}
-}
 
 // set attribute values on page load
 function setAttributes(user) {
@@ -1630,6 +1211,8 @@ function setAttributes(user) {
 		}
 		// TODO this should auto update database value?
 		$("#xp").trigger("change");
+	} else {
+		// TODO no rewards, character might be new
 	}
 }
 
@@ -1820,7 +1403,7 @@ function toggleHidden(col) {
 	$("#"+col).find(".with-hidden").css("padding-right", $("#"+col).find(".glyphicon-remove").is(":visible") ? "0" : "23px");
 }
 
-// hide / show weapon inputs
+// hide / show weapon inputs on chevron click (mobile)
 function toggleWeapon(weapon, element) {
 	var visible = $(element).hasClass('glyphicon-chevron-up');
 	$(element).removeClass(visible ? "glyphicon-chevron-up" : "glyphicon-chevron-down");
@@ -1925,117 +1508,10 @@ function forgotPassword() {
 	});
 }
 
-// add a new feat from modal values
-function newFeat() {
-	var featName = $("#feat_name_val").val() == "" ? $("#feat_name").val() : $("#feat_name_val").val();
-	var featDescription = $("#feat_description").val();
-	let editing = $("#feat_modal_title").html() == "Update Feat";
-
-	// make sure we're not adding a duplicate training name
-	if (!editing) {
-		for (var i in user_feats) {
-			if (user_feats[i]['name'] == featName && !user_feats[i]['name'].includes("Shapeshifter")) {
-				alert("Talent name already in use");
-				return;
-			}
-		}
-
-		// only allow one profession, one compelling action, one social trait, one morale trait
-		var featType = "";
-		for (var i in feat_list) {
-			if (feat_list[i]['name'].toLowerCase() == featName.toLowerCase()) {
-				featType = feat_list[i]['type'];
-
-				if (featType == "profession") {
-					for (var j in user_feats) {
-						if (user_feats[j]['type'] == "profession") {
-							alert("Only one Profession can be chosen");
-							return;
-						}
-					}
-				}
-				if (featType == "social_background") {
-					for (var j in user_feats) {
-						if (user_feats[j]['type'] == "social_background") {
-							alert("Only one Social Background can be chosen");
-							return;
-						}
-					}
-				}
-				if (featType == "compelling_action") {
-					for (var j in user_feats) {
-						if (user_feats[j]['type'] == "compelling_action") {
-							alert("Only one Compelling Action can be chosen");
-							return;
-						}
-					}
-				}
-				if (featType == "social_trait") {
-					for (var j in user_feats) {
-						if (user_feats[j]['type'] == "social_trait") {
-							alert("Only one Social Trait can be chosen");
-							return;
-						}
-					}
-				}
-				if (featType == "morale_trait") {
-					for (var j in user_feats) {
-						if (user_feats[j]['type'] == "morale_trait") {
-							alert("Only one Morale Trait can be chosen");
-							return;
-						}
-					}
-				}
-			}
-		}
-
-		// check for 'Divine Magic'
-		if (featName == "Divine Magic") {
-			// prompt to choose a vow
-			$("#vows_modal").modal("show");
-		}
-	}
-
-	if (featName != "" && featDescription != " ") {
-
-		// check for talents requiring additional selection
-		var featDisplayName = "";
-		if (featName == "Elemental Master") {
-			featDisplayName = featName + " ("+$(".elemental_select").val()+")";
-		} else if (featName == "Elementalist") {
-			featDisplayName = featName + " ("+$(".elementalist_select").val()+")";
-		} else if (featName == "Superhuman") {
-			featDisplayName = featName + " ("+$(".superhuman_select").val()+")";
-		}else if (featName == "Shapeshifter") {
-			// make sure animal name isn't empty
-			if ($("#animal_name").val() == "") {
-				alert("Please enter an animal name");
-				return;
-			}
-			featName = featName + " ("+$("#animal_name").val()+")";
-		}
-
-		if (!editing) {
-			// feat_id for custom feats = 0
-			let feat_id = $("#feat_id").val() == "" ? 0 : $("#feat_id").val();
-			let newFeat = {
-				"feat_id":feat_id,
-				"name":featDisplayName == "" ? featName : featDisplayName,
-				"type":featType,
-				"description":featDescription
-			};
-			user_feats.push(newFeat);
-			insertDatabaseObject('user_feat', newFeat, columns['user_feat']);
-		}
-
-		addFeatElements(featName, featDisplayName, featDescription.trim(), $("#feat_id").val(), $("#user_feat_id").val());
-	}
-}
-
 $("#vows_modal").on('hidden.bs.modal', function() {
 	// get selected radio value
 	var vow = $("input[type='radio'][name='vow']:checked").val();
-	// add new feat
+	// add new talent
 	$("#feat_name_val").val("Vow of "+vow);
 	$("#feat_description").val($("#"+vow+"_description").html());
 	newFeat();
@@ -2045,241 +1521,13 @@ $("#vows_modal").on('hidden.bs.modal', function() {
     }, 200);
 });
 
-// create html elements for feat
-function addFeatElements(featName, featDisplayName, featDescription, feat_id, user_feat_id) {
-	// check for magic talents
-	user['magic_talents'] = user['magic_talents'] || featName == "Arcane Blood" || featName == "Divine Magic";
-	if (user['magic_talents']) {
-		$("#magic_option").show();
-	}
-
-	// get uuid from user_feats
-	var id_val;
-	if (user_feat_id == "") {
-		for (var i in user_feats) {
-			if (user_feats[i]['name'].includes(featName)) {
-				id_val = "feat_"+user_feats[i]['feat_id'];
-			}
-		}
-	} else {
-		id_val = "feat_"+user_feat_id;
-	}
-	var featDescription = featDescription.split("\n\n")[0]; // remove extraneous text from feat descriptions
-
-	// new or updating?
-	let editing = $("#feat_modal_title").html() == "Update Feat";
-	if (editing) {
-		// update feat name and description
-		$("#"+id_val+"_name").html(featName+" : ");
-		$("#"+id_val+"_descrip").html(featDescription.length > 100 ? featDescription.substring(0,100)+"..." : featDescription);
-
-		// update hidden input values
-		$("#"+id_val+"_name_val").val(featName);
-		$("#"+id_val+"_descrip_val").val(featDescription);
-
-	} else {
-		// get feat cost - default cost = 4
-		var cost = 4;
-		for (var i in feat_list) {
-			if (feat_list[i]['name'].toLowerCase() == featName.toLowerCase()) {
-				cost = parseInt(feat_list[i]['cost']);
-			}
-		}
-
-		// if allocating attribute points, decrease points
-		if (allocatingAttributePts) {
-
-			// only one feat/skill per level
-			var skillCount = 0;
-			for (var i in userTrainings) {
-				if (userTrainings[i].is_new && (userTrainings[i].skill_type == "skill" || userTrainings[i].skill_type == "school")) {
-					skillCount += 1;
-				}
-			}
-			if ((!addingNewSchool && !characterCreation) && (feats.length > 0 || skillCount > 0)) {
-				alert("Only one new feat or unique skill can be added per level.");
-				return;
-			}
-
-			// make magic talent free
-			if (addingNewSchool) {
-				cost = 0;
-				addingNewSchool = false;
-			}
-
-			// check if we're adding shapeshifter - add animal level to cost
-			if (featName.includes("Shapeshifter")) {
-				cost = 4 + parseInt($("#animal_level").val());
-			}
-
-			// make sure we have enough points
-			if (parseInt($(".attribute-count").html().split(" Points")[0]) - cost < 0) {
-				alert("Not enough attribute points to allocate for a new feat/trait.");
-				return;
-			}
-
-			var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
-			$(".attribute-count").html(pts - cost+" Points");
-		}
-
-		var feat_container = createElement('div', 'feat', '#feats', id_val);
-		if (allocatingAttributePts) {
-			feats.push(feat_container);
-		}
-
-		var feat_title_descrip = createElement('div', '', feat_container);
-
-	    $('<p />', {
-	    	'id': id_val+"_name",
-	    	'class': 'feat-title',
-	    	'text': (featDisplayName == "" ? featName : featDisplayName)+" : "
-	    }).appendTo(feat_title_descrip);
-
-	    var feat_descrip = $('<p />', {
-	    	'id': id_val+"_descrip",
-	      'text': featDescription.length > 100 ? featDescription.substring(0,100)+"..." : featDescription
-	    }).appendTo(feat_title_descrip);
-
-		// if allocating points, make sure remove button is visible
-		var removeBtn = createElement('span', 'glyphicon glyphicon-remove hidden-icon', feat_container, id_val+"_remove");
-		if (allocatingAttributePts || adminEditMode || characterCreation) {
-			removeBtn.show();
-		}
-
-	    // add click function to edit button
-	    feat_title_descrip.on("click", function() {
-	    	var name = $("#"+id_val+"_name").html().split(" : ")[0];
-	    	// figure out what type of feat we are editing
-	    	var featType = "";
-	    	let custom = true;
-	    	for (var i in feat_list) {
-	    		if (name.toLowerCase().includes(feat_list[i]['name'].toLowerCase())) {
-	    			featType = feat_list[i]['type'];
-	    			featType = featType == "physical_trait" ? (cost > 0 ? "physical_trait_pos" : "physical_trait_neg") : featType;
-	    			$("#select_feat_type").val(featType+"_name").trigger("change");
-	    			$("#"+featType+"_name").val(feat_list[i]['name']).attr("disabled", !characterCreation && !adminEditMode);
-	    			custom = false;
-	    		}
-	    	}
-	    	// check for custom non-db feat
-	    	if (custom) {
-	    		$("#feat_name").val(name).attr("disabled", !characterCreation && !adminEditMode);
-	    	}
-	    	var description = $("#"+id_val+"_descrip_val").val();
-	    	// if feat is physical trait, add cost/bonus to description
-	    	if (featType == "physical_trait_pos" || featType == "physical_trait_neg") {
-				description += "\n\n"+(cost > 0 ? "Attribute Point Cost: "+cost : "Attribute Point Bonus: "+(cost*-1));
-	    	}
-	    	$("#feat_description").val(description).attr("disabled", !adminEditMode && !characterCreation);
-	    	$("#feat_id").val(feat_id);
-	    	$("#user_feat_id").val(user_feat_id);
-	    	$("#feat_modal_title").html("Update Feat");
-	    	$("#new_feat_modal").modal("show");
-			$("#feat_description").height( $("#feat_description")[0].scrollHeight );
-	    });
-
-	    $("#"+id_val+"_remove").on("click", function() {
-	    	var name = $("#"+id_val+"_name").html();
-	    	// confirm delete
-	    	var conf = confirm("Remove Talent, '"+name.split(" : ")[0]+"'?");
-	    	if (conf) {
-	    		removeFeatFunction(id_val, featName, cost, feat_container);
-	    	}
-	    });
-
-		// highlight on hover
-		feat_container.hover(function() {
-			$(this).addClass("highlight");
-		}, function() {
-			$(this).removeClass("highlight");
-		});
-
-		// add hidden inputs
-	    createInput('', 'hidden', 'feat_names[]', (featDisplayName == "" ? featName : featDisplayName), feat_container, id_val+"_name_val");
-	    createInput('', 'hidden', 'feat_descriptions[]', featDescription, feat_container, id_val+"_descrip_val");
-		createInput('', 'hidden', 'feat_ids[]', feat_id, feat_container);
-		createInput('', 'hidden', 'user_feat_ids[]', user_feat_id, feat_container);
-	}
-
-	// check for specific feats and adjust attributes (quick and the dead, improved crit, etc)
-	if (featName.toLowerCase() == "improved critical hit") {
-		for (var i in userWeapons) {
-			for (var j in userWeapons[i].equipped_index) {
-				let crit = userWeapons[i].getCritModifier();
-				$("#weapon_crit_"+userWeapons[i].equipped_index[j]).val(crit);
-			}
-		}
-	}
-	if (featName.toLowerCase() == "quick and the dead") {
-		adjustInitiative();
-	}
-	if (featName.toLowerCase() == "lightning reflexes") {
-		setDodge();
-	}
-	if (featName.toLowerCase() == "relentless defense") {
-		setDodge();
-		setDefend();
-	}
-
-	// adjust feat eligibility
-	setFeatList();
-}
-
-function removeFeatFunction(id_val, featName, cost, feat_container=null) {
-	// if allocating attribute points, increase points
-	if (allocatingAttributePts) {
-		var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
-		// if removing a negative trait, make sure we have enough points
-		if (cost < 0 && pts + cost < 0) {
-			alert("Not enough attribute points to remove trait, "+featName);
-			return;
-		}
-
-		$(".attribute-count").html(pts + cost +" Points");
-		var index = feats.indexOf(feat_container);
-		if (index !== -1) {
-		  feats.splice(index, 1);
-		}
-	}
-
-	// remove elements and update arrays
-	$("#"+id_val).remove();
-	for (var i in user_feats) {
-		if (user_feats[i]['name'] == featName) {
-		  deleteDatabaseObject('user_feat', user_feats[i]['id']);
-		  user_feats.splice(i, 1);
-		  break;
-		}
-	}
-
-	// check if we're removing feats that affect attributes
-	if (featName.toLowerCase() == "improved critical hit") {
-		for (var i in userWeapons) {
-			for (var j in userWeapons[i].equipped_index) {
-				let crit = userWeapons[i].getCritModifier();
-				$("#weapon_crit_"+userWeapons[i].equipped_index[j]).val(crit);
-			}
-		}
-	}
-	if (featName.toLowerCase() == "quick and the dead") {
-		adjustInitiative();
-	}
-	if (featName.toLowerCase() == "lightning reflexes") {
-		setDodge();
-	}
-	if (featName.toLowerCase() == "relentless defense") {
-		setDodge();
-		setDefend();
-	}
-}
-
 function adjustInitiative() {
 	// check if speed is higher than awareness and awareness is >= 0
 	var speed = user['speed'] == null ? 0 : parseInt(user['speed']);
 	var awareness = user['awareness'] == null ? 0 : parseInt(user['awareness']);
 	var quick = false;
-	for (var i in user_feats) {
-		if (user_feats[i]['name'].toLowerCase() == "quick and the dead") {
+	for (var i in userTalents) {
+		if (userTalents[i]['name'].toLowerCase() == "quick and the dead") {
 			quick = true;
 			break;
 		}
@@ -2298,40 +1546,22 @@ function adjustInitiative() {
 $("#new_school_modal").on('hidden.bs.modal', function() {
 	// make sure that a talent has been selected
 	if ($("#magic_talents").val() == "") {
-		if (cancel_magic) {
-			cancel_magic = false;
-			return;
+		// remove the newly added school training
+		for (var i in userTrainings) {
+			if (userTrainings[i].is_new && userTrainings[i].magic_school == 1) {
+				deleteDatabaseObject('user_training', userTrainings[i].id);
+				userTrainings[i].DOM_element.remove();
+				userTrainings.splice(i, 1);
+			}
 		}
-		cancelMagic();
+		// if allocating points, reset point count
+		if (allocatingAttributePts) {
+			var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
+			$(".attribute-count").html(pts + 4 +" Points");
+		}
+		setFeatList();
 	} else {
 		newSchool();
-	}
-});
-
-// show description on talent select
-$("#magic_talents").on("change", function() {
-	$("#talent_descrip").height(54).val("");
-	var talents = schoolTalents[$(this).val().split(":")[0]];
-	for (var i in talents) {
-		if (talents[i]['name'] == $(this).val().split(":")[1]) {
-			$("#talent_descrip").val(talents[i]['description']);
-			$("#talent_descrip").height( $("#talent_descrip")[0].scrollHeight );
-		}
-	}
-	// check for talents requiring additional selection
-	var talent = $(this).val().split(":")[1];
-	$(".elemental_select").hide();
-	$(".elementalist_select").hide();
-	$(".superhuman_select").hide();
-	$(".shapeshifter_select").hide();
-	if (talent == "Elemental Master") {
-		$(".elemental_select").show();
-	} else if (talent == "Elementalist") {
-		$(".elementalist_select").show();
-	} else if (talent == "Superhuman") {
-		$(".superhuman_select").show();
-	}else if (talent == "Shapeshifter") {
-		$(".shapeshifter_select").show();
 	}
 });
 
@@ -2466,25 +1696,22 @@ function enableHighlight(input, label) {
 // hidden number inputs - to trigger the number keypad for text inputs (mobile)
 function enableHiddenNumbers() {
 	$(".hidden-number").each(function() {
-		if (!hiddenEnabled.includes(this.id)) {
-			hiddenEnabled.push(this.id);
-			$(this).on("focus", function() {
-				// remove type='number' attribute to allow input of non-numeric input
-				$(this).removeAttr("type");
-				// get current input val of text field
-				var input = $("#"+this.id+"_text");
-				$(this).val(input.val());
-				// empty text field
-				input.val("");
-			});
-			$(this).on("focusout", function() {
-				// copy value from number input to text input
-				var input = $("#"+this.id+"_text");
-				input.val($(this).val());
-				// restore type='number' attribute to trigger number keyboard on next focus
-				$(this).attr("type", "number");
-			});
-		}
+		$(this).off("focus").on("focus", function() {
+			// remove type='number' attribute to allow input of non-numeric input
+			$(this).removeAttr("type");
+			// get current input val of text field
+			var input = $("#"+this.id+"_text");
+			$(this).val(input.val());
+			// empty text field
+			input.val("");
+		});
+		$(this).off("focusout").on("focusout", function() {
+			// copy value from number input to text input
+			var input = $("#"+this.id+"_text");
+			input.val($(this).val());
+			// restore type='number' attribute to trigger number keyboard on next focus
+			$(this).attr("type", "number");
+		});
 	});
 }
 
@@ -2569,13 +1796,110 @@ function deleteArrayObject(array, target_id) {
 
 // UserTalent
 
-// check if user has talent/trait
-function hasTalent(talent) {
-	for (var i in user_feats) {
-		if (user_feats[i]['name'] == talent) {
-			return true;
+// modal when learning a new magic school- get a list of talents for the selected school
+$("#magic_talents").on("change", function() {
+	let school = $(this).val().split(":")[0];
+	let talent = $(this).val().split(":")[1];
+	$("#talent_descrip").height(54).val("");
+	// get talent list for current school
+	if (talent != "") {
+		var talents = schoolTalents[school];
+		for (var i in talents) {
+			if (talents[i]['name'] == talent) {
+				$("#talent_descrip").val(talents[i]['description']);
+				$("#talent_descrip").height( $("#talent_descrip")[0].scrollHeight );
+			}
 		}
 	}
-	return false;
-}
+	// show/hide additional dropdowns
+	hideMagicSelects(talent, "");
+});
+
+// on new talent modal shown
+$("#new_feat_modal").on('shown.bs.modal', function() {
+	// add focus if inputs are editable
+	if (!$("#feat_name").prop('disabled')) {
+		$("#feat_name").focus();
+	} else if (!$("#feat_description").prop('disabled')) {
+		$("#feat_description").focus();
+	}
+
+	let editing = $("#feat_modal_title").html() == "Update Talent";
+	$("#select_feat_type").attr("disabled", editing);
+	$(".elemental_select").attr("disabled", editing);
+	$(".elementalist_select").attr("disabled", editing);
+	$(".superhuman_select").attr("disabled", editing);
+	$("#animal_name").attr("disabled", editing);
+	$("#animal_level").attr("disabled", editing);
+
+});
+
+$("#new_feat_modal").on('hidden.bs.modal', function() {
+	$("#feat_modal_title").html("New Talent");
+	$("#feat_update_btn").addClass("hidden");
+	$("#feat_submit_btn").removeClass("hidden");
+	$("#feat_name").val("").removeClass("x onX").attr("disabled", false);
+	$("#magic_talent_name").val("").removeClass("x onX").attr("disabled", false);
+	$("#feat_description").val("").height("125px").attr("disabled", false);
+	$("#feat_id").val("");
+	$("#user_feat_id").val("");
+
+	// reset all dropdowns
+	$("#select_feat_type").val("feat_name").trigger("change");
+	$("#social_trait_name").val("").attr("disabled", false);
+	$("#social_background_name").val("").attr("disabled", false);
+	$("#physical_trait_pos_name").val("").attr("disabled", false);
+	$("#physical_trait_neg_name").val("").attr("disabled", false);
+	$("#compelling_action_name").val("").attr("disabled", false);
+	$("#profession_name").val("").attr("disabled", false);
+	$("#morale_trait_name").val("").attr("disabled", false);
+});
+
+// autofill talent description on option select; feat-select present for all talent types except standard and magic
+$(".feat-select").on("change", function() {
+	$("#feat_description").val("");
+	$("#feat_id").val("");
+	$("#feat_type").val("");
+	$("#feat_cost").val("");
+	$("#feat_name_val").val("");
+	// find matching talent from selected name
+	for (var i in feat_list) {
+		if (feat_list[i]['name'] == $(this).val()) {
+			var description = feat_list[i]['description'];
+			let type = feat_list[i]['type'];
+			let cost = feat_list[i]['cost'];
+			// if morale trait, add line breaks between positive/negative states
+			description = type == "morale_trait" ? description.replace('; ', '.\n\n') : description;
+			// if physical trait, show attribute cost in description
+			description += type == "physical_trait" ? "\n\n"+(cost > 0 ? "Attribute Point Cost: "+cost : "Attribute Point Bonus: "+(cost*-1)) : "";
+			$("#feat_description").val(description);
+			$("#feat_id").val(feat_list[i]['id']);
+			$("#feat_type").val(type);
+			$("#feat_cost").val(cost);
+			$("#feat_name_val").val($(this).val());
+		}
+	}
+});
+
+// new talent modal - select talent type
+$("#select_feat_type").on("change", function() {
+	// hide all talent-type specific inputs - show inputs only for selected type
+	$(".feat-type").addClass("hidden");
+	$("#"+$(this).val()).val("").removeClass("hidden").trigger("change").removeClass("x onX");
+	// clear all inputs
+	$("#feat_description").val("");
+	// hide additional inputs
+	hideMagicSelects("", "");
+});
+
+// make sure all magic dropdowns have the same value
+$(".elementalist_select").change(function() {
+	$(".elementalist_select").val($(this).val());
+});
+$(".elemental_select").change(function() {
+	$(".elemental_select").val($(this).val());
+});
+$(".superhuman_select").change(function() {
+	$(".superhuman_select").val($(this).val());
+});
 

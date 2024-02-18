@@ -14,6 +14,10 @@
 	// delete any unnamed (unsaved) users
 	$sql = "DELETE FROM user WHERE character_name IS NULL";
 	$db->query($sql);
+	// TODO reset the auto-increment to max(id)+1 ?
+	// $sql = "ALTER TABLE `user` AUTO_INCREMENT = 1";
+	// would create issues if multiple people were creating characters at once
+	// move delete statement to window.unload function?
 
 	// get user list for dropdown nav
 	$users = [];
@@ -111,6 +115,7 @@
 	    	$user['is_new'] = false;
 
 	    	// get pending xp awards
+	    	// TODO get all xp awards to determine if character is new?
 	    	$sql = "SELECT * FROM user_xp_award WHERE awarded IS NULL AND user_id = ".$_GET["user"];
 	    	$result = $db->query($sql);
 	    	if ($result) {
@@ -200,6 +205,7 @@
 	    	$user = $row;
 	    	$user['is_new'] = true;
 		    $user['magic_talents'] = false;
+		    $user['attribute_pts'] = 12;
 	    }
 	  }
 	}
@@ -1311,7 +1317,7 @@
 					<div class="form-group">
 						<div class="col-sm-12">
 							<div id="feats">
-								<div class="feat" id="size" data-toggle="modal" data-target="#edit_size_modal">
+								<div class="feat <?php echo $user['is_new'] || $user['xp'] == 0 ? '' : 'cursor-auto' ?>" id="size" data-toggle="<?php echo $user['is_new'] || $user['xp'] == 0 ? 'modal' : '' ?>" data-target="#edit_size_modal">
 									<p class="feat-title">Size : </p>
 						    	<?php
 						    		$size = isset($user['size']) ? $user['size'] : 'Medium';
@@ -1490,17 +1496,17 @@
         	<label class="control-label">Choose a Talent from your new school</label>
         	<select class="form-control" id="magic_talents">
         	</select>
-        	<select class="form-control elemental_select">
+        	<select class="form-control elemental_select hidden">
         		<option value="Fire">Fire</option>
         		<option value="Ice">Ice</option>
         		<option value="Electricity">Electricity</option>
         	</select>
-        	<select class="form-control elementalist_select">
+        	<select class="form-control elementalist_select hidden">
         		<option value="Earth">Earth</option>
         		<option value="Water">Water</option>
         		<option value="Air">Air</option>
         	</select>
-        	<select class="form-control superhuman_select">
+        	<select class="form-control superhuman_select hidden">
         		<option value="Power/Dexterity">Power (Strength/Fortitude) & Dexterity (Speed/Agility)</option>
         		<option value="Power/Precision">Power (Strength/Fortitude) & Perception (Precision/Awareness)</option>
         		<option value="Dexterity/Precision">Dexterity (Speed/Agility) & Perception (Precision/Awareness)</option>
@@ -1672,8 +1678,10 @@
         </div>
         <div class="modal-body">
         	<!-- show dropdown only during character creation -->
-        	<label class="control-label <?php echo isset($user) && $user['xp'] != 0 ? 'hidden' : ''; ?>" id="select_feat_type_label">Type</label>
-        	<select class="form-control <?php echo isset($user) && $user['xp'] != 0 ? 'hidden' : ''; ?>" id="select_feat_type">
+        	<!-- <label class="control-label <?php echo isset($user) && $user['xp'] != 0 ? 'hidden' : ''; ?>" id="select_feat_type_label">Type</label> -->
+        	<!-- <select class="form-control <?php echo isset($user) && $user['xp'] != 0 ? 'hidden' : ''; ?>" id="select_feat_type"> -->
+        	<label class="control-label" id="select_feat_type_label">Type</label>
+        	<select class="form-control" id="select_feat_type">
         		<option id="standard_option" value="feat_name">Standard Talent</option>
         		<!--  hide unless user has magic -->
         		<option id="magic_option" value="magic_talent_name" <?php echo isset($user) && $user['magic_talents'] == true ? '' : 'hidden'; ?>>Magical Talent</option>
@@ -1687,7 +1695,6 @@
         		<option value="profession_name" <?php echo count($feat_ids) > 0 && $counts['profession_count'] == 0 ? 'hidden' : '' ?>>Profession</option>
         	</select>
         	<label class="control-label">Name</label>
-        	<input type="hidden" id="feat_name_val">
         	<input class="form-control clearable feat-type" type="text" id="feat_name">
         	<input class="form-control clearable feat-type hidden" type="text" id="magic_talent_name">
         	<select class="form-control feat-type feat-select hidden" id="social_background_name">
@@ -1695,7 +1702,7 @@
         		<?php
         			foreach ($feat_list as $feat) {
         				if ($feat['type'] == 'social_background') {
-        					echo "<option value='".str_replace('\'','',$feat['name'])."'>".$feat['name']."</option>";
+        					echo '<option value="'.$feat['name'].'"">'.$feat['name'].'</option>';
         				}
         			}
         		?>
@@ -1705,7 +1712,7 @@
         		<?php
         			foreach ($feat_list as $feat) {
         				if ($feat['type'] == 'social_trait') {
-        					echo "<option value='".str_replace('\'','',$feat['name'])."'>".$feat['name']."</option>";
+        					echo '<option value="'.$feat['name'].'"">'.$feat['name'].'</option>';
         				}
         			}
         		?>
@@ -1715,7 +1722,7 @@
         		<?php
         			foreach ($feat_list as $feat) {
         				if ($feat['type'] == 'physical_trait' && $feat['cost'] > 0) {
-        					echo "<option value='".str_replace('\'','',$feat['name'])."'>".$feat['name']."</option>";
+        					echo '<option value="'.$feat['name'].'"">'.$feat['name'].'</option>';
         				}
         			}
         		?>
@@ -1725,7 +1732,7 @@
         		<?php
         			foreach ($feat_list as $feat) {
         				if ($feat['type'] == 'physical_trait' && $feat['cost'] < 0) {
-        					echo "<option value='".str_replace('\'','',$feat['name'])."'>".$feat['name']."</option>";
+        					echo '<option value="'.$feat['name'].'"">'.$feat['name'].'</option>';
         				}
         			}
         		?>
@@ -1735,7 +1742,7 @@
         		<?php
         			foreach ($feat_list as $feat) {
         				if ($feat['type'] == 'compelling_action') {
-        					echo "<option value='".str_replace('\'','',$feat['name'])."'>".$feat['name']."</option>";
+        					echo '<option value="'.$feat['name'].'"">'.$feat['name'].'</option>';
         				}
         			}
         		?>
@@ -1745,7 +1752,7 @@
         		<?php
         			foreach ($feat_list as $feat) {
         				if ($feat['type'] == 'profession') {
-        					echo "<option value='".str_replace('\'','',$feat['name'])."'>".$feat['name']."</option>";
+        					echo '<option value="'.$feat['name'].'"">'.$feat['name'].'</option>';
         				}
         			}
         		?>
@@ -1755,31 +1762,31 @@
         		<?php
         			foreach ($feat_list as $feat) {
         				if ($feat['type'] == 'morale_trait') {
-        					echo "<option value='".str_replace('\'','',$feat['name'])."'>".$feat['name']."</option>";
+        					echo '<option value="'.$feat['name'].'"">'.$feat['name'].'</option>';
         				}
         			}
         		?>
         	</select>
 
-        	<select class="form-control elemental_select">
+        	<select class="form-control elemental_select hidden">
         		<option value="Fire">Fire</option>
         		<option value="Ice">Ice</option>
         		<option value="Electricity">Electricity</option>
         	</select>
 
-        	<select class="form-control elementalist_select">
+        	<select class="form-control elementalist_select hidden">
         		<option value="Earth">Earth</option>
         		<option value="Water">Water</option>
         		<option value="Air">Air</option>
         	</select>
 
-        	<select class="form-control superhuman_select">
+        	<select class="form-control superhuman_select hidden">
         		<option value="Power/Dexterity">Power (Strength/Fortitude) & Dexterity (Speed/Agility)</option>
         		<option value="Power/Precision">Power (Strength/Fortitude) & Perception (Precision/Awareness)</option>
         		<option value="Dexterity/Precision">Dexterity (Speed/Agility) & Perception (Precision/Awareness)</option>
         	</select>
 
-        	<div class="row shapeshifter_select">
+        	<div class="row shapeshifter_select hidden">
         		<div class="col-sm-6">
 	        		<label class="control-label">Animal Name</label>
 	        		<input class="form-control" type="text" id="animal_name">
@@ -1792,10 +1799,14 @@
 
         	<label class="control-label">Description</label>
         	<textarea class="form-control" id="feat_description" rows="6" maxlength="2000"></textarea>
+        	<input type="hidden" id="feat_name_val">
         	<input type="hidden" id="feat_id">
+        	<input type="hidden" id="feat_type">
+        	<input type="hidden" id="feat_cost">
         	<input type="hidden" id="user_feat_id">
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newFeat()" id="feat_submit_btn">Ok</button>
+	        	<button type="button" class="btn btn-primary hidden" data-dismiss="modal" onclick="updateFeat()" id="feat_update_btn">Ok</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
@@ -1914,7 +1925,7 @@
         	<label class="control-label">Weapon Name*</label>
         	<input class="form-control" type="text" id="weapon_name">
         	<label class="control-label">Quantity</label>
-        	<input class="form-control" type="text" id="weapon_quantity">
+        	<input class="form-control" type="number" min="0" id="weapon_quantity">
         	<label class="control-label">Damage*</label>
         	<input class="form-control" type="number" min="0" id="weapon_damage">
         	<label class="control-label">Max Damage</label>
@@ -2205,7 +2216,6 @@
 
 	<!-- JavaScript -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js" async defer></script> -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 	<script async src="https://www.google.com/recaptcha/api.js?render=6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
@@ -2223,7 +2233,7 @@
 		feat_reqs = <?php echo json_encode($feat_reqs); ?>;
 		
 		xp_awards = <?php echo json_encode(isset($awards) ? $awards : []); ?>;
-		user_feats = <?php echo json_encode($feats); ?>;
+		let user_feats = <?php echo json_encode($feats); ?>;
 		let user_trainings = <?php echo json_encode($trainings); ?>;
 		for (var i in user_trainings) {
 			let training = new UserTraining(user_trainings[i]);
@@ -2271,18 +2281,28 @@
 		// check for user feats
 		// get feat description from feat_or_trait table if feat_id is present
 		for (var i in user_feats) {
+			// store name and description values (may be custom)
+			user_feats[i]['display_name'] = user_feats[i]['name'];
 			var feat_id_null = true;
-			if (user_feats[i]['feat_id'] != null) {
+			if (user_feats[i]['feat_id'] != null && user_feats[i]['feat_id'] != 0) {
 				feat_id_null = false;
+				// get name, description, type, and cost from feat list
 				for (var j in feat_list) {
 					if (feat_list[j]['id'] == user_feats[i]['feat_id']) {
-						user_feats[i]['description'] = feat_list[j]['description'];
+						user_feats[i]['name'] = feat_list[j]['name'];
+						if (user_feats[i]['description'] == "") {
+							user_feats[i]['description'] = feat_list[j]['description'];
+						}
+						user_feats[i]['type'] = feat_list[j]['type'];
+						user_feats[i]['cost'] = feat_list[j]['cost'];
 					}
 				}
 			}
-			// TODO update function to accept object
-			addFeatElements(user_feats[i]['name'], user_feats[i]['name'], user_feats[i]['description'], feat_id_null ? "" : user_feats[i]['feat_id'], user_feats[i]['id']);
+			let talent = new UserTalent(user_feats[i]);
+			userTalents.push(talent);
+			addFeatElements(talent);
 		}
+		user['talents'] = userTalents;
 
 		// set feat list
 		setFeatList();
@@ -2322,10 +2342,12 @@
 
 			// select from dropdown if weapon is equipped
 			for (var j = 0; j < weapon.equipped; j++) {
-				$("#weapon_select_"+select_id).val(weapon.name);
-				selectWeapon(select_id, false);
-				weapon.equipped_index.push(select_id++);
-				// TODO auto expand weapon section on mobile?
+				if (j < weapon.quantity) {
+					$("#weapon_select_"+select_id).val(weapon.name);
+					selectWeapon(select_id, false);
+					weapon.equipped_index.push(select_id++);
+					// TODO auto expand weapon section on mobile?
+				}
 			}
 
 		}
