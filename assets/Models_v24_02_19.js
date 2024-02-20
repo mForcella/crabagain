@@ -53,7 +53,7 @@ function setFeatList() {
 	var ineligible_feats = [];
 	// set autocomplete list for feats
 	$.each(feat_list, function(i, feat) {
-		if (feat['type'] == 'feat' || feat['type'] == 'magic_talent') {
+		if (feat['type'] == 'feat' || feat['type'] == 'standard_talent' || feat['type'] == 'magic_talent' || feat['type'] == "school_talent") {
 			var is_eligible = true;
 			// feat[requirements] is an array of arrays - each array must return true
 			$.each(feat['requirements'], function(j, requirements) {
@@ -859,7 +859,7 @@ function addTrainingElements(training, skillType) {
 	var row = createElement('div', 'row training-row', '#'+training.attribute_group, id_val+"_row");
 	training.DOM_element = row;
 	training.skill_type = skillType;
-	if (allocatingAttributePts) {
+	if ($("#"+training.attribute_group+"_up").is(":visible")) {
 		training.is_new = true;
 	}
 	var div_left = createElement('div', 'col-md-7 col-xs-8', row);
@@ -919,8 +919,8 @@ function addTrainingElements(training, skillType) {
 		adjustAttribute(id_val, -1);
 	});
 
-	// GM edit mode or character creation - show plus minus icons
-	if (adminEditMode || characterCreation) {
+	// show plus minus icons if talent is new
+	if (training.is_new) {
 		up.show();
 		down.show();
 	}
@@ -930,8 +930,7 @@ function addTrainingElements(training, skillType) {
 	// adjust feat eligibility
 	setFeatList();
 
-	// if magic school - prompt to choose talent
-	// TODO training won't be marked new if adding without allocating (character creation)
+	// if new magic school - prompt to choose talent
 	if (training.is_new && training.magic_school == 1) {
 		// use id_val to update hidden input values
 		$("#"+id_val+"_magic").val(1);
@@ -974,6 +973,7 @@ function newSchool() {
 
 // add new magic school canceled without selecting starting talent
 // TODO replace 'cancel' button with 'back' button?
+// set modal title to show school name?
 function cancelMagic() {
 	$("#magic_talents").val("");
 }

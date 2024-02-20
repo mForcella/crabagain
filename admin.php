@@ -261,11 +261,11 @@
 	<link rel="icon" type="image/png" href="/assets/image/favicon-pentacle-black.ico"/>
 
 	<!-- Bootstrap -->
-	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 	<!-- Font Awesome -->
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 	<!-- jQuery UI -->
-	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+	<link rel="stylesheet" type="text/css" href="/assets/jquery/jquery-ui-1.12.1.min.css">
 	<!-- Google Fonts -->
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1380,10 +1380,10 @@
 </body>
 
 <!-- JavaScript -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <script async src="https://www.google.com/recaptcha/api.js?render=6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi"></script>
-<script src="bootstrap/js/bootstrap.min.js"></script>
+<script src="/assets/jquery/jquery-3.5.1.min.js"></script>
+<script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+<script src="/assets/jquery/jquery-ui-1.12.1.min.js"></script>
 <script type="text/javascript">
 
 	$(".xp-label").hover(function(){

@@ -12,7 +12,8 @@ var featList = [
 		'requirements':[
 			[{'fortitude':2}, {'strength':2}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Diehard',
@@ -24,7 +25,8 @@ var featList = [
 			[{'strength':3}],
 			[{'feat':'Battle Fury'}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Salty Dog',
@@ -35,7 +37,8 @@ var featList = [
 			[{'strength':2}],
 			[{'fortitude':2}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'The Pummeling',
@@ -48,7 +51,8 @@ var featList = [
 			[{'strength':4}],
 			[{'feat':'Improved Critical Hit'}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 
 	// *** Dexterity Talents *** //
@@ -62,7 +66,8 @@ var featList = [
 			[{'strength':0}],
 			[{'agility':2}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Defender',
@@ -72,7 +77,8 @@ var featList = [
 		'requirements':[
 			[{'agility':2}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Dual Weapon Master',
@@ -85,7 +91,8 @@ var featList = [
 			[{'speed':2}],
 			[{'feat':'Defender'}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Lightning Reflexes',
@@ -95,7 +102,8 @@ var featList = [
 		'requirements':[
 			[{'speed':2}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Quick and the Dead',
@@ -110,7 +118,8 @@ var featList = [
 			[{'agility':2}],
 			[{'feat':'Lightning Reflexes'}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Martial Arts',
@@ -123,7 +132,8 @@ var featList = [
 			[{'agility':2}],
 			[{'speed':2}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Relentless Defense',
@@ -138,7 +148,8 @@ var featList = [
 			[{'feat':'Martial Arts'}],
 			[{'feat':'Lightning Reflexes'}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Gunslinger',
@@ -156,7 +167,8 @@ var featList = [
 			[{'feat':'Quick and the Dead'}],
 			[{'feat':'Take Aim'}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 
 	// *** Perception Talents *** //
@@ -169,7 +181,8 @@ var featList = [
 		'requirements':[
 			[{'awareness':2}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Powers of Observation',
@@ -183,7 +196,8 @@ var featList = [
 			[{'intellect':3}],
 			[{'feat':'Keen Senses'}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Take Aim',
@@ -194,7 +208,8 @@ var featList = [
 		'requirements':[
 			[{'precision_':2}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Dual Pistol Master',
@@ -208,7 +223,8 @@ var featList = [
 			[{'speed':3}],
 			[{'feat':'Take Aim'}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Improved Critical Hit',
@@ -217,7 +233,8 @@ var featList = [
 		'requirements':[
 			[{'precision_':4}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Brutal Throw',
@@ -227,7 +244,8 @@ var featList = [
 			[{'strength':2}],
 			[{'feat':'Take Aim'}, {'feat':'Improved Critical Hit'}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Sneak Attack',
@@ -239,7 +257,8 @@ var featList = [
 			[{'training':'Stealth'}],
 			[{'feat':'Take Aim'}, {'feat':'Improved Critical Hit'}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 
 	// *** Charisma Talents *** //
@@ -251,7 +270,8 @@ var featList = [
 		'requirements':[
 			[{'allure':2}, {'deception':2}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Bond of Friendship',
@@ -263,7 +283,8 @@ var featList = [
 			[{'intuition':2}],
 			[{'feat':'Inspiring Presence'}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Silver Tongue',
@@ -274,7 +295,8 @@ var featList = [
 			[{'allure':2}],
 			[{'deception':2}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'I\'ve Seen Worse',
@@ -286,7 +308,8 @@ var featList = [
 			[{'deception':2}],
 			[{'feat':'Silver Tongue'}, {'feat':'Inspiring Presence'}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 
 	// *** Intelligence Talents *** //
@@ -297,7 +320,8 @@ var featList = [
 		'requirements':[
 			[{'intellect':4}, {'training':'First Aid'}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Arterial Bleeding',
@@ -308,7 +332,8 @@ var featList = [
 			[{'precision_':4}],
 			[{'feat':'Anatomical Warfare'}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Eclectic Knowledge',
@@ -319,7 +344,8 @@ var featList = [
 		'requirements':[
 			[{'intellect':2}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Jack of All Trades',
@@ -331,7 +357,8 @@ var featList = [
 			[{'intuition':2}],
 			[{'feat':'Eclectic Knowledge'}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 
 	// *** Spirit Talents *** //
@@ -343,7 +370,8 @@ var featList = [
 		'requirements':[
 			[{'vitality':2}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Gambler\'s Luck',
@@ -354,7 +382,8 @@ var featList = [
 			[{'vitality':2}],
 			[{'character_creation':true}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 
 	// *** Magic Talents *** //
@@ -365,7 +394,8 @@ var featList = [
 		'requirements':[
 			[{'character_creation':true}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Divine Magic',
@@ -376,7 +406,8 @@ var featList = [
 			[{'intuition':2}],
 			[{'character_creation':true}],
 		],
-		'type':'feat'
+		'type':'standard_talent',
+		'cost':4
 	},
 	{
 		'name':'Elemental Master',
@@ -389,7 +420,8 @@ var featList = [
 		'requirements':[
 			[{'training':'Ka'}],
 		],
-		'type':'feat'
+		'type':'school_talent',
+		'cost':4
 	},
 	{
 		'name':'Metal Master',
@@ -399,7 +431,8 @@ var featList = [
 		'requirements':[
 			[{'training':'Ka'}],
 		],
-		'type':'feat'
+		'type':'school_talent',
+		'cost':4
 	},
 	{
 		'name':'Nature Master',
@@ -411,7 +444,8 @@ var featList = [
 		'requirements':[
 			[{'training':'Avani'}],
 		],
-		'type':'feat'
+		'type':'school_talent',
+		'cost':4
 	},
 	{
 		'name':'Elementalist',
@@ -425,7 +459,8 @@ var featList = [
 		'requirements':[
 			[{'training':'Avani'}],
 		],
-		'type':'feat'
+		'type':'school_talent',
+		'cost':4
 	},
 	{
 		'name':'Illusionist',
@@ -434,7 +469,8 @@ var featList = [
 		'requirements':[
 			[{'training':'Nouse'}],
 		],
-		'type':'feat'
+		'type':'school_talent',
+		'cost':4
 	},
 	{
 		'name':'Psychic',
@@ -443,7 +479,8 @@ var featList = [
 		'requirements':[
 			[{'training':'Nouse'}],
 		],
-		'type':'feat'
+		'type':'school_talent',
+		'cost':4
 	},
 	{
 		'name':'Ensi',
@@ -452,7 +489,8 @@ var featList = [
 		'requirements':[
 			[{'training':'Nouse'}],
 		],
-		'type':'feat'
+		'type':'school_talent',
+		'cost':4
 	},
 	{
 		'name':'Seer',
@@ -462,7 +500,8 @@ var featList = [
 		'requirements':[
 			[{'training':'Nouse'}],
 		],
-		'type':'feat'
+		'type':'school_talent',
+		'cost':4
 	},
 	{
 		'name':'Healer',
@@ -473,7 +512,8 @@ var featList = [
 		'requirements':[
 			[{'training':'Soma'}],
 		],
-		'type':'feat'
+		'type':'school_talent',
+		'cost':4
 	},
 	{
 		'name':'Tormentor',
@@ -483,7 +523,8 @@ var featList = [
 		'requirements':[
 			[{'training':'Soma'}],
 		],
-		'type':'feat'
+		'type':'school_talent',
+		'cost':4
 	},
 	{
 		'name':'Superhuman',
@@ -494,7 +535,8 @@ var featList = [
 		'requirements':[
 			[{'training':'Soma'}],
 		],
-		'type':'feat'
+		'type':'school_talent',
+		'cost':4
 	},
 	{
 		'name':'Magic Adept',
@@ -507,7 +549,8 @@ var featList = [
 			[{'feat':'Arcane Blood'}],
 			[{'training':'Ka'},{'training':'Avani'},{'training':'Nouse'},{'training':'Soma'}],
 		],
-		'type':'feat'
+		'type':'magic_talent',
+		'cost':4
 	},
 	{
 		'name':'Master of Magic',
@@ -521,7 +564,8 @@ var featList = [
 			[{'feat':'Magic Adept'}],
 			[{'training':'Ka'},{'training':'Avani'},{'training':'Nouse'},{'training':'Soma'}],
 		],
-		'type':'feat'
+		'type':'magic_talent',
+		'cost':4
 	},
 	{
 		'name':'Time Lord',
@@ -539,7 +583,8 @@ var featList = [
 			[{'training':'Ka'}],
 			[{'training':'Nouse'}],
 		],
-		'type':'feat'
+		'type':'magic_talent',
+		'cost':4
 	},
 	{
 		'name':'Blood Magic',
@@ -551,7 +596,8 @@ var featList = [
 			[{'vitality':2}],
 			[{'feat':'Arcane Blood'}],
 		],
-		'type':'feat'
+		'type':'magic_talent',
+		'cost':4
 	},
 	{
 		'name':'Enchanter',
@@ -567,7 +613,8 @@ var featList = [
 			[{'vitality':4}],
 			[{'training':'Ka'},{'training':'Avani'},{'training':'Nouse'},{'training':'Soma'}],
 		],
-		'type':'feat'
+		'type':'magic_talent',
+		'cost':4
 	},
 	{
 		'name':'Necromancer',
@@ -586,7 +633,8 @@ var featList = [
 			[{'feat':'Blood Magic'}],
 			[{'training':'Ka'},{'training':'Avani'},{'training':'Nouse'},{'training':'Soma'}],
 		],
-		'type':'feat'
+		'type':'magic_talent',
+		'cost':4
 	},
 	{
 		'name':'Lord of the Damned',
@@ -608,7 +656,8 @@ var featList = [
 			[{'training':'Ka'}],
 			[{'training':'Nouse'}],
 		],
-		'type':'feat'
+		'type':'magic_talent',
+		'cost':4
 	},
 	{
 		'name':'Shapeshifter',
@@ -624,39 +673,46 @@ var featList = [
 			[{'training':'Avani'}],
 			[{'training':'Soma'}],
 		],
-		'type':'feat'
+		'type':'magic_talent',
+		'cost':4
 	},
 
 	// *** Social Traits *** //
 	{
 		'name':'Criminal',
 		'description':'You’ve got a record, as well as some unscrupulous contacts.',
-		'type':'social_trait'
+		'type':'social_trait',
+		'cost':0
 	},
 	{
 		'name':'Debt',
 		'description':'Starting money is tripled, but you have to pay it back some time.',
-		'type':'social_trait'
+		'type':'social_trait',
+		'cost':0
 	},
 	{
 		'name':'Dependent',
 		'description':'You have a staunch ally, but they always need something from you.',
-		'type':'social_trait'
+		'type':'social_trait',
+		'cost':0
 	},
 	{
 		'name':'Highborn',
 		'description':'Some people find you snooty, but you fit in well with high society.',
-		'type':'social_trait'
+		'type':'social_trait',
+		'cost':0
 	},
 	{
 		'name':'I Know a Guy',
 		'description':'You always run into someone you know, whether you want to or not.',
-		'type':'social_trait'
+		'type':'social_trait',
+		'cost':0
 	},
 	{
 		'name':'Indigent',
 		'description':'The slums are home, and it can be hard to fit in anywhere else.',
-		'type':'social_trait'
+		'type':'social_trait',
+		'cost':0
 	},
 
 	// *** Physical Traits *** //
@@ -810,11 +866,13 @@ var featList = [
 		'name':'Celebrity',
 		'description':'Positive State:\nYou gained 2 Renown last Session.\nNegative State:\nYou didn’t gain any Renown last Session.',
 		'type':'morale_trait',
+		'cost':0
 	},
 	{
 		'name':'Extrovert',
 		'description':'Positive State:\nA new NPC really likes you.\nNegative State:\nYou didn’t hang out with any NPC friends.',
 		'type':'morale_trait',
+		'cost':0
 	},
 	{
 		'name':'Fancypants',
@@ -825,46 +883,55 @@ var featList = [
 		'name':'Gamer',
 		'description':'Positive State:\nYou won some kind of game this Session.\nNegative State:\nYou lost a game last Session.',
 		'type':'morale_trait',
+		'cost':0
 	},
 	{
 		'name':'Glutton',
 		'description':'Positive State:\nAll of your meals were excessive.\nNegative State:\nNone of your meals were decent last Session.',
 		'type':'morale_trait',
+		'cost':0
 	},
 	{
 		'name':'Merrymaker',
 		'description':'Positive State:\nYou got drunk this Session.\nNegative State:\nYou didn’t have any drinks last Session.',
 		'type':'morale_trait',
+		'cost':0
 	},
 	{
 		'name':'Miracle',
 		'description':'Positive State:\nYou used no Alignment Bonuses last Session.\nNegative State:\nYou used all Alignment Bonuses last Session.',
 		'type':'morale_trait',
+		'cost':0
 	},
 	{
 		'name':'Pennypincher',
 		'description':'Positive State:\nYou have more than 800 credits/8 Gold/$40.\nNegative State:\nYou have less than 400 credits/4 Gold/$20.',
 		'type':'morale_trait',
+		'cost':0
 	},
 	{
 		'name':'Philanderer',
 		'description':'Positive State:\nYou had 1 new sexual encounter this Session.\nNegative State:\nNo new encounters last Session.',
 		'type':'morale_trait',
+		'cost':0
 	},
 	{
 		'name':'Rover',
 		'description':'Positive State:\nYou went to a new planet/region this Session.\nNegative State:\nYou stayed in one place last Session.',
 		'type':'morale_trait',
+		'cost':0
 	},
 	{
 		'name':'Spendthrift',
 		'description':'Positive State:\nYou have less than 20 credits/4 Silver/$1.\nNegative State:\nYou have more than 200 credits/2 Gold/$10.',
 		'type':'morale_trait',
+		'cost':0
 	},
 	{
 		'name':'Wunderkind',
 		'description':'Positive State:\nYou succeeded all rolls last Session.\nNegative State:\nYou failed 2 or more rolls last Session.',
 		'type':'morale_trait',
+		'cost':0
 	},
 
 	// *** Professions *** //
@@ -875,7 +942,8 @@ var featList = [
 		'and can make educated guesses about the purpose and nature of unknown ones. You can translate ancient writing from all '+
 		'known past civilizations in South American and may attempt translation of unknown ones. Archaeology must be learned under '+
 		'Intellect.',
-		'type':'profession'
+		'type':'profession',
+		'cost':0
 	},
 	{
 		'name':'Botanist/Herbalist',
@@ -884,7 +952,8 @@ var featList = [
 		'plant from the Drug/Poison Ingredients Lists once per day of travel without making a roll. Additionally, even if fail a '+
 		'roll or you are outside of the Amazon, a DL 15 will identify likely properties of any plants you encounter. Herbalism can '+
 		'be learned under Intuition or Intellect.',
-		'type':'profession'
+		'type':'profession',
+		'cost':0
 	},
 	{
 		'name':'Cartographer',
@@ -892,14 +961,16 @@ var featList = [
 		'travelled through with impressive accuracy (DL 14). Additionally, if you have a map of an unexplored area, you can never '+
 		'become lost and can also roll Cartography without a map to attempt to find your direction (DL 10). Cartography can be '+
 		'learned under Awareness or Innovation.',
-		'type':'profession'
+		'type':'profession',
+		'cost':0
 	},
 	{
 		'name':'Ex-Military',
 		'description':'You were a career soldier for many years, until that one mission went terribly wrong. Now you make your way '+
 		'as a hired gun, and you know guns well. You ignore Misfire on all weapons and reduce Accuracy penalties by 1. You also '+
 		'begin the game Trained in Demolitions and Tactics.',
-		'type':'profession'
+		'type':'profession',
+		'cost':0
 	},
 	{
 		'name':'Philanthropist',
@@ -910,7 +981,8 @@ var featList = [
 		'discretion. Even after you have done this, you can always name-drop with anyone, which will provide anywhere from a +4 '+
 		'to -4 to any Charisma roll. The bonus/penalty will be unknown to you until after the roll. Additionally, as long as you '+
 		'have access to a city with a bank, you can withdraw $100/day.',
-		'type':'profession'
+		'type':'profession',
+		'cost':0
 	},
 	{
 		'name':'Street Rat',
@@ -919,7 +991,8 @@ var featList = [
 		'town or city you can make an Intuition or Awareness roll to find black market or illegal activities, and these people will '+
 		'never be outright hostile toward you as long as you are alone. You also begin the game Trained in Stealth and either '+
 		'Security OR Sleight of Hand.',
-		'type':'profession'
+		'type':'profession',
+		'cost':0
 	},
 
 	// *** Social Backgrounds *** //
@@ -930,14 +1003,16 @@ var featList = [
 		'town or city you can make an Intuition or Awareness roll to find black market or illegal activities, and these people will '+
 		'never be outright hostile toward you as long as you are alone. You also begin the game Trained in Stealth and either '+
 		'Security OR Sleight of Hand.',
-		'type':'social_background'
+		'type':'social_background',
+		'cost':0
 	},
 	{
 		'name':'Courtier',
 		'description':'You weren’t rich, but you lived a wealthy life on the coattails of others, mainly by kissing the right '+
 		'asses and knowing how to manipulate your superiors. You gain 3 Bonus Skill Points to place in Diplomacy, Seduce or '+
 		'Sense Motive Focuses. You are Literate and gain 1d4 additional starting funds.',
-		'type':'social_background'
+		'type':'social_background',
+		'cost':0
 	},
 	{
 		'name':'Merchant',
@@ -945,14 +1020,16 @@ var featList = [
 		'peasant masses. You understand people and business well and travelled the world often buying, selling and trading. '+
 		'You gain 3 Bonus Skill Points to place in Appraise, Barter or Languages Focuses. You are Literate and gain 1d4 '+
 		'additional starting funds.',
-		'type':'social_background'
+		'type':'social_background',
+		'cost':0
 	},
 	{
 		'name':'Scholar',
 		'description':'You trained extensively with the most educated minds of your city, tirelessly transcribing texts and '+
 		'reading more books than even the wealthiest minds have consumed. You gain 4 Bonus Skill Points to place in Academia, '+
 		'Culture, Languages or Religion. You are Literate.',
-		'type':'social_background'
+		'type':'social_background',
+		'cost':0
 	},
 	{
 		'name':'Soldier',
@@ -960,21 +1037,24 @@ var featList = [
 		'but you’re ready for new adventures and some real freedom. You gain a +1 Bonus in Shoot and Attack. You must choose '+
 		'a specific Weapon Type for each Focus and you may apply the Bonus after initial Skill Points have been spent. You are '+
 		'Illiterate.',
-		'type':'social_background'
+		'type':'social_background',
+		'cost':0
 	},
 	{
 		'name':'Craftsman',
 		'description':'You made stuff, and you made it well enough to make a decent living, but never well enough to really '+
 		'get noticed. You gain a +2 Bonus in a single Craft Item Focus and you may apply the Bonus after initial Skill Points '+
 		'have been spent. You are Illiterate.',
-		'type':'social_background'
+		'type':'social_background',
+		'cost':0
 	},
 	{
 		'name':'Peasant',
 		'description':'You broke your body to keep the rich fat and barely enough food in your own belly. You’ve survived '+
 		'the hardest of times and come out strong for it. You gain 5 Bonus Skill Points to place in Lift, Resist Disease or '+
 		'Craft Item Focuses. You are Illiterate and lose 1d4 starting funds.',
-		'type':'social_background'
+		'type':'social_background',
+		'cost':0
 	},
 	{
 		'name':'Street Urchin',
@@ -982,7 +1062,8 @@ var featList = [
 		'survivor and as resourceful as they come. You gain 2 Bonus Skill Points to place in Disguise, Search, Listen or '+
 		'Run Focuses and gain the Security, Stealth or Sleight of Hand Unique Skill for free. You are Illiterate and lose '+
 		'2d4 starting funds.',
-		'type':'social_background'
+		'type':'social_background',
+		'cost':0
 	},
 
 	// *** Compelling Actions *** //

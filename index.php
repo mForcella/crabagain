@@ -114,9 +114,8 @@
 	    	$user = $row;
 	    	$user['is_new'] = false;
 
-	    	// get pending xp awards
-	    	// TODO get all xp awards to determine if character is new?
-	    	$sql = "SELECT * FROM user_xp_award WHERE awarded IS NULL AND user_id = ".$_GET["user"];
+	    	// get xp awards
+	    	$sql = "SELECT * FROM user_xp_award WHERE user_id = ".$_GET["user"];
 	    	$result = $db->query($sql);
 	    	if ($result) {
 		    	while($row = $result->fetch_assoc()) {
@@ -225,12 +224,12 @@
 	<link rel="icon" type="image/png" href="/assets/image/favicon-pentacle.ico"/>
 
 	<!-- Bootstrap -->
-	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 	<!-- Font Awesome -->
-	<!-- TODO change files from cloudfare to local -->
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+	<!-- <link rel="stylesheet" type="text/css" href="/assets/font-awesome/font-awesome-6.1.1-all.min.css"> -->
 	<!-- jQuery UI -->
-	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+	<link rel="stylesheet" type="text/css" href="/assets/jquery/jquery-ui-1.12.1.min.css">
 	<!-- Google Fonts -->
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -365,7 +364,7 @@
 						<!-- unlock on character creation -->
 						<label class="control-label col-sm-2 col-xs-4 font-small smaller" for="attribute_pts">Attribute Pts</label>
 						<div class="col-sm-2 col-xs-8">
-							<input class="form-control track-changes" <?php echo isset($user) && $user['xp'] != 0 ? 'readonly' : 'type="number"' ?> min="0" id="attribute_pts" name="attribute_pts" value="<?php echo isset($user) ? htmlspecialchars($user['attribute_pts']) : 12 ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+							<input class="form-control track-changes" <?php echo isset($user) &&  count($awards) == 0 ? 'type="number"' : 'readonly' ?> min="0" id="attribute_pts" name="attribute_pts" value="<?php echo isset($user) ? htmlspecialchars($user['attribute_pts']) : 12 ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
 						</div>
 					</div>
 
@@ -375,6 +374,7 @@
 							<input class="form-control pointer track-changes" readonly data-toggle="modal" data-target="#xp_modal" name="xp" id="xp" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['xp']) : 0 ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
 						</div>
 						<!-- TODO unlock level on character creation and adjust attribute points on change -->
+						<!-- only allow by GM? -->
 						<label class="control-label col-sm-2 col-xs-4" for="level">Level</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 							<?php
@@ -517,7 +517,6 @@
 
 							<div class="col-sm-4">
 								<div class="form-group">
-									<!-- TODO label 'for' value forces focus on input on chevron click -->
 									<label class="control-label col-md-12 center full-width" for="">Weapon 1<span class="glyphicon glyphicon-chevron-down" id="weapon_1" onclick="toggleWeapon(this.id, this)"></span></label>
 									<div class="col-md-12">
 										<select class="form-control weapon-select" id="weapon_select_1" name="weapon_1" onchange="selectWeapon(1)">
@@ -879,8 +878,8 @@
 									<label class="control-label">
 										<span class="attribute-val" id="strength_text"></span>
 										<input type="hidden" class="track-changes" name="strength" id="strength_val" value="<?php echo isset($user) ? $user['strength'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('strength', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('strength', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="Strength_up" onclick="adjustAttribute('strength', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="Strength_down" onclick="adjustAttribute('strength', -1)"></span>
 									</label>
 								</div>
 							</div>
@@ -905,8 +904,8 @@
 									<label class="control-label">
 										<span class="attribute-val" id="fortitude_text"></span>
 										<input type="hidden" class="track-changes" name="fortitude" id="fortitude_val" value="<?php echo isset($user) ? $user['fortitude'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('fortitude', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('fortitude', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="Fortitude_up" onclick="adjustAttribute('fortitude', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="Fortitude_down" onclick="adjustAttribute('fortitude', -1)"></span>
 									</label>
 								</div>
 							</div>
@@ -933,8 +932,8 @@
 									<label class="control-label">
 										<span class="attribute-val" id="speed_text"></span>
 										<input type="hidden" class="track-changes" name="speed" id="speed_val" value="<?php echo isset($user) ? $user['speed'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('speed', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('speed', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="Speed_up" onclick="adjustAttribute('speed', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="Speed_down" onclick="adjustAttribute('speed', -1)"></span>
 									</label>
 								</div>
 							</div>
@@ -959,8 +958,8 @@
 									<label class="control-label">
 										<span class="attribute-val" id="agility_text"></span>
 										<input type="hidden" class="track-changes" name="agility" id="agility_val" value="<?php echo isset($user) ? $user['agility'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('agility', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('agility', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="Agility_up" onclick="adjustAttribute('agility', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="Agility_down" onclick="adjustAttribute('agility', -1)"></span>
 									</label>
 								</div>
 							</div>
@@ -987,8 +986,8 @@
 									<label class="control-label">
 										<span class="attribute-val" id="precision__text"></span>
 										<input type="hidden" class="track-changes" name="precision_" id="precision__val" value="<?php echo isset($user) ? $user['precision_'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('precision_', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('precision_', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="Precision_up" onclick="adjustAttribute('precision_', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="Precision_down" onclick="adjustAttribute('precision_', -1)"></span>
 									</label>
 								</div>
 							</div>
@@ -1013,8 +1012,8 @@
 									<label class="control-label">
 										<span class="attribute-val" id="awareness_text"></span>
 										<input type="hidden" class="track-changes" name="awareness" id="awareness_val" value="<?php echo isset($user) ? $user['awareness'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('awareness', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('awareness', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="Awareness_up" onclick="adjustAttribute('awareness', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="Awareness_down" onclick="adjustAttribute('awareness', -1)"></span>
 									</label>
 								</div>
 							</div>
@@ -1041,8 +1040,8 @@
 									<label class="control-label">
 										<span class="attribute-val" id="allure_text"></span>
 										<input type="hidden" class="track-changes" name="allure" id="allure_val" value="<?php echo isset($user) ? $user['allure'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('allure', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('allure', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="Allure_up" onclick="adjustAttribute('allure', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="Allure_down" onclick="adjustAttribute('allure', -1)"></span>
 									</label>
 								</div>
 							</div>
@@ -1067,8 +1066,8 @@
 									<label class="control-label">
 										<span class="attribute-val" id="deception_text"></span>
 										<input type="hidden" class="track-changes" name="deception" id="deception_val" value="<?php echo isset($user) ? $user['deception'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('deception', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('deception', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="Deception_up" onclick="adjustAttribute('deception', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="Deception_down" onclick="adjustAttribute('deception', -1)"></span>
 									</label>
 								</div>
 							</div>
@@ -1095,8 +1094,8 @@
 									<label class="control-label">
 										<span class="attribute-val" id="intellect_text"></span>
 										<input type="hidden" class="track-changes" name="intellect" id="intellect_val" value="<?php echo isset($user) ? $user['intellect'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('intellect', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('intellect', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="Intellect_up" onclick="adjustAttribute('intellect', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="Intellect_down" onclick="adjustAttribute('intellect', -1)"></span>
 									</label>
 								</div>
 							</div>
@@ -1121,8 +1120,8 @@
 									<label class="control-label">
 										<span class="attribute-val" id="innovation_text"></span>
 										<input type="hidden" class="track-changes" name="innovation" id="innovation_val" value="<?php echo isset($user) ? $user['innovation'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('innovation', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('innovation', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="Innovation_up" onclick="adjustAttribute('innovation', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="Innovation_down" onclick="adjustAttribute('innovation', -1)"></span>
 									</label>
 								</div>
 							</div>
@@ -1149,8 +1148,8 @@
 									<label class="control-label">
 										<span class="attribute-val" id="intuition_text"></span>
 										<input type="hidden" class="track-changes" name="intuition" id="intuition_val" value="<?php echo isset($user) ? $user['intuition'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('intuition', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('intuition', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="Intuition_up" onclick="adjustAttribute('intuition', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="Intuition_down" onclick="adjustAttribute('intuition', -1)"></span>
 									</label>
 								</div>
 							</div>
@@ -1175,8 +1174,8 @@
 									<label class="control-label">
 										<span class="attribute-val" id="vitality_text"></span>
 										<input type="hidden" class="track-changes" name="vitality" id="vitality_val" value="<?php echo isset($user) ? $user['vitality'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" onclick="adjustAttribute('vitality', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" onclick="adjustAttribute('vitality', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="Vitality_up" onclick="adjustAttribute('vitality', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="Vitality_down" onclick="adjustAttribute('vitality', -1)"></span>
 									</label>
 								</div>
 							</div>
@@ -1317,7 +1316,7 @@
 					<div class="form-group">
 						<div class="col-sm-12">
 							<div id="feats">
-								<div class="feat <?php echo $user['is_new'] || $user['xp'] == 0 ? '' : 'cursor-auto' ?>" id="size" data-toggle="<?php echo $user['is_new'] || $user['xp'] == 0 ? 'modal' : '' ?>" data-target="#edit_size_modal">
+								<div class="feat <?php echo $user['is_new'] || count($awards) == 0 ? '' : 'cursor-auto' ?>" id="size" data-toggle="<?php echo $user['is_new'] || count($awards) == 0 ? 'modal' : '' ?>" data-target="#edit_size_modal">
 									<p class="feat-title">Size : </p>
 						    	<?php
 						    		$size = isset($user['size']) ? $user['size'] : 'Medium';
@@ -1677,9 +1676,6 @@
           <h4 class="modal-title" id="feat_modal_title">New Talent/Trait</h4>
         </div>
         <div class="modal-body">
-        	<!-- show dropdown only during character creation -->
-        	<!-- <label class="control-label <?php echo isset($user) && $user['xp'] != 0 ? 'hidden' : ''; ?>" id="select_feat_type_label">Type</label> -->
-        	<!-- <select class="form-control <?php echo isset($user) && $user['xp'] != 0 ? 'hidden' : ''; ?>" id="select_feat_type"> -->
         	<label class="control-label" id="select_feat_type_label">Type</label>
         	<select class="form-control" id="select_feat_type">
         		<option id="standard_option" value="feat_name">Standard Talent</option>
@@ -2215,11 +2211,11 @@
   </div>
 
 	<!-- JavaScript -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 	<script async src="https://www.google.com/recaptcha/api.js?render=6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi"></script>
-	<script src="bootstrap/js/bootstrap.min.js"></script>
-	<script src="/assets/font-awesome-6.1.1-all.min.js"></script>
+	<script src="/assets/jquery/jquery-3.5.1.min.js"></script>
+	<script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/assets/jquery/jquery-ui-1.12.1.min.js"></script>
+	<script src="/assets/font-awesome/font-awesome-6.1.1-all.min.js"></script>
 	<?php echo $keys['scripts'] ?>
 	<script type="text/javascript">
 
@@ -2308,7 +2304,7 @@
 		setFeatList();
 		
 		// character creation mode
-		if (user['is_new'] || user['xp'] == 0) {
+		if (user['is_new'] || xp_awards.length == 0) {
 			characterCreation = true;
 			// show new feat btn
 			$("#new_feat_btn").show();
@@ -2346,7 +2342,6 @@
 					$("#weapon_select_"+select_id).val(weapon.name);
 					selectWeapon(select_id, false);
 					weapon.equipped_index.push(select_id++);
-					// TODO auto expand weapon section on mobile?
 				}
 			}
 
