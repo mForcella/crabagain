@@ -298,6 +298,9 @@ $(document).on('input', '.clearable', function() {
 });
 
 function deleteDatabaseObject(table, id) {
+	if ($("#can_edit").val() == 0) {
+		return;
+	}
 	// console.log("deleteDatabaseObject");
 	$.ajax({
 		url: '/scripts/delete_database_object.php',
@@ -311,6 +314,9 @@ function deleteDatabaseObject(table, id) {
 }
 
 function insertDatabaseObject(table, object, columns, override=false) {
+	if ($("#can_edit").val() == 0) {
+		return;
+	}
 	// console.log("insertDatabaseObject");
 	$.ajax({
 		url: '/scripts/insert_database_object.php',
@@ -331,6 +337,9 @@ function insertDatabaseObject(table, object, columns, override=false) {
 
 // send updated object to database
 function updateDatabaseObject(table, object, columns) {
+	if ($("#can_edit").val() == 0) {
+		return;
+	}
 	// console.log("updateDatabaseObject");
 	$.ajax({
 		url: '/scripts/update_database_object.php',
@@ -345,6 +354,9 @@ function updateDatabaseObject(table, object, columns) {
 
 // send updated value to database
 function updateDatabaseColumn(table, column, value, id) {
+	if ($("#can_edit").val() == 0) {
+		return;
+	}
 	// console.log("updateDatabaseColumn");
 	$.ajax({
 		url: '/scripts/update_database_column.php',
@@ -359,6 +371,9 @@ function updateDatabaseColumn(table, column, value, id) {
 
 // track changes to inputs and autosave to database
 $(".track-changes").on("change", function() {
+	if ($("#can_edit").val() == 0) {
+		return;
+	}
 	let id = $(this).data("id");
 	let table = $(this).data("table");
 	let column = $(this).data("column") == undefined ? $(this).attr("name") : $(this).data("column");
@@ -514,53 +529,38 @@ function settings() {
 
 // enter GM edit mode
 function GMEditMode() {
-	// check password
-	var password = $("#gm_password").val();
-	$("#gm_password").val("");
-	// check admin_password
-	$.ajax({
-	  url: '/scripts/check_admin_password.php',
-	  data: { 'password' : password, 'admin_password' : campaign['admin_password'], 'hashed_password': "" },
-	  ContentType: "application/json",
-	  type: 'POST',
-	  success: function(response) {
-	  	if (response == 1) {
-	  		// enter admin edit mode
-			adminEditMode = true;
-			
-			// show GM menu, hide hamburger menu
-		  	$(".gm-menu").toggleClass("active");
-			$(".glyphicon-menu-hamburger").hide().toggleClass("active");
 
-			// show hidden attribute icons
-			$(".attribute-col").find(".hidden-icon").each(function() {
-				$(this).show();
-			});
+	adminEditMode = true;
+	
+	// show GM menu, hide hamburger menu
+	toggleMenu();
+  	$(".gm-menu").toggleClass("active");
+	$(".glyphicon-menu-hamburger").hide().toggleClass("active");
 
-			// show new feat button
-			$("#new_feat_btn").show();
-
-			// hide edit buttons
-			if (characterCreation) {
-				$(".attribute-col").unbind("mouseenter mouseleave");
-				if (is_mobile) {
-					$(".attribute-col").each(function() {
-						$(this).find(".glyphicon-edit").hide();
-					});
-				}
-			}
-
-			// enable edit attribute pts input, enable edit xp input
-			$("#attribute_pts").attr("readonly", false).attr("type", "number");
-			$("#xp").attr("readonly", false).attr("type", "number").attr("data-toggle", null);
-			$(".motivator-input").addClass("pointer");
-			$("#size").attr("data-toggle", "modal").removeClass("cursor-auto");
-
-	  	} else {
-			alert("Sorry sucker, that ain't it.");
-	  	}
-	  }
+	// show hidden attribute icons
+	$(".attribute-col").find(".hidden-icon").each(function() {
+		$(this).show();
 	});
+
+	// show new feat button
+	$("#feats").find(".glyphicon").show();
+	$("#new_feat_btn").show();
+
+	// hide edit buttons
+	if (characterCreation) {
+		$(".attribute-col").unbind("mouseenter mouseleave");
+		if (is_mobile) {
+			$(".attribute-col").each(function() {
+				$(this).find(".glyphicon-edit").hide();
+			});
+		}
+	}
+
+	// enable edit attribute pts input, enable edit xp input
+	$("#attribute_pts").attr("readonly", false).attr("type", "number");
+	$("#xp").attr("readonly", false).attr("type", "number").attr("data-toggle", null);
+	$(".motivator-input").addClass("pointer");
+	$("#size").attr("data-toggle", "modal").removeClass("cursor-auto");
 }
 
 // exit GM edit mode - restore inputs and elements
@@ -571,7 +571,9 @@ function endGMEdit() {
 	$(".attribute-col").find(".hidden-icon").each(function() {
 		$(this).hide();
 	});
-	$("#new_feat_btn").hide();
+	if (!characterCreation) {
+		$("#new_feat_btn").hide();
+	}
 	$("#feats").find(".glyphicon").hide();
 	$("#attribute_pts").attr("readonly", true).attr("type", "");
 	$("#xp").attr("readonly", true).attr("type", "").attr("data-toggle", "modal");

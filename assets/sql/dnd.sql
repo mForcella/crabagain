@@ -27,7 +27,6 @@
   CREATE TABLE campaign (
     id int PRIMARY KEY AUTO_INCREMENT,
     name varchar(255),
-    admin_password varchar(255),
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
   );
 
@@ -40,13 +39,31 @@
     FOREIGN KEY (feat_id) REFERENCES feat_or_trait(id) ON DELETE CASCADE
   );
 
-  CREATE TABLE user (
-    -- Non-character values
+  CREATE TABLE login (
     id int PRIMARY KEY AUTO_INCREMENT,
     email varchar(255),
     password varchar(255),
     reset_token varchar(255),
+    confirmed int DEFAULT 0,
+    confirmation_code varchar(255),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+  );
+
+  CREATE TABLE login_campaign (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    login_id int,
     campaign_id int,
+    campaign_role int DEFAULT 2,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (login_id) REFERENCES login(id) ON DELETE CASCADE,
+    FOREIGN KEY (campaign_id) REFERENCES campaign(id) ON DELETE CASCADE
+  );
+
+  CREATE TABLE user (
+    -- Non-character values
+    id int PRIMARY KEY AUTO_INCREMENT,
+    campaign_id int,
+    login_id int,
     -- XP, morale and leveling
     xp int DEFAULT 0,
     attribute_pts int DEFAULT 0,
@@ -84,6 +101,7 @@
     poison varchar(64),
     disease varchar(64),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (login_id) REFERENCES login(id),
     FOREIGN KEY (campaign_id) REFERENCES campaign(id)
   );
 
@@ -201,7 +219,7 @@
   -- To add on delete cascade
   -- ALTER TABLE feat_or_trait_req_set DROP FOREIGN KEY `feat_or_trait_req_set_ibfk_1`;
   -- ALTER TABLE feat_or_trait_req_set ADD CONSTRAINT `feat_or_trait_req_set_ibfk_1`
-  -- FOREIGN KEY (`feat_id`) REFERENCES feat_or_trait(`id`) ON DELETE CASCADE;
+  --    FOREIGN KEY (`feat_id`) REFERENCES feat_or_trait(`id`) ON DELETE CASCADE;
 
   -- Add default values to user table
   -- ALTER TABLE `user` ALTER COLUMN xp SET DEFAULT 0;

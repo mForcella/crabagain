@@ -1,9 +1,21 @@
 <?php
 
+	session_start();
+
+	if (isset($_POST['logout'])) {
+	  session_destroy();
+	  header('Location: /login.php');
+	}
+
+	// make sure we are logged in - check for existing session
+	if (!isset($_SESSION['login_id'])) {
+    header('Location: /login.php');
+	}
+	$login_id = $_SESSION['login_id'];
+
 	// establish database connection
 	include_once('config/db_config.php');
 	include_once('config/keys.php');
-	$db = new mysqli($db_config['servername'], $db_config['username'], $db_config['password'], $db_config['dbname']);
 
 	// check for campaign parameter in url
 	if (!isset($_GET["campaign"])) {
@@ -12,6 +24,36 @@
 	}
 
 	// delete any unnamed (unsaved) users
+	$db = new mysqli($db_config['servername'], $db_config['username'], $db_config['password'], $db_config['dbname']);
+
+	// get current login info (email)
+	$login;
+	$sql = "SELECT * from login WHERE id = $login_id";
+	$result = $db->query($sql);
+	if ($result) {
+		while($row = $result->fetch_assoc()) {
+			$login = $row;
+		}
+	}
+
+	// make sure campaign id variables are valid - redirect to select campaign if not
+	$campaign_id = $_GET["campaign"];
+	$sql = "SELECT * FROM campaign WHERE id = $campaign_id";
+	$result = $db->query($sql);
+	if ($result->num_rows === 0) {
+		header('Location: /select_campaign.php');
+  }
+
+	// make sure user id variables are valid - redirect to new character if not
+	if (isset($_GET["user"])) {
+		$user_id = $_GET["user"];
+		$sql = "SELECT * FROM user WHERE id = $user_id";
+		$result = $db->query($sql);
+		if ($result->num_rows === 0) {
+			header('Location: /?campaign='.$campaign_id);
+	  }
+	}
+
 	$sql = "DELETE FROM user WHERE character_name IS NULL";
 	$db->query($sql);
 	// TODO reset the auto-increment to max(id)+1 ?
@@ -19,9 +61,19 @@
 	// would create issues if multiple people were creating characters at once
 	// move delete statement to window.unload function?
 
+	// check user campaign role
+	$campaign_role = 2;
+	$sql = "SELECT campaign_role FROM login_campaign WHERE login_id = $login_id";
+	$result = $db->query($sql);
+  if ($result) {
+    while($row = $result->fetch_assoc()) {
+    	$campaign_role = $row['campaign_role'];
+    }
+  }
+
 	// get user list for dropdown nav
 	$users = [];
-	$sql = "SELECT * FROM user WHERE campaign_id = ".$_GET["campaign"]." ORDER BY character_name";
+	$sql = "SELECT * FROM user WHERE campaign_id = $campaign_id ORDER BY character_name";
 	$result = $db->query($sql);
   if ($result) {
     while($row = $result->fetch_assoc()) {
@@ -31,7 +83,7 @@
 
   // get feat_id list
   $feat_ids = [];
-	$sql = "SELECT feat_id FROM campaign_feat WHERE campaign_id = ".$_GET["campaign"];
+	$sql = "SELECT feat_id FROM campaign_feat WHERE campaign_id = $campaign_id";
 	$result = $db->query($sql);
   if ($result) {
     while($row = $result->fetch_assoc()) {
@@ -41,7 +93,7 @@
 
 	// get active counts for each feat type
 	$counts = [];
-	$sql = "SELECT * FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"];
+	$sql = "SELECT * FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = $campaign_id";
 	$result = $db->query($sql);
 	if ($result) {
 		$counts['physical_pos_count'] = 0;
@@ -86,7 +138,7 @@
   }
 
   // get campaign name
-  $sql = "SELECT * FROM campaign WHERE id = ".$_GET["campaign"];
+  $sql = "SELECT * FROM campaign WHERE id = $campaign_id";
 	$result = $db->query($sql);
 	$campaign = "";
   if ($result) {
@@ -209,6 +261,16 @@
 	  }
 	}
 
+	// check if user can edit (always true for campaign admin)
+	$can_edit = $campaign_role == 1 ? 1 : 0;
+	$sql = "SELECT id FROM user WHERE login_id = $login_id";
+	$result = $db->query($sql);
+  if ($result) {
+    while($row = $result->fetch_assoc()) {
+    	$can_edit = $can_edit == 1 || $row['id'] == $user['id'] ? 1 : 0;
+    }
+  }
+
 	$db->close();
 
 ?>
@@ -237,6 +299,12 @@
 	<!-- Custom Styles -->
 	<link rel="stylesheet" type="text/css" href="<?php echo $keys['styles'] ?>">
 
+	<style type="text/css">
+		.login-name .glyphicon:hover {
+			cursor: default;
+		}
+	</style>
+
 </head>
 
 <body>
@@ -248,6 +316,9 @@
 	<nav class="navbar">
 
 	  <div class="nav-menu">
+	    <div class="nav-item login-name">
+	      <span class="glyphicon"><span class="nav-item-label"><i class="fa-solid icon-crab custom-icon nav-icon"></i> <?php echo explode("@", $login['email'])[0]; ?></span></span>
+	    </div>
 	  	<!-- show 'Save' option for new characters -->
 	    <?php
 	    	if ($user['is_new']) {
@@ -258,24 +329,44 @@
 				   ';
 	    	}
 	    ?>
-	    <div class="nav-item">
-	       <span id="attribute_pts_span" class="glyphicon <?php echo isset($user) && $user['attribute_pts'] == 0 ? 'disabled' : ''; ?>" onclick="allocateAttributePts(this)"><span class="nav-item-label"><i class="fa-solid fa-shield-heart nav-icon"></i> Allocate Attribute Points</span></span>
-	    </div>
-	    <!-- show 'GM Mode' option for existing characters -->
+	    <!-- allocate attribute points -->
 	    <?php
-	    	if (!$user['is_new']) {
+	    	if ($can_edit == 1) {
 	    		echo '
 				    <div class="nav-item">
-				       <span class="glyphicon" data-toggle="modal" data-target="#gm_modal"><span class="nav-item-label"><i class="fa-solid fa-dice-d20 nav-icon"></i> GM Edit Mode</span></span>
+				       <span id="attribute_pts_span" class="glyphicon '. (isset($user) && $user['attribute_pts'] == 0 ? 'disabled' : '') .'" onclick="allocateAttributePts(this)"><span class="nav-item-label"><i class="fa-solid fa-shield-heart nav-icon"></i> Allocate Attribute Points</span></span>
+				    </div>
+				   ';
+	    	}
+	    ?>
+	    <!-- GM edit mode -->
+	    <?php
+	    	if (!$user['is_new'] && $campaign_role == 1) {
+	    		echo '
+				    <div class="nav-item">
+				       <button type="button" class="glyphicon" onclick="GMEditMode()"><span class="nav-item-label"><i class="fa-solid fa-dice-d20 nav-icon"></i> GM Edit Mode</span></button>
+				    </div>
+				   ';
+	    	}
+	    ?>
+	    <!-- campaign admin -->
+	    <?php
+	    	if ($campaign_role == 1) {
+	    		echo '
+				    <div class="nav-item">
+				       <span class="glyphicon" onclick="settings()"><span class="nav-item-label"><i class="fa-solid fa-gear nav-icon"></i> Campaign Admin</span></span>
 				    </div>
 				   ';
 	    	}
 	    ?>
 	    <div class="nav-item">
-	       <span class="glyphicon" onclick="settings()"><span class="nav-item-label"><i class="fa-solid fa-gear nav-icon"></i> Campaign Admin</span></span>
+	       <span class="glyphicon" onclick="back()"><span class="nav-item-label"><i class="fa-solid fa-person-hiking nav-icon"></i> Change Campaign</span></span>
 	    </div>
 	    <div class="nav-item">
-	       <span class="glyphicon" onclick="back()"><span class="nav-item-label"><i class="fa-solid fa-arrow-left nav-icon"></i> Change Campaign</span></span>
+	    	<form method="post">
+					<button class="glyphicon" type="submit" name="logout"><span class="nav-item-label"><i class="fa-solid icon-log custom-icon nav-icon"></i> Logout</span></button>
+			  </form>
+	       
 	    </div>
 	  </div>
 
@@ -289,8 +380,6 @@
 	  <!-- GM edit menu -->
 	  <div class="gm-menu">
 	    <div><span class="glyphicon glyphicon-ok" onclick="endGMEdit()"><span class="nav-item-label"> Exit GM Mode</span></span></div>
-	    <!-- <div><span class="glyphicon glyphicon-ok" onclick="endGMEdit(true)"><span class="nav-item-label"> Accept Changes</span></span></div> -->
-	    <!-- <div><span class="glyphicon glyphicon-remove" onclick="endGMEdit(false)"><span class="nav-item-label"> Discard Changes</span></span></div> -->
 	  </div>
 
 	  <!-- hamburger menu -->
@@ -349,6 +438,8 @@
 		<input type="hidden" id="user_id" name="user_id" value="<?php echo isset($user) ? $user['id'] : '' ?>">
 		<input type="hidden" id="campaign_id" name="campaign_id" value="<?php echo $_GET["campaign"] ?>">
 		<input type="hidden" id="user_email" name="email" value="<?php echo isset($user) ? $user["email"] : '' ?>">
+		<input type="hidden" id="campaign_role" value="<?php echo $campaign_role ?>">
+		<input type="hidden" id="can_edit" value="<?php echo $can_edit ?>">
 		<input type="hidden" id="uuid">
 		<div class="row">
 			<div class="col-md-6">
@@ -2185,16 +2276,15 @@
         </div>
         <div class="modal-body">
         	<h4>Character Creation</h4>
-					<p>When creating a new character you will start with a default of 12 Attribute Points. This value is 'unlocked' during character creation, and can be adjusted based on any modifiers. Your Attribute Points can be allocated by selecting the <i>Allocate Attribute Points</i> option from the nav menu. Points will be automatically adjusted as you increase or decrease Attributes, and as Talents and Trainings are added. Your Attributes and Talents are also 'unlocked' during character creation, allowing you to add additional starting Talents/Traits and Skills as needed. In order to save a newly created character, you will need to know the 'secret code.' If you don't know what it is, ask your GM. If they don't know it...find a new GM? You will also need to set a personal password when creating a new character, which you will need when updating your character in the future.</p><br>
+					<p>When creating a new character you will start with a default of 12 Attribute Points. This value is 'unlocked' during character creation, and can be adjusted based on any modifiers. Your Attribute Points can be allocated by selecting the <i>Allocate Attribute Points</i> option from the nav menu. Points will be automatically adjusted as you increase or decrease Attributes, and as Talents and Trainings are added. Your Attributes and Talents are also 'unlocked' during character creation, allowing you to add additional starting Talents/Traits and Skills as needed. In order to save a newly created character, you will need to know the 'secret code.' If you don't know what it is, ask your GM. If they don't know it...find a new GM?</p><br>
 					<h4>Adding XP & Allocating Attribute Points</h4>
 					<p>Once your character has begun collecting XP, all of your Attribute Values, Skills, and Talents will be locked. The only way to modify your Attributes is by accruing and allocating Attribute Points. As you add XP, your level will be automatically adjusted, and as you gain levels, Attribute Points will automatically be added. These Attribute Points can then be allocated via the <i>Allocate Attribute Points</i> option from the nav menu. Attributes can only be raised by one point per allocation, and only one unique Skill or Talent, as well as one Focus or Training, can be added per allocation. Attribute Points will be automatically deducted. If additional modifications need to be made to Attributes, Skills or Talents, this will need to be done through the <i>GM Edit Mode</i>.</p><br>
 					<h4>GM Edit Mode</h4>
-					<p>Using the admin password (set when creating the campaign), the GM can unlock and edit Attribute Points, XP, Attribute Values, Skills, and Talents. The GM can use this edit mode to make and save changes to any of the characters at any time. 
-						<br><br><span class="narrow"><strong>NOTE:</strong> If modiyfing a character <i>during gameplay</i> make sure that player has saved their character beforehand to ensure that you are working with the most current version of that character.</span></p><br>
+					<p>The GM can unlock and edit Attribute Points, XP, Attribute Values, Skills, and Talents. The GM can use this edit mode to make changes to any of the characters at any time. 
 					<h4>Campaign Admin</h4>
-					<p>The campaign admin page is password protected and can only be accessed with the admin password. The admin page provides a quick view of all characters and certain attributes. It is also where the GM is able to award XP to characters. You can also award bonus XP based on leftover Motivator chips bonuses and costumes. 
-						<br><br><span class="narrow"><strong>NOTE:</strong> XP bonuses from Motivator arguments are automatically awarded when characters increase these values on their character sheets.</span><br>
-						You can also view all available Talents, Traits, Compelling Actions, and Profressions. You can add new Talents and Traits, and you can adjust which Talents and Traits are available to your players.</p>
+					<p>The campaign admin page can only be accessed by the campaign admin (the creator of the campaign). The admin page provides a quick view of all characters and certain attributes. It is also where the GM is able to award XP to characters.
+					<br><br><span class="narrow"><strong>NOTE:</strong> XP bonuses from Motivator arguments are automatically awarded when characters increase these values on their character sheets.</span><br>
+					From the campaign admin you can also view all available Talents, Traits, etc, and you can adjust which Talents and Traits are available to your campaign.</p>
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary forgot-password-btn" data-dismiss="modal">Ok</button>
         	</div>
@@ -2219,6 +2309,7 @@
 	<?php echo $keys['scripts'] ?>
 	<script type="text/javascript">
 
+		// TODO don't expose keys on front end
 		keys = <?php echo json_encode($keys); ?>;
 
 		// get all database values
@@ -2234,6 +2325,15 @@
 		for (var i in user_trainings) {
 			let training = new UserTraining(user_trainings[i]);
 			userTrainings.push(training);
+		}
+
+		// disable all inputs if user can't edit
+		if ($("#can_edit").val() == 0 && !user['is_new']) {
+			$("input").attr("readonly", true);
+			$("select").attr("disabled", true);
+			$("textarea").attr("readonly", true);
+			$(".glyphicon-plus-sign").attr("data-toggle", null);
+			$("#user_select").attr("disabled", false);
 		}
 
 		// set user motivators

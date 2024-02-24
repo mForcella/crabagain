@@ -384,6 +384,11 @@ h1 {
 	color: #999999;
 	cursor: default !important;
 }
+button.glyphicon {
+	border: none;
+	background-color: transparent;
+	padding: 0;
+}
 @media (hover: hover) {
 	.glyphicon:hover {
 		text-shadow: 0px 0px 3px #404040;
@@ -572,6 +577,12 @@ h1 {
 }
 .icon-path {
     background-image: url("image/path.svg");
+}
+.icon-log {
+    background-image: url("image/log.svg");
+}
+.icon-crab {
+    background-image: url("image/crab.svg");
 }
 .italic {
 	font-style: italic;

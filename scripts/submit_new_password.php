@@ -3,9 +3,9 @@
     // Initialize PHPMailer
     use PHPMailer\PHPMailer\PHPMailer;
     use PHPMailer\PHPMailer\Exception;
-    require_once 'PHPMailer/src/Exception.php';
-    require_once 'PHPMailer/src/PHPMailer.php';
-    require_once 'PHPMailer/src/SMTP.php';
+    require_once '../PHPMailer/src/Exception.php';
+    require_once '../PHPMailer/src/PHPMailer.php';
+    require_once '../PHPMailer/src/SMTP.php';
 
 	// establish database connection
 	include_once('../config/db_config.php');
@@ -20,7 +20,7 @@
 
 	// set new password and clear reset token
 	$hashed_password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-	$sql = "UPDATE user SET password = '".$hashed_password."', reset_token = 'NULL' WHERE id = ".$_POST['user_id'];
+	$sql = "UPDATE user SET password = '".$hashed_password."', reset_token = 'NULL WHERE id = ".$_POST['user_id'];
 	$db->query($sql);
 	echo $db->error == "" ? 'ok' : $db->error;
 	$db->close();

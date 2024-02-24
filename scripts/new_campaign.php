@@ -10,13 +10,23 @@
 	  	die("Connection failed: " . $db->connect_error);
 	}
 
-	// insert new row
-	$hashed_password = password_hash($_POST['admin_password'], PASSWORD_DEFAULT);
-	$sql = "INSERT into campaign (name, admin_password) VALUES ('".$_POST['name']."', '".$hashed_password."')";
+	// create campaign
+	$sql = "INSERT into campaign (name) VALUES ('".$_POST['name']."')";
+	$db->query($sql);
+	$campaign_id = $db->insert_id;
+	echo $campaign_id;
+
+	// make campaign creator admin
+	$sql = "INSERT into login_campaign (campaign_id, login_id, campaign_role) VALUES ($campaign_id, ".$_POST['admin_id'].", 1)";
 	$db->query($sql);
 
-	// return inserted id
-	echo $db->insert_id;
+	// add other players to campaign
+	$users = $_POST['users'];
+	foreach ($users as $user_id) {
+		$sql = "INSERT into login_campaign (campaign_id, login_id, campaign_role) VALUES ($campaign_id, $user_id, 2)";
+		$db->query($sql);
+	}
+
 	$db->close();
 
 ?>
