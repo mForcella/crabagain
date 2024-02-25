@@ -17,7 +17,7 @@
     $mail->SMTPAuth = true;
     $mail->Username = $email_config['user'];
     $mail->Password = $email_config['password'];
-    $mail->setFrom($mail->Username, "Gary Gygax, Dark Lord of Crabs");
+    $mail->setFrom($mail->Username, "Gary, Dark Lord of Crabs");
     $mail->addAddress('michael.forcella@gmail.com');
     $mail->Subject = 'CrabAgain.com - User Suggestion';
     $mail->msgHTML($_POST['message']);

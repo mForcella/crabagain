@@ -109,6 +109,16 @@
 	<link rel="stylesheet" type="text/css" href="/assets/toggle-switchy.css">
 </head>
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-R6WG932F36"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-R6WG932F36');
+</script>
+
 <style type="text/css">
 
 	.container {
@@ -344,6 +354,7 @@
 	function createCampaign() {
 		// make sure campaign name doesn't already exist
 		// TODO this might be confusing if the user can't see the other campaign names...
+		// allow duplicate campaign names, add date created in dropdown if duplicate?
 		for (var i in campaign_names) {
 			if (campaign_names[i] == $("#campaign_name").val()) {
 				alert("Campaign name already in use");

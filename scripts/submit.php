@@ -25,6 +25,8 @@
 	$login_id = $_SESSION['login_id'];
 	$sql = "INSERT into login_user (login_id, user_id) VALUES ($login_id, $user_id)";
 	$db->query($sql);
+	$db->close();
+	header("Location: /?campaign=".$_POST['campaign_id']."&user=".$user_id,  true,  301 );  exit;
 
 	// $user_columns = ['campaign_id', 'email', 'character_name', 'attribute_pts', 'xp', 'morale', 'race', 'height', 'weight', 'age', 'eyes', 'hair', 'gender', 'other', 'size', 'strength', 'fortitude', 'speed', 'agility', 'precision_', 'awareness', 'allure', 'deception', 'intellect', 'innovation', 'intuition', 'vitality', 'background', 'magic', 'fear', 'poison', 'disease', 'damage', 'fatigue'];
 
@@ -337,6 +339,4 @@
 	// 	$db->query($sql);
 	// }
 
-	$db->close();
-	header("Location: /?campaign=".$_POST['campaign_id']."&user=".$user_id,  true,  301 );  exit;
 ?>

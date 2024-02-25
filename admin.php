@@ -295,6 +295,16 @@
 	<link rel="stylesheet" type="text/css" href="/assets/toggle-switchy.css">
 </head>
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-R6WG932F36"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-R6WG932F36');
+</script>
+
 <style type="text/css">
 	.table-heading {
 		text-align: center;

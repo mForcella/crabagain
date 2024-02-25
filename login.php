@@ -42,14 +42,16 @@
 				} else if (password_verify($password, $login['password'])) {
 		        	// set session values (login_id)
 		        	$_SESSION['login_id'] = $login['id'];
-		        	// redirect to most recently updated character page if available, else campaign select page
+		        	// redirect to most recently updated character page if available
 		        	$sql = "SELECT id, campaign_id FROM user WHERE login_id = ".$login['id']." ORDER BY created_at ASC";
 					$result = $db->query($sql);
 					if ($result->num_rows > 0) {
 						while($row = $result->fetch_assoc()) {
 		        			header('Location: /?campaign='.$row['campaign_id'].'&user='.$row['id']);
 						}
-					} else {
+					}
+					// no characters found - show campaign select page
+					else {
 		        		header('Location: /select_campaign.php');
 					}
 				} else {
@@ -88,6 +90,16 @@
 	<!-- Custom Styles -->
 	<link rel="stylesheet" type="text/css" href="<?php echo $keys['styles'] ?>">
 </head>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-R6WG932F36"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-R6WG932F36');
+</script>
 
 <style type="text/css">
 
