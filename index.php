@@ -1,5 +1,6 @@
 <?php
 
+	session_set_cookie_params(604800);
 	session_start();
 
 	if (isset($_POST['logout'])) {
@@ -90,27 +91,24 @@
     	array_push($feat_ids, $row['feat_id']);
     }
   }
+  // add race_trait feat_ids
+	$sql = "SELECT trait_id FROM race_trait";
+	$result = $db->query($sql);
+  if ($result) {
+    while($row = $result->fetch_assoc()) {
+    	array_push($feat_ids, $row['trait_id']);
+    }
+  }
 
 	// get active counts for each feat type
 	$counts = [];
-	$sql = "SELECT * FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = $campaign_id";
+	$sql = "SELECT feat_or_trait.type, feat_or_trait.cost FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_feat.campaign_id = $campaign_id";
 	$result = $db->query($sql);
 	if ($result) {
-		$counts['physical_pos_count'] = 0;
-		$counts['physical_neg_count'] = 0;
-		$counts['social_count'] = 0;
-		$counts['morale_count'] = 0;
-		$counts['compelling_count'] = 0;
-		$counts['profession_count'] = 0;
-		$counts['social_background_count'] = 0;
 		while($row = $result->fetch_assoc()) {
-			$counts['physical_pos_count'] += $row['type'] == 'physical_trait' && $row['cost'] > 0 ? 1 : 0;
-			$counts['physical_neg_count'] += $row['type'] == 'physical_trait' && $row['cost'] < 0 ? 1 : 0;
-			$counts['social_count'] += $row['type'] == 'social_trait' ? 1 : 0;
-			$counts['morale_count'] += $row['type'] == 'morale_trait' ? 1 : 0;
-			$counts['compelling_count'] += $row['type'] == 'compelling_action' ? 1 : 0;
-			$counts['profession_count'] += $row['type'] == 'profession' ? 1 : 0;
-			$counts['social_background_count'] += $row['type'] == 'social_background' ? 1 : 0;
+			$type = $row['type'] == 'physical_trait' && $row['cost'] > 0 ? 'physical_trait_pos' : 
+				($row['type'] == 'physical_trait' && $row['cost'] < 0 ? 'physical_trait_neg' : $row['type']);
+			$counts[$type] = isset($counts[$type]) ? $counts[$type] + 1 : 1;
 		}
 	}
   
@@ -137,6 +135,30 @@
     }
   }
 
+  // get talents
+  $talents = [];
+  $no_id = [];
+	$json_string = file_get_contents($keys['feat_list']);
+	$talent_list_json = json_decode($json_string);
+
+	// assign talent ID
+	foreach($talent_list_json as $json) {
+		$found = false;
+		foreach($feat_list as $feat) {
+			if ($feat['name'] == $json->name) {
+				$json->id = $feat['id'];
+				$found = true;
+			}
+		}
+		array_push($talents, $json);
+		if (!$found) {
+			array_push($no_id, $json);
+		}
+	}
+	usort($talents, function($a, $b) {
+    	return $a->name <=> $b->name;
+	});
+
   // get campaign name
   $sql = "SELECT * FROM campaign WHERE id = $campaign_id";
 	$result = $db->query($sql);
@@ -145,6 +167,36 @@
     while($row = $result->fetch_assoc()) {
     	$campaign = $row;
     }
+  }
+
+  // get campaign races and race traits
+  $race_ids = [];
+  $races = [];
+  $race_traits = [];
+  $sql = "SELECT race_id FROM campaign_race WHERE campaign_id = $campaign_id";
+	$result = $db->query($sql);
+  if ($result) {
+    while($row = $result->fetch_assoc()) {
+    	array_push($race_ids, $row['race_id']);
+    }
+  }
+
+  if (count($race_ids) > 0) {
+	  $sql = "SELECT * FROM race WHERE id IN (".implode(',',$race_ids).") ORDER BY name";
+		$result = $db->query($sql);
+	  if ($result) {
+	    while($row = $result->fetch_assoc()) {
+	    	array_push($races, $row);
+	    }
+	  }
+
+	  $sql = "SELECT * FROM race_trait WHERE race_id IN (".implode(',',$race_ids).")";
+		$result = $db->query($sql);
+	  if ($result) {
+	    while($row = $result->fetch_assoc()) {
+	    	array_push($race_traits, $row);
+	    }
+	  }
   }
 
 	$feats = [];
@@ -310,11 +362,13 @@
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-R6WG932F36"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+	if (document.location.hostname.search("crabagain.com") !== -1) {
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
 
-  gtag('config', 'G-R6WG932F36');
+	  gtag('config', 'G-R6WG932F36');
+	}
 </script>
 
 <body>
@@ -543,7 +597,7 @@
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="race">Race</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">
-							<input class="form-control track-changes" type="text" id="race" name="race" value="<?php echo isset($user) ? htmlspecialchars($user['race']) : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+							<input class="form-control track-changes" type="text" id="race" name="race" value="<?php echo htmlspecialchars($user['race']) ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user" <?php echo $user['is_new'] || count($awards) == 0 ? '' : 'readonly' ?> >
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="age">Age</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">
@@ -618,7 +672,7 @@
 
 							<div class="col-sm-4">
 								<div class="form-group">
-									<label class="control-label col-md-12 center full-width" for="">Weapon 1<span class="glyphicon glyphicon-chevron-down" id="weapon_1" onclick="toggleWeapon(this.id, this)"></span></label>
+									<label class="control-label col-md-12 center full-width" for="weapon_select_1">Weapon 1<span class="glyphicon glyphicon-chevron-down" id="weapon_1" onclick="toggleWeapon(this.id, this)"></span></label>
 									<div class="col-md-12">
 										<select class="form-control weapon-select" id="weapon_select_1" name="weapon_1" onchange="selectWeapon(1)">
 											<option></option>
@@ -655,7 +709,7 @@
 
 							<div class="col-sm-4">
 								<div class="form-group">
-									<label class="control-label col-md-12 center full-width" for="">Weapon 2<span class="glyphicon glyphicon-chevron-down" id="weapon_2" onclick="toggleWeapon(this.id, this)"></span></label>
+									<label class="control-label col-md-12 center full-width" for="weapon_select_2">Weapon 2<span class="glyphicon glyphicon-chevron-down" id="weapon_2" onclick="toggleWeapon(this.id, this)"></span></label>
 									<div class="col-md-12">
 										<select class="form-control weapon-select" id="weapon_select_2" name="weapon_2" onchange="selectWeapon(2)">
 											<option></option>
@@ -692,7 +746,7 @@
 
 							<div class="col-sm-4">
 								<div class="form-group">
-									<label class="control-label col-md-12 center full-width" for="">Weapon 3<span class="glyphicon glyphicon-chevron-down" id="weapon_3" onclick="toggleWeapon(this.id, this)"></span></label>
+									<label class="control-label col-md-12 center full-width" for="weapon_select_3">Weapon 3<span class="glyphicon glyphicon-chevron-down" id="weapon_3" onclick="toggleWeapon(this.id, this)"></span></label>
 									<div class="col-md-12">
 										<select class="form-control weapon-select" id="weapon_select_3" name="weapon_3" onchange="selectWeapon(3)">
 											<option></option>
@@ -1425,6 +1479,7 @@
 									<p id="character_size_text"><?php echo $size ?></p>
 									<input type="hidden" name="size" id="character_size_val" value="<?php echo $size ?>">
 								</div>
+								<div id="race_traits"></div>
 							</div>
 						</div>
 					</div>
@@ -1780,20 +1835,27 @@
         	<label class="control-label" id="select_feat_type_label">Type</label>
         	<select class="form-control" id="select_feat_type">
         		<option id="standard_option" value="feat_name">Standard Talent</option>
+        		<option id="race_trait_option" value="race_trait_name" hidden>Race Trait</option>
         		<!--  hide unless user has magic -->
-        		<option id="magic_option" value="magic_talent_name" <?php echo isset($user) && $user['magic_talents'] == true ? '' : 'hidden'; ?>>Magical Talent</option>
-        		<!-- hide options if their counts are zero -->
-        		<option value="social_background_name" <?php echo count($feat_ids) > 0 && $counts['social_background_count'] == 0 ? 'hidden' : '' ?>>Social Background</option>
-        		<option value="social_trait_name" <?php echo count($feat_ids) > 0 && $counts['social_count'] == 0 ? 'hidden' : '' ?>>Social Trait</option>
-        		<option value="physical_trait_pos_name" <?php echo count($feat_ids) > 0 && $counts['physical_pos_count'] == 0 ? 'hidden' : '' ?>>Physical Trait (Positive)</option>
-        		<option value="physical_trait_neg_name" <?php echo count($feat_ids) > 0 && $counts['physical_neg_count'] == 0 ? 'hidden' : '' ?>>Physical Trait (Negative)</option>
-        		<option value="morale_trait_name" <?php echo count($feat_ids) > 0 && $counts['morale_count'] == 0 ? 'hidden' : '' ?>>Morale Trait</option>
-        		<option value="compelling_action_name" <?php echo count($feat_ids) > 0 && $counts['compelling_count'] == 0 ? 'hidden' : '' ?>>Compelling Action</option>
-        		<option value="profession_name" <?php echo count($feat_ids) > 0 && $counts['profession_count'] == 0 ? 'hidden' : '' ?>>Profession</option>
+        		<option id="magic_option" value="magic_talent_name">Magical Talent</option>
+        		<option value="social_background_name">Social Background</option>
+        		<option value="social_trait_name">Social Trait</option>
+        		<option value="physical_trait_pos_name">Physical Trait (Positive)</option>
+        		<option value="physical_trait_neg_name">Physical Trait (Negative)</option>
+        		<option value="morale_trait_name">Morale Trait</option>
+        		<option value="compelling_action_name">Compelling Action</option>
+        		<option value="profession_name">Profession</option>
         	</select>
         	<label class="control-label">Name</label>
         	<input class="form-control clearable feat-type" type="text" id="feat_name">
         	<input class="form-control clearable feat-type hidden" type="text" id="magic_talent_name">
+        	<select class="form-control feat-type feat-select hidden" id="race_trait_name">
+        		<?php
+        			foreach ($race_traits as $trait) {
+        				echo '<option value="'.$trait['trait'].'"">'.$trait['trait'].'</option>';
+        			}
+        		?>
+        	</select>
         	<select class="form-control feat-type feat-select hidden" id="social_background_name">
         		<option></option>
         		<?php
@@ -1904,7 +1966,7 @@
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="newFeat()" id="feat_submit_btn">Ok</button>
 	        	<button type="button" class="btn btn-primary hidden" data-dismiss="modal" onclick="updateFeat()" id="feat_update_btn">Ok</button>
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal" id="feat_cancel_btn">Cancel</button>
         	</div>
         </div>
       </div>
@@ -1994,6 +2056,7 @@
 		        	<input class="form-check-input" type="radio" name="skill_type" id="focus" value="focus">
 		        	<label class="form-check-label" for="focus">Focus (1 attribute pt)</label>
         			<input class="form-control skill-name clearable" type="text" id="focus_name">
+        			<input class="form-control skill-name clearable" type="text" id="focus_name2">
 	        	</div>
         	</div>
         	<input type="hidden" id="attribute_type">
@@ -2127,30 +2190,6 @@
     </div>
   </div>
 
-	<!-- new password modal -->
-  <div class="modal" id="new_password_modal" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">New Character</h4>
-        </div>
-        <div class="modal-body">
-        	<h5>Please set a password for your new character. Also, you should probably write it down or something.</h5>
-        	<input class="form-control" type="password" id="new_password">
-        	<label class="control-label" for="password_conf">Confirm password</label>
-        	<input class="form-control" type="password" id="password_conf">
-        	<h5>In the unlikely event that a large bird crashes into your head and you suffer from temporary amnesia and can't remember your password, please provide us with your email address.</h5>
-        	<input class="form-control" type="email" id="email">
-        	<span class="tiny">Note: We reserve the right to sell your information to satanic cults, or the highest bidder.</span>
-        	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" id="password_btn" data-dismiss="modal" data-toggle="modal" data-target="#new_password_modal_2" disabled>Ok</button>
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-        	</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
 	<!-- new password modal - bot test -->
   <div class="modal" id="new_password_modal_2" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
@@ -2175,47 +2214,6 @@
       <div class="modal-content">
         <div class="modal-body center">
 					<span class="glyphicon glyphicon-refresh spinning"></span> Waiting for server response...
-        </div>
-      </div>
-    </div>
-  </div>
-
-	<!-- password modal -->
-  <div class="modal" id="password_modal" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Update Character</h4>
-        </div>
-        <div class="modal-body">
-        	<h4>Please enter your password to update your character</h4>
-        	<input class="form-control" type="password" id="password">
-        	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" id="password_btn" onclick="validatePassword()">Ok</button>
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-        	</div>
-        	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary forgot-password-btn" data-dismiss="modal" data-toggle="modal" data-target="#forgot_password_modal">I Forgot My Password!</button>
-        	</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-	<!-- forgot password modal -->
-  <div class="modal" id="forgot_password_modal" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Forgot My Password</h4>
-        </div>
-        <div class="modal-body">
-        	<h4 class="center">Did you try crab?</h4>
-        	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary forgot-password-btn" data-dismiss="modal">Oh dang. That was it. Thanks.</button>
-	        	<button type="button" class="btn btn-primary forgot-password-btn" data-dismiss="modal" onclick="forgotPassword()">Yes, I tried crab. That wasn't it.</button>
-	        	<button style="white-space: normal;" type="button" class="btn btn-primary forgot-password-btn" data-dismiss="modal" onclick="forgotPassword()">No, it's definitely not crab. It's something super secure. I just can't remember what it was. I guess I should've written it down, or something?</button>
-        	</div>
         </div>
       </div>
     </div>
@@ -2328,6 +2326,13 @@
 		console.log(user);
 		feat_list = <?php echo json_encode($feat_list); ?>;
 		feat_reqs = <?php echo json_encode($feat_reqs); ?>;
+		let races = <?php echo json_encode($races); ?>;
+		let talents = <?php echo json_encode($talents); ?>;
+		// talents with no ID are either not active for campaign or not in DB
+		let no_id = <?php echo json_encode($no_id); ?>;
+		console.log(no_id);
+		let race_traits = <?php echo json_encode($race_traits); ?>;
+		let counts = <?php echo json_encode($counts); ?>;
 		
 		xp_awards = <?php echo json_encode(isset($awards) ? $awards : []); ?>;
 		let user_feats = <?php echo json_encode($feats); ?>;

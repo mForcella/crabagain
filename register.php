@@ -1,5 +1,6 @@
 <?php
 
+	session_set_cookie_params(604800);
 	session_start();
 
     // Initialize PHPMailer
@@ -117,11 +118,13 @@
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-R6WG932F36"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+	if (document.location.hostname.search("crabagain.com") !== -1) {
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
 
-  gtag('config', 'G-R6WG932F36');
+	  gtag('config', 'G-R6WG932F36');
+	}
 </script>
 
 <style type="text/css">

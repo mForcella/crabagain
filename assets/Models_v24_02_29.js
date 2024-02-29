@@ -490,16 +490,16 @@ function addFeatElements(talent) {
 
 	var feat_title_descrip = createElement('div', '', feat_container);
 
-    $('<p />', {
-    	'id': id_val+"_name",
-    	'class': 'feat-title',
-    	'text': talent.display_name+" : "
-    }).appendTo(feat_title_descrip);
+  $('<p />', {
+  	'id': id_val+"_name",
+  	'class': 'feat-title',
+  	'text': talent.display_name+" : "
+  }).appendTo(feat_title_descrip);
 
-    var feat_descrip = $('<p />', {
-    	'id': id_val+"_descrip",
-      'text': featDescription.length > 100 ? featDescription.substring(0,100)+"..." : featDescription
-    }).appendTo(feat_title_descrip);
+  var feat_descrip = $('<p />', {
+  	'id': id_val+"_descrip",
+    'text': featDescription.length > 100 ? featDescription.substring(0,100)+"..." : featDescription
+  }).appendTo(feat_title_descrip);
 
 	// if allocating points, make sure remove button is visible
 	var removeBtn = createElement('span', 'glyphicon glyphicon-remove hidden-icon', feat_container, id_val+"_remove");
@@ -525,8 +525,8 @@ function addFeatElements(talent) {
 	});
 
 	// add hidden inputs
-    createInput('', 'hidden', 'feat_names[]', talent.display_name, feat_container, id_val+"_name_val");
-    createInput('', 'hidden', 'feat_descriptions[]', featDescription, feat_container, id_val+"_descrip_val");
+  createInput('', 'hidden', 'feat_names[]', talent.display_name, feat_container, id_val+"_name_val");
+  createInput('', 'hidden', 'feat_descriptions[]', featDescription, feat_container, id_val+"_descrip_val");
 	createInput('', 'hidden', 'feat_ids[]', talent.feat_id, feat_container);
 	createInput('', 'hidden', 'user_feat_ids[]', talent.id, feat_container);
 
@@ -687,6 +687,9 @@ class UserTalent {
 
 		// if editing is allowed, change feat_update_btn text to 'Update', else set to 'Ok'
 		$("#feat_update_btn").html(adminEditMode && (featType == "feat" || featType == "magic_talent") ? "Update" : "Ok");
+		if (!adminEditMode || (featType != "feat" && featType != "magic_talent")) {
+			$("#feat_cancel_btn").addClass("hidden");
+		}
 		$("#feat_description").val(description).attr("disabled", !(adminEditMode && (featType == "feat" || featType == "magic_talent")));
 		// focus on description if editable, and name is not
 		if (adminEditMode && (featType == "feat" || featType == "magic_talent") && this.feat_id != 0) {
@@ -731,6 +734,7 @@ function newTrainingModal(attribute) {
 	$("#skill_name").val("").hide();
 	$("#training_name").val("").hide();
 	$("#focus_name").val("").hide();
+	$("#focus_name2").val("").hide();
 	$("#school_name").val("").hide();
 
 	// if vitality, check for magic talents
@@ -764,7 +768,23 @@ function newTrainingModal(attribute) {
 		source: training
 	});
 	$("#focus_name").autocomplete({
-		source: focus
+		source: focus,
+		select: function(event, ui) {
+			// check for specifics required
+			let val = ui.item.value;
+			if (val.includes("(specific")) {
+				$(this).val(val.split("(")[0]);
+				// show additional input
+				var specific = val.split("(specific ")[1];
+				specific = specific.slice(0, -1); 
+				$("#focus_name2").show().attr("placeholder", "specific "+(specific)+" name");
+				return false;
+			} else {
+				// hide additional input
+				$("#focus_name2").hide();
+				return true;
+			}
+		}
 	});
 
 	$("#new_training_modal").modal("show");
@@ -784,6 +804,11 @@ function newTraining() {
 	var attribute = $("#attribute_type").val();
 
 	if (trainingName != "") {
+		// check for additional input
+		if ($("#focus_name2").is(":visible")) {
+			// TODO make sure focus_name2 isn't empty?
+			trainingName += " ("+$("#focus_name2").val()+")";
+		}
 		// check if user is already trained
 		for (var i in userTrainings) {
 			if (userTrainings[i]['name'] == trainingName) {
@@ -2152,6 +2177,7 @@ function newMisc() {
 	if (editing) {
 		// update misc inputs
 		var misc_id = "misc_"+$("#misc_id").val();
+		let originalName = $("#"+misc_id+"_name").val();
 		$("#"+misc_id+"_name").val(name);
 		$("#"+misc_id+"_quantity").val(quantity);
 		$("#"+misc_id+"_notes").val(notes);
@@ -2161,7 +2187,7 @@ function newMisc() {
 		$("#"+misc_id+"_mobile_details").html( (notes == "" ? "" : "Notes: "+notes+"; ")+"Weight: "+weight+"lbs; Qty: "+quantity);
 		updateTotalWeight(true);
 		// update misc in database
-		let misc = getMisc(name);
+		let misc = getMisc(originalName);
 		misc.name = name;
 		misc.quantity = quantity;
 		misc.notes = notes;

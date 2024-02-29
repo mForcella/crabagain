@@ -9,14 +9,26 @@
 	}
 
 	$feat_status = $_POST['feat_status'];
+	$race_status = $_POST['race_status'];
+	$campaign_id = $_POST['campaign_id'];
 
 	// delete all campaign feats
-	$sql = "DELETE FROM campaign_feat WHERE campaign_id = ".$_POST['campaign_id'];
+	$sql = "DELETE FROM campaign_feat WHERE campaign_id = $campaign_id";
 	$db->query($sql);
 
 	// add current campaign feats
 	foreach($feat_status as $feat_id) {
-		$sql = "INSERT INTO campaign_feat (feat_id, campaign_id) VALUES (".$feat_id.", ".$_POST['campaign_id'].")";
+		$sql = "INSERT INTO campaign_feat (feat_id, campaign_id) VALUES ($feat_id, $campaign_id)";
+		$db->query($sql);
+	}
+
+	// delete all campaign races
+	$sql = "DELETE FROM campaign_race WHERE campaign_id = $campaign_id";
+	$db->query($sql);
+
+	// add current campaign races
+	foreach($race_status as $race_id) {
+		$sql = "INSERT INTO campaign_race (race_id, campaign_id) VALUES ($race_id, $campaign_id)";
 		$db->query($sql);
 	}
 

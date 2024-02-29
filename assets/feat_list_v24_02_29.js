@@ -1,4 +1,5 @@
-var featList = [
+var featList = 
+	[
 
 	// *** Standard Talents *** //
 
@@ -998,11 +999,7 @@ var featList = [
 	// *** Social Backgrounds *** //
 	{
 		'name':'Nobility',
-		'description':'You’ve never had a family to look out for you, and the roof over your head was the sky more often than not. '+
-		'But it made you resilient and creative, and you know how to get along with the wrong kind of people. Any time you are in a '+
-		'town or city you can make an Intuition or Awareness roll to find black market or illegal activities, and these people will '+
-		'never be outright hostile toward you as long as you are alone. You also begin the game Trained in Stealth and either '+
-		'Security OR Sleight of Hand.',
+		'description':'You had a posh upbringing that some might consider pampered and indulgent. You’re well-read, well-educated and well-traveled. You gain 2 Bonus Skill Points to place in Diplomacy, Academia or Language Focuses. You are Literate and gain 2d4 additional starting funds.',
 		'type':'social_background',
 		'cost':0
 	},
@@ -1102,7 +1099,7 @@ var featList = [
 		'cost':-2
 	},
 	{
-		'name':'Fuck Authority',
+		'name':'Rebel Yell',
 		'description':'You don’t like being told what to do, how to act, or what they can and cannot say. When this happens, you '+
 		'will often reject the command or suggestion simply for the sake of maintaining your sense of autonomy. To resist this desire '+
 		'requires a minimum Vitality roll DL 10 unless it would put your lifeat risk.',

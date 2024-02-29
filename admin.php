@@ -1,5 +1,6 @@
 <?php
 
+	session_set_cookie_params(604800);
 	session_start();
 
 	// make sure we are logged in - check for existing session
@@ -41,7 +42,7 @@
 
 	// get characters
 	$users = [];
-	$sql = "SELECT * FROM user WHERE campaign_id = ".$_GET["campaign"];
+	$sql = "SELECT * FROM user WHERE campaign_id = $campaign_id";
 	$result_u = $db->query($sql);
 	if ($result_u) {
 		while($row_u = $result_u->fetch_assoc()) {
@@ -153,7 +154,7 @@
 	// get active counts for each feat type
 	$total_count = 0;
 	$counts = [];
-	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'physical_trait' AND cost > 0";
+	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = $campaign_id AND type = 'physical_trait' AND cost > 0";
 	$result = $db->query($sql);
 	if ($result) {
 		while($row = $result->fetch_assoc()) {
@@ -161,7 +162,7 @@
 			$total_count += $row['count'];
 		}
 	}
-	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'physical_trait' AND cost < 0";
+	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = $campaign_id AND type = 'physical_trait' AND cost < 0";
 	$result = $db->query($sql);
 	if ($result) {
 		while($row = $result->fetch_assoc()) {
@@ -169,7 +170,7 @@
 			$total_count += $row['count'];
 		}
 	}
-	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'social_trait'";
+	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = $campaign_id AND type = 'social_trait'";
 	$result = $db->query($sql);
 	if ($result) {
 		while($row = $result->fetch_assoc()) {
@@ -177,7 +178,7 @@
 			$total_count += $row['count'];
 		}
 	}
-	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'morale_trait'";
+	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = $campaign_id AND type = 'morale_trait'";
 	$result = $db->query($sql);
 	if ($result) {
 		while($row = $result->fetch_assoc()) {
@@ -185,7 +186,7 @@
 			$total_count += $row['count'];
 		}
 	}
-	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'compelling_action'";
+	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = $campaign_id AND type = 'compelling_action'";
 	$result = $db->query($sql);
 	if ($result) {
 		while($row = $result->fetch_assoc()) {
@@ -193,7 +194,7 @@
 			$total_count += $row['count'];
 		}
 	}
-	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'profession'";
+	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = $campaign_id AND type = 'profession'";
 	$result = $db->query($sql);
 	if ($result) {
 		while($row = $result->fetch_assoc()) {
@@ -201,7 +202,7 @@
 			$total_count += $row['count'];
 		}
 	}
-	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = ".$_GET["campaign"]." AND type = 'social_background'";
+	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = $campaign_id AND type = 'social_background'";
 	$result = $db->query($sql);
 	if ($result) {
 		while($row = $result->fetch_assoc()) {
@@ -212,7 +213,7 @@
 
 	// get feat active status
 	$campaign_feats = [];
-	$sql = "SELECT * FROM campaign_feat WHERE campaign_id = ".$_GET["campaign"];
+	$sql = "SELECT * FROM campaign_feat WHERE campaign_id = $campaign_id";
 	$result = $db->query($sql);
 	if ($result) {
 		while($row = $result->fetch_assoc()) {
@@ -220,50 +221,62 @@
 		}
 	}
 
-	// get feat requirements
-	$feat_req_sets = [];
-	$sql = "SELECT id, feat_id FROM feat_or_trait_req_set";
-	$result = $db->query($sql);
-	if ($result) {
-		while($row = $result->fetch_assoc()) {
-			array_push($feat_req_sets, $row);
+	$talents = [];
+	$json_string = file_get_contents($keys['feat_list']);
+	$talent_list_json = json_decode($json_string);
+
+	// assign talent ID
+	foreach($talent_list_json as $json) {
+		foreach($feats as $feat) {
+			// TODO some race traits are duplicate names
+			if ($feat['name'] == $json->name) {
+				$json->id = $feat['id'];
+				array_push($talents, $json);
+			}
 		}
 	}
-	$feat_reqs = [];
-	$sql = "SELECT feat_id, req_set_id, type, value FROM feat_or_trait_req_set JOIN feat_or_trait_req ON feat_or_trait_req_set.id = feat_or_trait_req.req_set_id";
-	$result = $db->query($sql);
-	if ($result) {
-		while($row = $result->fetch_assoc()) {
-			array_push($feat_reqs, $row);
+	usort($talents, function($a, $b) {
+    	return $a->name <=> $b->name;
+	});
+	
+	// check if talent is active for the current campaign
+	foreach($talents as $talent) {
+		foreach ($campaign_feats as $campaign_feat) {
+				if ($campaign_feat['feat_id'] == $talent->id) {
+					$talent->active = true;
+			}
 		}
 	}
 
-	$feat_list = [];
-	foreach($feats as $feat) {
-		foreach ($campaign_feats as $campaign_feat) {
-			if ($campaign_feat['feat_id'] == $feat['id']) {
-				$feat['active'] = true;
+	// get races
+	$races = [];
+	$race_data = [];
+	$sql = "SELECT * FROM race ORDER BY name";
+	$result = $db->query($sql);
+	if ($result) {
+		while($row = $result->fetch_assoc()) {
+			array_push($race_data, $row);
+		}
+	}
+
+	// get race active status
+	$campaign_races = [];
+	$sql = "SELECT * FROM campaign_race WHERE campaign_id = $campaign_id";
+	$result = $db->query($sql);
+	if ($result) {
+		while($row = $result->fetch_assoc()) {
+			array_push($campaign_races, $row);
+		}
+	}
+	
+	// check if race is active for the current campaign
+	foreach($race_data as $race) {
+		foreach ($campaign_races as $campaign_race) {
+			if ($campaign_race['race_id'] == $race['id']) {
+				$race['active'] = true;
 			}
 		}
-		if ($feat['type'] == 'feat' || $feat['type'] == 'magic_talent') {
-			$feat['requirements'] = [];
-			foreach($feat_req_sets as $req_set) {
-				if ($feat['id'] == $req_set['feat_id']) {
-					$feat['requirements'][$req_set['id']] = [];
-				}
-			}
-			foreach($feat_reqs as $req) {
-				if ($feat['id'] == $req['feat_id']) {
-					$req_vals = [
-						$req['type'] => $req['value']
-					];
-					array_push($feat['requirements'][$req['req_set_id']], $req_vals);
-				}
-			}
-			array_push($feat_list, $feat);
-		} else {
-			array_push($feat_list, $feat);
-		}
+		array_push($races, $race);
 	}
 
 	$db->close();
@@ -298,11 +311,13 @@
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-R6WG932F36"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+	if (document.location.hostname.search("crabagain.com") !== -1) {
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
 
-  gtag('config', 'G-R6WG932F36');
+	  gtag('config', 'G-R6WG932F36');
+	}
 </script>
 
 <style type="text/css">
@@ -616,7 +631,8 @@
 		</div>
 
 		<select class="form-control section-select" id="section_links">
-			<option value="">Standard Talents</option>
+			<option value="">Races</option>
+			<option value="#section_standard">Standard Talents</option>
 			<option value="#magical_talents">Magical Talents</option>
 			<option value="#section_physical_trait_pos">Physical Traits (Positive)</option>
 			<option value="#section_physical_trait_neg">Physical Traits (Negative)</option>
@@ -729,7 +745,27 @@
 
 		<form id="campaign_form">
 			<input type="hidden" id="campaign_id" name="campaign_id" value="<?php echo $campaign['id'] ?>">
-			<h4 class="table-heading" id="section_feat">Standard Talents</h4>
+
+			<h4 class="table-heading" id="section_races">Races</h4>
+			<div class="panel panel-default">
+				<table class="table" id="feat_table">
+					<tr>
+						<th>Enabled</th>
+						<th>Name</th>
+					</tr>
+					<?php
+						foreach($races as $race) {
+							echo 
+							"<tr class='table-row' id='row_".$race['id']."'>
+								<td class='center'><input id='".$race['id']."' type='checkbox' ".(isset($race['active']) || $total_count == 0 ? 'checked' : '')." name='race_status[]' value='".$race['id']."'></td>
+								<td><label for='".$race['id']."'>".$race['name']."</label></td>
+							</tr>";
+						}
+					?>
+				</table>
+			</div>
+
+			<h4 class="table-heading" id="section_standard">Standard Talents</h4>
 			<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('feat')"></span> -->
 			<div class="panel panel-default">
 				<table class="table" id="feat_table">
@@ -741,11 +777,11 @@
 						<!-- <th>Edit</th> -->
 					</tr>
 					<?php
-						foreach($feat_list as $feat) {
+						foreach($talents as $talent) {
 							$reqs = "";
-							if ($feat['type'] == 'feat') {
+							if ($talent->type == 'standard_talent') {
 								// build requirement string
-								foreach($feat['requirements'] as $req_set) {
+								foreach($talent->requirements as $req_set) {
 									for($i = 0; $i < count($req_set); $i++) {
 										foreach($req_set[$i] as $key => $value) {
 											$reqs .= $i > 0 ? "OR " : "&#8226;";
@@ -758,13 +794,13 @@
 									}
 								}
 								echo 
-								"<tr class='table-row' id='row_".$feat['id']."'>
-									<td class='center'><input type='checkbox' ".(isset($feat['active']) || $total_count == 0 ? 'checked' : '')." name='feat_status[]' value='".$feat['id']."'></td>
-									<td>".$feat['name']."</td>
-									<td>".$feat['description']."</td>
+								"<tr class='table-row' id='row_".$talent->id."'>
+									<td class='center'><input type='checkbox' ".(isset($talent->active) || $total_count == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td>".$talent->name."</td>
+									<td>".$talent->description."</td>
 									<td>".$reqs."</td>
 								</tr>";
-								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
+								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
 						}
 					?>
@@ -791,11 +827,11 @@
 						<!-- <th>Edit</th> -->
 					</tr>
 					<?php
-						foreach($feat_list as $feat) {
+						foreach($talents as $talent) {
 							$reqs = "";
-							if ($feat['type'] == 'magic_talent') {
+							if ($talent->type == 'magic_talent' || $talent->type == 'school_talent') {
 								// build requirement string
-								foreach($feat['requirements'] as $req_set) {
+								foreach($talent->requirements as $req_set) {
 									for($i = 0; $i < count($req_set); $i++) {
 										foreach($req_set[$i] as $key => $value) {
 											$reqs .= $i > 0 ? "OR " : "&#8226;";
@@ -808,13 +844,13 @@
 									}
 								}
 								echo 
-								"<tr class='table-row' id='row_".$feat['id']."'>
-									<td class='center'><input type='checkbox' ".(isset($feat['active']) || $total_count == 0 ? 'checked' : '')." name='feat_status[]' value='".$feat['id']."'></td>
-									<td>".$feat['name']."</td>
-									<td>".$feat['description']."</td>
+								"<tr class='table-row' id='row_".$talent->id."'>
+									<td class='center'><input type='checkbox' ".(isset($talent->active) || $total_count == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td>".$talent->name."</td>
+									<td>".$talent->description."</td>
 									<td>".$reqs."</td>
 								</tr>";
-								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
+								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
 						}
 					?>
@@ -841,16 +877,16 @@
 						<!-- <th>Edit</th> -->
 					</tr>
 					<?php
-						foreach($feat_list as $feat) {
-							if ($feat['type'] == 'physical_trait' && $feat['cost'] > 0) {
+						foreach($talents as $talent) {
+							if ($talent->type == 'physical_trait' && $talent->cost > 0) {
 								echo 
-								"<tr class='table-row' id='row_".$feat['id']."'>
-									<td class='center'><input class='physical-trait-pos-check' type='checkbox' ".(isset($feat['active']) || $counts['physical_pos_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$feat['id']."'></td>
-									<td>".$feat['name']."</td>
-									<td>".$feat['description']."</td>
-									<td class='center'>".$feat['cost']."</td>
+								"<tr class='table-row' id='row_".$talent->id."'>
+									<td class='center'><input class='physical-trait-pos-check' type='checkbox' ".(isset($talent->active) || $counts['physical_pos_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td>".$talent->name."</td>
+									<td>".$talent->description."</td>
+									<td class='center'>".$talent->cost."</td>
 								</tr>";
-								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
+								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
 						}
 					?>
@@ -877,16 +913,16 @@
 						<!-- <th>Edit</th> -->
 					</tr>
 					<?php
-						foreach($feat_list as $feat) {
-							if ($feat['type'] == 'physical_trait' && $feat['cost'] < 0) {
+						foreach($talents as $talent) {
+							if ($talent->type == 'physical_trait' && $talent->cost < 0) {
 								echo 
-								"<tr class='table-row' id='row_".$feat['id']."'>
-									<td class='center'><input class='physical-trait-neg-check' type='checkbox' ".(isset($feat['active']) || $counts['physical_neg_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$feat['id']."'></td>
-									<td>".$feat['name']."</td>
-									<td>".$feat['description']."</td>
-									<td class='center'>".(intval($feat['cost'])*-1)."</td>
+								"<tr class='table-row' id='row_".$talent->id."'>
+									<td class='center'><input class='physical-trait-neg-check' type='checkbox' ".(isset($talent->active) || $counts['physical_neg_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td>".$talent->name."</td>
+									<td>".$talent->description."</td>
+									<td class='center'>".(intval($talent->cost)*-1)."</td>
 								</tr>";
-								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
+								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
 						}
 					?>
@@ -912,15 +948,15 @@
 						<!-- <th>Edit</th> -->
 					</tr>
 					<?php
-						foreach($feat_list as $feat) {
-							if ($feat['type'] == 'social_trait') {
+						foreach($talents as $talent) {
+							if ($talent->type == 'social_trait') {
 								echo 
-								"<tr class='table-row' id='row_".$feat['id']."'>
-									<td class='center'><input class='social-trait-check' type='checkbox' ".(isset($feat['active']) || $counts['social_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$feat['id']."'></td>
-									<td>".$feat['name']."</td>
-									<td>".$feat['description']."</td>
+								"<tr class='table-row' id='row_".$talent->id."'>
+									<td class='center'><input class='social-trait-check' type='checkbox' ".(isset($talent->active) || $counts['social_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td>".$talent->name."</td>
+									<td>".$talent->description."</td>
 								</tr>";
-								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
+								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
 						}
 					?>
@@ -947,19 +983,19 @@
 						<!-- <th>Edit</th> -->
 					</tr>
 					<?php
-						foreach($feat_list as $feat) {
-							if ($feat['type'] == 'morale_trait') {
-								$pos_state = explode('Positive State: ', $feat['description'])[1];
+						foreach($talents as $talent) {
+							if ($talent->type == 'morale_trait') {
+								$pos_state = explode('Positive State: ', $talent->description)[1];
 								$pos_state = explode('; Negative State: ', $pos_state)[0];
-								$neg_state = explode('Negative State: ', $feat['description'])[1];
+								$neg_state = explode('Negative State: ', $talent->description)[1];
 								echo 
-								"<tr class='table-row' id='row_".$feat['id']."'>
-									<td class='center'><input class='morale-trait-check' type='checkbox' ".(isset($feat['active']) || $counts['morale_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$feat['id']."'></td>
-									<td>".$feat['name']."</td>
+								"<tr class='table-row' id='row_".$talent->id."'>
+									<td class='center'><input class='morale-trait-check' type='checkbox' ".(isset($talent->active) || $counts['morale_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td>".$talent->name."</td>
 									<td>".$pos_state."</td>
 									<td>".$neg_state."</td>
 								</tr>";
-								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
+								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
 						}
 					?>
@@ -985,15 +1021,15 @@
 						<!-- <th>Edit</th> -->
 					</tr>
 					<?php
-						foreach($feat_list as $feat) {
-							if ($feat['type'] == 'compelling_action') {
+						foreach($talents as $talent) {
+							if ($talent->type == 'compelling_action') {
 								echo 
-								"<tr class='table-row' id='row_".$feat['id']."'>
-									<td class='center'><input class='compelling-action-check' type='checkbox' ".(isset($feat['active']) || $counts['compelling_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$feat['id']."'></td>
-									<td>".$feat['name']."</td>
-									<td>".$feat['description']."</td>
+								"<tr class='table-row' id='row_".$talent->id."'>
+									<td class='center'><input class='compelling-action-check' type='checkbox' ".(isset($talent->active) || $counts['compelling_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td>".$talent->name."</td>
+									<td>".$talent->description."</td>
 								</tr>";
-								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
+								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
 						}
 					?>
@@ -1019,15 +1055,15 @@
 						<!-- <th>Edit</th> -->
 					</tr>
 					<?php
-						foreach($feat_list as $feat) {
-							if ($feat['type'] == 'profession') {
+						foreach($talents as $talent) {
+							if ($talent->type == 'profession') {
 								echo 
-								"<tr class='table-row' id='row_".$feat['id']."'>
-									<td class='center'><input class='profession-check' type='checkbox' ".(isset($feat['active']) || $counts['profession_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$feat['id']."'></td>
-									<td>".$feat['name']."</td>
-									<td>".$feat['description']."</td>
+								"<tr class='table-row' id='row_".$talent->id."'>
+									<td class='center'><input class='profession-check' type='checkbox' ".(isset($talent->active) || $counts['profession_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td>".$talent->name."</td>
+									<td>".$talent->description."</td>
 								</tr>";
-								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
+								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
 						}
 					?>
@@ -1053,15 +1089,15 @@
 						<!-- <th>Edit</th> -->
 					</tr>
 					<?php
-						foreach($feat_list as $feat) {
-							if ($feat['type'] == 'social_background') {
+						foreach($talents as $talent) {
+							if ($talent->type == 'social_background') {
 								echo 
-								"<tr class='table-row' id='row_".$feat['id']."'>
-									<td class='center'><input class='social_background-check' type='checkbox' ".(isset($feat['active']) || $counts['social_background_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$feat['id']."'></td>
-									<td>".$feat['name']."</td>
-									<td>".$feat['description']."</td>
+								"<tr class='table-row' id='row_".$talent->id."'>
+									<td class='center'><input class='social_background-check' type='checkbox' ".(isset($talent->active) || $counts['social_background_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td>".$talent->name."</td>
+									<td>".$talent->description."</td>
 								</tr>";
-								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$feat['name'])."\")'></td>
+								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
 						}
 					?>
@@ -1395,6 +1431,7 @@
 <script src="/assets/jquery/jquery-3.5.1.min.js"></script>
 <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
 <script src="/assets/jquery/jquery-ui-1.12.1.min.js"></script>
+<script src="/assets/admin_edit_talents.js"></script>
 <script type="text/javascript">
 
 	$(".xp-label").hover(function(){
@@ -1407,23 +1444,6 @@
 	$("#section_links").on("change", function(){
 		$('html,body').animate({scrollTop: $($(this).val()).offset().top},'slow');
 		$(this).val("");
-	});
-
-	$("#req_type_select").on("change", function(){
-		$(".req-inputs").addClass("hidden");
-		$("#"+$(this).val()+"_inputs").removeClass("hidden");
-	});
-	$("#req_type_select2").on("change", function(){
-		$(".req-inputs2").addClass("hidden");
-		$("#"+$(this).val()+"_inputs2").removeClass("hidden");
-	});
-
-	$("#multi_req").on("change", function(){
-		if ($(this).is(":checked")) {
-			$("#multi_req_container").removeClass("hidden");
-		} else {
-			$("#multi_req_container").addClass("hidden");
-		}
 	});
 
 	$("#select_all").on("change", function(){
@@ -1511,12 +1531,13 @@
 	}
 
 	// get feat list and requirements
-	var feat_list = <?php echo json_encode($feat_list); ?>;
+	var talents = <?php echo json_encode($talents); ?>;
+
 	// set feat list for autocomplete
 	var feats = [];
-	for (var i in feat_list) {
-		if (feat_list[i]['type'] == 'feat') {
-			feats.push(feat_list[i]['name']);
+	for (var i in talents) {
+		if (talents[i]['type'] == 'standard_talent') {
+			feats.push(talents[i]['name']);
 		}
 	}
 	$("#feat_val").autocomplete({
@@ -1528,73 +1549,7 @@
 		select: function(event, ui) {}
 	});
 
-	// set training list for autocomplete
-	var trainings = ["Swimming", "Engineering", "Train Animal", "Perform", "First Aid", "Tactics", "Demolitions", "Security", "Survival", "Sleight of Hand", "Ride Animal", "Stealth"];
-	$("#training_val").autocomplete({
-		source: trainings.sort(),
-		select: function(event, ui) {}
-	});
-	$("#training_val2").autocomplete({
-		source: trainings.sort(),
-		select: function(event, ui) {}
-	});
-
-	// launch new feat modal
-	function newFeatModal(type) {
-		$("#feat_type_val").val(type);
-		$("#new_feat_modal_title").html( ($("#feat_id").val() == "" ? "New " : "Update ") + $("#section_"+type).html());
-		// hide/show elements based on feat type
-		$(".new-feat-element").addClass("hidden");
-		if (type != "morale_trait") {
-			$("#feat_description").removeClass("hidden");
-		} else {
-			$("#feat_neg_state").removeClass("hidden");
-			$("#feat_pos_state").removeClass("hidden");
-		}
-		if (type == "feat") {
-			$("#feat_requirements").removeClass("hidden");
-			$("#character_create").removeClass("hidden");
-		}
-		if (type == "physical_trait_neg") {
-			$("#feat_bonus").removeClass("hidden");
-		}
-		if (type == "physical_trait_pos") {
-			$("#feat_cost").removeClass("hidden");
-		}
-		$("#new_feat_modal").modal("show");
-		$("#feat_description_val").height( $("#feat_description_val")[0].scrollHeight );
-	}
-
 	// on modal close, reset inputs
-	$("#new_feat_modal").on('hidden.bs.modal', function(){
-		$("#delete_feat_btn").addClass("hidden");
-		$("#update_feat_btn").html("Ok");
-		$("#new_feat_modal_title").html("New Feat");
-		$("#feat_id").val("");
-		$("#feat_name_val").val("");
-		$("#feat_description_val").val("");
-		$("#feat_description_val").height('100px');
-		$("#feat_pos_state_val").val("");
-		$("#feat_neg_state_val").val("");
-		$("#feat_cost_val").val("");
-		$("#feat_bonus_val").val("");
-		$("#feat_requirements").val("");
-		$("#character_create_only").prop("checked", false);
-		$("#requirement_container").html("");
-	});
-	$("#new_req_modal").on('hidden.bs.modal', function(){
-		$("#req_type_select").val("").trigger("change");
-		$("#attribute_type_val").val("");
-		$("#attribute_value").val("");
-		$("#training_val").val("");
-		$("#feat_val").val("");
-		$("#multi_req").prop("checked", false).trigger("change");
-		$("#req_type_select2").val("").trigger("change");
-		$("#attribute_type_val2").val("");
-		$("#attribute_value2").val("");
-		$("#training_val2").val("");
-		$("#feat_val2").val("");
-	});
 	$("#xp_modal").on('hidden.bs.modal', function(){
 		$(".award").html("0");
 		$(".chips").val("0");
@@ -1608,463 +1563,6 @@
 	$("#xp_modal").on('shown.bs.modal', function(){
 		scrollToTop();
 	});
-
-	// add a new feat requirement
-	function newRequirement() {
-		// make sure inputs aren't empty
-		var multi_req = $("#multi_req").is(":checked");
-		var value  = "";
-		var value2  = "";
-		var feat_type = $("#req_type_select").val();
-		var error = "";
-		if (feat_type == "") {
-			error = "Please select a requirement type";
-		} else if (feat_type == "attribute") {
-			var attribute_type = $("#attribute_type_val").val();
-			var attribute_val = $("#attribute_value").val();
-			if (attribute_type == "") {
-				error = "Please select an attribute";
-			} else if (attribute_val == "") {
-				error = "Please enter an attribute value";
-			} else {
-				value = capitalize(attribute_type.replace("_", ""))+": "+attribute_val;
-			}
-		} else if (feat_type == "training") {
-			var training = $("#training_val").val();
-			if (training == "") {
-				error = "Please enter a training name";
-			} else {
-				value = "Training: "+training;
-			}
-		} else {
-			var feat = $("#feat_val").val();
-			if (feat == "") {
-				error = "Please enter a feat name";
-			} else {
-				value = "Feat: "+feat;
-			}
-		}
-		if (multi_req) {
-			var feat_type2 = $("#req_type_select2").val();
-			if (feat_type2 == "") {
-				error = "Please select a requirement type";
-			} else if (feat_type2 == "attribute") {
-				var attribute_type2 = $("#attribute_type_val2").val();
-				var attribute_val2 = $("#attribute_value2").val();
-				if (attribute_type2 == "") {
-					error = "Please select an attribute";
-				} else if (attribute_val2 == "") {
-					error = "Please enter an attribute value";
-				} else {
-					value2 = " OR "+capitalize(attribute_type2.replace("_", ""))+": "+attribute_val2;
-				}
-			} else if (feat_type2 == "training") {
-				var training2 = $("#training_val2").val();
-				if (training2 == "") {
-					error = "Please enter a training name";
-				} else {
-					value2 = " OR Training: "+training2;
-				}
-			} else {
-				var feat2 = $("#feat_val2").val();
-				if (feat2 == "") {
-					error = "Please enter a feat name";
-				} else {
-					value2 = " OR Feat: "+feat2;
-				}
-			}
-			value += value2;
-		}
-		if (error == "") {
-			addRequirement(value);
-			$("#new_req_modal").modal("hide");
-		} else {
-			alert(error);
-		}
-	}
-
-	// create elements with requirement value
-	function addRequirement(value) {
-		// create elements
-		var span = $('<span />', {
-		  'class': 'feat-requirement',
-		}).appendTo($("#requirement_container"));
-	    $('<p />', {
-	    	'class': 'feat-requirement-label',
-	    	'text': value
-	    }).appendTo(span);
-	    $('<input />', {
-	    	'type': 'hidden',
-	    	'value': value,
-	    	'name': 'feat_reqs[]',
-	    	'class': 'feat-req-val'
-	    }).appendTo(span);
-		var removeBtn = $('<span />', {
-		  'class': 'glyphicon glyphicon-remove',
-		}).appendTo(span);
-		removeBtn.on("click", function(){
-			span.remove();
-		});
-	}
-
-	function editFeat(name) {
-		// get feat from feat list
-		for (var i in feat_list) {
-			if (feat_list[i]['name'].replace("'", "") == name) {
-				$("#delete_feat_btn").removeClass("hidden");
-				$("#update_feat_btn").html("Update");
-				$("#feat_id").val(feat_list[i]['id']);
-				$("#feat_type_val").val(feat_list[i]['type']);
-				// fill modal values and launch modal
-				$("#feat_name_val").val(feat_list[i]['name']);
-				if (feat_list[i]['type'] != "morale_trait") {
-					$("#feat_description_val").val(feat_list[i]['description']);
-				} else {
-					var pos_state = feat_list[i]['description'].split("Positive State: ")[1].split("; Negative State")[0];
-					var neg_state = feat_list[i]['description'].split("Negative State: ")[1];
-					$("#feat_neg_state_val").val(neg_state);
-					$("#feat_pos_state_val").val(pos_state);
-				}
-				if (feat_list[i]['type'] == "feat") {
-					for (var j in feat_list[i]['requirements']) {
-						value = "";
-						for (var k in feat_list[i]['requirements'][j]) {
-							if (k > 0) {
-								value += " OR ";
-							}
-							for (var l in feat_list[i]['requirements'][j][k]) {
-								if (l == "character_creation") {
-									$("#character_create_only").prop("checked", true);
-								} else {
-									if (l == "feat") {
-										value += "Feat: "+feat_list[i]['requirements'][j][k][l];
-									} else if (l == "training") {
-										value += "Training: "+feat_list[i]['requirements'][j][k][l];
-									} else {
-										value += capitalize(l).replace("_", "")+": "+feat_list[i]['requirements'][j][k][l];
-									}
-								}
-							}
-						}
-						if (value != "") {
-							addRequirement(value);
-						}
-					}
-				}
-				if (feat_list[i]['type'] == "physical_trait" && feat_list[i]['cost'] < 0) {
-					$("#feat_bonus_val").val(feat_list[i]['cost']*-1);
-				}
-				if (feat_list[i]['type'] == "physical_trait" && feat_list[i]['cost'] > 0) {
-					$("#feat_cost_val").val(feat_list[i]['cost']);
-				}
-				newFeatModal(feat_list[i]['type'] == "physical_trait" ? 
-					(feat_list[i]['cost'] > 0 ? "physical_trait_pos" : "physical_trait_neg") : feat_list[i]['type']);
-
-			}
-		}
-	}
-
-	// remove feat from database
-	function deleteFeat() {
-		var conf = confirm("Are you sure you want to delete this feat?");
-		if (conf) {
-			// get feat id
-			var feat_id = $("#feat_id").val();
-			// close modal
-			$("#new_feat_modal").modal("hide");
-			// send ajax request
-			$.ajax({
-				url: '/scripts/delete_feat.php',
-				data: { 'feat_id' : feat_id },
-				ContentType: "application/json",
-				type: 'POST',
-				success: function(response){
-					// remove row from table
-					if (response == 'ok') {
-						$("#row_"+feat_id).remove();
-						// update feat_list and feats
-						var feat_name = "";
-						for (var i in feat_list) {
-							if (feat_list[i]['id'] == feat_id) {
-								feat_name = feat_list[i]['name'];
-								feat_list.splice(i,1);
-								break;
-							}
-						}
-						for (var i in feats) {
-							if (feats[i] == feat_name) {
-								feats.splice(i,1);
-								break;
-							}
-						}
-					}
-				}
-			});
-		}
-	}
-
-	// create/update feat from modal values
-	function newFeat() {
-		var error = "";
-		if ($("#feat_name_val").val() == "") {
-			error = "Name is required";
-		}
-		switch ($("#feat_type_val").val()) {
-			case "feat":
-				if ($("#feat_description_val").val() == "") {
-					error = "Description is required";
-				}
-				if ($("#requirement_container").html() == "") {
-					error = "Feat requirements is required";
-				}
-				break;
-			case "morale_trait":
-				if ($("#feat_pos_state_val").val() == "") {
-					error = "Positive state is required";
-				}
-				if ($("#feat_neg_state_val").val() == "") {
-					error = "Negative state is required";
-				}
-				break;
-			case "physical_trait_pos":
-				if ($("#feat_description_val").val() == "") {
-					error = "Description is required";
-				}
-				if ($("#feat_cost_val").val() == "") {
-					error = "Cost is required";
-				}
-				break;
-			case "physical_trait_neg":
-				if ($("#feat_description_val").val() == "") {
-					error = "Description is required";
-				}
-				if ($("#feat_bonus_val").val() == "") {
-					error = "Bonus is required";
-				}
-				break;
-			case "social_background":
-			case "social_trait":
-			case "compelling_action":
-			case "profession":
-				if ($("#feat_description_val").val() == "") {
-					error = "Description is required";
-				}
-				break;
-		}
-		if (error != "") {
-			alert(error);
-			return;
-		}
-
-		// check if we are editing or creating a new feat
-		var udpate = $("#feat_id").val() != undefined && $("#feat_id").val() != "";
-		var conf = udpate ? confirm("Are you sure you want to update this feat?") : confirm("Are you sure you want to create a new feat?");
-		if (conf) {
-			// submit form via ajax
-			$.ajax({
-                url: udpate ? '/scripts/update_feat.php' : '/scripts/feat_submit.php',
-                type: 'POST',
-                data: $("#new_feat_form").serialize(),
-                success:function(result){
-                	if (isNaN(result)) {
-                		if (result == "update ok") {
-                			alert("Feat updated successfully");
-                			var feat_id = $("#feat_id").val();
-                			var row = getRowForFeat(feat_id);
-                			$("#row_"+feat_id).replaceWith(row);
-                			// update feat_list and feats
-                			var feat = getNewFeatVals(feat_id);
-                			var feat_name = "";
-                			for (var i in feat_list) {
-                				if (feat_list[i]['id'] == feat['id']) {
-                					feat_name = feat_list[i]['name'];
-                					feat_list.splice(i, 1);
-                					break;
-                				}
-                			}
-                			feat_list.push(feat);
-                			if (feat['type'] == 'feat') {
-	                			for (var i in feats) {
-	                				if (feats[i] == feat_name) {
-	                					feats.splice(i, 1);
-	                					break;
-	                				}
-	                			}
-	                			feats.push(feat['name']);
-                			}
-                			$("#new_feat_modal").modal("hide");
-                			saveCampaignSettings();
-                		} else {
-                			alert(result);
-                		}
-                	} else {
-                		var feat = getNewFeatVals(result);
-	    				feat_list.push(feat);
-						if (feat['type'] == 'feat') {
-							feats.push(feat['name']);
-							$("#feat_val").autocomplete({
-								source: feats
-							});
-							$("#feat_val2").autocomplete({
-								source: feats
-							});
-						}
-						var row = getRowForFeat(result);
-						switch($("#feat_type_val").val()) {
-							case "feat":
-							    var element = $("#feat_table");
-				    			break;
-							case "physical_trait_pos":
-							    var element = $("#physical_trait_pos_table");
-								break;
-							case "physical_trait_neg":
-							    var element = $("#physical_trait_neg_table");
-								break;
-							case "social_trait":
-							    var element = $("#social_trait_table");
-								break;
-							case "morale_trait":
-							    var element = $("#morale_trait_table");
-								break;
-							case "compelling_action":
-							    var element = $("#compelling_action_table");
-								break;
-							case "profession":
-							    var element = $("#profession_table");
-								break;
-							case "social_background":
-							    var element = $("#social_background_table");
-								break;
-						}
-						row.appendTo(element);
-                		$("#new_feat_modal").modal("hide");
-                		saveCampaignSettings();
-                	}
-                }
-            });
-		}
-	}
-
-	function getNewFeatVals(feat_id) {
-		feat = [];
-		feat['id'] = feat_id;
-		feat['type'] = $("#feat_type_val").val().includes("physical_trait") ? "physical_trait" : $("#feat_type_val").val();
-		feat['name'] = $("#feat_name_val").val();
-	    if ($("#feat_type_val").val() != "morale_trait") {
-			feat['description'] = $("#feat_description_val").val();
-	    } else {
-	    	feat['description'] = "Positive State: "+$("#feat_pos_state_val").val()+"; Negative State: "+$("#feat_neg_state_val").val();
-	    }
-		switch($("#feat_type_val").val()) {
-			case "feat":
-				// add feat['requirements']
-			    var requirements = [];
-			    $(".feat-req-val").each(function(){
-			    	// create req set array
-			    	var req_set = [];
-			    	// split on ' OR '
-			    	var reqs = $(this).val().split(" OR ");
-			    	for (var i in reqs) {
-			    		// for each - create dictionary type : value
-			    		var req = [];
-			    		req[reqs[i].split(":")[0]] = reqs[i].split(":")[1];
-			    		req_set.push(req);
-			    	}
-			    	requirements.push(req_set);
-			    });
-			    // check for 'character_create_only'
-			    if ($("#character_create_only").prop("checked", true)) {
-			    	var req_set = [];
-			    	var req = [];
-			    	req["character_creation"] = true;
-			    	req_set.push(req);
-			    	requirements.push(req_set);
-				}
-			    feat['requirements'] = requirements;
-    			break;
-			case "physical_trait_pos":
-				feat['cost'] = $("#feat_cost_val").val();
-				break;
-			case "physical_trait_neg":
-				feat['cost'] = parseInt($("#feat_bonus_val").val()) * -1;
-				break;
-		}
-		return feat;
-	}
-
-	function getRowForFeat(feat_id) {
-		// add new entry row to table
-	    var row = $('<tr />', {
-	    	'class': 'table-row',
-	    	'id': 'row_'+feat_id
-	    });
-		var check = $('<td />', {
-	    	'class': 'center'
-	    }).appendTo(row);
-	    // disable check if section is disabled
-	    var type = $("#feat_type_val").val();
-	    var enabled = type == 'feat' || $("#"+type+"_toggle").prop("checked");
-	    $('<input />', {
-	    	'type': 'checkbox',
-	    	'class': $("#feat_type_val").val().replaceAll("_","-")+"-check",
-	    	'value': feat_id,
-	    	'name': 'feat_status[]',
-	    	"checked": "checked",
-	    	"disabled": !enabled
-	    }).appendTo(check);
-		$('<td />', {
-	    	'text': $("#feat_name_val").val()
-	    }).appendTo(row);
-	    if ($("#feat_type_val").val() != "morale_trait") {
-			$('<td />', {
-		    	'text': $("#feat_description_val").val()
-		    }).appendTo(row);
-	    }
-		switch($("#feat_type_val").val()) {
-			case "feat":
-			    var reqs = "";
-			    $(".feat-req-val").each(function(){
-			    	reqs += "&#8226;"+$(this).val()+"<br>";
-			    });
-			    if ($("#character_create_only").prop("checked", true)) {
-				    reqs += "&#8226;Character Creation Only<br>";
-				}
-    			$('<td />', {
-			    	'html': reqs
-			    }).appendTo(row);
-    			break;
-			case "physical_trait_pos":
-    			$('<td />', {
-    				'class': 'center',
-			    	'text': $("#feat_cost_val").val()
-			    }).appendTo(row);
-				break;
-			case "physical_trait_neg":
-    			$('<td />', {
-    				'class': 'center',
-			    	'text': $("#feat_bonus_val").val()
-			    }).appendTo(row);
-				break;
-			case "morale_trait":
-    			$('<td />', {
-			    	'text': $("#feat_pos_state_val").val()
-			    }).appendTo(row);
-    			$('<td />', {
-			    	'text': $("#feat_neg_state_val").val()
-			    }).appendTo(row);
-				break;
-		}
-		var edit = $('<td />', {
-	    }).appendTo(row);
-	    var btn = $('<span />', {
-	    	'class': 'glyphicon glyphicon-edit'
-	    }).appendTo(edit);
-	    var name = $("#feat_name_val").val();
-	    btn.on("click", function(){
-	    	editFeat(name.replaceAll("'",""));
-	    });
-	    return row;
-	}
 
 	// add award val to modal inputs
 	function awardXP() {
@@ -2150,6 +1648,7 @@
 		$("html, body").animate({ scrollTop: 0 }, "fast");
 	}
 
+	// hide/show scroll to top button
 	window.onscroll = function() {
 		if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
 			$("#scroll_top").removeClass("no-vis")
@@ -2158,6 +1657,7 @@
 		}
 	};
 
+	// save settings on input change
 	$(document).ready(function() {
 		$("input:checkbox").change(function(){
 			saveCampaignSettings();

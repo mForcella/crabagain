@@ -74,8 +74,8 @@ var skillAutocompletes = {
 		],
 		'training':[],
 		'focus':[
-			'Brawl'
-			// 'Attack - specific weapon'
+			'Brawl',
+			'Attack (specific weapon)'
 		],
 	},
 	'Awareness':
@@ -102,8 +102,8 @@ var skillAutocompletes = {
 		],
 		'training':[],
 		'focus':[
-			// 'Shoot - specific weapon',
-			// 'Throw - specific weapon'
+			'Shoot (specific weapon)',
+			'Throw (specific weapon)'
 		],
 	},
 	'Allure':
@@ -146,7 +146,7 @@ var skillAutocompletes = {
 		],
 		'training':[],
 		'focus':[
-			// 'Craft - specific item'
+			'Craft (specific item)'
 		],
 	},
 	'Intellect':
@@ -161,12 +161,12 @@ var skillAutocompletes = {
 		'training':[],
 		'focus':[
 			'Appraise',
-			// 'Academia - specific area',
-			// 'Culture - specific area',
+			'Academia (specific area)',
+			'Culture (specific area)',
 			'Languages',
-			// 'Religion - specific religion',
+			'Religion (specific religion)',
 			'Magic',
-			// 'Profession - specific profession'
+			'Profession (specific profession)'
 		],
 	},
 	'Intuition':
@@ -294,6 +294,9 @@ $(document).on('input', '.clearable', function() {
     	$("#feat_description").val("").height("125px");
 		// hide additional inputs
 		hideMagicSelects("", "");
+    }
+    if (this.id == "focus_name") {
+    	$("#focus_name2").val("").hide();
     }
 });
 
@@ -491,12 +494,14 @@ $("#skill").on("click", function() {
 	$("#skill_name").show();
 	$("#training_name").hide();
 	$("#focus_name").hide();
+	$("#focus_name2").hide();
 	$("#school_name").hide();
 });
 $("#training").on("click", function() {
 	$("#skill_name").hide();
 	$("#training_name").show();
 	$("#focus_name").hide();
+	$("#focus_name2").hide();
 	$("#school_name").hide();
 });
 $("#focus").on("click", function() {
@@ -509,6 +514,7 @@ $("#school").on("click", function() {
 	$("#skill_name").hide();
 	$("#training_name").hide();
 	$("#focus_name").hide();
+	$("#focus_name2").hide();
 	$("#school_name").show();
 });
 
@@ -561,6 +567,7 @@ function GMEditMode() {
 	$("#xp").attr("readonly", false).attr("type", "number").attr("data-toggle", null);
 	$(".motivator-input").addClass("pointer");
 	$("#size").attr("data-toggle", "modal").removeClass("cursor-auto");
+	$("#race").attr("readonly", false);
 }
 
 // exit GM edit mode - restore inputs and elements
@@ -573,6 +580,7 @@ function endGMEdit() {
 	});
 	if (!characterCreation) {
 		$("#new_feat_btn").hide();
+		$("#race").attr("readonly", true);
 	}
 	$("#feats").find(".glyphicon").hide();
 	$("#attribute_pts").attr("readonly", true).attr("type", "");
@@ -1149,6 +1157,9 @@ function setAttributes(user) {
 	editSize(false);
 	// set initiative
 	adjustInitiative();
+	// set race
+	setRaceInput();
+	$("#race").trigger("change");
 
 	// check for pending xp awards
 	if (xp_awards.length > 0) {
@@ -1174,6 +1185,85 @@ function setAttributes(user) {
 		}
 		$("#xp").trigger("change");
 	}
+}
+
+// enable race autocomplete
+function setRaceInput() {
+	$("#race").autocomplete({
+		source: function(input, add) {
+			let suggestions = [];
+			$.each(races, function(i, race) {
+				suggestions.push(race['name']);
+			});
+			add(suggestions);
+		},
+		select: function(event, ui) {
+			selectRace(ui.item.value);
+		}
+	});
+
+	// add on change function
+	$("#race").on("change", function() {
+		selectRace($(this).val());
+	});
+}
+
+// select race value from autocomplete list
+function selectRace(input) {
+	let race = getRace(input);
+
+	if (race == false) {
+		$("#character_size_select").val("Medium");
+		editSize(true);
+		$("#race_traits").html("");
+	} else {
+		// set size
+		$("#character_size_select").val(race['size']);
+		editSize(true);
+		// get traits
+		$("#race_traits").html("");
+		for (var i in race_traits) {
+			if (race_traits[i]['race_id'] == race['id']) {
+				// set race traits
+				for (var j in talents) {
+					if (talents[j]['name'] == race_traits[i]['trait']) {
+						let newTalent = new UserTalent({
+							"name":talents[j]['name'],
+							"display_name":talents[j]['name'],
+							"description":talents[j]['description'],
+							"type":"race_trait"
+						});
+						let feat_container = createElement('div', 'feat', '#race_traits', "");
+						let feat_title_descrip = createElement('div', '', feat_container);
+						$('<p />', {
+							'class': 'feat-title',
+							'text': newTalent.name+" : "
+						}).appendTo(feat_title_descrip);
+						$('<p />', {
+							'text': newTalent.description.length > 100 ? newTalent.description.substring(0,100)+"..." : newTalent.description
+						}).appendTo(feat_title_descrip);
+					    feat_title_descrip.on("click", function() {
+					    	newTalent.edit();
+					    });
+						feat_container.hover(function() {
+							$(this).addClass("highlight");
+						}, function() {
+							$(this).removeClass("highlight");
+						});
+					}
+				}
+			}
+		}
+	}
+}
+
+function getRace(race) {
+	for (var i in races) {
+		if (races[i]['name'] == race) {
+			return races[i];
+		}
+	}
+	return false;
 }
 
 function setMoraleEffect(morale) {
@@ -1792,12 +1882,27 @@ $("#new_feat_modal").on('shown.bs.modal', function() {
 	$("#animal_name").attr("disabled", editing);
 	$("#animal_level").attr("disabled", editing);
 
+	// hide / show select options
+	$("#select_feat_type").find("option").each(function() {
+		let feat_type = $(this).val().split("_name")[0];
+		if ($(this).val() == "feat_name") {
+			$(this).attr("hidden", false);
+		} else if ($(this).val() == "race_trait_name") {
+			$(this).attr("hidden", true);
+		} else if ($(this).val() == "magic_talent_name") {
+			$(this).attr("hidden", !user['magic_talents']);
+		} else {
+			$(this).attr("hidden", !characterCreation || counts[feat_type] == undefined);
+		}
+	});
+
 });
 
 $("#new_feat_modal").on('hidden.bs.modal', function() {
 	$("#feat_modal_title").html("New Talent");
 	$("#feat_update_btn").addClass("hidden");
 	$("#feat_submit_btn").removeClass("hidden");
+	$("#feat_cancel_btn").removeClass("hidden");
 	$("#feat_name").val("").removeClass("x onX").attr("disabled", false);
 	$("#magic_talent_name").val("").removeClass("x onX").attr("disabled", false);
 	$("#feat_description").val("").height("125px").attr("disabled", false);

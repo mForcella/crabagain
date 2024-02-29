@@ -4,6 +4,7 @@
     name varchar(255),
     description varchar(2000),
     type varchar(255),
+    race varchar(64),
     cost int DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
   );
@@ -209,6 +210,161 @@
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
   );
+
+  CREATE TABLE race (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    name varchar(64),
+    size varchar(64) DEFAULT "Medium",
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+  );
+
+  CREATE TABLE campaign_race (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    race_id int,
+    campaign_id int,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (race_id) REFERENCES race(id) ON DELETE CASCADE,
+    FOREIGN KEY (campaign_id) REFERENCES campaign(id) ON DELETE CASCADE
+  );
+
+  CREATE TABLE race_trait (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    race_id int,
+    trait varchar(64),
+    trait_id int,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (race_id) REFERENCES race(id) ON DELETE CASCADE
+  );
+
+  CREATE TABLE race_skill (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    race_id int,
+    skill varchar(64),
+    attribute varchar(64),
+    input_required bool DEFAULT false,
+    value int,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (race_id) REFERENCES race(id) ON DELETE CASCADE
+  );
+
+  insert into feat_or_trait (name,description,type,cost) values ("Iron Soul","Asgari add half their Soma Bonus to their Caster Level for Soma Magic only.","race_trait",0);
+  insert into feat_or_trait (name,description,type,cost) values ("Master of the Wild","Vanir add half their Avani Bonus to their Caster Level for Avani Magic only.","race_trait",0);
+  insert into feat_or_trait (name,description,type,cost) values ("Mentalist","Pangu add half their Nous Bonus to their Caster Level for Nous Magic only.","race_trait",0);
+  insert into feat_or_trait (name,description,type,cost) values ("Energy Weaver","Alfir add half their Ka Bonus to their Caster Level for Ka Magic only.","race_trait",0);
+
+  INSERT INTO race (name) VALUES ("Danu");
+  SET @race_id := (SELECT LAST_INSERT_ID());
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Religion (Elohim)","Intellect",1);
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Diplomacy","Allure",2);
+  INSERT INTO campaign_race (race_id, campaign_id) VALUES (@race_id,7);
+
+  INSERT INTO race (name) VALUES ("Asgari");
+  SET @race_id := (SELECT LAST_INSERT_ID());
+  INSERT INTO race_skill (race_id,skill,attribute,value,input_required) VALUES (@race_id,"Religion","Intellect",2,true);
+  INSERT INTO race_skill (race_id,skill,attribute,value,input_required) VALUES (@race_id,"Academia","Intellect",1,true);
+  SET @trait_id := (SELECT id FROM feat_or_trait WHERE name = "Iron Soul");
+  INSERT INTO race_trait (race_id,trait_id,trait) VALUES (@race_id,@trait_id,"Iron Soul");
+  SET @trait_id := (SELECT id FROM feat_or_trait WHERE name = "Pacifist");
+  INSERT INTO race_trait (race_id,trait_id,trait) VALUES (@race_id,@trait_id,"Pacifist");
+  INSERT INTO campaign_race (race_id, campaign_id) VALUES (@race_id,7);
+
+  INSERT INTO race (name) VALUES ("Shenari");
+  SET @race_id := (SELECT LAST_INSERT_ID());
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Sail","Innovation/Intellect",0);
+  INSERT INTO campaign_race (race_id, campaign_id) VALUES (@race_id,7);
+
+  INSERT INTO race (name) VALUES ("Zerzuran");
+  SET @race_id := (SELECT LAST_INSERT_ID());
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Train Animal","Allure",0);
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Sense Motive","Intuition",1);
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Search","Awareness",1);
+  SET @trait_id := (SELECT id FROM feat_or_trait WHERE name = "Honest");
+  INSERT INTO race_trait (race_id,trait_id,trait) VALUES (@race_id,@trait_id,"Honest");
+  INSERT INTO campaign_race (race_id, campaign_id) VALUES (@race_id,7);
+
+  INSERT INTO race (name) VALUES ("Alyoni");
+  SET @race_id := (SELECT LAST_INSERT_ID());
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Stealth","Awareness/Deception",0);
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Listen","Awareness",1);
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Search","Awareness",1);
+  SET @trait_id := (SELECT id FROM feat_or_trait WHERE name = "Honor-bound");
+  INSERT INTO race_trait (race_id,trait_id,trait) VALUES (@race_id,@trait_id,"Honor-bound");
+  INSERT INTO campaign_race (race_id, campaign_id) VALUES (@race_id,7);
+
+  INSERT INTO race (name) VALUES ("Nerran");
+  SET @race_id := (SELECT LAST_INSERT_ID());
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Religion (Nergal)","Intellect",2);
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Profession (Fisher)","Intellect",2);
+  SET @trait_id := (SELECT id FROM feat_or_trait WHERE name = "Ascetic");
+  INSERT INTO race_trait (race_id,trait_id,trait) VALUES (@race_id,@trait_id,"Ascetic");
+  INSERT INTO campaign_race (race_id, campaign_id) VALUES (@race_id,7);
+
+  INSERT INTO race (name) VALUES ("Vanir");
+  SET @race_id := (SELECT LAST_INSERT_ID());
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Listen","Awareness",2);
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Diplomacy","Allure",1);
+  SET @trait_id := (SELECT id FROM feat_or_trait WHERE name = "Master of the Wild");
+  INSERT INTO race_trait (race_id,trait_id,trait) VALUES (@race_id,@trait_id,"Master of the Wild");
+  SET @trait_id := (SELECT id FROM feat_or_trait WHERE name = "Protector of the Wild");
+  INSERT INTO race_trait (race_id,trait_id,trait) VALUES (@race_id,@trait_id,"Protector of the Wild");
+  INSERT INTO campaign_race (race_id, campaign_id) VALUES (@race_id,7);
+
+  INSERT INTO race (name,size) VALUES ("Aesir","Large");
+  SET @race_id := (SELECT LAST_INSERT_ID());
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Climb","Strength",2);
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Intimidate","Vitality",1);
+  SET @trait_id := (SELECT id FROM feat_or_trait WHERE name = "Warrior's Code");
+  INSERT INTO race_trait (race_id,trait_id,trait) VALUES (@race_id,@trait_id,"Warrior's Code");
+  INSERT INTO campaign_race (race_id, campaign_id) VALUES (@race_id,7);
+
+  INSERT INTO race (name,size) VALUES ("Sileni","Small");
+  SET @race_id := (SELECT LAST_INSERT_ID());
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Perform","Allure/Deception",0);
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Sense Motive","Intuition",2);
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Barter","Allure",1);
+  SET @trait_id := (SELECT id FROM feat_or_trait WHERE name = "Curious");
+  INSERT INTO race_trait (race_id,trait_id,trait) VALUES (@race_id,@trait_id,"Curious");
+  INSERT INTO campaign_race (race_id, campaign_id) VALUES (@race_id,7);
+
+  INSERT INTO race (name,size) VALUES ("Pangu","Small");
+  SET @race_id := (SELECT LAST_INSERT_ID());
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Engineering","Innovation/Intellect",0);
+  INSERT INTO race_skill (race_id,skill,attribute,value,input_required) VALUES (@race_id,"Academia","Intellect",1,true);
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Diplomacy","Allure",1);
+  SET @trait_id := (SELECT id FROM feat_or_trait WHERE name = "Mentalist");
+  INSERT INTO race_trait (race_id,trait_id,trait) VALUES (@race_id,@trait_id,"Mentalist");
+  INSERT INTO campaign_race (race_id, campaign_id) VALUES (@race_id,7);
+
+  INSERT INTO race (name) VALUES ("Alfir");
+  SET @race_id := (SELECT LAST_INSERT_ID());
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Climb","Strength",2);
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Listen","Awareness",1);
+  SET @trait_id := (SELECT id FROM feat_or_trait WHERE name = "Energy Weaver");
+  INSERT INTO race_trait (race_id,trait_id,trait) VALUES (@race_id,@trait_id,"Energy Weaver");
+  SET @trait_id := (SELECT id FROM feat_or_trait WHERE name = "Rebel Yell");
+  INSERT INTO race_trait (race_id,trait_id,trait) VALUES (@race_id,@trait_id,"Rebel Yell");
+  INSERT INTO campaign_race (race_id, campaign_id) VALUES (@race_id,7);
+
+  INSERT INTO race (name) VALUES ("Halbarn");
+  SET @race_id := (SELECT LAST_INSERT_ID());
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Barter","Allure",2);
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Appraise","Intellect",2);
+  SET @trait_id := (SELECT id FROM feat_or_trait WHERE name = "Show Me the Money");
+  INSERT INTO race_trait (race_id,trait_id,trait) VALUES (@race_id,@trait_id,"Show Me the Money");
+  INSERT INTO campaign_race (race_id, campaign_id) VALUES (@race_id,7);
+
+  INSERT INTO race (name) VALUES ("Betu");
+  SET @race_id := (SELECT LAST_INSERT_ID());
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Survival","Intellect/Intuition",0);
+  INSERT INTO campaign_race (race_id, campaign_id) VALUES (@race_id,7);
+
+  INSERT INTO race (name,size) VALUES ("Ogre","Large");
+  SET @race_id := (SELECT LAST_INSERT_ID());
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Smell","Awareness",2);
+  INSERT INTO race_skill (race_id,skill,attribute,value) VALUES (@race_id,"Brawl","Agility",1);
+  SET @trait_id := (SELECT id FROM feat_or_trait WHERE name = "For the Clan");
+  INSERT INTO race_trait (race_id,trait_id,trait) VALUES (@race_id,@trait_id,"For the Clan");
+  INSERT INTO campaign_race (race_id, campaign_id) VALUES (@race_id,7);
 
   -- To get foreign key names
   -- SHOW CREATE TABLE `yourtable`;
