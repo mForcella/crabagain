@@ -210,6 +210,14 @@
 			$total_count += $row['count'];
 		}
 	}
+	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = $campaign_id AND type = 'magic_talent'";
+	$result = $db->query($sql);
+	if ($result) {
+		while($row = $result->fetch_assoc()) {
+			$counts['magical_talent_count'] = $row['count'];
+			$total_count += $row['count'];
+		}
+	}
 
 	// get feat active status
 	$campaign_feats = [];
@@ -251,11 +259,13 @@
 	// get races
 	$races = [];
 	$race_data = [];
+	$race_ids = [];
 	$sql = "SELECT * FROM race ORDER BY name";
 	$result = $db->query($sql);
 	if ($result) {
 		while($row = $result->fetch_assoc()) {
 			array_push($race_data, $row);
+			array_push($race_ids, $row['id']);
 		}
 	}
 
@@ -268,6 +278,14 @@
 			array_push($campaign_races, $row);
 		}
 	}
+	$sql = "SELECT count(*) AS count FROM campaign_race WHERE campaign_id = $campaign_id";
+	$result = $db->query($sql);
+	if ($result) {
+		while($row = $result->fetch_assoc()) {
+			$counts['race_count'] = $row['count'];
+			$total_count += $row['count'];
+		}
+	}
 	
 	// check if race is active for the current campaign
 	foreach($race_data as $race) {
@@ -277,6 +295,24 @@
 			}
 		}
 		array_push($races, $race);
+	}
+
+	// get race traits and skills
+	$race_traits = [];
+	$sql = "SELECT * from race_trait WHERE race_id IN (".implode(',',$race_ids).")";
+	$result = $db->query($sql);
+	if ($result) {
+		while($row = $result->fetch_assoc()) {
+			array_push($race_traits, $row);
+		}
+	}
+	$race_skills = [];
+	$sql = "SELECT * from race_skill WHERE race_id IN (".implode(',',$race_ids).")";
+	$result = $db->query($sql);
+	if ($result) {
+		while($row = $result->fetch_assoc()) {
+			array_push($race_skills, $row);
+		}
 	}
 
 	$db->close();
@@ -746,19 +782,47 @@
 		<form id="campaign_form">
 			<input type="hidden" id="campaign_id" name="campaign_id" value="<?php echo $campaign['id'] ?>">
 
-			<h4 class="table-heading" id="section_races">Races</h4>
+			<div class="title">
+				<h4 class="table-heading" id="section_races">Races</h4>
+				<label class="toggle-switchy" for="race_toggle" data-size="sm" data-text="false">
+					<input checked type="checkbox" id="race_toggle" checked onclick="enable(this, 'race-check')">
+					<span class="toggle">
+						<span class="switch"></span>
+					</span>
+				</label>
+			</div>
 			<div class="panel panel-default">
 				<table class="table" id="feat_table">
 					<tr>
-						<th>Enabled</th>
+						<th>Enabled <input type='checkbox' class="race-check" checked onclick="checkAll(this, 'race-check')"></th>
 						<th>Name</th>
+						<th>Size</th>
+						<th>Traits</th>
+						<th>Skills</th>
 					</tr>
 					<?php
 						foreach($races as $race) {
+							$traits = "";
+							foreach($race_traits as $trait) {
+								if ($trait['race_id'] == $race['id']) {
+									$traits .= $trait['trait'].", ";
+								}
+							}
+							$traits = rtrim($traits, ", ");
+							$skills = "";
+							foreach($race_skills as $skill) {
+								if ($skill['race_id'] == $race['id']) {
+									$skills .= ($skill['value'] == 0 ? 'Training: ' : 'Focus: ').$skill['skill'].($skill['input_required'] ? ' (Any)' : '').($skill['value'] == 0 ? '' : ' +'.$skill['value']).", ";
+								}
+							}
+							$skills = rtrim($skills, ", ");
 							echo 
 							"<tr class='table-row' id='row_".$race['id']."'>
-								<td class='center'><input id='".$race['id']."' type='checkbox' ".(isset($race['active']) || $total_count == 0 ? 'checked' : '')." name='race_status[]' value='".$race['id']."'></td>
+								<td class='center'><input id='".$race['id']."' class='race-check' type='checkbox' ".(isset($race['active']) || $counts['race_count'] == 0 ? 'checked' : '')." name='race_status[]' value='".$race['id']."'></td>
 								<td><label for='".$race['id']."'>".$race['name']."</label></td>
+								<td>".$race['size']."</td>
+								<td>".$traits."</td>
+								<td>".$skills."</td>
 							</tr>";
 						}
 					?>
@@ -845,7 +909,7 @@
 								}
 								echo 
 								"<tr class='table-row' id='row_".$talent->id."'>
-									<td class='center'><input type='checkbox' ".(isset($talent->active) || $total_count == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td class='center'><input class='magical-talent-check' type='checkbox' ".(isset($talent->active) || $counts['magical_talent_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
 									<td>".$talent->name."</td>
 									<td>".$talent->description."</td>
 									<td>".$reqs."</td>
@@ -1503,13 +1567,13 @@
 		});
 	}
 
-	var users = <?php echo json_encode($users); ?>;
-	var campaign = <?php echo json_encode($campaign); ?>;
-
 	// get feat counts
 	var total_count = <?php echo json_encode($total_count); ?>;
 	var counts = <?php echo json_encode($counts); ?>;
 	if (total_count != 0) {
+		if (counts['physical_pos_count'] == 0) {
+			$("#physical_trait_pos_toggle").trigger("click");
+		}
 		if (counts['physical_pos_count'] == 0) {
 			$("#physical_trait_pos_toggle").trigger("click");
 		}
@@ -1527,6 +1591,12 @@
 		}
 		if (counts['profession_count'] == 0) {
 			$("#profession_toggle").trigger("click");
+		}
+		if (counts['magical_talent_count'] == 0) {
+			$("#magical_talents_toggle").trigger("click");
+		}
+		if (counts['race_count'] == 0) {
+			$("#race_toggle").trigger("click");
 		}
 	}
 

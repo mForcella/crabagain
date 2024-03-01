@@ -3,3 +3,4 @@ keys.php
 email_config.php
 .DS_Store
 phpinfo.php
+/logs
