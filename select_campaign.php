@@ -293,7 +293,6 @@
 <script src="/assets/font-awesome/font-awesome-6.1.1-all.min.js"></script>
 <script type="text/javascript">
 
-	var keys = <?php echo json_encode($keys); ?>;
 	let user_ids = <?php echo json_encode($user_ids); ?>;
 	let login_campaigns = <?php echo json_encode($login_campaigns); ?>;
 	let campaign_names = <?php echo json_encode($campaign_names); ?>;
@@ -364,33 +363,27 @@
 				return;
 			}
 		}
-
-		// TODO don't expose keys on front end, confirm secret word in php
 		
-		// check secret word
-		if ($("#secret_word").val().toLowerCase() == keys['nerd_test']) {
-			// submit new campaign to ajax
-			$.ajax({
-			  url: '/scripts/new_campaign.php',
-			  data: { 
-			  	'name' : $("#campaign_name").val(),
-			  	'users' : users,
-			  	'admin_id' : $("#login_id").val()
-			  },
-			  ContentType: "application/json",
-			  type: 'POST',
-			  success: function(response) {
-			  	if (response != 0) {
+		// submit new campaign to ajax
+		$.ajax({
+			url: '/scripts/new_campaign.php',
+			data: { 
+				'name' : $("#campaign_name").val(),
+				'users' : users,
+				'admin_id' : $("#login_id").val(),
+				'secret_word': $("#secret_word").val().toLowerCase().trim()
+			},
+			ContentType: "application/json",
+			type: 'POST',
+			success: function(response) {
+				if (response != 0) {
 					// redirect to campaign admin page
 					window.location.href = "/admin.php?campaign="+response;
-			  	} else {
-			  		// handle error?
-			  	}
-			  }
-			});
-		} else {
-			alert("Sorry nerd, that's not it.");
-		}
+				} else {
+					alert("Sorry nerd, that's not it.");
+				}
+			}
+		});
 	}
 
 </script>

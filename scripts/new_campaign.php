@@ -1,7 +1,16 @@
 <?php
 
 	// establish database connection
+	include_once('../config/keys.php');
 	include_once('../config/db_config.php');
+
+	// check the secret word
+	$secret_word = $_POST['secret_word'];
+	if ($secret_word != $keys['nerd_test']) {
+		echo 0;
+		return;
+	}
+
 	$db = new mysqli($db_config['servername'], $db_config['username'], $db_config['password'], $db_config['dbname']);
 
 	// check connection

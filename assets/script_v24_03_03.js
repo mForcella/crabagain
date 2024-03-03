@@ -1,5 +1,4 @@
 // php array values
-var keys;
 var campaign;
 var user;
 var xp_awards;
@@ -1334,85 +1333,31 @@ function formSubmit() {
 	}
 }
 
-// validate password via ajax
-function validatePassword() {
-	$.ajax({
-	  url: '/scripts/check_password.php',
-	  data: { 'password' : $("#password").val(), 'user_id' : $("#user_id").val(), 'campaign_id' : $("#campaign_id").val() },
-	  ContentType: "application/json",
-	  type: 'POST',
-	  success: function(response) {
-	  	// on response success, submit form
-	  	if (response == 1) {
-	  		// close modal
-	  		$("#password_modal").modal("hide");
-	  		// submit form
-			$("#user_form").submit();
-	  	} else {
-	  		alert("Password does not match our records");
-	  	}
-	  }
-	});
-}
-
-// validate the form (old form w/ create password prompt)
-// function setPassword() {
-//   	var regex = /\S+@\S+\.\S+/;
-// 	// make sure passwords match
-// 	if ($("#new_password").val() != $("#password_conf").val()) {
-// 		alert("Passwords must match, nerd");
-// 	// make sure we have a valid email address
-// 	} else if (!regex.test($("#email").val())) {
-// 	// make sure human response is correct
-// 		alert("That doesn't look like a real email address, nerd");
-// 	} else if ($("#nerd_test").val().toLowerCase() != keys['nerd_test']) {
-// 		alert("That's not the secret word, nerd");
-// 	} else {
-// 		// set user email in form
-// 		$("#user_email").val($("#email").val());
-// 		// show submitting message
-// 		$("#submit_load_modal").modal("show");
-// 		// get recaptcha token before submit
-// 		grecaptcha.ready(function () {
-// 			grecaptcha.execute('6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi', { action: 'new_user' }).then(function (token) {
-// 				$("#recaptcha_response").val(token);
-// 				$("#password_val").val($("#new_password").val());
-// 				submitForm = true;
-// 				$("#user_form").submit();
-// 			});
-// 		});
-// 	}
-// }
-
 // validate the form (current form, no password setting required)
-function setPasswordV2() {
-	if ($("#nerd_test").val().toLowerCase() != keys['nerd_test']) {
-		alert("That's not the secret word, nerd");
-	} else {
-		// show submitting message
-		$("#submit_load_modal").modal("show");
-		// get recaptcha token before submit
-		grecaptcha.ready(function () {
-			grecaptcha.execute('6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi', { action: 'new_user' }).then(function (token) {
-				$("#recaptcha_response").val(token);
-				$("#password_val").val("");
-				submitForm = true;
-				$("#user_form").submit();
-			});
-		});
-	}
-}
-
-function forgotPassword() {
-	alert("Ok fine. Hang tight and we'll be along with a reset link shortly.");
+function submitUser() {
+	// check secret code in ajax
 	$.ajax({
-	  url: '/scripts/email_password_reset_link.php',
-	  data: { 'user_id' : $("#user_id").val() },
-	  ContentType: "application/json",
-	  type: 'POST',
-	  success: function(response) {
-	  	// no action necessary
-	  }
+		url: '/scripts/check_secret_word.php',
+		data: { 'secret_word' : $("#nerd_test").val().toLowerCase().trim() },
+		ContentType: "application/json",
+		type: 'POST',
+		success: function(response) {
+			if (response == 1) {
+				// show submitting message
+				$("#submit_load_modal").modal("show");
+				// get recaptcha token before submit
+				grecaptcha.ready(function () {
+					grecaptcha.execute('6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi', { action: 'new_user' }).then(function (token) {
+						$("#recaptcha_response").val(token);
+						$("#password_val").val("");
+						submitForm = true;
+						$("#user_form").submit();
+					});
+				});
+			} else {
+				alert("That's not the secret word, nerd");
+			}
+		}
 	});
 }
 
@@ -1625,22 +1570,30 @@ function enableHiddenNumbers() {
 
 // suggestion box submission
 function submitSuggestion() {
-	// check nerd word value
-	if ($("#nerd_word").val().toLowerCase() != keys['nerd_test']) {
-		alert("That's not the secret word, nerd");
-		return;
-	}
-	// submit suggestion
+	// check secret code in ajax
 	$.ajax({
-	  url: '/scripts/submit_suggestion.php',
-	  data: { 'message' : $("#suggestion").val() },
-	  ContentType: "application/json",
-	  type: 'POST',
-	  success: function(response) {
-	  	if (response == 'ok') {
-	  		alert("Thanks for your suggestion! I'm sure someone is hard at work to address your concern.");
-	  	}
-	  }
+		url: '/scripts/check_secret_word.php',
+		data: { 'secret_word' : $("#nerd_word").val().toLowerCase().trim() },
+		ContentType: "application/json",
+		type: 'POST',
+		success: function(response) {
+			if (response == 1) {
+				// submit suggestion
+				$.ajax({
+					url: '/scripts/submit_suggestion.php',
+					data: { 'message' : $("#suggestion").val() },
+					ContentType: "application/json",
+					type: 'POST',
+					success: function(response) {
+						if (response == 'ok') {
+							alert("Thanks for your suggestion! I'm sure someone is hard at work to address your concern.");
+						}
+					}
+				});
+			} else {
+				alert("That's not the secret word, nerd");
+			}
+		}
 	});
 }
 

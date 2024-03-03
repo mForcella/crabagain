@@ -2163,7 +2163,7 @@
     </div>
   </div>
 
-	<!-- new password modal - bot test -->
+	<!-- save character - bot test -->
   <div class="modal" id="new_password_modal_2" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
       <div class="modal-content">
@@ -2174,7 +2174,7 @@
         	<h5 class="center">Before we can let you pass, we just need to make sure you're not a robot, or a Russki, or both. Please enter the most secret of the secret codes.</h5>
         	<input class="form-control" type="text" name="nerd_test" id="nerd_test">
         	<div class="button-bar">
-		        <button type="button" class="btn btn-primary" id="password_btn_2" data-dismiss="modal" onclick="setPasswordV2()">Ok</button>
+		        <button type="button" class="btn btn-primary" id="password_btn_2" data-dismiss="modal" onclick="submitUser()">Ok</button>
 		      </div>
         </div>
       </div>
@@ -2289,9 +2289,6 @@
 	<script src="/assets/font-awesome/font-awesome-6.1.1-all.min.js"></script>
 	<?php echo $keys['scripts'] ?>
 	<script type="text/javascript">
-
-		// TODO don't expose keys on front end
-		keys = <?php echo json_encode($keys); ?>;
 
 		// get all database values
 		campaign = <?php echo json_encode(isset($campaign) ? $campaign : []); ?>;

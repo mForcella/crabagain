@@ -1185,7 +1185,7 @@
 						<li>See an overview of your players' stats.</li>
 						<li>Distribute XP to your players.</li>
 						<!-- <li>Create new Feats/Traits or edit existing Feats/Traits.</li> -->
-						<li>Adjust which Talents/Traits are available for your campaign.<br>
+						<li>Adjust which Talents, Traits, and Races are available for your campaign.<br>
 						<i class="small">Note: Anything other than Standard or Magical Talents are only available to players during character creation</i></li><br>
 					</ul>
 					<div class="button-bar">
@@ -1484,7 +1484,7 @@
 	<!-- footer -->
 	<div class="footer row">
 		<p class="link col-md-4" data-toggle="modal" data-target="#welcome_modal"><span class="glyphicon glyphicon-info-sign"></span> Guide</p>
-		<p class="link col-md-4" data-toggle="modal" data-target="#suggestion_modal"><span class="glyphicon glyphicon-envelope"></span> Suggestion Box</p>
+		<!-- <p class="link col-md-4" data-toggle="modal" data-target="#suggestion_modal"><span class="glyphicon glyphicon-envelope"></span> Suggestion Box</p> -->
 		<p class=" col-md-4">© <?php echo date("Y"); ?> CrabAgain.com</p>
 	</div>
 
