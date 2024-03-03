@@ -59,6 +59,7 @@
 	$db->query($sql);
 	// TODO reset the auto-increment to max(id)+1 ?
 	// $sql = "ALTER TABLE `user` AUTO_INCREMENT = 1";
+	// $db->query($sql);
 	// would create issues if multiple people were creating characters at once
 	// move delete statement to window.unload function?
 
@@ -140,6 +141,10 @@
   $no_id = [];
 	$json_string = file_get_contents($keys['feat_list']);
 	$talent_list_json = json_decode($json_string);
+
+	// get trainings for autocomplete
+	$json_string = file_get_contents($keys['training_list']);
+	$training_autocomplete = json_decode($json_string);
 
 	// assign talent ID
 	foreach($talent_list_json as $json) {
@@ -388,7 +393,7 @@
 	    	if ($user['is_new']) {
 	    		echo '
 				    <div class="nav-item">
-				      <span class="glyphicon" onclick="formSubmit()"><span class="nav-item-label"><i class="fa-solid fa-floppy-disk nav-icon"></i> Save Character Data</span></span>
+				      <span class="glyphicon" onclick="formSubmit()"><span class="nav-item-label"><i class="fa-solid fa-floppy-disk nav-icon"></i> Save New Character</span></span>
 				    </div>
 				   ';
 	    	}
@@ -398,7 +403,7 @@
 	    	if ($can_edit == 1) {
 	    		echo '
 				    <div class="nav-item">
-				       <span id="attribute_pts_span" class="glyphicon '. (isset($user) && $user['attribute_pts'] == 0 ? 'disabled' : '') .'" onclick="allocateAttributePts(this)"><span class="nav-item-label"><i class="fa-solid fa-shield-heart nav-icon"></i> Allocate Attribute Points</span></span>
+				       <span id="attribute_pts_span" class="glyphicon '. ($user['attribute_pts'] == 0 ? 'disabled' : '') .'" onclick="allocateAttributePts(this)"><span class="nav-item-label"><i class="fa-solid fa-shield-heart nav-icon"></i> Allocate Attribute Points</span></span>
 				    </div>
 				   ';
 	    	}
@@ -499,9 +504,9 @@
 	</select>
 
 	<form id="user_form" method="post" action="/scripts/submit.php" novalidate>
-		<input type="hidden" id="user_id" name="user_id" value="<?php echo isset($user) ? $user['id'] : '' ?>">
+		<input type="hidden" id="user_id" name="user_id" value="<?php echo $user['id'] ?>">
 		<input type="hidden" id="campaign_id" name="campaign_id" value="<?php echo $_GET["campaign"] ?>">
-		<input type="hidden" id="user_email" name="email" value="<?php echo isset($user) ? $user["email"] : '' ?>">
+		<input type="hidden" id="user_email" name="email" value="<?php echo $user["email"] ?>">
 		<input type="hidden" id="campaign_role" value="<?php echo $campaign_role ?>">
 		<input type="hidden" id="can_edit" value="<?php echo $can_edit ?>">
 		<input type="hidden" id="uuid">
@@ -514,19 +519,19 @@
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="character_name">Name</label>
 						<div class="col-sm-6 col-xs-8 mobile-pad-bottom">
-							<input class="form-control <?php echo $user['is_new'] ? '' : 'track-changes' ?>" type="text" id="character_name" name="character_name" value="<?php echo isset($user) ? htmlspecialchars($user['character_name']) : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+							<input class="form-control <?php echo $user['is_new'] ? '' : 'track-changes' ?>" type="text" id="character_name" name="character_name" value="<?php echo htmlspecialchars($user['character_name']) ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 						</div>
 						<!-- unlock on character creation -->
 						<label class="control-label col-sm-2 col-xs-4 font-small smaller" for="attribute_pts">Attribute Pts</label>
 						<div class="col-sm-2 col-xs-8">
-							<input class="form-control track-changes" <?php echo isset($user) &&  count($awards) == 0 ? 'type="number"' : 'readonly' ?> min="0" id="attribute_pts" name="attribute_pts" value="<?php echo isset($user) ? htmlspecialchars($user['attribute_pts']) : 12 ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+							<input class="form-control track-changes" <?php echo count($awards) == 0 ? 'type="number"' : 'readonly' ?> min="0" id="attribute_pts" name="attribute_pts" value="<?php echo htmlspecialchars($user['attribute_pts']) ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 						</div>
 					</div>
 
 					<div class="form-group tablet-adjust">
 						<label class="control-label col-sm-2 col-xs-4" for="xp">XP</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-							<input class="form-control pointer track-changes" readonly data-toggle="modal" data-target="#xp_modal" name="xp" id="xp" min="0" value="<?php echo isset($user) ? htmlspecialchars($user['xp']) : 0 ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+							<input class="form-control pointer track-changes" readonly data-toggle="modal" data-target="#xp_modal" name="xp" id="xp" min="0" value="<?php echo htmlspecialchars($user['xp']) ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 						</div>
 						<!-- TODO unlock level on character creation and adjust attribute points on change -->
 						<!-- only allow by GM? -->
@@ -540,21 +545,20 @@
 									array_push($levels, $xp_total);
 								}
 								$level = 1;
-								if (isset($user)) {
-									$i = 2;
-									foreach ($levels as $lvl) {
-										if ($user['xp'] >= $lvl) {
-											$level = $i++;
-										}
+								$i = 2;
+								foreach ($levels as $lvl) {
+									if ($user['xp'] >= $lvl) {
+										$level = $i++;
 									}
 								}
 							?>
-							<input class="form-control" readonly name="level" id="level" value="<?php echo $level ?>">
+							<input class="form-control" <?php echo count($awards) == 0 ? 'type="number"' : 'readonly' ?> name="level" min="1" id="level" value="<?php echo $level ?>">
+
 						</div>
 						<label class="control-label col-sm-2 col-xs-4 font-small smaller" for="caster_level">Caster Level</label>
 						<div class="col-sm-2 col-xs-8">
 							<?php
-								$caster_level = isset($user) ? $user['vitality'] + 10 : 10;
+								$caster_level = $user['vitality'] + 10;
 							?>
 							<input class="form-control" readonly name="caster_level" id="caster_level" value="<?php echo $caster_level ?>">
 						</div>
@@ -563,7 +567,7 @@
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="morale">Morale</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
-							<input class="form-control track-changes" type="number" name="morale" id="morale" min="-10" value="<?php echo isset($user) ? htmlspecialchars($user['morale']) : 0 ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+							<input class="form-control track-changes" type="number" name="morale" id="morale" min="-10" value="<?php echo htmlspecialchars($user['morale']) ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 						</div>
 						<div class="col-xs-4 d-sm-none"></div>
 						<div class="col-sm-4 col-xs-8 mobile-pad-bottom">
@@ -572,13 +576,9 @@
 						<?php
 							$fate = 0;
 							// vitality bonus
-							$fate += isset($user) ? (
-								$user['vitality'] >= 0 ?
-									floor($user['vitality']/2) :
-									(ceil($user['vitality']/3) == 0 ? 0 : ceil($user['vitality']/3))
-							) : 0;
+							$fate += $user['vitality'] >= 0 ? floor($user['vitality']/2) : ( ceil($user['vitality']/3) == 0 ? 0 : ceil($user['vitality']/3) );
 							// morale bonus
-							$morale = isset($user) ? htmlspecialchars($user['morale']) : 0;
+							$morale = htmlspecialchars($user['morale']);
 							$fate += $morale >= 6 ? 2 : ($morale >= 2 ? 1 : 0);
 						?>
 						<label class="control-label col-sm-2 col-xs-4" for="fate">Fate</label>
@@ -601,26 +601,22 @@
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="age">Age</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">
-							<input class="form-control" type="text" name="age" id="age_text" value="<?php echo isset($user) ? htmlspecialchars($user['age']) : '' ?>">
-							<input class="form-control hidden-number track-changes" type="number" id="age" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user" data-column="age">
+							<input class="form-control" type="text" name="age" id="age_text" value="<?php echo htmlspecialchars($user['age']) ?>">
+							<input class="form-control hidden-number track-changes" type="number" id="age" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user" data-column="age">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="gender">Gender</label>
 						<div class="col-sm-2 col-xs-8 desktop-no-pad-left">
-							<input class="form-control track-changes" type="text" id="gender" name="gender" value="<?php echo isset($user) ? htmlspecialchars($user['gender']) : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+							<input class="form-control track-changes" type="text" id="gender" name="gender" value="<?php echo htmlspecialchars($user['gender']) ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="height">Height</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">
-							<select class="form-control track-changes" name="height" id="height" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+							<select class="form-control track-changes" name="height" id="height" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 								<?php
 									// limit range by user size - small: 36-59, medium: 60-83, large: 84-107
-									$size = "Medium";
-									$height = 0;
-									if (isset($user)) {
-										$size = $user['size'] == "" ? "Medium" : $user['size'];
-										$height = $user['height'] == "" ? 0 : $user['height'];
-									}
+									$size = $user['size'] == "" ? "Medium" : $user['size'];
+									$height = $user['height'] == "" ? 0 : $user['height'];
 									$lower = $size == "Small" ? 36 : ($size == "Large" ? 84 : 60);
 									$upper = $size == "Small" ? 60 : ($size == "Large" ? 108 : 84);
 									for ($i = $lower; $i < $upper; $i++) {
@@ -637,22 +633,22 @@
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="weight">Weight</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">
-							<input class="form-control" type="text" name="weight" id="weight_text" value="<?php echo isset($user) ? htmlspecialchars($user['weight']) : '' ?>">
-							<input class="form-control hidden-number track-changes" type="number" id="weight" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user" data-column="weight">
+							<input class="form-control" type="text" name="weight" id="weight_text" value="<?php echo htmlspecialchars($user['weight']) ?>">
+							<input class="form-control hidden-number track-changes" type="number" id="weight" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user" data-column="weight">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="eyes">Eyes</label>
 						<div class="col-sm-2 col-xs-8 desktop-no-pad-left">
-							<input class="form-control track-changes" type="text" id="eyes" name="eyes" value="<?php echo isset($user) ? htmlspecialchars($user['eyes']) : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+							<input class="form-control track-changes" type="text" id="eyes" name="eyes" value="<?php echo htmlspecialchars($user['eyes']) ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="hair">Hair</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">
-							<input class="form-control track-changes" type="text" id="hair" name="hair" value="<?php echo isset($user) ? htmlspecialchars($user['hair']) : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+							<input class="form-control track-changes" type="text" id="hair" name="hair" value="<?php echo htmlspecialchars($user['hair']) ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="other">Other</label>
 						<div class="col-sm-6 col-xs-8 desktop-no-pad-left">
-							<input class="form-control track-changes" type="text" id="other" name="other" value="<?php echo isset($user) ? htmlspecialchars($user['other']) : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+							<input class="form-control track-changes" type="text" id="other" name="other" value="<?php echo htmlspecialchars($user['other']) ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 						</div>
 					</div>
 				</div>
@@ -796,36 +792,22 @@
 						<label class="control-label col-sm-2 col-xs-4" for="toughness">Toughness</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 							<?php
-								$toughness = isset($user) ? (
-									$user['strength'] >= 0 ?
-										floor($user['strength']/2) :
-										(ceil($user['strength']/3) == 0 ? 0 : ceil($user['strength']/3))
-								) : 0;
+								$toughness = $user['strength'] >= 0 ? floor($user['strength']/2) : ( ceil($user['strength']/3) == 0 ? 0 : ceil($user['strength']/3) );
 							?>
 							<input class="form-control" readonly name="toughness" id="toughness" value="<?php echo $toughness ?>">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="defend">Defend</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 							<?php
-								$defend = isset($user) ? 10 + $user['agility'] : 10;
-								// add size modifier
-								$size_modifier = 0;
-								if (isset($user)) {
-									$size_modifier = $user['size'] == "Small" ? 2 : ($user['size'] == "Large" ? -2 : 0);
-									$defend += $size_modifier;
-								}
+								$size_modifier = $user['size'] == "Small" ? 2 : ($user['size'] == "Large" ? -2 : 0);
+								$defend = 10 + $user['agility'] + $size_modifier;
 							?>
 							<input class="form-control" readonly name="defend" id="defend" value="<?php echo $defend ?>">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="dodge">Dodge</label>
 						<div class="col-sm-2 col-xs-8">
 							<?php
-								$dodge = isset($user) ? (
-									$user['agility'] >= 0 ?
-										floor($user['agility']/2) :
-										(ceil($user['agility']/3) == 0 ? 0 : ceil($user['agility']/3))
-								) : 0;
-								// add size modifier
+								$dodge = $user['agility'] >= 0 ? floor($user['agility']/2) : ( ceil($user['agility']/3) == 0 ? 0 : ceil($user['agility']/3) );
 								$dodge += $size_modifier;
 							?>
 							<input class="form-control" readonly name="dodge" id="dodge" value="<?php echo $dodge ?>">
@@ -836,29 +818,29 @@
 						<div class="col-sm-3 pad-left-right-zero">
 							<label class="control-label col-sm-7 col-xs-4" for="magic">Magic</label>
 							<div class="col-sm-5 col-xs-8 no-pad-input mobile-pad-bottom">
-							<input class="form-control" type="text" name="magic" id="magic_text" value="<?php echo isset($user) ? htmlspecialchars($user['magic']) : '' ?>">
-							<input class="form-control hidden-number track-changes" type="number" id="magic" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user" data-column="magic">
+							<input class="form-control" type="text" name="magic" id="magic_text" value="<?php echo htmlspecialchars($user['magic']) ?>">
+							<input class="form-control hidden-number track-changes" type="number" id="magic" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user" data-column="magic">
 							</div>
 						</div>
 						<div class="col-sm-3 pad-left-right-zero">
 							<label class="control-label col-sm-7 col-xs-4" for="fear">Fear</label>
 							<div class="col-sm-5 col-xs-8 no-pad-input mobile-pad-bottom">
-							<input class="form-control" type="text" name="fear" id="fear_text" value="<?php echo isset($user) ? htmlspecialchars($user['fear']) : '' ?>">
-							<input class="form-control hidden-number track-changes" type="number" id="fear" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user" data-column="fear">
+							<input class="form-control" type="text" name="fear" id="fear_text" value="<?php echo htmlspecialchars($user['fear']) ?>">
+							<input class="form-control hidden-number track-changes" type="number" id="fear" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user" data-column="fear">
 							</div>
 						</div>
 						<div class="col-sm-3 pad-left-right-zero">
 							<label class="control-label col-sm-7 col-xs-4" for="poison">Poison</label>
 							<div class="col-sm-5 col-xs-8 no-pad-input mobile-pad-bottom">
-							<input class="form-control" type="text" name="poison" id="poison_text" value="<?php echo isset($user) ? htmlspecialchars($user['poison']) : '' ?>">
-							<input class="form-control hidden-number track-changes" type="number" id="poison" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user" data-column="poison">
+							<input class="form-control" type="text" name="poison" id="poison_text" value="<?php echo htmlspecialchars($user['poison']) ?>">
+							<input class="form-control hidden-number track-changes" type="number" id="poison" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user" data-column="poison">
 							</div>
 						</div>
 						<div class="col-sm-3 pad-left-right-zero">
 							<label class="control-label col-sm-7 col-xs-4" for="disease">Disease</label>
 							<div class="col-sm-5 col-xs-8 no-pad-input">
-							<input class="form-control" type="text" name="disease" id="disease_text" value="<?php echo isset($user) ? htmlspecialchars($user['disease']) : '' ?>">
-							<input class="form-control hidden-number track-changes" type="number" id="disease" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user" data-column="disease">
+							<input class="form-control" type="text" name="disease" id="disease_text" value="<?php echo htmlspecialchars($user['disease']) ?>">
+							<input class="form-control hidden-number track-changes" type="number" id="disease" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user" data-column="disease">
 							</div>
 						</div>
 
@@ -884,12 +866,8 @@
 							<div class="row">
 								<div class="col-xs-5 no-pad">
 									<?php 
-										$resilience = isset($user) ? (
-											$user['fortitude'] >= 0 ? 
-												3 + floor($user['fortitude']/2) :
-												3 + ceil($user['fortitude']/3)
-										) : 3;
-										$damage = isset($user) && $user['damage'] != null ? $user['damage'] : 0;
+										$resilience = $user['fortitude'] >= 0 ? 3 + floor($user['fortitude']/2) : 3 + ceil($user['fortitude']/3);
+										$damage = $user['damage'] != null ? $user['damage'] : 0;
 										$wounds = 0;
 										while ($damage >= $resilience) {
 											$wounds += 1;
@@ -899,7 +877,7 @@
 										$wound_penalty_val = $wounds == 0 ? "None" : ($wounds == 1 ? "-1" : ($wounds == 2 ? "-3" : ($wounds == 3 ? "-5" : "Yer Dead")));
 									?>
 									<input class="form-control" id="damage" type="number" min="<?php echo $wounds == 0 ? 0 : -1 ?>" value="<?php echo $damage ?>">
-									<input type="hidden" class="track-changes" name="damage" id="total_damage" data-table="user" data-column="damage" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>">
+									<input type="hidden" class="track-changes" name="damage" id="total_damage" data-table="user" data-column="damage" data-id="<?php echo htmlspecialchars($user['id']) ?>">
 								</div>
 								<div class="col-xs-2 center no-pad">
 									/
@@ -953,9 +931,9 @@
 							<div class="row">
 								<div class="col-xs-12 no-pad">
 									<?php 
-										$fatigue = isset($user) ? ($user['fatigue'] == '' ? 0 : $user['fatigue']) : 0;
+										$fatigue = $user['fatigue'] == '' ? 0 : $user['fatigue'];
 									?>
-									<select class="form-control track-changes" id="fatigue" name="fatigue" onchange="updateTotalWeight(false)" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+									<select class="form-control track-changes" id="fatigue" name="fatigue" onchange="updateTotalWeight(false)" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 										<option value="0" <?php echo $fatigue == 0 ? 'selected' : '' ?>>None</option>
 										<option value="1" <?php echo $fatigue == 1 ? 'selected' : '' ?>>Tired</option>
 										<option value="2" <?php echo $fatigue == 2 ? 'selected' : '' ?>>Weary</option>
@@ -1023,7 +1001,7 @@
 
 				<!-- section: attributes -->
 				<div class="section form-horizontal">
-					<div class="section-title" id="section_attributes"><span>Attributes</span> <i class="fa-solid fa-dice"></i></div>
+					<div class="section-title" id="section_attributes"><span>Attributes & Trainings</span> <i class="fa-solid fa-dice"></i></div>
 
 					<div class="form-group">
 						<div class="col-sm-6 attribute-col" id="col_strength">
@@ -1032,7 +1010,7 @@
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
 										<span class="attribute-val" id="strength_text"></span>
-										<input type="hidden" class="track-changes" name="strength" id="strength_val" value="<?php echo isset($user) ? $user['strength'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+										<input type="hidden" class="track-changes" name="strength" id="strength_val" value="<?php echo $user['strength'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 										<span class="glyphicon glyphicon-plus hidden-icon" id="Strength_up" onclick="adjustAttribute('strength', 1)"></span>
 										<span class="glyphicon glyphicon-minus hidden-icon" id="Strength_down" onclick="adjustAttribute('strength', -1)"></span>
 									</label>
@@ -1058,7 +1036,7 @@
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
 										<span class="attribute-val" id="fortitude_text"></span>
-										<input type="hidden" class="track-changes" name="fortitude" id="fortitude_val" value="<?php echo isset($user) ? $user['fortitude'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+										<input type="hidden" class="track-changes" name="fortitude" id="fortitude_val" value="<?php echo $user['fortitude'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 										<span class="glyphicon glyphicon-plus hidden-icon" id="Fortitude_up" onclick="adjustAttribute('fortitude', 1)"></span>
 										<span class="glyphicon glyphicon-minus hidden-icon" id="Fortitude_down" onclick="adjustAttribute('fortitude', -1)"></span>
 									</label>
@@ -1086,7 +1064,7 @@
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
 										<span class="attribute-val" id="speed_text"></span>
-										<input type="hidden" class="track-changes" name="speed" id="speed_val" value="<?php echo isset($user) ? $user['speed'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+										<input type="hidden" class="track-changes" name="speed" id="speed_val" value="<?php echo $user['speed'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 										<span class="glyphicon glyphicon-plus hidden-icon" id="Speed_up" onclick="adjustAttribute('speed', 1)"></span>
 										<span class="glyphicon glyphicon-minus hidden-icon" id="Speed_down" onclick="adjustAttribute('speed', -1)"></span>
 									</label>
@@ -1112,7 +1090,7 @@
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
 										<span class="attribute-val" id="agility_text"></span>
-										<input type="hidden" class="track-changes" name="agility" id="agility_val" value="<?php echo isset($user) ? $user['agility'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+										<input type="hidden" class="track-changes" name="agility" id="agility_val" value="<?php echo $user['agility'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 										<span class="glyphicon glyphicon-plus hidden-icon" id="Agility_up" onclick="adjustAttribute('agility', 1)"></span>
 										<span class="glyphicon glyphicon-minus hidden-icon" id="Agility_down" onclick="adjustAttribute('agility', -1)"></span>
 									</label>
@@ -1140,7 +1118,7 @@
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
 										<span class="attribute-val" id="precision__text"></span>
-										<input type="hidden" class="track-changes" name="precision_" id="precision__val" value="<?php echo isset($user) ? $user['precision_'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+										<input type="hidden" class="track-changes" name="precision_" id="precision__val" value="<?php echo $user['precision_'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 										<span class="glyphicon glyphicon-plus hidden-icon" id="Precision_up" onclick="adjustAttribute('precision_', 1)"></span>
 										<span class="glyphicon glyphicon-minus hidden-icon" id="Precision_down" onclick="adjustAttribute('precision_', -1)"></span>
 									</label>
@@ -1166,7 +1144,7 @@
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
 										<span class="attribute-val" id="awareness_text"></span>
-										<input type="hidden" class="track-changes" name="awareness" id="awareness_val" value="<?php echo isset($user) ? $user['awareness'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+										<input type="hidden" class="track-changes" name="awareness" id="awareness_val" value="<?php echo $user['awareness'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 										<span class="glyphicon glyphicon-plus hidden-icon" id="Awareness_up" onclick="adjustAttribute('awareness', 1)"></span>
 										<span class="glyphicon glyphicon-minus hidden-icon" id="Awareness_down" onclick="adjustAttribute('awareness', -1)"></span>
 									</label>
@@ -1194,7 +1172,7 @@
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
 										<span class="attribute-val" id="allure_text"></span>
-										<input type="hidden" class="track-changes" name="allure" id="allure_val" value="<?php echo isset($user) ? $user['allure'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+										<input type="hidden" class="track-changes" name="allure" id="allure_val" value="<?php echo $user['allure'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 										<span class="glyphicon glyphicon-plus hidden-icon" id="Allure_up" onclick="adjustAttribute('allure', 1)"></span>
 										<span class="glyphicon glyphicon-minus hidden-icon" id="Allure_down" onclick="adjustAttribute('allure', -1)"></span>
 									</label>
@@ -1220,7 +1198,7 @@
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
 										<span class="attribute-val" id="deception_text"></span>
-										<input type="hidden" class="track-changes" name="deception" id="deception_val" value="<?php echo isset($user) ? $user['deception'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+										<input type="hidden" class="track-changes" name="deception" id="deception_val" value="<?php echo $user['deception'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 										<span class="glyphicon glyphicon-plus hidden-icon" id="Deception_up" onclick="adjustAttribute('deception', 1)"></span>
 										<span class="glyphicon glyphicon-minus hidden-icon" id="Deception_down" onclick="adjustAttribute('deception', -1)"></span>
 									</label>
@@ -1248,7 +1226,7 @@
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
 										<span class="attribute-val" id="intellect_text"></span>
-										<input type="hidden" class="track-changes" name="intellect" id="intellect_val" value="<?php echo isset($user) ? $user['intellect'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+										<input type="hidden" class="track-changes" name="intellect" id="intellect_val" value="<?php echo $user['intellect'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 										<span class="glyphicon glyphicon-plus hidden-icon" id="Intellect_up" onclick="adjustAttribute('intellect', 1)"></span>
 										<span class="glyphicon glyphicon-minus hidden-icon" id="Intellect_down" onclick="adjustAttribute('intellect', -1)"></span>
 									</label>
@@ -1274,7 +1252,7 @@
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
 										<span class="attribute-val" id="innovation_text"></span>
-										<input type="hidden" class="track-changes" name="innovation" id="innovation_val" value="<?php echo isset($user) ? $user['innovation'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+										<input type="hidden" class="track-changes" name="innovation" id="innovation_val" value="<?php echo $user['innovation'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 										<span class="glyphicon glyphicon-plus hidden-icon" id="Innovation_up" onclick="adjustAttribute('innovation', 1)"></span>
 										<span class="glyphicon glyphicon-minus hidden-icon" id="Innovation_down" onclick="adjustAttribute('innovation', -1)"></span>
 									</label>
@@ -1302,7 +1280,7 @@
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
 										<span class="attribute-val" id="intuition_text"></span>
-										<input type="hidden" class="track-changes" name="intuition" id="intuition_val" value="<?php echo isset($user) ? $user['intuition'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+										<input type="hidden" class="track-changes" name="intuition" id="intuition_val" value="<?php echo $user['intuition'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 										<span class="glyphicon glyphicon-plus hidden-icon" id="Intuition_up" onclick="adjustAttribute('intuition', 1)"></span>
 										<span class="glyphicon glyphicon-minus hidden-icon" id="Intuition_down" onclick="adjustAttribute('intuition', -1)"></span>
 									</label>
@@ -1328,7 +1306,7 @@
 								<div class="col-md-5 col-xs-4">
 									<label class="control-label">
 										<span class="attribute-val" id="vitality_text"></span>
-										<input type="hidden" class="track-changes" name="vitality" id="vitality_val" value="<?php echo isset($user) ? $user['vitality'] : '' ?>" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user">
+										<input type="hidden" class="track-changes" name="vitality" id="vitality_val" value="<?php echo $user['vitality'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 										<span class="glyphicon glyphicon-plus hidden-icon" id="Vitality_up" onclick="adjustAttribute('vitality', 1)"></span>
 										<span class="glyphicon glyphicon-minus hidden-icon" id="Vitality_down" onclick="adjustAttribute('vitality', -1)"></span>
 									</label>
@@ -1361,17 +1339,13 @@
 						<div class="form-group motivator-bonus">
 							<label for="bonuses">Bonuses:</label>
 							<?php
-								if (isset($user)) {
-									$m_pts = 0;
-									foreach ($user_motivators as $m) {
-										if ($m['primary_'] == 1) {
-											$m_pts += intval($m['points']);
-										}
+								$m_pts = 0;
+								foreach ($user_motivators as $m) {
+									if ($m['primary_'] == 1) {
+										$m_pts += intval($m['points']);
 									}
-									$bonuses = $m_pts >= 64 ? 5 : ($m_pts >= 32 ? 4 : ($m_pts >= 16 ? 3 : ($m_pts >= 8 ? 2 : ($m_pts >= 4 ? 1 : 0))));
-								} else {
-									$bonuses = 0;
 								}
+								$bonuses = $m_pts >= 64 ? 5 : ($m_pts >= 32 ? 4 : ($m_pts >= 16 ? 3 : ($m_pts >= 8 ? 2 : ($m_pts >= 4 ? 1 : 0))));
 								$set_motivators = count($user_motivators) == 0;
 							?>
 							<input class="form-control" readonly name="bonuses" id="bonuses" value="<?php echo $bonuses ?>">
@@ -1510,7 +1484,7 @@
 			<!-- section: protection -->
 			<div class="col-md-12">
 				<div class="section form-horizontal">
-					<div class="section-title"><span>Protection</span> <i class="fa-solid icon-protection custom-icon"></i></div>
+					<div class="section-title"><span>Protections</span> <i class="fa-solid icon-protection custom-icon"></i></div>
 					<div class="form-group">
 						<label class="control-label col-xs-1 col-icon mobile-hide" for="_eqip"></label>
 						<label class="control-label col-xs-3 col-icon-right mobile-hide center" for="protections[]">Item</label>
@@ -1582,7 +1556,7 @@
 
 						<div class="col-xs-3">
 							<?php
-								$base = isset($user) ? 100 + 20 * $user['strength'] : 100;
+								$base = 100 + 20 * $user['strength'];
 							?>
 							<input class="form-control" readonly name="unhindered" id="unhindered" value="<?php echo $base / 4 ?>">
 						</div>
@@ -1628,7 +1602,7 @@
 					</div>
 					<div class="form-group">
 						<div class="col-xs-12">
-							<textarea class="form-control track-changes" rows="6" name="background" id="background" maxlength="2000" data-id="<?php echo isset($user) ? htmlspecialchars($user['id']) : '' ?>" data-table="user"><?php echo isset($user) ? htmlspecialchars($user['background']) : '' ?></textarea>
+							<textarea class="form-control track-changes" rows="6" name="background" id="background" maxlength="2000" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user"><?php echo htmlspecialchars($user['background']) ?></textarea>
 						</div>
 					</div>
 				</div>
@@ -1739,10 +1713,9 @@
         <div class="modal-body">
         	<!-- get xp to next level -->
 					<?php
-						$current_xp = isset($user) ? $user['xp'] : 0;
 						$next_level = 0;
 						foreach ($levels as $lvl) {
-							if ($current_xp < $lvl) {
+							if ($user['xp'] < $lvl) {
 								$next_level = $lvl;
 								break;
 							}
@@ -2322,7 +2295,7 @@
 
 		// get all database values
 		campaign = <?php echo json_encode(isset($campaign) ? $campaign : []); ?>;
-		user = <?php echo json_encode(isset($user) ? $user : []); ?>;
+		user = <?php echo json_encode($user); ?>;
 		console.log(user);
 		feat_list = <?php echo json_encode($feat_list); ?>;
 		feat_reqs = <?php echo json_encode($feat_reqs); ?>;
@@ -2341,6 +2314,8 @@
 			let training = new UserTraining(user_trainings[i]);
 			userTrainings.push(training);
 		}
+
+		let trainingAutocompletes = <?php echo json_encode($training_autocomplete); ?>;
 
 		// disable all inputs if user can't edit
 		if ($("#can_edit").val() == 0 && !user['is_new']) {
@@ -2504,6 +2479,15 @@
 			addNoteElements(note);
 		}
 		user['notes'] = userNotes;
+
+		// generate leveling table
+		let levels = [];
+		var xp_total = 0;
+		levels.push(xp_total);
+		for (var i = 1; i < 25; i++) {
+			xp_total +=  20 * i;
+			levels.push(xp_total);
+		}
 
 	</script>
 

@@ -8,6 +8,7 @@ var feat_reqs;
 // booleans to determine rules and element visibility for various operating modes
 var inputChanges = false;
 var allocatingAttributePts = false;
+var pointsAllocated = 0;
 var characterCreation = false;
 var adminEditMode = false;
 var addingNewSchool = false;
@@ -33,165 +34,6 @@ for (var i in featList) {
 		schoolTalents[featList[i]['requirements'][0][0]['training']].push(featList[i]);
 	}
 }
-
-var skillAutocompletes = {
-	'Strength':
-	{
-		'skill':[
-			'Swimming'
-		],
-		'training':[],
-		'focus':[
-			'Climb',
-			'Jump',
-			'Lift'
-		],
-	},
-	'Fortitude':
-	{
-		'skill':[
-			'Swimming'
-		],
-		'training':[],
-		'focus':[
-			'Resist Poison',
-			'Resist Disease'
-		],
-	},
-	'Speed':
-	{
-		'skill':[],
-		'training':[],
-		'focus':[
-			'Run',
-			'React'
-		],
-	},
-	'Agility':
-	{
-		'skill':[
-			'Ride Animal'
-		],
-		'training':[],
-		'focus':[
-			'Brawl',
-			'Attack (specific weapon)'
-		],
-	},
-	'Awareness':
-	{
-		'skill':[
-			'Stealth'
-		],
-		'training':[],
-		'focus':[
-			'Search',
-			'Listen',
-			'Smell',
-			'Taste'
-		],
-	},
-	'Precision':
-	{
-		'skill':[
-			'Demolitions',
-			'Security',
-			'Drive',
-			'Pilot',
-			'Sleight of Hand'
-		],
-		'training':[],
-		'focus':[
-			'Shoot (specific weapon)',
-			'Throw (specific weapon)'
-		],
-	},
-	'Allure':
-	{
-		'skill':[
-			'Train Animal',
-			'Perform'
-		],
-		'training':[],
-		'focus':[
-			'Seduce',
-			'Diplomacy',
-			'Barter'
-		],
-	},
-	'Deception':
-	{
-		'skill':[
-			'Hacking',
-			'Perform',
-			'Sleight of Hand',
-			'Stealth'
-		],
-		'training':[],
-		'focus':[
-			'Disguise'
-		],
-	},
-	'Innovation':
-	{
-		'skill':[
-			'Engineering',
-			'Hacking',
-			'First Aid',
-			'Tactics',
-			'Security',
-			'Drive',
-			'Pilot',
-			'Sail'
-		],
-		'training':[],
-		'focus':[
-			'Craft (specific item)'
-		],
-	},
-	'Intellect':
-	{
-		'skill':[
-			'Engineering',
-			'First Aid',
-			'Survival',
-			'Demolitions',
-			'Sail'
-		],
-		'training':[],
-		'focus':[
-			'Appraise',
-			'Academia (specific area)',
-			'Culture (specific area)',
-			'Languages',
-			'Religion (specific religion)',
-			'Magic',
-			'Profession (specific profession)'
-		],
-	},
-	'Intuition':
-	{
-		'skill':[
-			'Survival',
-			'Tactics',
-			'Ride Animal'
-		],
-		'training':[],
-		'focus':[
-			'Sense Motive',
-			'Interrogate'
-		],
-	},
-	'Vitality':
-	{
-		'skill':[],
-		'training':[],
-		'focus':[
-			'Intimidate',
-			'Willpower'
-		],
-	},
-};
 
 var attributes = [
 	'strength',
@@ -387,6 +229,16 @@ $(".track-changes").on("change", function() {
 		user[column] = newVal;
 		updateDatabaseColumn(table, column, newVal, id);
 	}
+});
+
+$("#level").on("change", function() {
+	// adjust xp
+	$("#xp").val(levels[$(this).val()-1]).trigger("change");
+	user['xp'] = levels[$(this).val()-1];
+	$("#next_level").html(levels[$(this).val()]);
+	// adjust attribute points
+	$("#attribute_pts").val($(this).val()*12 - pointsAllocated).trigger("change");
+	user['attribute_pts'] = $(this).val()*12 - pointsAllocated;
 });
 
 $(".motivator-input").on("click", function() {
@@ -699,6 +551,8 @@ function endEditAttributes(accept) {
 		}
 	}
 	if (accept) {
+		// set pointsAllocated value
+		pointsAllocated += $("#attribute_pts").val() - $(".attribute-count").html().split(" Points")[0];
 		// update #attribute_pts input val from .attribute-count
 		$("#attribute_pts").val($(".attribute-count").html().split(" Points")[0]).trigger("change");
 		if (parseInt($("#attribute_pts").val()) == 0) {
@@ -1159,7 +1013,9 @@ function setAttributes(user) {
 	adjustInitiative();
 	// set race
 	setRaceInput();
-	$("#race").trigger("change");
+	if ($("#race").val() != "") {
+		$("#race").trigger("change");
+	}
 
 	// check for pending xp awards
 	if (xp_awards.length > 0) {
@@ -1193,7 +1049,9 @@ function setRaceInput() {
 		source: function(input, add) {
 			let suggestions = [];
 			$.each(races, function(i, race) {
-				suggestions.push(race['name']);
+				if (race['name'].toLowerCase().includes(input['term'].toLowerCase())) {
+					suggestions.push(race['name']);
+				}
 			});
 			add(suggestions);
 		},

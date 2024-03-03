@@ -758,9 +758,9 @@ function newTrainingModal(attribute) {
 	}
 
 	// set autocomplete values to inputs - skill_name, training_name, focus_name
-	var skill = skillAutocompletes[attribute]['skill'];
-	var training = skillAutocompletes[attribute]['training'];
-	var focus = skillAutocompletes[attribute]['focus'];
+	var skill = trainingAutocompletes[attribute]['skill'];
+	var training = trainingAutocompletes[attribute]['training'];
+	var focus = trainingAutocompletes[attribute]['focus'];
 	$("#skill_name").autocomplete({
 		source: skill
 	});
