@@ -13,13 +13,13 @@
 	$data = $_POST['data'];
 	$columns = $_POST['columns'];
 
-	$sql = "INSERT INTO ".$_POST['table']." (user_id,";
+	$sql = $_POST['user_id'] == "" ? "INSERT INTO ".$_POST['table']." (" : "INSERT INTO ".$_POST['table']." (user_id,";
 	foreach ($columns as $column) {
 		if (isset($data[$column]) && $data[$column] != '') {
 			$sql .= $column.",";
 		}
 	}
-	$sql = rtrim($sql, ",") . ") VALUES (".$_POST['user_id'].",";
+	$sql = $_POST['user_id'] == "" ? rtrim($sql, ",") . ") VALUES (" : rtrim($sql, ",") . ") VALUES (".$_POST['user_id'].",";
 	foreach ($columns as $column) {
 		if (isset($data[$column]) && $data[$column] != '') {
 			$sql .= is_numeric($data[$column]) ? $data[$column]."," : "'".addslashes($data[$column])."',";

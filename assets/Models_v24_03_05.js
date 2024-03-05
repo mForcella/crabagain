@@ -680,10 +680,6 @@ class UserTalent {
 		$("#"+featType+"_name").val(this.name).removeClass("hidden").attr("disabled", !(adminEditMode && this.feat_id == 0));
 
 		var description = this.description;
-		// if feat is physical trait, add cost/bonus to description
-		if (featType == "physical_trait_pos" || featType == "physical_trait_neg") {
-			description += "\n\n"+(this.cost > 0 ? "Attribute Point Cost: "+this.cost : "Attribute Point Bonus: "+(this.cost*-1));
-		}
 
 		// if editing is allowed, change feat_update_btn text to 'Update', else set to 'Ok'
 		$("#feat_update_btn").html(adminEditMode && (featType == "feat" || featType == "magic_talent") ? "Update" : "Ok");

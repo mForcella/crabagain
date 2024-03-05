@@ -40,9 +40,37 @@
 		}
 	}
 
+	// get all login users and campaign membership status
+	$login_data = [];
+	$login_campaigns = [];
+	$login_ids = [];
+	$sql = "SELECT * FROM login WHERE 1 ORDER BY email ASC";
+	$result_1 = $db->query($sql);
+	if ($result_1) {
+		while($row = $result_1->fetch_assoc()) {
+			$login = $row;
+			$login['active'] = false;
+			$login['admin'] = false;
+
+			$sql = "SELECT * FROM login_campaign WHERE campaign_id = $campaign_id";
+			$result_2 = $db->query($sql);
+			if ($result_2) {
+				while($row = $result_2->fetch_assoc()) {
+					if ($row['login_id'] == $login['id']) {
+						array_push($login_campaigns, $row);
+						$login['active'] = true;
+						$login['admin'] = $login['admin'] || $row['campaign_role'] == 1;
+					}
+				}
+			}
+			array_push($login_ids, $login['id']);
+			array_push($login_data, $login);
+		}
+	}
+
 	// get characters
 	$users = [];
-	$sql = "SELECT * FROM user WHERE campaign_id = $campaign_id";
+	$sql = "SELECT * FROM user WHERE campaign_id = $campaign_id AND login_id IN (".implode(',',$login_ids).")";
 	$result_u = $db->query($sql);
 	if ($result_u) {
 		while($row_u = $result_u->fetch_assoc()) {
@@ -134,6 +162,19 @@
 
 			array_push($users, $user);
 		}
+	}
+
+	$logins = [];
+	foreach($login_data as $login) {
+		$characters = "";
+		foreach($users as $user) {
+			if ($user['login_id'] == $login['id']) {
+				$characters .= $user['character_name'].", ";
+			}
+		}
+		$characters = rtrim($characters, ", ");
+		$login['characters'] = $characters;
+		array_push($logins, $login);
 	}
 
 	// sort users by initiative
@@ -236,7 +277,6 @@
 	// assign talent ID
 	foreach($talent_list_json as $json) {
 		foreach($feats as $feat) {
-			// TODO some race traits are duplicate names
 			if ($feat['name'] == $json->name) {
 				$json->id = $feat['id'];
 				array_push($talents, $json);
@@ -357,6 +397,9 @@
 </script>
 
 <style type="text/css">
+	body {
+		overflow-x: auto;
+	}
 	.table-heading {
 		text-align: center;
 		font-weight: bold;
@@ -374,6 +417,8 @@
 		border: 1px solid black;
 		display: table;
 		margin: 0 auto;
+		width: 100%;
+		max-width: 1200px;
 	}
 	.table {
 		background-color: #e6e6e6;
@@ -385,8 +430,16 @@
 	th {
 		white-space:nowrap;
 	}
+	.table.fixed-width th:nth-of-type(1) {
+		width: 120px;
+		max-width: 120px;
+	}
+	.table.fixed-width th:nth-of-type(2) {
+		width: 180px;
+		max-width: 180px;
+	}
 	.container, .footer {
-		min-width: 750px;
+		min-width: 1200px;
 	}
 	.footer {
 		margin-top: 30px;
@@ -409,22 +462,17 @@
 	.base-award-label {
 		font-size: 16px;
 	}
-	#xp_modal {
-		width: 750px;
-		position: absolute;
-	}
-	#xp_modal .modal-content {
+	#xp_modal .modal-content, #edit_players_modal .modal-content {
 		background-color: #cccccc;
 	}
 	#xp_modal .note {
-		/*max-width: 500px;*/
 		margin: 0 auto;
 		margin-top: 15px;
 		cursor: default;
 		white-space: normal;
 		width: 100%;
 	}
-	#xp_modal .toggle-switchy {
+	.modal-content .toggle-switchy {
 		transform: scale(0.7);
 	}
 	#xp_modal input {
@@ -449,6 +497,10 @@
 	}
 	.modal {
 		margin: 0 auto;
+	}
+	.modal-body {
+		max-width: 100%;
+		overflow-x: auto;
 	}
 	@media (min-width: 768px) {
 		.modal-dialog {
@@ -540,7 +592,14 @@
 		padding-bottom: 12px;
 	}
 	.btn-wrapper {
-		text-align: center;
+		display: flex;
+		justify-content: space-between;
+		background-color: transparent;
+		border: none;
+		box-shadow: none;
+		-webkit-box-shadow: none;
+		max-width: 1200px;
+		padding: 0 250px;
 	}
 	#xp_btn {
 		margin-bottom: 15px;
@@ -596,8 +655,11 @@
 	.btn.btn-primary.btn-danger {
 		background-color: red !important;
 	}
+	.highlight-hover:hover {
+		text-shadow: 0px 0px 3px #404040;
+	}
 
-	@media (max-width: 868px) {
+	/*@media (max-width: 868px) {
 		.name-row, .select-row {
 			display: none;
 		}
@@ -607,8 +669,8 @@
 		.table-row td {
 			border-top: none !important;
 		}
-	}
-	@media (max-width: 868px) {
+	}*/
+	/*@media (max-width: 868px) {
 		#xp_modal {
 			height: 200vh;
 		}
@@ -622,31 +684,31 @@
 		    -webkit-transform: scale(1.3);
 		}
 		#xp_modal .note {
-			/*max-width: 300px;*/
+			max-width: 300px;
 		}
-	}
+	}*/
 	/* extra small for mobile? */
-	@media (max-width: 767px) {
+	/*@media (max-width: 767px) {
 		#xp_modal .table>tbody>tr>th, #xp_modal .table>tbody>tr>td {
-/*			padding: 5px;*/
-/*			font-size: 13px;*/
+			padding: 5px;
+			font-size: 13px;
 		}
 		th input {
-/*			margin-top: -6px !important;*/
+			margin-top: -6px !important;
 		}
 		#xp_modal .modal-dialog {
-/*			width: 465px;*/
+			width: 465px;
 		}
 		#xp_modal .small {
-/*			font-size: 63%;*/
+			font-size: 63%;
 		}
-	}
+	}*/
 </style>
 
 <body>
 	<div class="container">
 
-		<input type="hidden" id="admin_password" value="<?php echo isset($_GET['auth']) ? $_GET['auth'] : '' ?>">
+		<input type="hidden" id="campaign_id" value="<?php echo $campaign_id?>">
 
 		<!-- button - scroll to top of page -->
 		<button id="scroll_top" class="no-vis"><span class="glyphicon glyphicon-arrow-up" onclick="scrollToTop()"></span></button>
@@ -696,6 +758,14 @@
 				</tr>
 				<?php
 					foreach($users as $user) {
+						// make sure player is active in campaign - user['login_id'] is in login_campaigns
+						$active = false;
+						foreach($login_campaigns as $login) {
+							$active = $active || $login['login_id'] == $user['login_id'];
+						}
+						if (!$active) {
+							continue;
+						}
 
 						// get level
 						$levels = [];
@@ -746,10 +816,7 @@
 						$defend += $user['defend_mod'];
 
 						echo 
-						"<tr class='mobile-name-row'>
-							<td colspan='10'><a href='/?campaign=".$campaign['id']."&user=".$user['id']."'><strong>".$user['character_name']."</strong></a></td>
-						</tr>
-						<tr class='table-row'>
+						"<tr class='table-row user-row'>
 							<td class='name-row'><a href='/?campaign=".$campaign['id']."&user=".$user['id']."'><strong>".$user['character_name']."</strong></a></td>
 							<td id='xp_".$user['id']."'>"
 							.$user['xp']
@@ -775,8 +842,9 @@
 		</div>
 
 		<!-- open xp modal -->
-		<div class="btn-wrapper" <?php if(count($users) == 0) { echo 'hidden'; } ?>>
+		<div class="btn-wrapper panel panel-default" <?php if(count($users) == 0) { echo 'hidden'; } ?>>
 			<button id="xp_btn" data-toggle="modal" data-target="#xp_modal"><i class="fa-solid fa-award"></i> Award XP</button>
+			<button id="xp_btn" data-toggle="modal" data-target="#edit_players_modal">Add/Remove Players</button>
 		</div>
 
 		<form id="campaign_form">
@@ -792,7 +860,7 @@
 				</label>
 			</div>
 			<div class="panel panel-default">
-				<table class="table" id="feat_table">
+				<table class="table" id="race_table">
 					<tr>
 						<th>Enabled <input type='checkbox' class="race-check" checked onclick="checkAll(this, 'race-check')"></th>
 						<th>Name</th>
@@ -805,22 +873,22 @@
 							$traits = "";
 							foreach($race_traits as $trait) {
 								if ($trait['race_id'] == $race['id']) {
-									$traits .= $trait['trait'].", ";
+									$traits .= "<span class='highlight-hover'>".$trait['trait']."</span>, ";
 								}
 							}
 							$traits = rtrim($traits, ", ");
 							$skills = "";
 							foreach($race_skills as $skill) {
 								if ($skill['race_id'] == $race['id']) {
-									$skills .= ($skill['value'] == 0 ? 'Training: ' : 'Focus: ').$skill['skill'].($skill['input_required'] ? ' (Any)' : '').($skill['value'] == 0 ? '' : ' +'.$skill['value']).", ";
+									$skills .= "<span class='highlight-hover'>".($skill['value'] == 0 ? 'Training: ' : 'Focus: ').$skill['skill'].($skill['input_required'] ? ' (Any)' : '').($skill['value'] == 0 ? '' : ' +'.$skill['value'])."</span>, ";
 								}
 							}
 							$skills = rtrim($skills, ", ");
 							echo 
 							"<tr class='table-row' id='row_".$race['id']."'>
 								<td class='center'><input id='".$race['id']."' class='race-check' type='checkbox' ".(isset($race['active']) || $counts['race_count'] == 0 ? 'checked' : '')." name='race_status[]' value='".$race['id']."'></td>
-								<td><label for='".$race['id']."'>".$race['name']."</label></td>
-								<td>".$race['size']."</td>
+								<td class='highlight-hover'><label for='".$race['id']."'>".$race['name']."</label></td>
+								<td class='highlight-hover'>".$race['size']."</td>
 								<td>".$traits."</td>
 								<td>".$skills."</td>
 							</tr>";
@@ -832,7 +900,7 @@
 			<h4 class="table-heading" id="section_standard">Standard Talents</h4>
 			<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('feat')"></span> -->
 			<div class="panel panel-default">
-				<table class="table" id="feat_table">
+				<table class="table fixed-width" id="feat_table">
 					<tr>
 						<th>Enabled</th>
 						<th>Name</th>
@@ -846,6 +914,7 @@
 							if ($talent->type == 'standard_talent') {
 								// build requirement string
 								foreach($talent->requirements as $req_set) {
+									$reqs .= "<span class='highlight-hover'>";
 									for($i = 0; $i < count($req_set); $i++) {
 										foreach($req_set[$i] as $key => $value) {
 											$reqs .= $i > 0 ? "OR " : "&#8226;";
@@ -856,12 +925,13 @@
 											}
 										}
 									}
+									$reqs .= "</span>";
 								}
 								echo 
 								"<tr class='table-row' id='row_".$talent->id."'>
-									<td class='center'><input type='checkbox' ".(isset($talent->active) || $total_count == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
-									<td>".$talent->name."</td>
-									<td>".$talent->description."</td>
+									<td class='center'><input id='check_".$talent->id."' type='checkbox' ".(isset($talent->active) || $total_count == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
+									<td class='highlight-hover'>".$talent->description."</td>
 									<td>".$reqs."</td>
 								</tr>";
 								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
@@ -882,7 +952,7 @@
 			</div>
 			<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('magical_talent')"></span> -->
 			<div class="panel panel-default">
-				<table class="table" id="physical_trait_pos_table">
+				<table class="table fixed-width" id="physical_trait_pos_table">
 					<tr>
 						<th>Enabled <input type='checkbox' class="magical-talent-check" checked onclick="checkAll(this, 'magical-talent-check')"></th>
 						<th>Name</th>
@@ -896,6 +966,7 @@
 							if ($talent->type == 'magic_talent' || $talent->type == 'school_talent') {
 								// build requirement string
 								foreach($talent->requirements as $req_set) {
+									$reqs .= "<span class='highlight-hover'>";
 									for($i = 0; $i < count($req_set); $i++) {
 										foreach($req_set[$i] as $key => $value) {
 											$reqs .= $i > 0 ? "OR " : "&#8226;";
@@ -906,12 +977,13 @@
 											}
 										}
 									}
+									$reqs .= "</span>";
 								}
 								echo 
 								"<tr class='table-row' id='row_".$talent->id."'>
-									<td class='center'><input class='magical-talent-check' type='checkbox' ".(isset($talent->active) || $counts['magical_talent_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
-									<td>".$talent->name."</td>
-									<td>".$talent->description."</td>
+									<td class='center'><input id='check_".$talent->id."' class='magical-talent-check' type='checkbox' ".(isset($talent->active) || $counts['magical_talent_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
+									<td class='highlight-hover'>".$talent->description."</td>
 									<td>".$reqs."</td>
 								</tr>";
 								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
@@ -932,7 +1004,7 @@
 			</div>
 			<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('physical_trait_pos')"></span> -->
 			<div class="panel panel-default">
-				<table class="table" id="physical_trait_pos_table">
+				<table class="table fixed-width" id="physical_trait_pos_table">
 					<tr>
 						<th>Enabled <input type='checkbox' class="physical-trait-pos-check" checked onclick="checkAll(this, 'physical-trait-pos-check')"></th>
 						<th>Name</th>
@@ -945,10 +1017,10 @@
 							if ($talent->type == 'physical_trait' && $talent->cost > 0) {
 								echo 
 								"<tr class='table-row' id='row_".$talent->id."'>
-									<td class='center'><input class='physical-trait-pos-check' type='checkbox' ".(isset($talent->active) || $counts['physical_pos_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
-									<td>".$talent->name."</td>
-									<td>".$talent->description."</td>
-									<td class='center'>".$talent->cost."</td>
+									<td class='center'><input id='check_".$talent->id."' class='physical-trait-pos-check' type='checkbox' ".(isset($talent->active) || $counts['physical_pos_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
+									<td class='highlight-hover'>".$talent->description."</td>
+									<td class='center highlight-hover'>".$talent->cost."</td>
 								</tr>";
 								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
@@ -968,7 +1040,7 @@
 			</div>
 			<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('physical_trait_neg')"></span> -->
 			<div class="panel panel-default">
-				<table class="table" id="physical_trait_neg_table">
+				<table class="table fixed-width" id="physical_trait_neg_table">
 					<tr>
 						<th>Enabled <input type='checkbox' class="physical-trait-neg-check" checked onclick="checkAll(this, 'physical-trait-neg-check')"></th>
 						<th>Name</th>
@@ -981,10 +1053,10 @@
 							if ($talent->type == 'physical_trait' && $talent->cost < 0) {
 								echo 
 								"<tr class='table-row' id='row_".$talent->id."'>
-									<td class='center'><input class='physical-trait-neg-check' type='checkbox' ".(isset($talent->active) || $counts['physical_neg_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
-									<td>".$talent->name."</td>
-									<td>".$talent->description."</td>
-									<td class='center'>".(intval($talent->cost)*-1)."</td>
+									<td class='center'><input id='check_".$talent->id."' class='physical-trait-neg-check' type='checkbox' ".(isset($talent->active) || $counts['physical_neg_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
+									<td class='highlight-hover'>".$talent->description."</td>
+									<td class='center highlight-hover'>".(intval($talent->cost)*-1)."</td>
 								</tr>";
 								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
@@ -1004,7 +1076,7 @@
 			</div>
 			<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('social_trait')"></span> -->
 			<div class="panel panel-default">
-				<table class="table" id="social_trait_table">
+				<table class="table fixed-width" id="social_trait_table">
 					<tr>
 						<th>Enabled <input type='checkbox' class="social-trait-check" checked onclick="checkAll(this, 'social-trait-check')"></th>
 						<th>Name</th>
@@ -1016,9 +1088,9 @@
 							if ($talent->type == 'social_trait') {
 								echo 
 								"<tr class='table-row' id='row_".$talent->id."'>
-									<td class='center'><input class='social-trait-check' type='checkbox' ".(isset($talent->active) || $counts['social_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
-									<td>".$talent->name."</td>
-									<td>".$talent->description."</td>
+									<td class='center'><input id='check_".$talent->id."' class='social-trait-check' type='checkbox' ".(isset($talent->active) || $counts['social_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
+									<td class='highlight-hover'>".$talent->description."</td>
 								</tr>";
 								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
@@ -1038,7 +1110,7 @@
 			</div>
 			<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('morale_trait')"></span> -->
 			<div class="panel panel-default">
-				<table class="table" id="morale_trait_table">
+				<table class="table fixed-width" id="morale_trait_table">
 					<tr>
 						<th>Enabled <input type='checkbox' class="morale-trait-check" checked onclick="checkAll(this, 'morale-trait-check')"></th>
 						<th>Name</th>
@@ -1054,10 +1126,10 @@
 								$neg_state = explode('Negative State: ', $talent->description)[1];
 								echo 
 								"<tr class='table-row' id='row_".$talent->id."'>
-									<td class='center'><input class='morale-trait-check' type='checkbox' ".(isset($talent->active) || $counts['morale_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
-									<td>".$talent->name."</td>
-									<td>".$pos_state."</td>
-									<td>".$neg_state."</td>
+									<td class='center'><input id='check_".$talent->id."' class='morale-trait-check' type='checkbox' ".(isset($talent->active) || $counts['morale_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
+									<td class='highlight-hover'>".$pos_state."</td>
+									<td class='highlight-hover'>".$neg_state."</td>
 								</tr>";
 								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
@@ -1077,7 +1149,7 @@
 			</div>
 			<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('compelling_action')"></span> -->
 			<div class="panel panel-default">
-				<table class="table" id="compelling_action_table">
+				<table class="table fixed-width" id="compelling_action_table">
 					<tr>
 						<th>Enabled <input type='checkbox' class="compelling-action-check" checked onclick="checkAll(this, 'compelling-action-check')"></th>
 						<th>Name</th>
@@ -1089,9 +1161,9 @@
 							if ($talent->type == 'compelling_action') {
 								echo 
 								"<tr class='table-row' id='row_".$talent->id."'>
-									<td class='center'><input class='compelling-action-check' type='checkbox' ".(isset($talent->active) || $counts['compelling_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
-									<td>".$talent->name."</td>
-									<td>".$talent->description."</td>
+									<td class='center'><input id='check_".$talent->id."' class='compelling-action-check' type='checkbox' ".(isset($talent->active) || $counts['compelling_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
+									<td class='highlight-hover'>".$talent->description."</td>
 								</tr>";
 								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
@@ -1111,7 +1183,7 @@
 			</div>
 			<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('profession')"></span> -->
 			<div class="panel panel-default">
-				<table class="table" id="profession_table">
+				<table class="table fixed-width" id="profession_table">
 					<tr>
 						<th>Enabled <input type='checkbox' class="profession-check" checked onclick="checkAll(this, 'profession-check')"></th>
 						<th>Name</th>
@@ -1123,9 +1195,9 @@
 							if ($talent->type == 'profession') {
 								echo 
 								"<tr class='table-row' id='row_".$talent->id."'>
-									<td class='center'><input class='profession-check' type='checkbox' ".(isset($talent->active) || $counts['profession_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
-									<td>".$talent->name."</td>
-									<td>".$talent->description."</td>
+									<td class='center'><input id='check_".$talent->id."' class='profession-check' type='checkbox' ".(isset($talent->active) || $counts['profession_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
+									<td class='highlight-hover'>".$talent->description."</td>
 								</tr>";
 								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
@@ -1145,7 +1217,7 @@
 			</div>
 			<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('social_background')"></span> -->
 			<div class="panel panel-default">
-				<table class="table" id="social_background_table">
+				<table class="table fixed-width" id="social_background_table">
 					<tr>
 						<th>Enabled <input type='checkbox' class="social_background-check" checked onclick="checkAll(this, 'social_background-check')"></th>
 						<th>Name</th>
@@ -1157,9 +1229,9 @@
 							if ($talent->type == 'social_background') {
 								echo 
 								"<tr class='table-row' id='row_".$talent->id."'>
-									<td class='center'><input class='social_background-check' type='checkbox' ".(isset($talent->active) || $counts['social_background_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
-									<td>".$talent->name."</td>
-									<td>".$talent->description."</td>
+									<td class='center'><input id='check_".$talent->id."' class='social_background-check' type='checkbox' ".(isset($talent->active) || $counts['social_background_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
+									<td class='highlight-hover'>".$talent->description."</td>
 								</tr>";
 								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
@@ -1196,10 +1268,56 @@
 		</div>
 	</div>
 
-	<!-- award xp modal -->
+	<!-- add/remove players modal -->
+	<div class="modal" id="edit_players_modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-md modal-dialog-centered" role="document">
+		  <div class="modal-content">
+		    <div class="modal-header">
+		      <h4 class="modal-title">Edit Party</h4>
+		    </div>
+		    <div class="modal-body">
 
+				<div class="panel">
+					<table class="table center">
+						<tr>
+							<th>Party Member?</th>
+							<th>Player</th>
+							<th>Characters</th>
+						</tr>
+						<?php
+							foreach($logins as $login) {
+								echo "
+								<tr>
+									<td class='select-row'>
+										<label class='toggle-switchy' for='select_".$login['id']."' data-size='sm' data-text='false'>
+											<input class='active-checkbox' type='checkbox' id='select_".$login['id']."' ".($login['active'] ? 'checked' : '')." ".($login['admin'] ? 'disabled' : '').">
+											<span class='toggle'>
+												<span class='switch'></span>
+											</span>
+										</label>
+									</td>
+									<td>".$login['email']."</td>
+									<td>".($login['characters'] == "" ? "None" : $login['characters'])."</td>
+								</tr>
+								";
+							}
+						?>
+					</table>
+				</div>
+
+		    	<!-- TODO option to invite new players -->
+
+		    	<div class="button-bar">
+		        	<button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+		    	</div>
+		    </div>
+		  </div>
+		</div>
+	</div>
+
+	<!-- award xp modal -->
 	<div class="modal" id="xp_modal" tabindex="-1" role="dialog">
-		<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+		<div class="modal-dialog modal-md modal-dialog-centered" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
 					<h4 class="modal-title">Award XP</h4>
@@ -1225,57 +1343,40 @@
 								<th class="name-row">Character</th>
 								<th>Base Award</th>
 								<th>Costume?</th>
-								<th>Chips</th>
+								<!-- <th>Chips</th> -->
 								<th>Total</th>
 							</tr>
 							<?php
 								foreach($users as $user) {
 
-									// get level
-									$levels = [];
-									$xp_total = 0;
-									foreach (range(1,25) as $number) {
-										$xp_total += 20 * $number;
-										array_push($levels, $xp_total);
+									// make sure player is active in campaign - user['login_id'] is in login_campaigns
+									$active = false;
+									foreach($login_campaigns as $login) {
+										$active = $active || $login['login_id'] == $user['login_id'];
 									}
-									$level = 1;
-									$i = 2;
-									foreach ($levels as $lvl) {
-										if ($user['xp'] >= $lvl) {
-											$level = $i++;
-										}
+									if (!$active) {
+										continue;
 									}
 
-									echo 
-									"<tr class='mobile-name-row'>
-										<td colspan='4'>
-										<label><strong>".$user['character_name']."</strong></label>
-										<label class='toggle-switchy' for='mobile_select_".$user['id']."' data-size='sm' data-text='false'>
-											<input class='xp-checkbox-mobile' checked type='checkbox' id='mobile_select_".$user['id']."' checked>
-											<span class='toggle'>
-												<span class='switch'></span>
-											</span>
-										</label>
-										</td>
-									<tr>
+									echo "
 									<tr class='xp-row table-row' id='".$user['id']."'>
 										<td class='select-row'>
 										<label class='toggle-switchy' for='select_".$user['id']."' data-size='sm' data-text='false'>
-											<input class='xp-checkbox' checked type='checkbox' id='select_".$user['id']."' checked>
+											<input class='xp-checkbox' type='checkbox' id='select_".$user['id']."' checked>
 											<span class='toggle'>
 												<span class='switch'></span>
 											</span>
 										</label>
 										</td>
-										<td class='name-row'><label for='select_".$user['id']."' class='xp-label min'><strong>".$user['character_name']."</strong></label></td>
+										<td class='name-row'><label for='select_".$user['id']."' class='xp-label min'>".$user['character_name']."</label></td>
 										<td>
 											<span class='award' id='award_".$user['id']."'>0</span>
 										</td>
 										<td><input type='checkbox' class='costume-chk' id='costume_".$user['id']."'></td>
-										<td><input type='number' value='0' min='0' class='form-control chips' id='chips_".$user['id']."'></td>
+										<!-- <td><input type='number' value='0' min='0' class='form-control chips' id='chips_".$user['id']."'></td> -->
 										<td>
-											<strong><span class='total' id='total_".$user['id']."'>0</span></strong>
-											</td>
+											<span class='total' id='total_".$user['id']."'>0</span>
+										</td>
 									</tr>";
 								}
 							?>
@@ -1283,7 +1384,7 @@
 					</div>
 
 					<div class="center note">
-						<i class="small">Note: XP that has been awarded to characters will be added to their total the next time that player loads/saves their character.</i>
+						<i class="small">Note: XP that has been awarded to characters will be added to their total the next time that player views their character.</i>
 					</div>
 
 					<div class="button-bar">
@@ -1526,33 +1627,204 @@
 		adjustTotals();
 	});
 
-	$(".costume-chk").on("change", function(){
+	$(".costume-chk").on("change", function() {
 		adjustTotals();
 	});
 
-	$(".xp-checkbox").on("change", function(){
+	$(".xp-checkbox").on("change", function() {
 		adjustTotals();
 		var id = this.id.split("select_")[1];
 		$("#mobile_select_"+id).prop("checked", $(this).is(":checked"));
-		$("#chips_"+id).attr("disabled", !$(this).is(":checked"));
+		// $("#chips_"+id).attr("disabled", !$(this).is(":checked"));
 		$("#costume_"+id).attr("disabled", !$(this).is(":checked"));
 	});
 
-	$(".xp-checkbox-mobile").on("change", function(){
+	$(".xp-checkbox-mobile").on("change", function() {
 		var id = this.id.split("mobile_select_")[1];
 		$("#select_"+id).trigger("click");
 	});
 
-
-	$(".chips").on("input", function(){
-		// get number value
-		var num = parseInt($(this).val());
-		if (isNaN(num)) {
-			num = 0;
+	$(".active-checkbox").on("change", function() {
+		let login_id = this.id.split("select_")[1];
+		let campaign_id = $("#campaign_id").val();
+		if ($(this).is(":checked")) {
+			// insert login_campaign
+			$.ajax({
+				url: '/scripts/insert_database_object.php',
+				data: { 'table' : 'login_campaign', 'data' : {'login_id':login_id, 'campaign_id':campaign_id}, 'columns' : ['login_id', 'campaign_id'], 'user_id' : "" },
+				ContentType: "application/json",
+				type: 'POST',
+				success: function(response) {
+					// console.log(response);
+					let login_campaign = {'id':response, 'campaign_id':campaign_id, 'login_id':login_id};
+					login_campaigns.push(login_campaign);
+					updateTables();
+				}
+			});
+		} else {
+			// delete login_campaign
+			var id = 0;
+			for (var i in login_campaigns) {
+				if (login_campaigns[i]['login_id'] == login_id) {
+					id = login_campaigns[i]['id'];
+					login_campaigns.splice(i,1);
+					updateTables();
+					break;
+				}
+			}
+			$.ajax({
+				url: '/scripts/delete_database_object.php',
+				data: { 'table' : 'login_campaign', 'id' : id },
+				ContentType: "application/json",
+				type: 'POST',
+				success: function(response) {
+					// console.log(response);
+				}
+			});
 		}
-		$(this).val(num);
-		adjustTotals();
 	});
+
+	function updateTables() {
+
+		$(".user-row").remove();
+		$(".xp-row").remove();
+
+		for (var i in users) {
+			let user = users[i];
+			var active = false;
+			for (var j in login_campaigns) {
+				active = active || login_campaigns[j]['login_id'] == user['login_id'];
+			}
+			if (!active) {
+				continue;
+			}
+
+			// get character level
+			let levels = [];
+			var xp_total = 0;
+			var level = 1;
+			for (var j = 1; j < 25; j++) {
+				xp_total += 20 * j;
+				levels.push(xp_total);
+			}
+			for (var j in levels) {
+				if (user['xp'] >= levels[j]) {
+					level += 1;
+				}
+			}
+
+			// get resilience, damage and wounds
+			let resilience = user['fortitude'] >= 0 ? 3 + Math.floor(user['fortitude']/2) : 3 + Math.ceil(user['fortitude']/3);
+			var damage = user['damage'];
+			var wounds = 0;
+			while (damage >= resilience) {
+				wounds += 1;
+				damage -= resilience;
+			}
+
+			// get size modifier, dodge, defend, toughness
+			let size_modifier = user['size'] == "Small" ? 2 : (user['size'] == "Large" ? -2 : 0);
+			var dodge = user['agility'] >= 0 ? Math.floor(user['agility']/2) : (Math.ceil(user['agility']/3) == 0 ? 0 : Math.ceil(user['agility']/3));
+			dodge = dodge + size_modifier + user['dodge_mod'];
+			let toughness = user['strength'] >= 0 ? Math.floor(user['strength']/2) : (Math.ceil(user['strength']/3) == 0 ? 0 : Math.ceil(user['strength']/3));
+			let defend = parseInt(user['agility']) + 10 + parseInt(size_modifier) + parseInt(user['defend_mod']);
+
+			// update user table
+			let row_user = $('<tr />', {
+				'class': 'user-row table-row',
+			}).appendTo($(".user-table"));
+
+			$('<td />', {
+				'class': "name-row",
+				'html': "<a href='/?campaign="+campaign['id']+"&user="+user['id']+"'><strong>"+user['character_name']+"</strong></a>"
+			}).appendTo(row_user);
+
+			$('<td />', {
+				'id': "xp_"+user['id'],
+				'html': user['xp'] + (user['xp_award'] == 0 ? '' : (user['xp_award'] > 0 ? " (+"+user['xp_award']+")" : " ("+user['xp_award']+")"))
+			}).appendTo(row_user);
+
+			$('<td />', {
+				'id': "level_"+user['id'],
+				'html': level
+			}).appendTo(row_user);
+
+			$('<td />', {
+				'html': "<input class='short-input form-control' id='damage_"+user['id']+"' min='0' type='number' value='"+damage+"'> / "+resilience
+			}).appendTo(row_user);
+
+			$('<td />', {
+				'html': "<input class='short-input form-control' id='wounds_"+user['id']+"' max='3' min='0' type='number' value='"+wounds+"'> / 3"
+			}).appendTo(row_user);
+
+			$('<td />', {
+				'html': user['primary']+"/"+user['secondary']
+			}).appendTo(row_user);
+
+			$('<td />', {
+				'html': toughness + (user['toughness_bonus'] > 0 ? " (+"+user['toughness_bonus']+")" : "")
+			}).appendTo(row_user);
+
+			$('<td />', {
+				'html': defend + (user['defend_bonus'] > 0 ? " (+"+user['defend_bonus']+")" : "")
+			}).appendTo(row_user);
+
+			$('<td />', {
+				'html': dodge
+			}).appendTo(row_user);
+
+			$('<td />', {
+				'html': user['awareness']
+			}).appendTo(row_user);
+
+			$('<td />', {
+				'html': user['vitality']
+			}).appendTo(row_user);
+
+
+			// update xp table
+			let row_xp = $('<tr />', {
+				'id': user['id'],
+				'class': 'xp-row table-row',
+			}).appendTo($(".xp-table"));
+
+			$('<td />', {
+				'class': 'select-row',
+				'html': "<label class='toggle-switchy' for='select_"+user['id']+"' data-size='sm' data-text='false'>"+
+				"<input class='xp-checkbox' type='checkbox' id='select_"+user['id']+"' checked>"+
+				"<span class='toggle'><span class='switch'></span></span></label>"
+			}).appendTo(row_xp);
+
+			$('<td />', {
+				'class': 'name-row',
+				'html': "<label for='select_"+user['id']+"' class='xp-label min'>"+user['character_name']+"</label>"
+			}).appendTo(row_xp);
+
+			$('<td />', {
+				'html': "<span class='award' id='award_"+user['id']+"'>0</span>"
+			}).appendTo(row_xp);
+
+			$('<td />', {
+				'html': "<input type='checkbox' class='costume-chk' id='costume_"+user['id']+"'>"
+			}).appendTo(row_xp);
+
+			$('<td />', {
+				'html': "<span class='total' id='total_"+user['id']+"'>0</span>"
+			}).appendTo(row_xp);
+
+		}
+
+	}
+
+	// $(".chips").on("input", function() {
+	// 	// get number value
+	// 	var num = parseInt($(this).val());
+	// 	if (isNaN(num)) {
+	// 		num = 0;
+	// 	}
+	// 	$(this).val(num);
+	// 	adjustTotals();
+	// });
 
 	function adjustTotals() {
 		// select_id
@@ -1562,7 +1834,8 @@
 			var level = parseInt($("#level_"+this.id).html());
 			var base = parseInt($("#award_"+this.id).html());
 			var costume = $("#costume_"+this.id).is(":checked");
-			var chips = parseInt($("#chips_"+this.id).val());
+			// var chips = parseInt($("#chips_"+this.id).val());
+			let chips = 0;
 			$("#total_"+this.id).html( selected ? base + (costume ? level : 0) + (chips * level) : 0 );
 		});
 	}
@@ -1601,7 +1874,11 @@
 	}
 
 	// get feat list and requirements
+	var campaign = <?php echo json_encode($campaign); ?>;
 	var talents = <?php echo json_encode($talents); ?>;
+	var logins = <?php echo json_encode($logins); ?>;
+	var users = <?php echo json_encode($users); ?>;
+	var login_campaigns = <?php echo json_encode($login_campaigns); ?>;
 
 	// set feat list for autocomplete
 	var feats = [];

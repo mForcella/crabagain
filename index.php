@@ -74,8 +74,17 @@
   }
 
 	// get user list for dropdown nav
+	$login_ids = [];
+	$sql = "SELECT login_id FROM login_campaign WHERE campaign_id = $campaign_id";
+	$result = $db->query($sql);
+  if ($result) {
+    while($row = $result->fetch_assoc()) {
+    	array_push($login_ids, $row['login_id']);
+    }
+  }
+
 	$users = [];
-	$sql = "SELECT * FROM user WHERE campaign_id = $campaign_id ORDER BY character_name";
+	$sql = "SELECT * FROM user WHERE campaign_id = $campaign_id AND login_id IN (".implode(',',$login_ids).") ORDER BY character_name";
 	$result = $db->query($sql);
   if ($result) {
     while($row = $result->fetch_assoc()) {
@@ -509,6 +518,7 @@
 		<input type="hidden" id="user_email" name="email" value="<?php echo $user["email"] ?>">
 		<input type="hidden" id="campaign_role" value="<?php echo $campaign_role ?>">
 		<input type="hidden" id="can_edit" value="<?php echo $can_edit ?>">
+		<input type="hidden" id="login_id" value="<?php echo $login_id ?>">
 		<input type="hidden" id="uuid">
 		<div class="row">
 			<div class="col-md-6">

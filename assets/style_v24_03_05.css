@@ -633,7 +633,13 @@ button.glyphicon {
 	text-align: center;
 }
 .modal-sm {
-	width: 300px !important;
+	width: 95%;
+	max-width: 300px !important;
+	margin: 30px auto !important;
+}
+.modal-md {
+	width: 95%;
+	max-width: 720px !important;
 	margin: 30px auto !important;
 }
 .motivator-title {

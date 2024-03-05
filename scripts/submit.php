@@ -15,17 +15,13 @@
 	}
 
 	// set character name and campaign id
+	$login_id = $_SESSION['login_id'];
 	$user_id = $_POST['user_id'];
 	$character_name = $_POST['character_name'];
 	$campaign_id = $_POST['campaign_id'];
-	$sql = "UPDATE user SET character_name = '$character_name', campaign_id = $campaign_id WHERE id = ".$user_id;
+	$sql = "UPDATE user SET character_name = '$character_name', campaign_id = $campaign_id, login_id = $login_id WHERE id = ".$user_id;
 	$db->query($sql);
 
-	// create login_user entry
-	$login_id = $_SESSION['login_id'];
-	$sql = "INSERT into login_user (login_id, user_id) VALUES ($login_id, $user_id)";
-	$db->query($sql);
-	$db->close();
 	header("Location: /?campaign=".$_POST['campaign_id']."&user=".$user_id,  true,  301 );  exit;
 
 	// $user_columns = ['campaign_id', 'email', 'character_name', 'attribute_pts', 'xp', 'morale', 'race', 'height', 'weight', 'age', 'eyes', 'hair', 'gender', 'other', 'size', 'strength', 'fortitude', 'speed', 'agility', 'precision_', 'awareness', 'allure', 'deception', 'intellect', 'innovation', 'intuition', 'vitality', 'background', 'magic', 'fear', 'poison', 'disease', 'damage', 'fatigue'];
