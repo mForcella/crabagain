@@ -68,6 +68,11 @@
 		}
 	}
 
+	// sort active users at the top of the list
+	usort($login_data, function($a, $b) {
+    	return $b['active'] <=> $a['active'];
+	});
+
 	// get characters
 	$users = [];
 	$sql = "SELECT * FROM user WHERE campaign_id = $campaign_id AND login_id IN (".implode(',',$login_ids).")";
@@ -652,6 +657,9 @@
 	.pointer {
 		cursor: pointer;
 	}
+	.btn-primary {
+		margin: 0 10px;
+	}
 	.btn.btn-primary.btn-danger {
 		background-color: red !important;
 	}
@@ -709,6 +717,7 @@
 	<div class="container">
 
 		<input type="hidden" id="campaign_id" value="<?php echo $campaign_id?>">
+		<input type="hidden" id="login_id" value="<?php echo $login_id?>">
 
 		<!-- button - scroll to top of page -->
 		<button id="scroll_top" class="no-vis"><span class="glyphicon glyphicon-arrow-up" onclick="scrollToTop()"></span></button>
@@ -741,7 +750,12 @@
 		</select>
 
 		<!-- character stats overview -->
-		<div class="panel panel-default" <?php if(count($users) == 0) { echo 'hidden'; } ?>>
+		<?php
+			if (count($users) == 0) {
+				echo "<h2 class='center'>No Characters Yet!</h2>";
+			}
+		?>
+		<div class="panel panel-default <?php if(count($users) == 0) { echo 'hidden'; } ?> ">
 			<table class="table user-table center">
 				<tr>
 					<th class="name-row"></th>
@@ -843,7 +857,7 @@
 
 		<!-- open xp modal -->
 		<div class="btn-wrapper panel panel-default" <?php if(count($users) == 0) { echo 'hidden'; } ?>>
-			<button id="xp_btn" data-toggle="modal" data-target="#xp_modal"><i class="fa-solid fa-award"></i> Award XP</button>
+			<button id="xp_btn" data-toggle="modal" data-target="#xp_modal" <?php if(count($users) == 0) { echo 'disabled'; } ?>><i class="fa-solid fa-award"></i> Award XP</button>
 			<button id="xp_btn" data-toggle="modal" data-target="#edit_players_modal">Add/Remove Players</button>
 		</div>
 
@@ -1268,6 +1282,28 @@
 		</div>
 	</div>
 
+	<!-- invite new players -->
+	<div class="modal" id="invite_modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+		  <div class="modal-content">
+		    <div class="modal-header">
+		      <h4 class="modal-title">Invite New Player</h4>
+		    </div>
+		    <div class="modal-body">
+
+				<p>Enter the email address below of the player you'd like to invite.<br><br>Once they complete the registration process they will automatically be added to your campaign. </p>
+				<input class="form-control" type="email" id="invite_email">
+
+		    	<div class="button-bar">
+		        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+		        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="sendInvite()">Invite</button>
+		    	</div>
+
+		    </div>
+		  </div>
+		</div>
+	</div>
+
 	<!-- add/remove players modal -->
 	<div class="modal" id="edit_players_modal" tabindex="-1" role="dialog">
 		<div class="modal-dialog modal-md modal-dialog-centered" role="document">
@@ -1297,7 +1333,7 @@
 										</label>
 									</td>
 									<td>".$login['email']."</td>
-									<td>".($login['characters'] == "" ? "None" : $login['characters'])."</td>
+									<td>".($login['characters'] == "" ? "<strong>NONE</strong>" : $login['characters'])."</td>
 								</tr>
 								";
 							}
@@ -1305,10 +1341,9 @@
 					</table>
 				</div>
 
-		    	<!-- TODO option to invite new players -->
-
 		    	<div class="button-bar">
 		        	<button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+		        	<button type="button" class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#invite_modal"><i class="fa-regular fa-paper-plane"></i> Invite New Players</button>
 		    	</div>
 		    </div>
 		  </div>
@@ -1967,17 +2002,46 @@
 	// submit campaign settings to ajax
 	function saveCampaignSettings() {
 		$.ajax({
-		  url: '/scripts/update_campaign.php',
-		  data: $("#campaign_form").serialize(),
-		  ContentType: "application/json",
-		  type: 'POST',
-		  success: function(response){
-		  	if (response == 'ok') {
-		  		// do nothing
-		  	}
-		  }
+			url: '/scripts/update_campaign.php',
+			data: $("#campaign_form").serialize(),
+			ContentType: "application/json",
+			type: 'POST',
+			success: function(response){
+				if (response == 'ok') {
+					// do nothing
+				}
+			}
 		});
 	}
+
+	// invite new player to campaign
+	function sendInvite() {
+		// get invite email
+		let email = $("#invite_email").val();
+		// check if it's a valid email
+		if (validateEmail(email)) {
+			// submit to ajax
+			$.ajax({
+				url: '/scripts/send_invite.php',
+				data: {'email':email, 'campaign_id':$("#campaign_id").val(), 'login_id':$("#login_id").val()},
+				ContentType: "application/json",
+				type: 'POST',
+				success: function(response){
+					if (response == 1) {
+						alert("Your invitation has been sent");
+					}
+				}
+			});
+		} else {
+			alert("Please enter a valid email address");
+		}
+	}
+
+	function validateEmail(email) {
+		return String(email)
+		.toLowerCase()
+		.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+	};
 
 	function enable(e, type) {
 		$("."+type).attr("disabled", !e.checked);

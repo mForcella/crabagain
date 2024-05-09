@@ -79,12 +79,12 @@ function setFeatList() {
 								// get user's governing magic school value
 								for (var i in userTrainings) {
 									if (userTrainings[i].governing_school == 1) {
-										satisfied = satisfied ? true : userTrainings[i].value >= req[key];
+										satisfied = satisfied ? true : parseInt(userTrainings[i].value) >= parseInt(req[key]);
 									}
 								}
 								break;
 							default: // skill
-								satisfied = satisfied ? true : user[key] >= req[key];
+								satisfied = satisfied ? true : parseInt(user[key]) >= parseInt(req[key]);
 								break;
 						}
 					}
@@ -940,8 +940,8 @@ function addTrainingElements(training, skillType) {
 		adjustAttribute(id_val, -1);
 	});
 
-	// show plus minus icons if talent is new
-	if (training.is_new) {
+	// show plus minus icons for new talents during character creation
+	if (training.is_new && characterCreation) {
 		up.show();
 		down.show();
 	}

@@ -125,9 +125,12 @@ html, body {
 }
 
 /* detect touchscreen */
-@media (hover: none) {
+#is_mobile {
+	display: none;
+}
+@media (hover: hover) and (pointer: fine) {
   #is_mobile {
-  	display: none;
+  	display: block;
   }
 }
 
@@ -777,15 +780,20 @@ ul {
 	display: none;
 	margin-left: 20px;
 }
-@media (hover: none) {
+@media screen and (max-width:991px) {
 	#resilience_adjust {
 		display: inline-block;
 	}
 }
+/*@media (hover: hover) and (pointer: fine) {
+	#resilience_adjust {
+		display: none;
+	}
+}*/
 .row {
 	margin: 0;
 }
-@media screen and (min-width:992px)  {
+@media screen and (min-width:992px) {
 	.row-narrow-desktop {
 		margin-left: -30px !important;
 	}

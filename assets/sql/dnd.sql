@@ -60,6 +60,15 @@
     FOREIGN KEY (campaign_id) REFERENCES campaign(id) ON DELETE CASCADE
   );
 
+  CREATE TABLE invitation (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    invite_code varchar(255),
+    email varchar(255),
+    campaign_id int,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (campaign_id) REFERENCES campaign(id) ON DELETE CASCADE
+  );
+
   CREATE TABLE user (
     -- Non-character values
     id int PRIMARY KEY AUTO_INCREMENT,
@@ -102,8 +111,8 @@
     poison varchar(64),
     disease varchar(64),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (login_id) REFERENCES login(id),
-    FOREIGN KEY (campaign_id) REFERENCES campaign(id)
+    FOREIGN KEY (login_id) REFERENCES login(id) ON DELETE SET NULL,
+    FOREIGN KEY (campaign_id) REFERENCES campaign(id) ON DELETE SET NULL
   );
 
   CREATE TABLE user_feat (

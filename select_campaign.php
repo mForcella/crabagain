@@ -174,6 +174,9 @@
 		right: 50px;
 		text-align: right;
 	}
+	#add_users_modal .modal-sm {
+		max-width: 400px !important;
+	}
 </style>
 
 <body>
@@ -206,7 +209,7 @@
 
 	<!-- new campaign modal -->
 	<div class="modal" id="new_campaign_modal" tabindex="-1" role="dialog">
-		<div class="modal-dialog modal-md modal-dialog-centered" role="document">
+		<div class="modal-dialog modal-sm modal-dialog-centered" role="document">
 			<div class="modal-content searching-prompt">
 				<div class="modal-header">
 					<h4 class="modal-title">New Campaign</h4>
@@ -225,16 +228,15 @@
 
 	<!-- add users modal -->
 	<div class="modal" id="add_users_modal" tabindex="-1" role="dialog">
-		<div class="modal-dialog modal-md modal-dialog-centered" role="document">
+		<div class="modal-dialog modal-sm modal-dialog-centered" role="document">
 			<div class="modal-content searching-prompt">
 				<div class="modal-header">
 					<h4 class="modal-title">New Campaign</h4>
 				</div>
 				<div class="modal-body">
 
-					<label class="control-label">Let's add some users to this campaign, shall we.</label><br><br>
+					<label class="control-label">Go ahead and select some players to add to your campaign. We'll notify them by email. And don't worry, you can add (or remove) players from your campaign later on as well.</label><br><br>
 
-					<!-- checkbox list with all users -->
 					<?php
 						foreach($users as $user) {
 							if ($user['id'] != $login_id) {
@@ -253,11 +255,13 @@
 						}
 					?>
 
-					<!-- TODO add option to invite new users -->
+					<br><label class="control-label">You can also invite new players by entering their email addresses below. Once they complete the registration process they will automatically be added to your campaign. <strong><i>Separate emails with a comma.</i></strong> </label><br><br>
+
+					<textarea class="form-control" id="email_invites"></textarea>
 
 					<div class="button-bar">
 						<button type="button" class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#new_campaign_modal">Back</button>
-						<button type="button" class="btn btn-primary" data-dismiss="modal" disabled id="next_btn_2" data-toggle="modal" data-target="#confirm_nerd_modal">Next</button>
+						<button type="button" class="btn btn-primary" data-dismiss="modal" id="next_btn_2" data-toggle="modal" data-target="#confirm_nerd_modal">Next</button>
 					</div>
 				</div>
 			</div>
@@ -302,10 +306,6 @@
 		$("#next_btn").attr("disabled", $(this).val() == "");
 	});
 
-	$("#admin_password").on("input", function(){
-		$("#next_btn_2").attr("disabled", $(this).val() == "");
-	});
-
 	// enable/disable button on checkbox toggle
 	$(".user-toggle").on("change", function() {
 		if (this.checked) {
@@ -316,7 +316,7 @@
 				users.splice(index, 1);
 			}
 		}
-		$("#next_btn_2").attr("disabled", users.length == 0);
+		// $("#next_btn_2").attr("disabled", users.length == 0);
 	});
 
 	// on campaign select - redirect to campaign page
@@ -356,7 +356,8 @@
 	function createCampaign() {
 		// make sure campaign name doesn't already exist
 		// TODO this might be confusing if the user can't see the other campaign names...
-		// allow duplicate campaign names, add date created in dropdown if duplicate?
+		// only need to check against campaigns where user is admin?
+
 		for (var i in campaign_names) {
 			if (campaign_names[i] == $("#campaign_name").val()) {
 				alert("Campaign name already in use");
@@ -377,13 +378,46 @@
 			type: 'POST',
 			success: function(response) {
 				if (response != 0) {
+					let campaign_id = response;
+
+					// check for invites
+					let invites = $("#email_invites").val().split(",");
+					for (var i in invites) {
+						if (invites[i] != "") {
+							// validate email and send invite
+							let email = invites[i].trim();
+							if (validateEmail(email)) {
+								// submit to ajax
+								$.ajax({
+									url: '/scripts/send_invite.php',
+									data: {'email':email, 'campaign_id':campaign_id, 'login_id':$("#login_id").val()},
+									ContentType: "application/json",
+									type: 'POST',
+									success: function(response){
+										if (response == 1) {
+											// email ok
+										}
+									}
+								});
+							} else {
+								// invalid email address
+							}
+						}
+					}
+
 					// redirect to campaign admin page
-					window.location.href = "/admin.php?campaign="+response;
+					window.location.href = "/admin.php?campaign="+campaign_id;
 				} else {
 					alert("Sorry nerd, that's not it.");
 				}
 			}
 		});
 	}
+
+	function validateEmail(email) {
+		return String(email)
+		.toLowerCase()
+		.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+	};
 
 </script>

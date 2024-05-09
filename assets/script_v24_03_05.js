@@ -1124,11 +1124,12 @@ function getRace(race) {
 }
 
 function setMoraleEffect(morale) {
+	// TODO set max morale to 8
 	var positiveEffects = {
 		2: "You gain +1 Fate",
 		4: "You gain 1 Motivator Bonus Each Session",
 		6: "You gain +1 Fate",
-		8: "Once per Session you can declare a Fate 6, leading to an Epic Success"
+		8: "Once per Session you can declare a Natural 20, leading to an Epic Success"
 	};
 	var negativeEffects = {
 		2: "You suffer -1 Fate",
@@ -1169,6 +1170,7 @@ function adjustFate() {
 
 // adjust attribute value
 function adjustAttribute(attribute, val) {
+	// TODO trainings should have a min val of 0
 	var originalVal = parseInt($("#" + attribute+"_val").val());
 	var newVal = originalVal + parseInt(val);
 	// check if we are allocating attribute points

@@ -19,6 +19,18 @@
 	$email = isset($_POST['email']) ? $_POST['email'] : "";
     $password = isset($_POST['password']) ? $_POST['password'] : "";
     $password_confirm = isset($_POST['password_confirm']) ? $_POST['password_confirm'] : "";
+    $invite_code = isset($_GET['invite']) ? $_GET['invite'] : "";
+
+    // get email and invitation from invite code
+    $invitation;
+    if ($invite_code != "") {
+        $sql = "SELECT * FROM invitation WHERE invite_code = '$invite_code'";
+		$result = $db->query($sql);
+		while ($row = $result->fetch_assoc()) {
+			$invitation = $row;
+			$email = $row['email'];
+		}
+    }
 
     if ($email != "" && $password != "" && $password_confirm != "") {
 
@@ -58,12 +70,22 @@
 			$sql = "INSERT into login (email, password, confirmation_code) VALUES ('$email', '$hashed_password', '$confirmation_code')";
 			$db->query($sql);
 
-			// generate reset link
+			// check for invite code - add user to campaign
+			if ($invite_code != "") {
+				$sql = "INSERT into login_campaign (login_id, campaign_id, campaign_role) VALUES (".$db->insert_id.", ".$invitation['campaign_id'].", 2)";
+				$db->query($sql);
+
+				// delete invitation
+				$sql = "DELETE FROM invitation WHERE id = ".$invitation['id'];
+				$db->query($sql);
+			}
+
+			// generate confirmation link
 			$protocol = isset($_SERVER["HTTPS"]) ? 'https://' : 'http://';
 			$domain = $_SERVER['HTTP_HOST'];
 			$url = "<a href='".$protocol.$domain."/scripts/confirm_account.php?confirmation_code=".$confirmation_code."'>Confirm Your Account</a>";
 
-			// email me with reset link
+			// email me with confirmation link
 		    $mail = new PHPMailer;
 		    $mail->Host = $email_config['host'];
 		    $mail->Port = $email_config['port'];
@@ -189,7 +211,7 @@
 		<form action="" method="POST">
 			<div>
 				<label class="control-label">Email</label>
-				<input class="form-control" type="text" name="email" required>
+				<input class="form-control" type="text" name="email" required value="<?php echo $email ?>" <?php echo $invite_code == "" ? "" : "disabled" ?>>
 			</div>
 			<div class="container-row">
 				<label class="control-label">Password</label>
@@ -201,6 +223,9 @@
 			</div>
 			<button class="btn btn-primary" type="submit">Register</button>
 		</form>
+	</div>
+	<div class="link-container">
+		<a class="link" href="/login.php">Already registered? Login!</a>
 	</div>
 
 </body>

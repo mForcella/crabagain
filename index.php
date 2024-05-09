@@ -2310,7 +2310,7 @@
 		let talents = <?php echo json_encode($talents); ?>;
 		// talents with no ID are either not active for campaign or not in DB
 		let no_id = <?php echo json_encode($no_id); ?>;
-		console.log(no_id);
+		// console.log(no_id);
 		let race_traits = <?php echo json_encode($race_traits); ?>;
 		let counts = <?php echo json_encode($counts); ?>;
 		
