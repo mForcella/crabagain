@@ -18,16 +18,16 @@ function updateFeat() {
 		return;
 	}
 
-	let featName = $("#feat_name_val").val() == "" ? $("#feat_name").val() : $("#feat_name_val").val();
+	let featName = $("#feat_name_val").val() == "" ? $("#standard_talent_name").val() : $("#feat_name_val").val();
 	let featType = $("#feat_type").val() == "" ? "feat" : $("#feat_type").val();
 	let feat_id = $("#feat_id").val() == "" ? 0 : $("#feat_id").val();
 	let user_feat_id = $("#user_feat_id").val();
 	let featDescription = $("#feat_description").val();
 	if (featDescription == "") {
-		// get description from feat_list if empty
-		for (var i in feat_list) {
-			if (feat_list[i]['id'] == feat_id) {
-				featDescription = feat_list[i]['description'];
+		// get description from talents if empty
+		for (var i in talents) {
+			if (talents[i]['id'] == feat_id) {
+				featDescription = talents[i]['description'];
 			}
 		}
 	}
@@ -39,7 +39,7 @@ function updateFeat() {
 		getTalent(user_feat_id).name = featName;
 	}
 
-	if (featType == "feat" || featType == "magic_talent") {
+	if (featType == "standard_talent" || featType == "magic_talent" || featType == "school_talent") {
 		// update description
 		updateDatabaseColumn('user_feat', 'description', featDescription, user_feat_id);
 		getTalent(user_feat_id).description = featDescription;
@@ -52,7 +52,7 @@ function setFeatList() {
 	var eligible_feats = [];
 	var ineligible_feats = [];
 	// set autocomplete list for feats
-	$.each(feat_list, function(i, feat) {
+	$.each(talents, function(i, feat) {
 		if (feat['type'] == 'feat' || feat['type'] == 'standard_talent' || feat['type'] == 'magic_talent' || feat['type'] == "school_talent") {
 			var is_eligible = true;
 			// feat[requirements] is an array of arrays - each array must return true
@@ -64,7 +64,7 @@ function setFeatList() {
 						switch (key) {
 							case 'feat':
 								for (var i in userTalents) {
-									satisfied = satisfied ? true : userTalents[i]['name'].includes(req[key]);
+									satisfied = satisfied ? true : userTalents[i].name.includes(req[key]);
 								}
 								break;
 							case 'training':
@@ -76,10 +76,14 @@ function setFeatList() {
 								satisfied = characterCreation;
 								break;
 							case 'governing':
-								// get user's governing magic school value
+								// get user's governing magic school name and/or value
 								for (var i in userTrainings) {
 									if (userTrainings[i].governing_school == 1) {
-										satisfied = satisfied ? true : parseInt(userTrainings[i].value) >= parseInt(req[key]);
+										if (isNaN(req[key])) {
+											satisfied = satisfied ? true : userTrainings[i].name == req[key];
+										} else {
+											satisfied = satisfied ? true : parseInt(userTrainings[i].value) >= parseInt(req[key]);
+										}
 									}
 								}
 								break;
@@ -106,7 +110,7 @@ function setFeatList() {
 	var standard_list1 = [];
 	var magic_list1 = [];
 	for (var i in eligible_feats) {
-		if (eligible_feats[i]['type'] == 'magic_talent') {
+		if (eligible_feats[i]['type'] == 'magic_talent' || eligible_feats[i]['type'] == 'school_talent') {
 			magic_list1.push(eligible_feats[i]['name']);
 		} else {
 			standard_list1.push(eligible_feats[i]['name']);
@@ -117,7 +121,7 @@ function setFeatList() {
 	var standard_list2 = [];
 	var magic_list2 = [];
 	for (var i in ineligible_feats) {
-		if (ineligible_feats[i]['type'] == 'magic_talent') {
+		if (ineligible_feats[i]['type'] == 'magic_talent' || ineligible_feats[i]['type'] == 'school_talent') {
 			magic_list2.push(ineligible_feats[i]['name']);
 		} else {
 			standard_list2.push(ineligible_feats[i]['name']);
@@ -128,7 +132,7 @@ function setFeatList() {
 	var standardList = standard_list1.concat(standard_list2);
 	var magicList = magic_list1.concat(magic_list2);
 
-	$("#feat_name").autocomplete({
+	$("#standard_talent_name").autocomplete({
 		source: function(input, add) {
 			featSourceFunction(input, add, standardList);
 		},
@@ -166,7 +170,7 @@ function featSourceFunction(input, add, list) {
 			entry.value = feat_name;
 			// check if attribute requirements are satisfied
 			entry.satisfied = true;
-			$.each(feat_list, function(j, feat_vals) {
+			$.each(talents, function(j, feat_vals) {
 				if (feat_vals['name'] == feat_name) {
 					$.each(feat_vals['requirements'], function(k, reqs) {
 						$.each(reqs, function(l, req) {
@@ -223,52 +227,35 @@ function featSelectFunction(ui) {
 	// build user message if requirements aren't satisfied
 	if (!ui.item.satisfied) {
 		var requirements = "";
-		for (var i in feat_list) {
-			if (feat_list[i]['name'] == ui.item.value) {
-				for (var j in feat_list[i]['requirements']) {
-					for (var k in feat_list[i]['requirements'][j]) {
-						for (var key in feat_list[i]['requirements'][j][k]) {
+		for (var i in talents) {
+			if (talents[i]['name'] == ui.item.value) {
+				for (var j in talents[i]['requirements']) {
+					for (var k in talents[i]['requirements'][j]) {
+						for (var key in talents[i]['requirements'][j][k]) {
 							// key types : feat, training, character_creation, governing, or attribute
 							// adjust labels for requirements
 							var item = key;
-							var req = feat_list[i]['requirements'][j][k][key];
+							var req = talents[i]['requirements'][j][k][key];
 							item = capitalize(item);
 							item = item == "Precision_" ? "Precision" : item;
 							item = item == "Governing" ? "Governing School" : item;
-							var attributes = [
-								'governing',
-								'strength',
-								'fortitude',
-								'speed',
-								'agility',
-								'precision_',
-								'awareness',
-								'allure',
-								'deception',
-								'intellect',
-								'innovation',
-								'intuition',
-								'vitality'
-							];
-							if (attributes.includes(key)) {
-								req = "+"+req;
-							}
+							req = isNaN(req) ? req : "+"+req;
 							requirements += key == "character_creation" ? "*only available during character creation" : 
 								item + " : " + req;
 						}
-						if (feat_list[i]['requirements'][j].length > 1 && k < feat_list[i]['requirements'][j].length-1) {
+						if (talents[i]['requirements'][j].length > 1 && k < talents[i]['requirements'][j].length-1) {
 							requirements += " OR ";
 						}
 					}
 					requirements += "\n";
 				}
 				requirements += "\n";
-				requirements += feat_list[i]['name']+"\n";
-				requirements += feat_list[i]['description'];
+				requirements += talents[i]['name']+"\n";
+				requirements += talents[i]['description'];
 			}
 		}
 		alert("Requirements not met for "+ui.item.value+":\n\n"+requirements);
-		$("#feat_name").val("").removeClass("x onX");
+		$("#standard_talent_name").val("").removeClass("x onX");
 		$("#feat_description").val("");
 		return false;
 	} else {
@@ -279,12 +266,12 @@ function featSelectFunction(ui) {
 
 		// auto fill description on feat selection
 		$("#feat_name_val").val(talent);
-		for (var i in feat_list) {
-			if (feat_list[i]['name'] == talent) {
-				$("#feat_id").val(feat_list[i]['id']);
-				$("#feat_type").val(feat_list[i]['type']);
-				$("#feat_cost").val(feat_list[i]['cost']);
-				$("#feat_description").val(feat_list[i]['description']).height($("#feat_description")[0].scrollHeight);
+		for (var i in talents) {
+			if (talents[i]['name'] == talent) {
+				$("#feat_id").val(talents[i]['id']);
+				$("#feat_type").val(talents[i]['type']);
+				$("#feat_cost").val(talents[i]['cost']);
+				$("#feat_description").val(talents[i]['description']).height($("#feat_description")[0].scrollHeight);
 			}
 		}
 		return true;
@@ -306,14 +293,13 @@ function hideMagicSelects(select, value) {
 	} else if (select == "Shapeshifter") {
 		$(".shapeshifter_select").removeClass("hidden")
 		$("#animal_name").val(value);
-		// TODO any way to get animal level? would need to save cost to database
-		// hide animal level input for now?
+		// TODO any way to get animal level? would need to save cost to database; hide animal level input for now?
 	}
 }
 
 function newFeat() {
 
-	let featName = $("#feat_name_val").val() == "" ? $("#feat_name").val() : $("#feat_name_val").val();
+	let featName = $("#feat_name_val").val() == "" ? $("#standard_talent_name").val() : $("#feat_name_val").val();
 	let featDescription = $("#feat_description").val();
 	let featType = $("#feat_type").val() == "" ? "feat" : $("#feat_type").val();
 	let featCost = $("#feat_cost").val() == "" ? 4 : $("#feat_cost").val();
@@ -396,6 +382,16 @@ function newFeat() {
 		return;
 	}
 
+	// strong and frail constitution not allowed at the same time
+	if (featName == "Strong Constitution" && hasTalent("Frail Constitution")) {
+		alert("Strong Constitution and Frail Constitution are not allowed concurrently");
+		return;
+	}
+	if (featName == "Frail Constitution" && hasTalent("Strong Constitution")) {
+		alert("Strong Constitution and Frail Constitution are not allowed concurrently");
+		return;
+	}
+
 	// check for 'Divine Magic'
 	if (featName == "Divine Magic") {
 		// prompt to choose a vow
@@ -410,7 +406,7 @@ function newFeat() {
 			// only one talent/skill per level
 			var skillCount = 0;
 			for (var i in userTrainings) {
-				if (userTrainings[i].is_new && (userTrainings[i].skill_type == "skill" || userTrainings[i].skill_type == "school")) {
+				if (userTrainings[i].is_new && (userTrainings[i].skill_type == "skill" || userTrainings[i].skill_type == "school" || userTrainings[i].skill_type == "esoteric")) {
 					skillCount += 1;
 				}
 			}
@@ -420,8 +416,7 @@ function newFeat() {
 					talentCount += 1;
 				}
 			}
-			// TODO level rules apply during character creation? only one talent or skill?
-			if ((!addingNewSchool && !characterCreation) && (talentCount > 0 || skillCount > 0)) {
+			if ((!addingNewSchool) && (talentCount > 0 || skillCount > 0)) {
 				alert("Only one new talent or unique skill can be added per level.");
 				return;
 			}
@@ -551,7 +546,18 @@ function addFeatElements(talent) {
 	}
 	// check for talents: Giant & Dwarf; adjust and lock size
 	if (talent.name == "Giant" || talent.name == "Dwarf") {
-		$("#character_size_select").val(talent.name == "Giant" ? "Large" : "Small");
+		// get race size and adjust
+		let sizes = [
+			"Tiny",
+			"Small",
+			"Medium",
+			"Large",
+			"Giant"
+		];
+		let size_adjust = talent.name == "Dwarf" ? -1 : 1;
+		let race = getRace($("#race").val());
+		let base = race == false ? 2 : sizes.indexOf(race['size']);
+		$("#character_size_select").val(sizes[base + size_adjust]);
 		editSize(true);
 		$("#size").attr("data-toggle", null).addClass("cursor-auto");
 	}
@@ -604,7 +610,7 @@ class UserTalent {
 		this.description = talent['description'];
 		// these values may be empty for custom talents
 		this.feat_id = parseInt(talent['feat_id']); // default = 0
-		this.type = talent['type'] != undefined ? talent['type'] : "feat"; // default = feat
+		this.type = talent['type'] != undefined ? talent['type'] : "standard_talent"; // default = feat
 		this.cost = talent['cost'] != undefined ? parseInt(talent['cost']) : 4; // default = 4
 		this.is_new = false;
 	}
@@ -657,7 +663,17 @@ class UserTalent {
 
 			// check for talents: Giant & Dwarf; adjust and unlock size
 			if (this.name == "Giant" || this.name == "Dwarf") {
-				$("#character_size_select").val("Medium");
+				// get race size and adjust
+				let sizes = [
+					"Tiny",
+					"Small",
+					"Medium",
+					"Large",
+					"Giant"
+				];
+				let race = getRace($("#race").val());
+				let base = race == false ? 2 : sizes.indexOf(race['size']);
+				$("#character_size_select").val(sizes[base]);
 				editSize(true);
 				$("#size").attr("data-toggle", characterCreation ? "modal" : null).removeClass(characterCreation ? "cursor-auto" : "");
 			}
@@ -675,6 +691,7 @@ class UserTalent {
 		hideMagicSelects(this.name, subType);
 
 		// set dropdown value
+		featType = featType == "school_talent" ? "magic_talent" : featType;
 		$("#select_feat_type").val(featType+"_name");
 		$(".feat-type").addClass("hidden");
 		$("#"+featType+"_name").val(this.name).removeClass("hidden").attr("disabled", !(adminEditMode && this.feat_id == 0));
@@ -682,19 +699,19 @@ class UserTalent {
 		var description = this.description;
 
 		// if editing is allowed, change feat_update_btn text to 'Update', else set to 'Ok'
-		$("#feat_update_btn").html(adminEditMode && (featType == "feat" || featType == "magic_talent") ? "Update" : "Ok");
-		if (!adminEditMode || (featType != "feat" && featType != "magic_talent")) {
+		$("#feat_update_btn").html(adminEditMode && (featType == "standard_talent" || featType == "magic_talent") ? "Update" : "Ok");
+		if (!adminEditMode || (featType != "standard_talent" && featType != "magic_talent")) {
 			$("#feat_cancel_btn").addClass("hidden");
 		}
-		$("#feat_description").val(description).attr("disabled", !(adminEditMode && (featType == "feat" || featType == "magic_talent")));
+		$("#feat_description").val(description).attr("disabled", !(adminEditMode && (featType == "standard_talent" || featType == "magic_talent")));
 		// focus on description if editable, and name is not
-		if (adminEditMode && (featType == "feat" || featType == "magic_talent") && this.feat_id != 0) {
+		if (adminEditMode && (featType == "standard_talent" || featType == "magic_talent") && this.feat_id != 0) {
 			$("#feat_description").focus();
-			// set text hint equal to feat_list item description
+			// set text hint equal to talents item description
 			$("#feat_description").attr("placeholder", "");
-			for (var i in feat_list) {
-				if (feat_list[i]['id'] == this.feat_id) {
-					$("#feat_description").attr("placeholder", feat_list[i]['description']);
+			for (var i in talents) {
+				if (talents[i]['id'] == this.feat_id) {
+					$("#feat_description").attr("placeholder", talents[i]['description']);
 				}
 			}
 		}
@@ -723,15 +740,28 @@ function newTrainingModal(attribute) {
 	$("#attribute_type").val(attribute);
 	$("#training_name").val("");
 
+	// look for esoteric knowledge, show esoteric skills
+	$("#esoteric_inputs").hide();
+	for (var i in userTrainings) {
+		if (userTrainings[i]['name'] == "Esoteric Knowledge" && userTrainings[i]['value'] >= 4) {
+			// check attribute for esoteric skills
+			var skills = trainingAutocompletes[attribute]['esoteric'];
+			if (skills.length > 0) {
+				$("#esoteric_inputs").show();
+			}
+		}
+	}
+
 	// deselect radios and hide and clear inputs
 	$("input:radio[name='skill_type']").each(function(i) {
 	      this.checked = false;
 	});
-	$("#skill_name").val("").hide();
-	$("#training_name").val("").hide();
-	$("#focus_name").val("").hide();
-	$("#focus_name2").val("").hide();
-	$("#school_name").val("").hide();
+	$("#skill_name").val("").hide().removeClass("x onX");
+	$("#training_name").val("").hide().removeClass("x onX");
+	$("#focus_name").val("").hide().removeClass("x onX");
+	$("#focus_name2").val("").hide().removeClass("x onX");
+	$("#school_name").val("").hide().removeClass("x onX");
+	$("#esoteric_name").val("").hide().removeClass("x onX");
 
 	// if vitality, check for magic talents
 	if (attribute == "Vitality" && user['magic_talents'] == true) {
@@ -754,9 +784,13 @@ function newTrainingModal(attribute) {
 	}
 
 	// set autocomplete values to inputs - skill_name, training_name, focus_name
-	var skill = trainingAutocompletes[attribute]['skill'];
-	var training = trainingAutocompletes[attribute]['training'];
-	var focus = trainingAutocompletes[attribute]['focus'];
+	let skill = trainingAutocompletes[attribute]['skill'];
+	let training = trainingAutocompletes[attribute]['training'];
+	let focus = trainingAutocompletes[attribute]['focus'];
+	let esoteric = trainingAutocompletes[attribute]['esoteric'];
+	$("#esoteric_name").autocomplete({
+		source: esoteric
+	});
 	$("#skill_name").autocomplete({
 		source: skill
 	});
@@ -802,8 +836,11 @@ function newTraining() {
 	if (trainingName != "") {
 		// check for additional input
 		if ($("#focus_name2").is(":visible")) {
-			// TODO make sure focus_name2 isn't empty?
-			trainingName += " ("+$("#focus_name2").val()+")";
+			if ($("#focus_name2").val() == "") {
+				alert("Please specify a value");
+				return;
+			}
+			trainingName = $("#focus_name2").val();
 		}
 		// check if user is already trained
 		for (var i in userTrainings) {
@@ -825,21 +862,36 @@ function newTraining() {
 
 		// allocating attribute points, make sure we are allowed to add the skill
 		if (allocatingAttributePts) {
-			let skillPts = (skillType == "skill" || skillType == "training") ? 2 : (skillType == "school" ? 4 : 1);
+
+			var skillCount = 0;
+			var trainingCount = 0;
+			var talentCount = 0;
+
 			for (var i in userTrainings) {
-				if (userTrainings[i].is_new 
-					&& (skillType == "skill" || skillType == "school") 
-					&& (userTrainings[i].skill_type == "skill" || userTrainings[i].skill_type == "school")) {
-					alert("Only one new feat or unique skill can be added per level.");
-					return;
+				if (userTrainings[i].is_new && (userTrainings[i].skill_type == "skill" || userTrainings[i].skill_type == "school" || userTrainings[i].skill_type == "esoteric")) {
+					skillCount += 1;
 				}
-				if (userTrainings[i].is_new 
-					&& (skillType == "focus" || skillType == "training") 
-					&& (userTrainings[i].skill_type == "focus" || userTrainings[i].skill_type == "training")) {
-					alert("Only one new focus or training can be added per level.");
-					return;
+				if (userTrainings[i].is_new && (userTrainings[i].skill_type == "focus" || userTrainings[i].skill_type == "training")) {
+					trainingCount += 1;
 				}
 			}
+			for (var i in userTalents) {
+				if (userTalents[i].is_new) {
+					talentCount += 1;
+				}
+			}
+
+			if ((skillType == "skill" || skillType == "school" || skillType == "esoteric") && skillCount > 0 || talentCount > 0) {
+				alert("Only one new talent or unique skill can be added per level.");
+				return;
+			}
+
+			if ((skillType == "focus" || skillType == "training") && trainingCount > 0) {
+				alert("Only one new focus or training can be added per level.");
+				return;
+			}
+
+			let skillPts = (skillType == "skill" || skillType == "training") ? 2 : ( (skillType == "school" || skillType == "esoteric") ? 4 : 1);
 			var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
 			if (pts - skillPts < 0) {
 				alert("Not enough attribute points to allocate for a new skill training.");
@@ -853,7 +905,7 @@ function newTraining() {
 		let newTraining = new UserTraining({
 			'attribute_group':attribute,
 			'name':trainingName,
-			'value':skillType == "skill" || skillType == "school" ? 0 : 1,
+			'value': (skillType == "skill" || skillType == "school" || skillType == "esoteric") ? 0 : 1,
 			'magic_school':skillType == "school",
 			'governing_school':skillType == "school" && schoolCount == 0 ? 1 : 0
 		});
@@ -875,7 +927,7 @@ function addTrainingElements(training, skillType) {
 	var id_val = "training_"+training.id;
 
 	// determine skill point cost and starting skill value if new training
-	training.skill_pts = (skillType == "skill" || skillType == "training") ? 2 : (skillType == "school" ? 4 : 1);
+	training.skill_pts = (skillType == "skill" || skillType == "training") ? 2 : ( (skillType == "school" || skillType == "esoteric") ? 4 : 1);
 
 	var row = createElement('div', 'row training-row', '#'+training.attribute_group, id_val+"_row");
 	training.DOM_element = row;
@@ -918,11 +970,17 @@ function addTrainingElements(training, skillType) {
 	  'class': 'control-label'
 	}).appendTo(div_right);
 
-	$('<span />', {
+	let text = $('<span />', {
 		'id': id_val+"_text",
 	  'class': 'attribute-val',
 	  'html': training.value == '' ? '+0' : (training.value >= 0 ? "+"+training.value : training.value),
 	}).appendTo(label_right);
+
+	// check if new training is stealth, look for size mod
+	if (training.name.toLowerCase() == "stealth" && $("#power_mod").val() != "") {
+		let stealth_mod = parseInt(training.value) - parseInt($("#power_mod").val());
+		text.html(stealth_mod >= 0 ? "+"+stealth_mod : stealth_mod);
+	}
 
 	createInput('', 'hidden', 'training[]', training.name+":"+training.attribute_group, label_right, id_val+"_name");
 	createInput('', 'hidden', 'training_val[]', training.value == '' ? 0 : training.value, label_right, id_val+"_val");
@@ -940,8 +998,8 @@ function addTrainingElements(training, skillType) {
 		adjustAttribute(id_val, -1);
 	});
 
-	// show plus minus icons for new talents during character creation
-	if (training.is_new && characterCreation) {
+	// show plus minus icons for new talents during character creation or GM edit mode
+	if (training.is_new && (characterCreation || adminEditMode)) {
 		up.show();
 		down.show();
 	}
@@ -984,9 +1042,9 @@ function newSchool() {
 	$("#feat_name_val").val($("#magic_talents").val().split(":")[1]);
 	$("#feat_description").val($("#talent_descrip").val());
 	// set feat_id value for new talent
-	for (var i in feat_list) {
-		if (feat_list[i]['name'] == $("#feat_name_val").val()) {
-			$("#feat_id").val(feat_list[i]['id']);
+	for (var i in talents) {
+		if (talents[i]['name'] == $("#feat_name_val").val()) {
+			$("#feat_id").val(talents[i]['id']);
 		}
 	}
 	newFeat();
@@ -1365,7 +1423,6 @@ function newWeapon() {
 		weapon.max_damage = max_damage == "" ? null : parseInt(max_damage);
 		weapon.quantity = qty;
 		weapon.name = name;
-		// TODO range_ not recorded for melee weapons; needed for thrown weapons
 		weapon.range_ = range == "" ? null : parseInt(range);
 		weapon.rof = rof;
 		weapon.notes = notes;
@@ -1606,7 +1663,7 @@ class UserWeapon {
 		this.quantity = weapon['quantity'];
 		this.damage = parseInt(weapon['damage']);
 		this.max_damage = weapon['max_damage'] == null || weapon['max_damage'] == "" ? null : parseInt(weapon['max_damage']);
-		this.range_ = weapon['type'] == "Melee" ? null : weapon['range_'] == null ? null : parseInt(weapon['range_']);
+		this.range_ = weapon['range_'] == null ? null : parseInt(weapon['range_']);
 		this.rof = weapon['type'] == "Melee" ? null : weapon['rof'];
 		this.defend = weapon['defend'] == null || weapon['defend'] == "" ? null : parseInt(weapon['defend']);
 		this.crit = weapon['crit'] == null || weapon['crit'] == "" ? null : parseInt(weapon['crit']);

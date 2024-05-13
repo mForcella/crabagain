@@ -747,6 +747,7 @@
 			<option value="#section_morale_trait">Morale Traits</option>
 			<option value="#section_compelling_action">Compelling Actions</option>
 			<option value="#section_profession">Professions</option>
+			<option value="#section_social_background">Social Backgrounds</option>
 		</select>
 
 		<!-- character stats overview -->

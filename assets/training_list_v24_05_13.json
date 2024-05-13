@@ -1,10 +1,15 @@
 {
 	"Strength":
 	{
+		"esoteric":[
+			
+		],
 		"skill":[
 			"Swimming"
 		],
-		"training":[],
+		"training":[
+			
+		],
 		"focus":[
 			"Climb",
 			"Jump",
@@ -13,10 +18,15 @@
 	},
 	"Fortitude":
 	{
+		"esoteric":[
+			
+		],
 		"skill":[
 			"Swimming"
 		],
-		"training":[],
+		"training":[
+			
+		],
 		"focus":[
 			"Resist Poison",
 			"Resist Disease"
@@ -24,8 +34,15 @@
 	},
 	"Speed":
 	{
-		"skill":[],
-		"training":[],
+		"esoteric":[
+			
+		],
+		"skill":[
+			
+		],
+		"training":[
+			
+		],
 		"focus":[
 			"Run",
 			"React"
@@ -33,10 +50,15 @@
 	},
 	"Agility":
 	{
+		"esoteric":[
+			
+		],
 		"skill":[
 			"Ride Animal"
 		],
-		"training":[],
+		"training":[
+			
+		],
 		"focus":[
 			"Brawl",
 			"Attack (specific weapon)"
@@ -44,10 +66,16 @@
 	},
 	"Awareness":
 	{
+		"esoteric":[
+			"Spiritualism",
+			"Astral Projection"
+		],
 		"skill":[
 			"Stealth"
 		],
-		"training":[],
+		"training":[
+			
+		],
 		"focus":[
 			"Search",
 			"Listen",
@@ -57,6 +85,9 @@
 	},
 	"Precision":
 	{
+		"esoteric":[
+			
+		],
 		"skill":[
 			"Demolitions",
 			"Security",
@@ -64,7 +95,9 @@
 			"Pilot",
 			"Sleight of Hand"
 		],
-		"training":[],
+		"training":[
+			
+		],
 		"focus":[
 			"Shoot (specific weapon)",
 			"Throw (specific weapon)"
@@ -72,11 +105,16 @@
 	},
 	"Allure":
 	{
+		"esoteric":[
+			
+		],
 		"skill":[
 			"Train Animal",
 			"Perform"
 		],
-		"training":[],
+		"training":[
+			
+		],
 		"focus":[
 			"Seduce",
 			"Diplomacy",
@@ -85,19 +123,28 @@
 	},
 	"Deception":
 	{
+		"esoteric":[
+			
+		],
 		"skill":[
 			"Hacking",
 			"Perform",
 			"Sleight of Hand",
 			"Stealth"
 		],
-		"training":[],
+		"training":[
+			
+		],
 		"focus":[
 			"Disguise"
 		]
 	},
 	"Innovation":
 	{
+		"esoteric":[
+			"Divination",
+			"Alchemy"
+		],
 		"skill":[
 			"Engineering",
 			"Hacking",
@@ -108,21 +155,30 @@
 			"Pilot",
 			"Sail"
 		],
-		"training":[],
+		"training":[
+			
+		],
 		"focus":[
 			"Craft (specific item)"
 		]
 	},
 	"Intellect":
 	{
+		"esoteric":[
+			"Mesmerism",
+			"Alchemy"
+		],
 		"skill":[
 			"Engineering",
+			"Esoteric Knowledge",
 			"First Aid",
 			"Survival",
 			"Demolitions",
 			"Sail"
 		],
-		"training":[],
+		"training":[
+			
+		],
 		"focus":[
 			"Appraise",
 			"Academia (specific area)",
@@ -135,12 +191,20 @@
 	},
 	"Intuition":
 	{
+		"esoteric":[
+			"Spiritualism",
+			"Divination"
+		],
 		"skill":[
+			"Esoteric Knowledge",
 			"Survival",
 			"Tactics",
-			"Ride Animal"
+			"Ride Animal",
+			"Train Animal"
 		],
-		"training":[],
+		"training":[
+			
+		],
 		"focus":[
 			"Sense Motive",
 			"Interrogate"
@@ -148,8 +212,16 @@
 	},
 	"Vitality":
 	{
-		"skill":[],
-		"training":[],
+		"esoteric":[
+			"Mesmerism",
+			"Astral Projection"
+		],
+		"skill":[
+			
+		],
+		"training":[
+			
+		],
 		"focus":[
 			"Intimidate",
 			"Willpower"

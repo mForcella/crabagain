@@ -1,0 +1,1036 @@
+[
+	{
+		"name":"Battle Fury",
+		"description":"As a Quick Action, the Character can work themselves into a frenzy, making them more effective in combat. They ignore all Wound penalties in Fury, are immune to Fear effects, and if a Save vs. Death would be needed, they ignore it until after the Fury ends. Depending on the injury, they may be unable to act even if Conscious. Additionally, every time they receive a Wound, they receive a cumulative +1 Critical Threat Range and Critical Damage. When the Fury ends, all effects from Wounds resolve and they are Fatigued. Fatigue Levels from Battle Fury are cumulative if they do not rest between uses.",
+		"requirements":[
+			[{"fortitude":2}, {"strength":2}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Diehard",
+		"description":"Your tolerance for pain and discomfort is higher than most people's. You reduce Wound penalties by 1 and are Immune to Unconsciousness as a result of Physical Damage unless you are Mortally Wounded. If you would need to Save vs. Death, you can continue to act for 1 additional Round before you need to roll and are treated as if Battle Fury were active, ignoring all penalties, including Fatigue and Encumbrance. If Battle Fury is already active, you can instead act for 2 additional Rounds. As soon as your Turn is over, you must immediately Save vs. Death.",
+		"requirements":[
+			[{"fortitude":4}],
+			[{"strength":3}],
+			[{"feat":"Battle Fury"}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Salty Dog",
+		"description":"You're rough around the edges, and even rougher on the inside. It's easy for you to scare others with little more than a grimace. You can Intimidate silently during Combat in conjunction with any other Action. You may now use Strength OR Fortitude as the base Attribute for Intimidate Checks, but must choose one when this Talent is learned, which cannot be changed. If Intimidate is the only Action you take, it is still a Quick Action. You also gain a cumulative +1 Critical Threat Range for each Level of Fear you cause in anyone you successfully Intimidate.",
+		"requirements":[
+			[{"strength":2}],
+			[{"fortitude":2}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Acrobat",
+		"description":"You are exceptionally skilled at leaping and tumbling. You reduce falling damage by 2 levels for each DL achieved (see the Game Master Reference Materials at the end of the book). All Climb and Jump rolls count as Quick Actions and may be treated as a Strength OR Agility Focus, but not both. Additionally, if an appropriate Agility check (determined by the GM) is made, you can move your full Move as a Quick Action by leaping, tumbling, and jumping across the terrain. The GM may rule that specific terrain is required for this, or that some terrain will make it impossible. Failure results in partial, or no Move, as determined by the GM.",
+		"requirements":[
+			[{"strength":0}],
+			[{"agility":2}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Martial Arts",
+		"description":"You have trained extensively in hand-to-hand combat. You no longer suffer Quick Action penalties on Unarmed attacks. You treat all Grapple and Disarm attempts with Light Weapons or Unarmed as Quick Actions and may attempt Knockdowns in conjunction with any other Attack Action without spending an additional Quick Action as long as you make a Called Shot at +5 DL. If you also have Dual Weapon Master and are Unarmed or using two Light Weapons, you reduce your Free Action Attack and Riposte penalties by 2. This will not function in Armor greater than Gambeson or with a Shield larger than a Buckler.",
+		"requirements":[
+			[{"agility":2}],
+			[{"speed":2}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Relentless Defense",
+		"description":"You've always said that the best offense is a good defense. You can no longer be Flanked and may also apply half of your Speed bonus to Defend and half your Brawl bonus to Dodge. Additionally, you may attempt to catch thrown weapons or arrows fired at you, or within 5 feet of you, by rolling your Brawl. The DL is equal to the attacker's roll +5 and is a minimum of DL 15. If you beat the attack roll, but fail to catch it, you are still not struck. If it was being fired at someone else, it may still strike them if you fail to catch it. This will also negate an Auto-Hit from the Take Aim Talent.",
+		"requirements":[
+			[{"agility":4}],
+			[{"speed":4}],
+			[{"feat":"Martial Arts"}],
+			[{"feat":"Lightning Reflexes"}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Defender",
+		"description":"You have focused much of your energy and training on a solid defense. You may Ready as a Quick Action at +2, and Standard at +3. If you use a Full Round Action, you may automatically ignore one Attack of your choice each Round. This does not work if a Natural 20 was rolled, but your attacker cannot gain Critical Hit or Called Shot Bonus Damage against you. This will also negate an Auto-Hit from the Take Aim Talent.",
+		"requirements":[
+			[{"agility":2}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Dual Weapon Master",
+		"description":"Whenever you are holding a weapon or shield in each hand (including Staves or Pole Weapons), or your off-hand free, you are treated as if Dual-Wielding. This reduces the Dual-Wield penalty on your Free Quick Action attack to -4 without Ambidexterity (See Combat & Defense for info on Dual- Wielding). Additionally, any time an opponent misses you in Melee Combat, you gain an immediate Free Quick Action Riposte against them at an additional -1 with your off-hand. This cannot allow you to go over the 4 Standard Action maximum. You cannot gain the bonus Riposte if your off-hand Weapon is more than Light unless it is a Staff or Pole Weapon.",
+		"requirements":[
+			[{"agility":4}],
+			[{"speed":2}],
+			[{"feat":"Defender"}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Lightning Reflexes",
+		"description":"You react with uncanny speed and precision. You no longer suffer Reaction Check Penalties and can Aim or make Called Shots on Reaction Checks, but not both. Additionally, you may apply half of your Speed bonus to Dodge, you cannot be Surprised, and if you would ever be caught Unaware, you may still react at -3 as if you were Surprised.",
+		"requirements":[
+			[{"speed":2}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Quick and the Dead",
+		"description":"When it comes to shooting and stabbing, there are few people faster than you. As long as your Weapon is Light (3 pounds or less for Medium humanoids), or a Ranged Weapon, you can Draw and Attack as a single Action, which counts as a Surprise attack. This is negated only by the Keen Senses Talent, or Quick and the Dead, both of which allow an opposed React Check against you. You also apply any Aim actions to ALL attacks in a Round. Additionally, as long as you have no penalty in Awareness, you can now use your Speed as your Primary Initiative, and Awareness as your Secondary.",
+		"requirements":[
+			[{"speed":4}],
+			[{"agility":2}],
+			[{"feat":"Lightning Reflexes"}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Gunslinger",
+		"description":"You reduce loading time (or cocking time) for all guns by 1 Action step (i.e. Standard to Quick). If loading or cocking would already be a Quick Action, you can now do so as a Free Action in conjunction with any other action. If it is done in conjunction with a Quick Action attack, you cannot Aim on that Attack, and you cannot be Dual Wielding. You also double the Fire Rates on firearms, but you cannot Aim if you go above the normal Fire Rate. Other gun's Fire Rates are not affected. Additionally, you can make trick shots using any gun with a projectile that can ricochet or reflect off of a specific surface. Whether or not a surface is acceptable is at the GMs discretion. This is always an Aimed Called Shot at +5 DL, and it allows you to completely ignore an enemy's Cover even if they have Full Cover. This does not go through enemy Cover, but rather around it.",
+		"requirements":[
+			[{"speed":6}],
+			[{"precision_":4}],
+			[{"feat":"Quick and the Dead"}],
+			[{"feat":"Take Aim"}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Keen Senses",
+		"description":"You have fine-tuned your senses to such a degree that you now have a Base 10 for Passive Awareness (Passive Awareness is a Base 8, + or – Awareness). Awareness Penalties for sleeping are reduced from -4 to -2. You can never be caught Unaware unless you are sleeping. If you would be normally caught Unaware, you are considered Surprised. Additionally, you can never suffer an Epic Failure on an Awareness roll. If you would, you may re-roll the Fate Die until it comes up higher than a 1. If you also have Lightning Reflexes, you reduce your penalty for being caught Unaware to -1.",
+		"requirements":[
+			[{"awareness":2}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Powers of Observation",
+		"description":"With an uncanny eye for detail, and obscure knowledge, you can spot things that most people miss and make connections that others would not. You may use Awareness to gather information about a person or location and may place Sense Motive as a Focus under Awareness. The information you deduce can include things such as a person's occupation, their relationship status, where they may have recently been, etc. – so long as this information can be deduced physically in some way.",
+		"requirements":[
+			[{"awareness":4}],
+			[{"intellect":3}],
+			[{"feat":"Keen Senses"}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Take Aim",
+		"description":"You've learned how to stay calm in the face of danger, control your breath, and take aim. You may Aim as a Quick Action at +2, and a Standard at +3. If you use a Full Round Action, you can declare an automatic hit at -1 Damage. You cannot make a Called Shot or score a Critical Hit on Auto-Hits. An Auto-Hit cannot be used with Ranged attacks if the target has more than 1/5 cover, is smaller than Small Scale or further than 50 ft. An Auto-Hit cannot be used with Melee attacks if the target has larger than a Small Shield, or Dual-Weapon Master and is Dual- Wielding.",
+		"requirements":[
+			[{"precision_":2}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Dual Pistol Master",
+		"description":"You reduce your base Dual-Wield penalty on your Free Quick Action attack with pistols to -4 without Ambidexterity (See Traits). When dual-wielding weapons with a Fire Rate of at least 4, you are treated as if the weapons have Autofire: 1 (+1 to Hit and Damage on Aim attacks). When dual-wielding weapons with Autofire (this includes Fire Rate: 4), you negate your penalty for attacking an Arc, but must still use 1 Quick Action per 45-degree arc. You may also attack a full 360 degrees as 1 Full Round Action at an additional -2 penalty.",
+		"requirements":[
+			[{"precision_":4}],
+			[{"speed":3}],
+			[{"feat":"Take Aim"}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Improved Critical Hit",
+		"description":"You are more efficient at exploiting enemy's weak points. You gain +1 to your Critical Threat Range and +1 Critical Damage for every +4 Attack bonus you have to a maximum of +3 at +12 to Hit. You also force your target to roll against a Knockdown every time you score a Critical Hit as long as they are your Scale or Smaller.",
+		"requirements":[
+			[{"precision_":4}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"The Pummeling",
+		"description":"You may deal Lethal or Non-lethal Damage with your Unarmed attacks. Additionally, anytime you make an unarmed Called Shot to the Head (+5 to the DL) and succeed, you automatically Daze your opponent once (regardless of Damage done) as long as they are your Size or smaller. If you score a Critical Hit on such a Called Shot, your Damage is added to their DL to resist Unconsciousness. The Base DL is 5 if it is less than a Wound, increasing by a cumulative +5 per Wound. This has no effect on Creatures Immune to Critical Hits.",
+		"requirements":[
+			[{"strength":4}],
+			[{"feat":"Improved Critical Hit"}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Brutal Throw",
+		"description":"You know how to use your Strength to your advantage when throwing melee weapons. As long as you are throwing a weapon of 2 pounds or more, you can add half of your Strength to Damage instead of Precision. Alternatively, you can add both, but cannot make Called Shots, score Critical Hits, or declare automatic hits with Take Aim.",
+		"requirements":[
+			[{"strength":2}],
+			[{"feat":"Take Aim"}, {"feat":"Improved Critical Hit"}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Sneak Attack",
+		"description":"You know how to strike from the shadows. If your opponent is Surprised or Unaware, you score an automatic Critical Hit at an additional +1 Damage for each +2 Attack Bonus you have, but still must meet their Defense with the attack (a DL 2 for Unaware Melee Attacks or -3 Defend if Surprised). Ranged Attacks are always against Base Range DL plus or minus Scale Modifiers. The additional bonus Damage before Called Shot bonuses cannot exceed +6. Attacking from Stealth grants all Enemies a Free Action Awareness roll at an additional +2 to spot you.",
+		"requirements":[
+			[{"awareness":2}],
+			[{"training":"Stealth"}],
+			[{"feat":"Take Aim"}, {"feat":"Improved Critical Hit"}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Inspiring Presence",
+		"description":"You've always been good with words, and you know what to say to make your allies more effective in battle. As a Standard Action, you can inspire all allies that can hear you, as well as yourself, if you succeed an Allure or Deception DL 12. If successful, you and your allies get +2 Morale against all enemies until one of you is Wounded or the battle ends. In addition, all Fate re-rolls utilized may be ignored after the battle ends. If you also have the Perform Unique Skill you no longer have to roll, and success is automatic so long as you can play your instrument.",
+		"requirements":[
+			[{"allure":2}, {"deception":2}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Silver Tongue",
+		"description":"You've always been a talker and talking is what you do best. You know how to get yourself out of the direst of situations through the grace of your words alone. Any time you are making a verbal Allure or Deception roll you can always roll the other if the first roll fails. Additionally, you can never suffer an Epic Failure on either Allure or Deception. If you would, you may re-roll the Fate Die until it comes up higher than a 1.",
+		"requirements":[
+			[{"allure":2}],
+			[{"deception":2}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Bond of Friendship",
+		"description":"Because you've spent so much time around your allies, you know how to take your natural good luck and spin it in their favor. Once per Session, you may grant an ally any re-roll or Motivator Bonus you would be allowed but cannot use it yourself. Additionally, once per Encounter, if you are aiding an ally on a roll, and they fail their roll, you can roll your Skill instead but must use the roll even if it is worse.",
+		"requirements":[
+			[{"allure":4}],
+			[{"intuition":2}],
+			[{"feat":"Inspiring Presence"}, {"feat":"Silver Tongue"}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"I've Seen Worse",
+		"description":"Sometimes your positivity is infectious. Once each Session you can make an Allure or Deception roll, starting at DL 10, modified by the absolute value of your party's current Morale Level. If you succeed, you increase your party Morale by +1 for 1 Session, or by +2 for 1 Encounter. This is cumulative with effects from Inspiring Presence. Additionally, you can never be below -7 Morale.",
+		"requirements":[
+			[{"allure":4}],
+			[{"deception":2}],
+			[{"feat":"Silver Tongue"}, {"feat":"Inspiring Presence"}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Anatomical Warfare",
+		"description":"You might lack combat training, but you make up for it with your knowledge of anatomy. Any time you make an Aimed Called Shot and succeed, you can score an automatic Critical Hit at an additional +1 Damage OR cause an automatic Knockdown as long as you deal at least 1 Damage to Resilience. Using these abilities on non-Human species or Larger Scale Enemies may require an Intellect Check at the GM’s discretion. This can stack with Sneak Attack Damage at an additional +1 Damage.",
+		"requirements":[
+			[{"intellect":4}, {"training":"First Aid"}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Arterial Bleeding",
+		"description":"Your physiological knowledge can weaken even the strongest of foes. If you make a Called Shot (+5 to the DL), you can cause extensive blood loss as long as you deal at least 1 Damage to Resilience. This attack ignores any natural Toughness but not Armor or Scale Bonuses. If successful, the target receives 1 additional Damage directly to Resilience at the end of each of their Turns until they are Stabilized. This has no effect on Creatures Immune to Critical Hits.",
+		"requirements":[
+			[{"precision_":4}],
+			[{"feat":"Anatomical Warfare"}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Eclectic Knowledge",
+		"description":"Your head is full of a varied assortment of generally useless facts that occasionally prove useful. Every time you fail a roll to see if you know a certain piece of information, you may roll your Percentile Dice (2d10). You have a 25% chance to know the information anyway. This means you must roll 25 or LESS on your roll. This increases by 5% for every +1 above +2 Intellect, up to a Maximum of 75% at +12. This will not function for information that you could not possibly know unless a Motivator Bonus is used to declare a Story Point (but this is still at the GMs discretion).",
+		"requirements":[
+			[{"intellect":2}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Jack of All Trades",
+		"description":"You've picked up a lot of knowledge and skills in your travels and know a little bit about everything. As a result, you no longer suffer a -2 penalty for Unique Skills you haven't learned, but you still cannot use any of the special effects and abilities listed under each Skill. Additionally, whenever you learn a Unique Skill, they start with a +1 bonus rather than no bonus.",
+		"requirements":[
+			[{"intellect":4}],
+			[{"innovation":2}],
+			[{"feat":"Eclectic Knowledge"}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Gambler's Luck",
+		"description":"Your Fate is a dangerous combination of spectacular and terrible. You may now choose to flip a coin any time you use Fate. A result of ‘heads’ creates an Epic Success on the roll, and ‘tails’ an Epic Failure.",
+		"requirements":[
+			[{"vitality":2}],
+			[{"character_creation":true}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Strength of Will",
+		"description":"You have honed your internal defenses against Mental Magic (see Combat & Defense) and psychic assaults. You will always know if someone is affecting you with mental Magic, but not necessarily who. If you win an opposed roll against anyone using Mental Magic against you, you Daze them, and they must wait until the following Round before attempting to affect you again. You also reduce all Fear effects one Level.",
+		"requirements":[
+			[{"vitality":2}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Arcane Blood",
+		"description":"Powerful Magic runs through your veins. You gain the use of Animas Magic as a Talent. You cannot cast other Magic Schools without Training (4 Skill Points). The first School you learn is your Governing School. See below for Schools and Talents.",
+		"requirements":[
+			[{"character_creation":true}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Divine Magic",
+		"description":"The Gods have blessed you with miraculous power. You gain the use of Animas Magic as a Talent. You cannot cast other Magic Schools without Training (4 Skill Points). You can never Train in more than 1 School, and it must be your deities favored School. You must choose one Vow (see the next page) to follow in service to your God. You cannot choose a Vow if it overlaps with a Compelling Action you already have.",
+		"requirements":[
+			[{"intuition":2}],
+			[{"character_creation":true}]
+		],
+		"type":"standard_talent",
+		"cost":4
+	},
+	{
+		"name":"Elemental Master",
+		"description":"You may choose 1 type of Elemental Magic when this Talent is taken: Fire, Ice or Electricity. You can cause extreme temperature fluctuations to heat or freeze things, create protective bubbles against hot or cold, and manipulate electricity, creating lightning and force fields or disabling electronic devices. Attacking with this School deals Damage with either fire, cold, or electricity. Flammable objects stay on fire, dealing additional Damage on subsequent rounds. Cold Damage slows a target, Encumbering them. Electrical Damage Dazes targets and ignores any armor that is not completely sealed against electricity.",
+		"requirements":[
+			[{"training":"Ka"}]
+		],
+		"type":"school_talent",
+		"cost":4
+	},
+	{
+		"name":"Metal Master",
+		"description":"You can control the properties of metal, as well as move metal objects with your mind by creating magnetic fields. You can magnetize or demagnetize objects, as well as weaken metal objects, animate metal statues and suits of armor or even transmute one metal into another.",
+		"requirements":[
+			[{"training":"Ka"}]
+		],
+		"type":"school_talent",
+		"cost":4
+	},
+	{
+		"name":"Nature Master",
+		"description":"You are one with the beasts and the wild places. You may speak with, and sway the disposition of animals, or communicate with the land. You can use this to speak directly with animals or call upon them for help, and even bond your soul with an animal, seeing through them and speaking to them telepathically. You can alter and enhance the properties of plants, creating potions and poisons. You can purify water and even create sustenance from little more than dirt.",
+		"requirements":[
+			[{"training":"Avani"}]
+		],
+		"type":"school_talent",
+		"cost":4
+	},
+	{
+		"name":"Elementalist",
+		"description":"You have become one with the elements. You may choose one type of Elemental Magic when this Talent is learned: Earth, Water or Air. You can manipulate dirt, mud, and rock, splitting the earth open, raising or shifting stone, animating stone statues or even causing violent earthquakes. You can control the movements of water, raising or lowering water levels, creating waterspouts or waves, fog, rain or snow, and walking on water. You can alter wind patterns and create powerful storms or tornados. When causing earthquakes and gusts of wind, the Agility or Strength DL to remain standing is the same as your roll, as is the Strength check for any non-living structures to remain standing.",
+		"requirements":[
+			[{"training":"Avani"}]
+		],
+		"type":"school_talent",
+		"cost":4
+	},
+	{
+		"name":"Illusionist",
+		"description":"You are a master at manipulating the senses of others. You can make people see, hear, taste, smell and feel whatever you wish, however, you cannot truly control anyone's thoughts and desires or cause them to make choices they would never make if they were unaffected.",
+		"requirements":[
+			[{"training":"Nouse"}]
+		],
+		"type":"school_talent",
+		"cost":4
+	},
+	{
+		"name":"Psychic",
+		"description":"You are a master at sensing and reading minds, thoughts, and emotions and projecting your own thoughts and feelings into theirs.",
+		"requirements":[
+			[{"training":"Nouse"}]
+		],
+		"type":"school_talent",
+		"cost":4
+	},
+	{
+		"name":"Ensi",
+		"description":"Your mind is merely an extension of your body and you can move, bend and break objects or people using only your willpower.",
+		"requirements":[
+			[{"training":"Nouse"}]
+		],
+		"type":"school_talent",
+		"cost":4
+	},
+	{
+		"name":"Seer",
+		"description":"Your mind is untethered by time – You can even see into the past and futures of yourself and others, catching brief glimpses of what may come to pass, within seconds or even years. The future is not set, and this will only give you hints about what may come to pass if certain actions are taken.",
+		"requirements":[
+			[{"training":"Nouse"}]
+		],
+		"type":"school_talent",
+		"cost":4
+	},
+	{
+		"name":"Healer",
+		"description":"You know how to manipulate the very fabric of the human body. You can Heal yourself and others, neutralize poison, ignore Wound penalties, and fight disease. The DL for neutralizing Poison and Disease is equal to the DL to resist. For Healing, Soma replaces the Natural Healing roll, and the character may roll immediately for themselves or others without Rest.",
+		"requirements":[
+			[{"training":"Soma"}]
+		],
+		"type":"school_talent",
+		"cost":4
+	},
+	{
+		"name":"Tormentor",
+		"description":"You know how to cause pain, burst blood vessels, and rupture organs with little more than a touch. This Damage is always against a Toughness of 0 plus or minus Scale Modifiers only and bypasses all Armor as long as skin can be touched.",
+		"requirements":[
+			[{"training":"Soma"}]
+		],
+		"type":"school_talent",
+		"cost":4
+	},
+	{
+		"name":"Superhuman",
+		"description":"You can accomplish incredible, physical feats with your body. Choose 2 Major Physical Attributes when this Talent is taken (Power, Dexterity, or Perception). You can greatly increase your strength, speed, and abilities or alter your perception, to see, hear, smell, and taste things beyond normal human perception. You can learn it a second time in order to affect all 3 Major Attributes.",
+		"requirements":[
+			[{"training":"Soma"}]
+		],
+		"type":"school_talent",
+		"cost":4
+	},
+	{
+		"name":"Magic Adept",
+		"description":"You have honed your casting abilities beyond most. You may ready spells as a Quick Action and increase your Standard Action Ready Bonus to +3. Additionally, if you cast a Standard Action spell as a Full Round Action you may also apply your +3 Bonus to your Caster Level for the sake of determining Fatigue. This latter ability only applies to Governing and Companion Magic. If you are a Divine Caster you may now cast Magic as a Standard Action once per Encounter.",
+		"requirements":[
+			[{"vitality":4}],
+			[{"feat":"Arcane Blood"}],
+			[{"training":"Ka"},{"training":"Avani"},{"training":"Nouse"},{"training":"Soma"}]
+		],
+		"type":"magic_talent",
+		"cost":4
+	},
+	{
+		"name":"Master of Magic",
+		"description":"There are few as good as you when it comes to slinging spells from your Governing School. You may now cast Magic from your Governing School as a Quick Action once per Encounter. You no longer need to roll to cast Cantrips, and you do not suffer Reaction Check penalties for your Governing School. If you also have Lightning Reflexes, you automatically win React Checks when using Magic, as long as your opponent does not also have Lightning Reflexes.",
+		"requirements":[
+			[{"vitality":6}],
+			[{"feat":"Magic Adept"}],
+			[{"governing":4}]
+		],
+		"type":"magic_talent",
+		"cost":4
+	},
+	{
+		"name":"Blood Magic",
+		"description":"You have honed your suffering into a source of power. You may inflict 1 or more Damage against your Resilience and gain +4 to your Caster Level for each such Damage inflicted, for one Encounter. You may use this any number of times, but if you Heal any Damage within a single Encounter all effects end, and you cannot use Blood Magic again during that Encounter.",
+		"requirements":[
+			[{"vitality":2}],
+			[{"feat":"Arcane Blood"}],
+			[{"training":"Ka"},{"training":"Avani"},{"training":"Nouse"},{"training":"Soma"}]
+		],
+		"type":"magic_talent",
+		"cost":4
+	},
+	{
+		"name":"Necromancer",
+		"description":"You have learned how to manipulate magical energies in order to communicate with and control the dead. Communication DLs are based on the length of time the body has been dead, starting at DL 6 for someone that died within a few minutes. The DL for animating the dead is equal to the Level of the target during life +10. You may animate multiple beings with a single spell, but Levels are cumulative. This automatically Fatigues you, and you remain Fatigued for as long as you keep any beings animated. They will cease being animated when you end the spell. Permanently animating a body requires a Soul. Permanent animation requires a 10 Minute Ritual and allows the Undead to operate independently of you with the Intelligence possessed by the Soul. However, they must obey your commands, and will always obey your most recent command in your absence. Undead possess the Physical abilities they had in life, suffer no penalties for Wounds, and are Immune to Mind Affecting Magic and Abilities (except from other Necromancers), Critical Hits, disease and poison. Cold Damage deals no Damage but Encumbers them 1 Level per Wound inflicted. Electric Damage deals no Damage but still Dazes them once per Wound inflicted.",
+		"requirements":[
+			[{"vitality":4}],
+			[{"feat":"Blood Magic"}],
+			[{"governing":1}]
+		],
+		"type":"magic_talent",
+		"cost":4
+	},
+	{
+		"name":"Shapeshifter",
+		"description":"You have gained incredible power over the expression of your own DNA. When this is learned, you may choose 1 Normal Animal, which you may Shapeshift into as a Standard Action. You can change form twice per Session without Fatigue, and each time thereafter you suffer cumulative Fatigue. You can stay in Animal form for as long as you like and take on the Animal's normal Physical Stats. This Talent costs 4 Skill Points plus 1 SP/Level of the Animal. You may learn this as many times as you like for different Animals and may never choose an Animal with a Combat Level above your Character Level.",
+		"requirements":[
+			[{"vitality":4}],
+			[{"training":"Avani"}],
+			[{"training":"Soma"}],
+			[{"governing":"Avani"},{"governing":"Soma"}]
+		],
+		"type":"magic_talent",
+		"cost":4
+	},
+	{
+		"name":"Shapeshifter Adept",
+		"description":"You have honed your shapeshifting into an art. You may Shift as a Quick Action and double the number of times you can Shift without suffering Fatigue. This begins at 4 times, but may be altered by Talents, Traits, Abilities and Magic Items. Any changes are applied to the standard base of 2 and then doubled. For example, someone with the Strong Constitution Trait could normally shift 3 times, and so with Master Shifter this doubles to 6, rather than 4 plus 1.",
+		"requirements":[
+			[{"vitality":6}],
+			[{"feat":"Shapeshifter"}]
+		],
+		"type":"magic_talent",
+		"cost":4
+	},
+	{
+		"name":"Master Shapeshifter",
+		"description":"Your body is as fluid is water. You can now Shift an additional 2 times without suffering Fatigue. You can alter your body partially into any part of an Animal you can normally Shift into, such as growing wings or Talons, rather than fully Shifting into an Eagle. Additionally, you may now learn to Shift into Magical Beasts.",
+		"requirements":[
+			[{"vitality":8}],
+			[{"feat":"Master of Magic"}],
+			[{"feat":"Shapeshifter Adept"}],
+			[{"governing":4}]
+		],
+		"type":"magic_talent",
+		"cost":4
+	},
+	{
+		"name":"Enchanter",
+		"description":"You have learned how to manipulate magical energies in order to alter the properties of a non-living object for extended periods. The time an Enchantment lasts starts at 1 Minute and is multiplied by 2 for each DL above Level above 1. Permanently Enchanting an object requires a Soul. This must be from a person or a magical beast. If a beast is used, their Combat Level is the maximum DL of the effect that can be Enchanted. Multiple souls are cumulative. A human soul is always equal to DL 26, or DL 34 for Magic Users. Permanent Enchanting requires 1 hour and always Fatigues you 1 Level. You must have a Talent in all effects you want to Enchant. The Enchantment Level is also used to determine costs for Enchanted Items (see Magic Items later in this section).",
+		"requirements":[
+			[{"vitality":4}],
+			[{"training":"Ka"},{"training":"Avani"},{"training":"Nouse"},{"training":"Soma"}]
+		],
+		"type":"magic_talent",
+		"cost":4
+	},
+	{
+		"name":"Time Lord",
+		"description":"You have gained control over spacetime. You can slow or halt the flow of time, open portals to other places, or travel forward or back in time. DLs begin at 10 for teleporting small objects short distances, slowing time enough to enhance your Defense and Reaction Checks, or traveling backward or forward in time a few seconds. Stopping time completely for a full Round or traveling forward or back in time more than a decade would start at DL 30. This is considered a Companion School Talent for purposes of Fatigue (i.e. you are not Fatigued for casting at or below your Caster Level).",
+		"requirements":[
+			[{"vitality":8}],
+			[{"feat":"Master of Magic"}],
+			[{"training":"Ka"}],
+			[{"training":"Nouse"}],
+			[{"governing":8}],
+			[{"governing":"Ka"}, {"governing":"Nous"}]
+		],
+		"type":"magic_talent",
+		"cost":4
+	},
+	{
+		"name":"Lord of the Damned",
+		"description":"You have achieved an ageless state of near immortality. You no longer age, you require no food, water or sleep; you suffer no penalties for being injured and are immune to Critical Hits, disease and poison. There is no limit to how much you can Heal but you can ONLY Heal from Soma Magic. You suffer Fatigue from Encumbrance and Casting only. Cold Damage deals no Damage but Encumbers you 1 Level per Wound inflicted. Electric Damage deals no Damage but Dazes you once per Wound inflicted. No roll is needed to become a Lord of the Damned, but you must have the Soul of another human Caster and complete a 1-hour ceremony. To do this, you must remove your own Soul and place it in an external receptacle, which if destroyed, instantly destroys your Soul. If your body then dies, you are permanently Dead. If your body dies but your Soul does not, your soul will remain within your receptacle and may be transferred into a new body by someone else. Blood Magic no longer functions.",
+		"requirements":[
+			[{"vitality":8}],
+			[{"feat":"Necromancer"}],
+			[{"feat":"Master of Magic"}],
+			[{"feat":"Enchanter"}],
+			[{"governing":8}]
+		],
+		"type":"magic_talent",
+		"cost":4
+	},
+	{
+		"name":"Criminal",
+		"description":"You've got a record, as well as some unscrupulous contacts.",
+		"type":"social_trait",
+		"cost":0
+	},
+	{
+		"name":"Debt",
+		"description":"Starting money is tripled, but you have to pay it back some time.",
+		"type":"social_trait",
+		"cost":0
+	},
+	{
+		"name":"Dependent",
+		"description":"You have a staunch ally, but they always need something from you.",
+		"type":"social_trait",
+		"cost":0
+	},
+	{
+		"name":"Highborn",
+		"description":"Some people find you snooty, but you fit in well with high society.",
+		"type":"social_trait",
+		"cost":0
+	},
+	{
+		"name":"I Know a Guy",
+		"description":"You always run into someone you know, whether you want to or not.",
+		"type":"social_trait",
+		"cost":0
+	},
+	{
+		"name":"Indigent",
+		"description":"The slums are home, and it can be hard to fit in anywhere else.",
+		"type":"social_trait",
+		"cost":0
+	},
+	{
+		"name":"Ambidexterity",
+		"description":"You negate your -2 off-hand penalty.",
+		"type":"physical_trait",
+		"cost":2
+	},
+	{
+		"name":"Beautiful",
+		"description":"+2 Charisma when sexuality is relevant.",
+		"type":"physical_trait",
+		"cost":4
+	},
+	{
+		"name":"Double-Jointed",
+		"description":"You can always Take a 10 when escaping from bonds.",
+		"type":"physical_trait",
+		"cost":1
+	},
+	{
+		"name":"Focused",
+		"description":"You gain an additional +1 on Aim, Ready & Full Round Actions.",
+		"type":"physical_trait",
+		"cost":3
+	},
+	{
+		"name":"Giant",
+		"description":"+1 Size Category",
+		"type":"physical_trait",
+		"cost":2
+	},
+	{
+		"name":"Hardened",
+		"description":"+2 Vitality vs. Fear.",
+		"type":"physical_trait",
+		"cost":2
+	},
+	{
+		"name":"Hardy Metabolism",
+		"description":"+2 Fortitude vs. Poisons, Drugs and Alcohol.",
+		"type":"physical_trait",
+		"cost":2
+	},
+	{
+		"name":"High Education",
+		"description":"+2 in one Academia Focus area",
+		"type":"physical_trait",
+		"cost":2
+	},
+	{
+		"name":"Night Vision",
+		"description":"Low Light is Daylight & Night is Low Light.",
+		"type":"physical_trait",
+		"cost":2
+	},
+	{
+		"name":"Photographic Memory",
+		"description":"If you saw it, you can remember it.",
+		"type":"physical_trait",
+		"cost":4
+	},
+	{
+		"name":"Quick Healer",
+		"description":"You always heal 1 additional Damage than you normally would.",
+		"type":"physical_trait",
+		"cost":4
+	},
+	{
+		"name":"Strong Constitution",
+		"description":"You can ignore your first Level of Fatigue.",
+		"type":"physical_trait",
+		"cost":4
+	},
+	{
+		"name":"Will to Live",
+		"description":"You can re-roll a Death Save once per Encounter.",
+		"type":"physical_trait",
+		"cost":2
+	},
+	{
+		"name":"All Thumbs",
+		"description":"A mishap occurs on a Fate 1 or 2 when using technology.",
+		"type":"physical_trait",
+		"cost":-2
+	},
+	{
+		"name":"Bad Luck",
+		"description":"A mishap occurs on a Fate 1 or 2.",
+		"type":"physical_trait",
+		"cost":-6
+	},
+	{
+		"name":"Clumsy",
+		"description":"A mishap occurs on a Fate 1 or 2 on movement-related rolls.",
+		"type":"physical_trait",
+		"cost":-4
+	},
+	{
+		"name":"Dwarf",
+		"description":"-1 Size Category",
+		"type":"physical_trait",
+		"cost":-2
+	},
+	{
+		"name":"Frail Constitution",
+		"description":"You are Unconscious after 3 Levels of Fatigue instead of 4.",
+		"type":"physical_trait",
+		"cost":-3
+	},
+	{
+		"name":"Incompetent",
+		"description":"You receive another -2 bonus to Untrained Unique Skills.",
+		"type":"physical_trait",
+		"cost":-2
+	},
+	{
+		"name":"Insomniac",
+		"description":"You suffer a -2 penalty to rest-related rolls, including Healing.",
+		"type":"physical_trait",
+		"cost":-2
+	},
+	{
+		"name":"Low Pain Tolerance",
+		"description":"You receive an additional -1 penalty for Wounds.",
+		"type":"physical_trait",
+		"cost":-3
+	},
+	{
+		"name":"Skittish",
+		"description":"-2 Vitality vs. Fear, and an additional -2 when Surprised.",
+		"type":"physical_trait",
+		"cost":-2
+	},
+	{
+		"name":"Slow Healer",
+		"description":"You always heal 1 less Damage than you normally would.",
+		"type":"physical_trait",
+		"cost":-3
+	},
+	{
+		"name":"Tongue-Tied",
+		"description":"A mishap occurs on a Fate 1 or 2 on speech-related rolls.",
+		"type":"physical_trait",
+		"cost":-4
+	},
+	{
+		"name":"Unmistakable",
+		"description":"Without a proper disguise, you're easy to spot in a crowd.",
+		"type":"physical_trait",
+		"cost":-1
+	},
+	{
+		"name":"Weak Metabolism",
+		"description":"-2 Fortitude vs. Poisons, Drugs and Alcohol.",
+		"type":"physical_trait",
+		"cost":-2
+	},
+	{
+		"name":"Celebrity",
+		"description":"Positive State: You gained 2 Renown last Session.; Negative State: You didn't gain any Renown last Session.",
+		"type":"morale_trait",
+		"cost":0
+	},
+	{
+		"name":"Extrovert",
+		"description":"Positive State: A new NPC really likes you.; Negative State: You didn't hang out with any NPC friends.",
+		"type":"morale_trait",
+		"cost":0
+	},
+	{
+		"name":"Fancypants",
+		"description":"Positive State: You had a new luxury experience this Session.; Negative State: No luxury experience last Session.",
+		"type":"morale_trait",
+		"cost":0
+	},
+	{
+		"name":"Gamer",
+		"description":"Positive State: You won some kind of game this Session.; Negative State: You lost a game last Session.",
+		"type":"morale_trait",
+		"cost":0
+	},
+	{
+		"name":"Glutton",
+		"description":"Positive State: All of your meals were excessive.; Negative State: None of your meals were decent last Session.",
+		"type":"morale_trait",
+		"cost":0
+	},
+	{
+		"name":"Merrymaker",
+		"description":"Positive State: You got drunk this Session.; Negative State: You didn't have any drinks last Session.",
+		"type":"morale_trait",
+		"cost":0
+	},
+	{
+		"name":"Miracle",
+		"description":"Positive State: You used no Alignment Bonuses last Session.; Negative State: You used all Alignment Bonuses last Session.",
+		"type":"morale_trait",
+		"cost":0
+	},
+	{
+		"name":"Pennypincher",
+		"description":"Positive State: You have more than 800 credits/8 Gold/$40.; Negative State: You have less than 400 credits/4 Gold/$20.",
+		"type":"morale_trait",
+		"cost":0
+	},
+	{
+		"name":"Philanderer",
+		"description":"Positive State: You had 1 new sexual encounter this Session.; Negative State: No new encounters last Session.",
+		"type":"morale_trait",
+		"cost":0
+	},
+	{
+		"name":"Rover",
+		"description":"Positive State: You went to a new planet/region this Session.; Negative State: You stayed in one place last Session.",
+		"type":"morale_trait",
+		"cost":0
+	},
+	{
+		"name":"Spendthrift",
+		"description":"Positive State: You have less than 20 credits/4 Silver/$1.; Negative State: You have more than 200 credits/2 Gold/$10.",
+		"type":"morale_trait",
+		"cost":0
+	},
+	{
+		"name":"Wunderkind",
+		"description":"Positive State: You succeeded all rolls last Session.; Negative State: You failed 2 or more rolls last Session.",
+		"type":"morale_trait",
+		"cost":0
+	},
+	{
+		"name":"Archaeologist",
+		"description":"You have studied and taught ancient civilizations and cultures of South America at world renowned Universities and are one of the best in your field. You can identify artifacts and structures of all known societies in South America and can make educated guesses about the purpose and nature of unknown ones. You can translate ancient writing from all known past civilizations in South American and may attempt translation of unknown ones. Archaeology must be learned under Intellect.",
+		"type":"profession",
+		"cost":0
+	},
+	{
+		"name":"Botanist/Herbalist",
+		"description":"Whether through academia or indigenous knowledge, you know the plants of the Amazon better than most. You can identify any Amazonian plants with a DL 10 or less, and as long as you are in or near the Amazon, you can find any plant from the Drug/Poison Ingredients Lists once per day of travel without making a roll. Additionally, even if fail a roll or you are outside of the Amazon, a DL 15 will identify likely properties of any plants you encounter. Herbalism can be learned under Intuition or Intellect.",
+		"type":"profession",
+		"cost":0
+	},
+	{
+		"name":"Cartographer",
+		"description":"The Cartographer is a master of maps and geography. You can create detailed maps of any area you have traveled through with impressive accuracy (DL 14). Additionally, if you have a map of an unexplored area, you can never become lost and can also roll Cartography without a map to attempt to find your direction (DL 10). Cartography can be learned under Awareness or Innovation.",
+		"type":"profession",
+		"cost":0
+	},
+	{
+		"name":"Ex-Military",
+		"description":"You were a career soldier for many years, until that one mission went terribly wrong. Now you make your way as a hired gun, and you know guns well. You ignore Misfire on all weapons and reduce Accuracy penalties by 1. You also begin the game Trained in Demolitions and Tactics.",
+		"type":"profession",
+		"cost":0
+	},
+	{
+		"name":"Philanthropist",
+		"description":"Somehow you got filthy rich, and you've spent most of your money funding the pursuit of the Lost City. Because of your deep pockets and fame, you have bought and befriended people everywhere. Any time you visit a new town or city you may declare a relationship with an inhabitant. This can be someone of your creation, with GM approval, or you can declare a relationship to any pre-existing NPC. The nature and quality of the relationship is still at the GM's discretion. Even after you have done this, you can always name-drop with anyone, which will provide anywhere from a +4 to -4 to any Charisma roll. The bonus/penalty will be unknown to you until after the roll. Additionally, as long as you have access to a city with a bank, you can withdraw $100/day.",
+		"type":"profession",
+		"cost":0
+	},
+	{
+		"name":"Street Rat",
+		"description":"You've never had a family to look out for you, and the roof over your head was the sky more often than not. But it made you resilient and creative, and you know how to get along with the wrong kind of people. Any time you are in a town or city you can make an Intuition or Awareness roll to find black market or illegal activities, and these people will never be outright hostile toward you as long as you are alone. You also begin the game Trained in Stealth and either Security OR Sleight of Hand.",
+		"type":"profession",
+		"cost":0
+	},
+	{
+		"name":"Professor/Researcher",
+		"description":"Whether in the University, museums or research institutes, you were once well-respected by the few people that knew your name. Unfortunately, your “extra-curricular” research got you into trouble and you've found yourself in need of alternate employment. You may choose one eclectic, academic area as a Focus under Intellect (i.e. American Folklore, Cryptozoology, etc.). This Focus is treated as if you have Eclectic Knowledge if you ever fail a roll, and if you also have Eclectic Knowledge, you double your normal percentile chance. You also gain the Esoteric Knowledge Skill.",
+		"type":"social_background",
+		"cost":0
+	},
+	{
+		"name":"Prospector",
+		"description":"You travelled west to make your fortune, and things went well for a while, but eventually, your home on the coast called you back for better things. Spending so much time underground had its benefits though. You always know direction in the dark, or when underground, and can identify likely mining areas on a detailed map (even if you have never visited the are) by making an appropriate Attribute roll of DL 10 maximum. You can identify any ores or precious metals, without rolling, and begin with either the Demolitions OR Engineering Skill.",
+		"type":"social_background",
+		"cost":0
+	},
+	{
+		"name":"Frontiersman",
+		"description":"You've made a living staking claims, mapping out new territories, hunting, and trapping. The wilderness is your home and you generally prefer it to city-life, but things get lonesome out west, and you know you're destined for bigger things. You can create detailed maps of any area you have travelled through with a DL 14. Additionally, if you have a map of an area, you can never become delayed or lost. You gain the Survival Skill.",
+		"type":"social_background",
+		"cost":0
+	},
+	{
+		"name":"Cowboy",
+		"description":"You made your living on the range, and you had a way with Horses beyond mere training and commands. But you were at it all for a bit too long, and the tedium got to you. Now it's time to mosey on. Any time you encounter a Horse, wild or domestic, you can attempt to Tame it using your Intuition or Allure. The DL is determined by the GM, based on your relationship to the Horse as well as the Horses' relationship to their owner (if they have one). The maximum DL is 14. You gain the Ride Animal Skill and may use Train Animal on Horses only.",
+		"type":"social_background",
+		"cost":0
+	},
+	{
+		"name":"Medicine Wo/Man",
+		"description":"Through your indigenous knowledge, you know the plants of America better than most. You've chosen to work with the white man because you know that greater evils are at play, and besides... maybe not every white man is a monster. You may choose one region: Mountain, Desert, Coastal or Forest. You can identify any plants with a maximum DL of 10 in your chosen region. Additionally, even if you fail a roll or you are outside of your chosen region, a DL 14 will identify likely properties of any plants you encounter. You also gain the First Aid Skill.",
+		"type":"social_background",
+		"cost":0
+	},
+	{
+		"name":"Old Money",
+		"description":"Because of your deep pockets and fame, you have befriended (and bribed) people everywhere, but your family (or business) has been trying to cut you out. It's about time to make a name for yourself on your terms. Any time you visit a new town or city you may declare a relationship with an inhabitant. This can be someone of your own creation (with GM approval), or you can declare a relationship to a pre-existing NPC. The quality and nature of the relationship is still at the GM's discretion, but it will never be detrimental to you. Additionally, as long as you have access to a city with a bank, you can withdraw up to $50/week and double your starting funds.",
+		"type":"social_background",
+		"cost":0
+	},
+	{
+		"name":"Definitely Illegal",
+		"description":"The frontier was the perfect place to make a living any way possible, and you took full advantage. But now it's time to do something bigger. You know your way around the seedy underbelly of American black markets, illegal businesses, criminal syndicates. Anytime you are in a new town, you can make an appropriate Attribute check to locate such businesses and activities, with a maximum DL of 10. You are fluent in the slang and culture of this world and will not be treated hostilely or with suspicion from such people unless you act in a contradictory way, or as the result of Fate. You gain the Security Skill AND any other Unique Skill of your choosing. You also have Bounty on your head (so watch your back).",
+		"type":"social_background",
+		"cost":0
+	},
+	{
+		"name":"Snake-oil Salesman",
+		"description":"Everyone's got to make a living, and you can give people a good show and some hope in a bottle, who are you to argue? But not everything is smoke and mirrors, and you're determined to find the truth behind the rumors you've heard about otherworldly forces at work in the world - if for no other reason than to monetize real magic. Because you've travelled so much, you know people everywhere, and most of them never want to see you again. Anytime you visit a town or city, you must use a Motivator Bonus to declare yourself unknown, otherwise your bad reputation will precede you. You gain the Sleight of Hand AND Perform Skill.",
+		"type":"social_background",
+		"cost":0
+	},
+	{
+		"name":"Soldier/Lawman",
+		"description":"You were a career gunman for many years, and you've seen your fair share of combat and shoot-outs. Eventually, you grew tired of the life you built and ventured out to find new excitement, and maybe make a name for yourself. You know guns better than your own body and may ignore Misfire on all weapons and reduce Accuracy penalties by 1. Unfortunately, you made a lot of enemies along the way, and you are wanted dead or alive by an outlaw gang. You gain the Tactics AND Ride Animal Skills.",
+		"type":"social_background",
+		"cost":0
+	},
+	{
+		"name":"Freed Slave",
+		"description":"You were born into slavery but managed to escape from bondage and find freedom in the North. Life still hasn't been easy, but a positive mindset and a cunning mind have kept you safe and content, and you've found a few Northerners you think can trust. Unfortunately, it's also impossible to travel into Confederate lands without a white escort. Negative Morale Effects are reduced 1 Level (i.e. you suffer no effects until -4, and can never suffer the standard -8 Morale Effect). You also gain the Stealth AND Survival Skills.",
+		"type":"social_background",
+		"cost":0
+	},
+	{
+		"name":"Nobility",
+		"description":"You had a posh upbringing that some might consider pampered and indulgent. You're well-read, well-educated and well-traveled. You gain 2 Bonus Skill Points to place in Diplomacy, Academia or Language Focuses. You are Literate and gain 2d4 additional starting funds.",
+		"type":"social_background",
+		"cost":0
+	},
+	{
+		"name":"Courtier",
+		"description":"You weren't rich, but you lived a wealthy life on the coattails of others, mainly by kissing the right asses and knowing how to manipulate your superiors. You gain 3 Bonus Skill Points to place in Diplomacy, Seduce or Sense Motive Focuses. You are Literate and gain 1d4 additional starting funds.",
+		"type":"social_background",
+		"cost":0
+	},
+	{
+		"name":"Merchant",
+		"description":"You came from a Merchant family, which meant you worked hard and often to keep yourselves above the peasant masses. You understand people and business well and travelled the world often buying, selling and trading. You gain 3 Bonus Skill Points to place in Appraise, Barter or Languages Focuses. You are Literate and gain 1d4 additional starting funds.",
+		"type":"social_background",
+		"cost":0
+	},
+	{
+		"name":"Scholar",
+		"description":"You trained extensively with the most educated minds of your city, tirelessly transcribing texts and reading more books than even the wealthiest minds have consumed. You gain 4 Bonus Skill Points to place in Academia, Culture, Languages or Religion. You are Literate.",
+		"type":"social_background",
+		"cost":0
+	},
+	{
+		"name":"Soldier",
+		"description":"You spent some time enlisted in the military, defending your home. You've seen your share of battle, but you're ready for new adventures and some real freedom. You gain a +1 Bonus in Shoot and Attack. You must choose a specific Weapon Type for each Focus and you may apply the Bonus after initial Skill Points have been spent. You are Illiterate.",
+		"type":"social_background",
+		"cost":0
+	},
+	{
+		"name":"Craftsman",
+		"description":"You made stuff, and you made it well enough to make a decent living, but never well enough to really get noticed. You gain a +2 Bonus in a single Craft Item Focus and you may apply the Bonus after initial Skill Points have been spent. You are Illiterate.",
+		"type":"social_background",
+		"cost":0
+	},
+	{
+		"name":"Peasant",
+		"description":"You broke your body to keep the rich fat and barely enough food in your own belly. You've survived the hardest of times and come out strong for it. You gain 5 Bonus Skill Points to place in Lift, Resist Disease or Craft Item Focuses. You are Illiterate and lose 1d4 starting funds.",
+		"type":"social_background",
+		"cost":0
+	},
+	{
+		"name":"Street Urchin",
+		"description":"You never had a real home and survived off of wit, luck and a lot of illegal activity. You're a survivor and as resourceful as they come. You gain 2 Bonus Skill Points to place in Disguise, Search, Listen or Run Focuses and gain the Security, Stealth or Sleight of Hand Unique Skill for free. You are Illiterate and lose 2d4 starting funds.",
+		"type":"social_background",
+		"cost":0
+	},
+	{
+		"name":"Addicted",
+		"description":"You have a vice that you can't seem to escape. You may choose one vice when this taken (i.e. alcohol, tobacco, gambling, sex, etc.), and may take this multiple times for multiple vices at the GM's discretion. Any time this vice is available to you, you must succeed a minimum Vitality roll DL 10 to resist. If you go a session without your vice, you receive a cumulative -1 penalty to Morale, up to -4 maximum.",
+		"type":"compelling_action",
+		"cost":-2
+	},
+	{
+		"name":"Ascetic",
+		"description":"You view the accumulation of wealth and the enjoyment of luxuries as bad for the soul. As such, you will avoid these things and must succeed a minimum Vitality roll DL 10 in order to receive money you don't need and enjoy activities or items that could be considered indulgent or unnecessary.",
+		"type":"compelling_action",
+		"cost":-2
+	},
+	{
+		"name":"Curious",
+		"description":"You have an extremely difficult time resisting unknown, interesting, and new situations. If you ever wish to avoid such a situation a minimum Vitality roll DL 10 is required unless death seems certain.",
+		"type":"compelling_action",
+		"cost":-2
+	},
+	{
+		"name":"For the Clan",
+		"description":"If the honor or prowess of you or your people is ever questioned or insulted, you are obligated to defend your honor. This may not always lead to a fight, but if the offender is already considered an enemy, it often will. Resisting this desire is always a minimum Vitality roll DL 10 unless engaging would somehow further sully your honor.",
+		"type":"compelling_action",
+		"cost":-2
+	},
+	{
+		"name":"Honest",
+		"description":"You value truth and honesty, and will rarely lie, especially to a friend or ally. If you ever wish to lie, except in clearly dire situations, you must first succeed a minimum Vitality roll DL 10.",
+		"type":"compelling_action",
+		"cost":-2
+	},
+	{
+		"name":"Honor-bound",
+		"description":"If you ever make a promise, you will do your best to never break it. This is doubly so if the recipient is close friend or ally, or someone who has helped you in some way. If you wish to go back on your word, a minimum Vitality roll DL 10 is necessary.",
+		"type":"compelling_action",
+		"cost":-2
+	},
+	{
+		"name":"Pacifist",
+		"description":"You value peace and harmony above all else and will do all you can to avoid violent conflict and even aggressive conversation. To resist this desire requires a minimum Vitality roll DL 10 unless you or someone close to you would be in immediate danger.",
+		"type":"compelling_action",
+		"cost":-2
+	},
+	{
+		"name":"Protector of the Wild",
+		"description":"You view yourself as a guardian of wild places. If you ever witness abuse, misuse, or wanton destruction of wild places or animals, you are obliged to intercede in some way. If you wish to resist this compulsion, a minimum Vitality roll DL 10 is necessary.",
+		"type":"compelling_action",
+		"cost":-2
+	},
+	{
+		"name":"Rebel Yell",
+		"description":"You don't like being told what to do, how to act, or what you can and cannot say. When this happens, you will often reject the command or suggestion simply for the sake of maintaining your sense of autonomy. To resist this desire requires a minimum Vitality roll DL 10 unless it would put your life at risk, or the life of someone you care about.",
+		"type":"compelling_action",
+		"cost":-2
+	},
+	{
+		"name":"Show Me the Money",
+		"description":"Anytime you have an opportunity to barter, gamble or otherwise make money without significant risk, you must do so, unless you succeed a Vitality roll of at least DL 10.",
+		"type":"compelling_action",
+		"cost":-2
+	},
+	{
+		"name":"Solemn Oath",
+		"description":"You have made a promise to an important individual or organization or have sworn vengeance against a person or organization. The oath must be agreed upon with the GM when this is taken and may take multiple Oath's at the GM's discretion. You must pursue this Oath whenever possible, and anything that could be a distraction from fulfilling your Oath, or is in conflict with your Oath, cannot be undertaken without a minimum Vitality roll of DL 10. This is Compelling Action is removed when the Oath is fulfilled.",
+		"type":"compelling_action",
+		"cost":-2
+	},
+	{
+		"name":"Warrior's Code",
+		"description":"You value honor in battle above most things. As a result, you will rarely attack an Unaware or unarmed opponent and will attempt to stop or intercede in a fight you see as dishonorable. If you wish to resist this compulsion, a minimum Vitality roll DL 10 is necessary.",
+		"type":"compelling_action",
+		"cost":-2
+	},
+	{
+		"name":"Iron Soul",
+		"description":"Asgari add half their Soma Bonus to their Caster Level for Soma Magic only.",
+		"type":"race_trait",
+		"race":"Asgari",
+		"cost":0
+	},
+	{
+		"name":"Master of the Wild",
+		"description":"Vanir add half their Avani Bonus to their Caster Level for Avani Magic only.",
+		"type":"race_trait",
+		"race":"Vanir",
+		"cost":0
+	},
+	{
+		"name":"Mentalist",
+		"description":"Pangu add half their Nous Bonus to their Caster Level for Nous Magic only.",
+		"type":"race_trait",
+		"race":"Pangu",
+		"cost":0
+	},
+	{
+		"name":"Energy Weaver",
+		"description":"Alfir add half their Ka Bonus to their Caster Level for Ka Magic only.",
+		"type":"race_trait",
+		"race":"Alfir",
+		"cost":0
+	}
+]

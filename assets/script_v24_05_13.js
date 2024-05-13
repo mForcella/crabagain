@@ -2,8 +2,6 @@
 var campaign;
 var user;
 var xp_awards;
-var feat_list;
-var feat_reqs;
 // booleans to determine rules and element visibility for various operating modes
 var inputChanges = false;
 var allocatingAttributePts = false;
@@ -20,19 +18,6 @@ var trainingVals = [];
 // ID of input to gain focus on modal show
 var focus_id = "";
 var submitForm = false;
-
-// get list of school talents
-var schoolTalents = {
-	"Ka": [],
-	"Avani": [],
-	"Nouse": [],
-	"Soma": []
-};
-for (var i in featList) {
-	if (featList[i]['type'] == "school_talent") {
-		schoolTalents[featList[i]['requirements'][0][0]['training']].push(featList[i]);
-	}
-}
 
 var attributes = [
 	'strength',
@@ -128,7 +113,7 @@ $(document).on('input', '.clearable', function() {
     $(this)[tog(this.offsetWidth-18 < e.clientX-this.getBoundingClientRect().left)]('onX');   
 }).on('click', '.onX', function() {
     $(this).removeClass('x onX').val('');
-    if (this.id == "feat_name") {
+    if (this.id == "standard_talent_name") {
     	$("#feat_description").val("").height("125px");
     }
     if (this.id == "magic_talent_name") {
@@ -299,9 +284,15 @@ $(window).on("beforeunload", function(e) {
 	}
 });
 
-// enable size edit button
+// enable misc highlight functions
 if (!is_mobile) {
 	$("#size").hover(function () {
+		$(this).addClass("highlight");
+	}, 
+	function () {
+		$(this).removeClass("highlight");
+	});
+	$("#age_category").hover(function () {
 		$(this).addClass("highlight");
 	}, 
 	function () {
@@ -341,7 +332,16 @@ $("#attribute_pts").on("input change", function() {
 });
 
 // show hidden inputs on skill type radio select
+$("#esoteric").on("click", function() {
+	$("#esoteric_name").show();
+	$("#skill_name").hide();
+	$("#training_name").hide();
+	$("#focus_name").hide();
+	$("#focus_name2").hide();
+	$("#school_name").hide();
+});
 $("#skill").on("click", function() {
+	$("#esoteric_name").hide();
 	$("#skill_name").show();
 	$("#training_name").hide();
 	$("#focus_name").hide();
@@ -349,6 +349,7 @@ $("#skill").on("click", function() {
 	$("#school_name").hide();
 });
 $("#training").on("click", function() {
+	$("#esoteric_name").hide();
 	$("#skill_name").hide();
 	$("#training_name").show();
 	$("#focus_name").hide();
@@ -356,12 +357,14 @@ $("#training").on("click", function() {
 	$("#school_name").hide();
 });
 $("#focus").on("click", function() {
+	$("#esoteric_name").hide();
 	$("#skill_name").hide();
 	$("#training_name").hide();
 	$("#focus_name").show();
 	$("#school_name").hide();
 });
 $("#school").on("click", function() {
+	$("#esoteric_name").hide();
 	$("#skill_name").hide();
 	$("#training_name").hide();
 	$("#focus_name").hide();
@@ -630,33 +633,39 @@ $(".motivator-pts").on("change touchend", function() {
 	$(this).data('val', current);
 	userMotivators[m_id]['points'] = current;
 
-	// adjust xp if primary motivator
-	if (userMotivators[m_id]['primary_'] == 1) {
-		$("#xp").val( parseInt($("#xp").val()) + parseInt($("#level").val()) * (current - prev) ).trigger("change");
-	}
-	// if increasing a non-primary motivator, check if it has exceeded a primary motivator (personality crisis)
-	else if (current > prev) {
-		for (var i in userMotivators) {
-			if (current > userMotivators[i]['points']) {
-				// alert user and prompt to change primary motivators
-				let motivator_name = userMotivators[m_id]['motivator'];
-				$("#crisis_name").html(motivator_name);
-				$("#crisis_modal").modal("show");
-				// get other three motivators and set labels for the next modal
-				var iter = 0;
-				$(".motivator-row").hide();
-				for (var j in userMotivators) {
-					if (userMotivators[j]['points'] < current) {
-						$("#remove_motivator_"+iter).val(userMotivators[j]['motivator']);
-						$("#motivator_"+iter+"_label").html(userMotivators[j]['motivator'] + " ("+userMotivators[j]['points']+" Pts)");
-						$("#motivator_"+iter+"_row").show();
-						iter++;
+	// check if GM edit mode
+	if (!adminEditMode) {
+
+		// adjust xp if primary motivator
+		if (userMotivators[m_id]['primary_'] == 1) {
+			$("#xp").val( parseInt($("#xp").val()) + parseInt($("#level").val()) * (current - prev) ).trigger("change");
+		}
+
+		// if increasing a non-primary motivator, check if it has exceeded a primary motivator (personality crisis)
+		else if (current > prev) {
+			for (var i in userMotivators) {
+				if (current > userMotivators[i]['points']) {
+					// alert user and prompt to change primary motivators
+					let motivator_name = userMotivators[m_id]['motivator'];
+					$("#crisis_name").html(motivator_name);
+					$("#crisis_modal").modal("show");
+					// get other three motivators and set labels for the next modal
+					var iter = 0;
+					$(".motivator-row").hide();
+					for (var j in userMotivators) {
+						if (userMotivators[j]['points'] < current) {
+							$("#remove_motivator_"+iter).val(userMotivators[j]['motivator']);
+							$("#motivator_"+iter+"_label").html(userMotivators[j]['motivator'] + " ("+userMotivators[j]['points']+" Pts)");
+							$("#motivator_"+iter+"_row").show();
+							iter++;
+						}
 					}
+					break;
 				}
-				break;
 			}
 		}
 	}
+
 	// update value in database
 	updateDatabaseColumn('user_motivator', 'points', current, userMotivators[m_id]['id']);
 
@@ -711,6 +720,10 @@ $("#xp").change(function() {
 
 // on morale change, set morale effect
 $("#morale").on("input change", function() {
+	// max morale 8
+	if ($(this).val() > 8) {
+		$(this).val(8);
+	}
 	setMoraleEffect(parseInt($(this).val()));
 	setMotivatorBonus();
 });
@@ -755,6 +768,49 @@ $("#damage").on("change", function() {
 	$("#wound_penalty").val($("#wound_penalty_val option:selected").text());
 });
 
+function editAge() {
+	let age = $("#character_age_select").val();
+	user['age_category'] = age;
+	updateDatabaseColumn('user', 'age_category', age, user['id']);
+
+	// update size texts
+	let age_text = age == "Child" ? "Child; -2 Power, -1 Dexterity, -2 Intelligence, -1 Spirit" : ( age == "Adolescent" ? "Adolescent; -1 Power, +1 Dexterity" : (age == "Middle-Aged" ? "Middle-Aged; -1 Dexterity, +1 Spirit" : ( age == "Elder" ? "Elder; -1 Power, -2 Dexterity, +1 Intelligence, +2 Spirit" : ( age == "Venerable" ? "Venerable; -2 Power, -3 Dexterity, +2 Intelligence, +3 Spirit" : age))));
+	$("#age_category_text").html(age_text);
+	$("#age_category_val").val(age);
+
+	// update attributes
+	let power_mod = age == "Child" ? -2 : ( age == "Adolescent" ? -1 : (age == "Middle-Aged" ? 0 : ( age == "Elder" ? -1 : ( age == "Venerable" ? -2 : 0))));
+	$("#age_power_mod").val(power_mod);
+	let dexterity_mod = age == "Child" ? -1 : ( age == "Adolescent" ? +1 : (age == "Middle-Aged" ? -1 : ( age == "Elder" ? -2 : ( age == "Venerable" ? -3 : 0))));
+	$("#age_dexterity_mod").val(dexterity_mod);
+	let intelligence_mod = age == "Child" ? -2 : ( age == "Adolescent" ? 0 : (age == "Middle-Aged" ? 0 : ( age == "Elder" ? +1 : ( age == "Venerable" ? +2 : 0))));
+	$("#age_intelligence_mod").val(intelligence_mod);
+	let spirit_mod = age == "Child" ? -1 : ( age == "Adolescent" ? 0 : (age == "Middle-Aged" ? +1 : ( age == "Elder" ? +2 : ( age == "Venerable" ? +3 : 0))));
+	$("#age_spirit_mod").val(spirit_mod);
+
+	// check for size mod
+	let size_mod = $("#power_mod").val() == "" ? 0 : parseInt($("#power_mod").val());
+
+	// update attribute text
+	let strength_mod = parseInt($("#strength_val").val()) + power_mod + size_mod;
+	let fortitude_mod = parseInt($("#fortitude_val").val()) + power_mod + size_mod;
+	let speed_mod = parseInt($("#speed_val").val()) + dexterity_mod;
+	let agility_mod = parseInt($("#agility_val").val()) + dexterity_mod;
+	let intellect_mod = parseInt($("#intellect_val").val()) + intelligence_mod;
+	let innovation_mod = parseInt($("#innovation_val").val()) + intelligence_mod;
+	let intuition_mod = parseInt($("#intuition_val").val()) + spirit_mod;
+	let vitality_mod = parseInt($("#vitality_val").val()) + spirit_mod;
+
+	$("#strength_text").html(strength_mod >= 0 ? "+"+strength_mod : strength_mod);
+	$("#fortitude_text").html(fortitude_mod >= 0 ? "+"+fortitude_mod : fortitude_mod);
+	$("#speed_text").html(speed_mod >= 0 ? "+"+speed_mod : speed_mod);
+	$("#agility_text").html(agility_mod >= 0 ? "+"+agility_mod : agility_mod);
+	$("#intellect_text").html(intellect_mod >= 0 ? "+"+intellect_mod : intellect_mod);
+	$("#innovation_text").html(innovation_mod >= 0 ? "+"+innovation_mod : innovation_mod);
+	$("#intuition_text").html(intuition_mod >= 0 ? "+"+intuition_mod : intuition_mod);
+	$("#vitality_text").html(vitality_mod >= 0 ? "+"+vitality_mod : vitality_mod);
+}
+
 function editSize(modify_user) {
 	// set size text
 	let size = $("#character_size_select").val();
@@ -763,18 +819,37 @@ function editSize(modify_user) {
 		user['size'] = size;
 		updateDatabaseColumn('user', 'size', size, user['id']);
 	}
-	let size_text = size == "Small" ? "Small; +2 Defend/Dodge/Stealth, -10 Move" : (size == "Large" ? "Large; -2 Defend/Dodge/Stealth, +10 Move" : size)
+	// update size texts
+	let size_text = size == "Tiny" ? "Tiny; -4 Power, +4 Defend/Dodge/Stealth, -20 Move" : ( size == "Small" ? "Small; -2 Power, +2 Defend/Dodge/Stealth, -10 Move" : (size == "Large" ? "Large; +2 Power, -2 Defend/Dodge/Stealth, +10 Move" : ( size == "Giant" ? "Giant; +4 Power, -4 Defend/Dodge/Stealth, +20 Move" : size)));
 	$("#character_size_text").html(size_text);
 	$("#character_size_val").val(size);
 	setDodge();
 	setDefend();
-	updateTotalWeight(false);
+	updateTotalWeight(false); // update movement
+
+	// check for age mod
+	let age_mod = $("#age_power_mod").val() == "" ? 0 : parseInt($("#age_power_mod").val());
+
+	// update strength and fortitude
+	let power_mod = size == "Tiny" ? -4 : (size == "Small" ? -2 : (size == "Large" ? 2 : (size == "Giant" ? 4 : 0)));
+	$("#power_mod").val(power_mod);
+	let strength_mod = parseInt($("#strength_val").val()) + power_mod + age_mod;
+	let fortitude_mod = parseInt($("#fortitude_val").val()) + power_mod + age_mod;
+	$("#strength_text").html(strength_mod >= 0 ? "+"+strength_mod : strength_mod);
+	$("#fortitude_text").html(fortitude_mod >= 0 ? "+"+fortitude_mod : fortitude_mod);
+	// check for stealth training
+	for (var i in userTrainings) {
+		if (userTrainings[i]['name'].toLowerCase() == "stealth") {
+			let stealth_mod = parseInt($("#training_"+userTrainings[i]['id']+"_val").val()) - power_mod;
+			$("#training_"+userTrainings[i]['id']+"_text").html(stealth_mod >= 0 ? "+"+stealth_mod : stealth_mod);
+		}
+	}
 
 	// update height dropdown values
 	let height = $("#height").val();
 	$("#height").html("");
-	let lower = size == "Small" ? 36 : (size == "Large" ? 84 : 60);
-	let upper = size == "Small" ? 60 : (size == "Large" ? 108 : 84);
+	let lower = size == "Tiny" ? 24 : ( size == "Small" ? 36 : (size == "Large" ? 84 : ( size == "Giant" ? 108 : 60)));
+	let upper = size == "Tiny" ? 35 : ( size == "Small" ? 59 : (size == "Large" ? 107 : ( size == "Giant" ? 143 : 84)));
 	for (var i = lower; i < upper; i++) {
 		var feet = 0;
 		var inches = i;
@@ -794,7 +869,7 @@ function setDodge() {
 	// get size value and agility value
 	let size = $("#character_size_select").val();
 	let agility = parseInt($("#agility_val").val());
-	var dodge = (agility >= 0 ? Math.floor(agility/2) : Math.ceil(agility/3)) + (size == "Small" ? 2 : (size == "Large" ? -2 : 0));
+	var dodge = (agility >= 0 ? Math.floor(agility/2) : Math.ceil(agility/3)) + ( size == "Tiny" ? 4 : (size == "Small" ? 2 : (size == "Large" ? -2 : ( size == "Giant" ? -4 : 0))));
 	// check for feats - Lightning Reflexes and Relentless Defense
 	if (hasTalent("Lightning Reflexes")) {
 		let speed = parseInt($("#speed_val").val());
@@ -811,7 +886,7 @@ function setDefend() {
 	// get size value and agility value
 	var size = $("#character_size_select").val();
 	var agility = parseInt($("#agility_val").val());
-	var defend = 10 + agility + (size == "Small" ? 2 : (size == "Large" ? -2 : 0));
+	var defend = 10 + agility + ( size == "Tiny" ? 4 : (size == "Small" ? 2 : (size == "Large" ? -2 : ( size == "Giant" ? -4 : 0))));
 	// check for weapon defend modifier
 	var bonus = 0;
 	for (var i in userWeapons) {
@@ -1006,7 +1081,8 @@ function setAttributes(user) {
 	// set morale effect from morale
 	setMoraleEffect(user['morale'] == null ? 0 : parseInt(user['morale']));
 	setMotivatorBonus();
-	// set size text
+	// set age and size text
+	editAge();
 	editSize(false);
 	// set initiative
 	adjustInitiative();
@@ -1069,15 +1145,23 @@ function setRaceInput() {
 function selectRace(input) {
 	let race = getRace(input);
 
+	// check for traits, Giant/Dwarf
+	let sizes = [
+		"Tiny",
+		"Small",
+		"Medium",
+		"Large",
+		"Giant"
+	];
+	let size_adjust = hasTalent("Dwarf") ? -1 : (hasTalent("Giant") ? 1 : 0);
+	let base = race == false ? 2 : sizes.indexOf(race['size']);
+	$("#character_size_select").val(sizes[base + size_adjust]);
+	editSize(true);
+
 	if (race == false) {
-		$("#character_size_select").val("Medium");
-		editSize(true);
 		$("#race_traits").html("");
 	} else {
-		// set size
-		$("#character_size_select").val(race['size']);
-		editSize(true);
-		// get traits
+		// get race traits
 		$("#race_traits").html("");
 		for (var i in race_traits) {
 			if (race_traits[i]['race_id'] == race['id']) {
@@ -1124,7 +1208,6 @@ function getRace(race) {
 }
 
 function setMoraleEffect(morale) {
-	// TODO set max morale to 8
 	var positiveEffects = {
 		2: "You gain +1 Fate",
 		4: "You gain 1 Motivator Bonus Each Session",
@@ -1170,9 +1253,66 @@ function adjustFate() {
 
 // adjust attribute value
 function adjustAttribute(attribute, val) {
-	// TODO trainings should have a min val of 0
 	var originalVal = parseInt($("#" + attribute+"_val").val());
 	var newVal = originalVal + parseInt(val);
+	// training values should not be negative, and should not be greater than parent attribute value
+	if (attribute.includes("training_")) {
+		let parent_attribute = $("#"+attribute+"_row").parent().attr("id").toLowerCase();
+		let parent_val = parseInt($("#"+parent_attribute+"_val").val());
+		if (newVal < 0 || newVal > parent_val) {
+			return;
+		}
+	}
+	$("#"+attribute+"_val").val(newVal).trigger("change");
+
+	// check for attribute mods
+	var modVal = 0;
+	// check for stealth training
+	var is_stealth = false;
+	for (var i in userTrainings) {
+		if (userTrainings[i]['name'].toLowerCase() == "stealth") {
+			is_stealth = userTrainings[i]['id'] == attribute.split("training_")[1];
+		}
+	}
+
+	// need to check for all attribute mods
+	var size_mod;
+	var age_mod;
+	switch(attribute) {
+		case "strength":
+		case "fortitude":
+			size_mod = $("#power_mod").val() == "" ? 0 : parseInt($("#power_mod").val());
+			age_mod = $("#age_power_mod").val() == "" ? 0 : parseInt($("#age_power_mod").val());
+			break;
+		case "speed":
+		case "agility":
+			size_mod = 0;
+			age_mod = $("#age_dexterity_mod").val() == "" ? 0 : parseInt($("#age_dexterity_mod").val());
+			break;
+		case "intellect":
+		case "innovation":
+			size_mod = 0;
+			age_mod = $("#age_intelligence_mod").val() == "" ? 0 : parseInt($("#age_intelligence_mod").val());
+			break;
+		case "intuition":
+		case "vitality":
+			size_mod = 0;
+			age_mod = $("#age_spirit_mod").val() == "" ? 0 : parseInt($("#age_spirit_mod").val());
+			break;
+		default:
+			size_mod = 0;
+			age_mod = 0;
+	}
+
+	newVal = is_stealth ? newVal + (size_mod * -1) : newVal + size_mod + age_mod;
+	originalVal = is_stealth ? originalVal + (size_mod * -1) : originalVal + size_mod + age_mod;
+
+	// if ((attribute == "strength" || attribute == "fortitude" || is_stealth) &&  $("#power_mod").val() != "") {
+	// 	modVal = parseInt($("#power_mod").val());
+	// 	newVal += is_stealth ? modVal * -1 : modVal;
+	// 	originalVal += is_stealth ? modVal * -1 : modVal;
+	// }
+
 	// check if we are allocating attribute points
 	if (allocatingAttributePts) {
 		// only allow +1 increase from saved val
@@ -1185,7 +1325,7 @@ function adjustAttribute(attribute, val) {
 		var pts = parseInt($(".attribute-count").html().split(" Points")[0]);
 		if (val == 1) {
 			// increasing attribute; reduce points by newVal, if newVal > 0, else reduce by originalVal
-			let cost = originalVal >= 8 ? newVal + Math.round(newVal/2) : newVal;
+			let cost = originalVal >= (8 + modVal) ? newVal + Math.round(newVal/2) : newVal;
 			var newPts = pts - Math.abs(newVal > 0 ? cost : originalVal);
 			// make sure we have enough points to allocate
 			if (newPts >= 0) {
@@ -1197,13 +1337,11 @@ function adjustAttribute(attribute, val) {
 			}
 		} else {
 			// decreasing attribute; increase points by originalVal, if original > 0, else increase by newVal
-			let cost = originalVal > 8 ? originalVal + Math.round(originalVal/2) : originalVal;
+			let cost = originalVal > (8 + modVal) ? originalVal + Math.round(originalVal/2) : originalVal;
 			$(".attribute-count").html(pts + Math.abs(originalVal > 0 ? cost : newVal)+" Points");
 		}
 	}
 	$("#"+attribute+"_text").html(newVal >= 0 ? "+"+newVal : newVal);
-	$("#"+attribute+"_val").val(newVal).trigger("change");
-	user[attribute] = newVal;
 	// adjust stats based on attribute
 	switch(attribute) {
 		case 'strength':
@@ -1445,7 +1583,7 @@ function updateTotalWeight(showMsg = false) {
 	var speed = user['speed'] == undefined ? 0 : user['speed'];
 	var standard = speed >=0 ? 1 + Math.floor(speed/4) : 1 - Math.round(-1*speed/6);
 	var quick = speed >= 0 ? (Math.floor(speed/2) % 2 == 0 ? 0 : 1) : (Math.ceil(speed/3) % 2 == 0 ? 0 : 1);
-	var move = user['size'] == undefined ? 40 : (user['size'] == "Small" ? 30 : (user['size'] == "Large" ? 50 : 40));
+	var move = user['size'] == undefined ? 40 : ( user['size'] == "Tiny" ? 20 : (user['size'] == "Small" ? 30 : (user['size'] == "Large" ? 50 : ( user['size'] == "Giant" ? 60 : 40))));
 	var fatigue = $("#fatigue").val();
 
 	// adjust action/move values
@@ -1469,6 +1607,14 @@ function updateTotalWeight(showMsg = false) {
 		$("#overburdened").addClass("selected");
 		$("#encumbrance").val("Overburdened");
 		msg = "You are overburdened (-1 SA, -10 Move).<br>Reduce your item weight to remove the penalty.";
+	}
+
+	// adjust fatigue for strong/frail constitution
+	if (hasTalent("Strong Constitution") && fatigue == 1) {
+		fatigue = 0;
+	}
+	if (hasTalent("Frail Constitution") && fatigue == 3) {
+		fatigue = 4;
 	}
 
 	let unconcious = fatigue == 4;
@@ -1681,8 +1827,8 @@ $("#magic_talents").on("change", function() {
 // on new talent modal shown
 $("#new_feat_modal").on('shown.bs.modal', function() {
 	// add focus if inputs are editable
-	if (!$("#feat_name").prop('disabled')) {
-		$("#feat_name").focus();
+	if (!$("#standard_talent_name").prop('disabled')) {
+		$("#standard_talent_name").focus();
 	} else if (!$("#feat_description").prop('disabled')) {
 		$("#feat_description").focus();
 	}
@@ -1698,7 +1844,7 @@ $("#new_feat_modal").on('shown.bs.modal', function() {
 	// hide / show select options
 	$("#select_feat_type").find("option").each(function() {
 		let feat_type = $(this).val().split("_name")[0];
-		if ($(this).val() == "feat_name") {
+		if ($(this).val() == "standard_talent_name") {
 			$(this).attr("hidden", false);
 		} else if ($(this).val() == "race_trait_name") {
 			$(this).attr("hidden", true);
@@ -1716,14 +1862,14 @@ $("#new_feat_modal").on('hidden.bs.modal', function() {
 	$("#feat_update_btn").addClass("hidden");
 	$("#feat_submit_btn").removeClass("hidden");
 	$("#feat_cancel_btn").removeClass("hidden");
-	$("#feat_name").val("").removeClass("x onX").attr("disabled", false);
+	$("#standard_talent_name").val("").removeClass("x onX").attr("disabled", false);
 	$("#magic_talent_name").val("").removeClass("x onX").attr("disabled", false);
 	$("#feat_description").val("").height("125px").attr("disabled", false);
 	$("#feat_id").val("");
 	$("#user_feat_id").val("");
 
 	// reset all dropdowns
-	$("#select_feat_type").val("feat_name").trigger("change");
+	$("#select_feat_type").val("standard_talent_name").trigger("change");
 	$("#social_trait_name").val("").attr("disabled", false);
 	$("#social_background_name").val("").attr("disabled", false);
 	$("#physical_trait_pos_name").val("").attr("disabled", false);
@@ -1741,17 +1887,17 @@ $(".feat-select").on("change", function() {
 	$("#feat_cost").val("");
 	$("#feat_name_val").val("");
 	// find matching talent from selected name
-	for (var i in feat_list) {
-		if (feat_list[i]['name'] == $(this).val()) {
-			var description = feat_list[i]['description'];
-			let type = feat_list[i]['type'];
-			let cost = feat_list[i]['cost'];
+	for (var i in talents) {
+		if (talents[i]['name'] == $(this).val()) {
+			var description = talents[i]['description'];
+			let type = talents[i]['type'];
+			let cost = talents[i]['cost'];
 			// if morale trait, add line breaks between positive/negative states
 			description = type == "morale_trait" ? description.replace('; ', '.\n\n') : description;
 			// if physical trait, show attribute cost in description
 			description += type == "physical_trait" ? "\n\n"+(cost > 0 ? "Attribute Point Cost: "+cost : "Attribute Point Bonus: "+(cost*-1)) : "";
 			$("#feat_description").val(description);
-			$("#feat_id").val(feat_list[i]['id']);
+			$("#feat_id").val(talents[i]['id']);
 			$("#feat_type").val(type);
 			$("#feat_cost").val(cost);
 			$("#feat_name_val").val($(this).val());

@@ -134,16 +134,9 @@
     	array_push($feat_list, $row);
     }
   }
-
-  // get feat requirements
-  $feat_reqs = [];
-	$sql = "SELECT feat_id, req_set_id, type, value FROM feat_or_trait_req_set JOIN feat_or_trait_req ON feat_or_trait_req_set.id = feat_or_trait_req.req_set_id";
-	$result = $db->query($sql);
-  if ($result) {
-    while($row = $result->fetch_assoc()) {
-    	array_push($feat_reqs, $row);
-    }
-  }
+	usort($feat_list, function($a, $b) {
+    	return $a['name'] <=> $b['name'];
+	});
 
   // get talents
   $talents = [];
@@ -543,8 +536,6 @@
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 							<input class="form-control pointer track-changes" readonly data-toggle="modal" data-target="#xp_modal" name="xp" id="xp" min="0" value="<?php echo htmlspecialchars($user['xp']) ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 						</div>
-						<!-- TODO unlock level on character creation and adjust attribute points on change -->
-						<!-- only allow by GM? -->
 						<label class="control-label col-sm-2 col-xs-4" for="level">Level</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 							<?php
@@ -624,11 +615,11 @@
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">
 							<select class="form-control track-changes" name="height" id="height" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 								<?php
-									// limit range by user size - small: 36-59, medium: 60-83, large: 84-107
+									// limit range by user size - tiny: 24-35, small: 36-59, medium: 60-83, large: 84-107, giant: 108-143
 									$size = $user['size'] == "" ? "Medium" : $user['size'];
 									$height = $user['height'] == "" ? 0 : $user['height'];
-									$lower = $size == "Small" ? 36 : ($size == "Large" ? 84 : 60);
-									$upper = $size == "Small" ? 60 : ($size == "Large" ? 108 : 84);
+									$lower = $size == "Tiny" ? 24 : ( $size == "Small" ? 36 : ($size == "Large" ? 84 : ( $size == "Giant" ? 108 : 60 )));
+									$upper = $size == "Tiny" ? 35 : ( $size == "Small" ? 59 : ($size == "Large" ? 107 : ( $size == "Giant" ? 143 : 83 )));
 									for ($i = $lower; $i < $upper; $i++) {
 										$feet = 0;
 										$inches = $i;
@@ -1455,6 +1446,7 @@
 					<div class="form-group">
 						<div class="col-sm-12">
 							<div id="feats">
+
 								<div class="feat <?php echo $user['is_new'] || count($awards) == 0 ? '' : 'cursor-auto' ?>" id="size" data-toggle="<?php echo $user['is_new'] || count($awards) == 0 ? 'modal' : '' ?>" data-target="#edit_size_modal">
 									<p class="feat-title">Size : </p>
 						    	<?php
@@ -1462,7 +1454,23 @@
 						    	?>
 									<p id="character_size_text"><?php echo $size ?></p>
 									<input type="hidden" name="size" id="character_size_val" value="<?php echo $size ?>">
+									<input type="hidden" id="power_mod">
 								</div>
+								
+								<div class="feat <?php echo $user['is_new'] || count($awards) == 0 ? '' : 'cursor-auto' ?>" id="age_category" data-toggle="<?php echo $user['is_new'] || count($awards) == 0 ? 'modal' : '' ?>" data-target="#edit_age_modal">
+									<p class="feat-title">Age Category : </p>
+						    	<?php
+						    		$age_category = isset($user['age_category']) ? $user['age_category'] : 'Adult';
+						    		$age_text = $age_category == "Child" ? "Child; -2 Power, -1 Dexterity, -2 Intelligence, -1 Spirit" : ( $age_category == "Adolescent" ? "Adolescent; -1 Power, +1 Dexterity" : ($age_category == "Middle-Aged" ? "Middle-Aged; -1 Dexterity, +1 Spirit" : ( $age_category == "Elder" ? "Elder; -1 Power, -2 Dexterity, +1 Intelligence, +2 Spirit" : ( $age_category == "Venerable" ? "Venerable; -2 Power, -3 Dexterity, +2 Intelligence, +3 Spirit" : $age_category))));
+						    	?>
+									<p id="age_category_text"><?php echo $age_text ?></p>
+									<input type="hidden" name="age_category" id="age_category_val" value="<?php echo $age_category ?>">
+									<input type="hidden" id="age_power_mod">
+									<input type="hidden" id="age_dexterity_mod">
+									<input type="hidden" id="age_intelligence_mod">
+									<input type="hidden" id="age_spirit_mod">
+								</div>
+
 								<div id="race_traits"></div>
 							</div>
 						</div>
@@ -1772,12 +1780,43 @@
         		$size = isset($user['size']) ? $user['size'] : 'Medium';
         	?>
         	<select class="form-control" id="character_size_select">
+        		<option value="Tiny" <?php echo $size == "Tiny" ? 'selected' : '' ?>>Tiny (2’0”–2’11”)</option>
         		<option value="Small" <?php echo $size == "Small" ? 'selected' : '' ?>>Small (3’0”–4’11”)</option>
         		<option value="Medium" <?php echo $size == "Medium" ? 'selected' : '' ?>>Medium (5’0”–6’11”)</option>
         		<option value="Large" <?php echo $size == "Large" ? 'selected' : '' ?>>Large (7’0”–8’11”)</option>
+        		<option value="Giant" <?php echo $size == "Giant" ? 'selected' : '' ?>>Giant (9’0”–11’11”)</option>
         	</select>
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="editSize(true)">Ok</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+	<!-- edit age modal -->
+  <div class="modal" id="edit_age_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Character Age</h4>
+        </div>
+        <div class="modal-body">
+        	<label class="control-label">Please select your age category</label>
+        	<?php
+        		$age = isset($user['age_category']) ? $user['age_category'] : 'Adult';
+        	?>
+        	<select class="form-control" id="character_age_select">
+        		<option value="Child" <?php echo $age == "Child" ? 'selected' : '' ?>>Child (0-9)</option>
+        		<option value="Adolescent" <?php echo $age == "Adolescent" ? 'selected' : '' ?>>Adolescent (10-16)</option>
+        		<option value="Adult" <?php echo $age == "Adult" ? 'selected' : '' ?>>Adult (17-39)</option>
+        		<option value="Middle-Aged" <?php echo $age == "Middle-Aged" ? 'selected' : '' ?>>Middle-Aged (40-59)</option>
+        		<option value="Elder" <?php echo $age == "Elder" ? 'selected' : '' ?>>Elder (60-79)</option>
+        		<option value="Venerable" <?php echo $age == "Venerable" ? 'selected' : '' ?>>Venerable (80+)</option>
+        	</select>
+        	<div class="button-bar">
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="editAge()">Ok</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
@@ -1817,7 +1856,7 @@
         <div class="modal-body">
         	<label class="control-label" id="select_feat_type_label">Type</label>
         	<select class="form-control" id="select_feat_type">
-        		<option id="standard_option" value="feat_name">Standard Talent</option>
+        		<option id="standard_option" value="standard_talent_name">Standard Talent</option>
         		<option id="race_trait_option" value="race_trait_name" hidden>Race Trait</option>
         		<!--  hide unless user has magic -->
         		<option id="magic_option" value="magic_talent_name">Magical Talent</option>
@@ -1830,7 +1869,7 @@
         		<option value="profession_name">Profession</option>
         	</select>
         	<label class="control-label">Name</label>
-        	<input class="form-control clearable feat-type" type="text" id="feat_name">
+        	<input class="form-control clearable feat-type" type="text" id="standard_talent_name">
         	<input class="form-control clearable feat-type hidden" type="text" id="magic_talent_name">
         	<select class="form-control feat-type feat-select hidden" id="race_trait_name">
         		<?php
@@ -2024,6 +2063,11 @@
         				<option value="Nouse">Nouse</option>
         				<option value="Soma">Soma</option>
         			</select>
+	        	</div>
+	        	<div class="form-check" id="esoteric_inputs">
+		        	<input class="form-check-input" type="radio" name="skill_type" id="esoteric" value="esoteric">
+		        	<label class="form-check-label" for="esoteric">Esoteric Skill (4 attribute pts)</label>
+        			<input class="form-control skill-name clearable" type="text" id="esoteric_name">
 	        	</div>
 	        	<div class="form-check">
 		        	<input class="form-check-input" type="radio" name="skill_type" id="skill" value="skill">
@@ -2304,8 +2348,6 @@
 		campaign = <?php echo json_encode(isset($campaign) ? $campaign : []); ?>;
 		user = <?php echo json_encode($user); ?>;
 		console.log(user);
-		feat_list = <?php echo json_encode($feat_list); ?>;
-		feat_reqs = <?php echo json_encode($feat_reqs); ?>;
 		let races = <?php echo json_encode($races); ?>;
 		let talents = <?php echo json_encode($talents); ?>;
 		// talents with no ID are either not active for campaign or not in DB
@@ -2320,6 +2362,19 @@
 		for (var i in user_trainings) {
 			let training = new UserTraining(user_trainings[i]);
 			userTrainings.push(training);
+		}
+
+		// get list of school talents
+		var schoolTalents = {
+			"Ka": [],
+			"Avani": [],
+			"Nouse": [],
+			"Soma": []
+		};
+		for (var i in talents) {
+			if (talents[i]['type'] == "school_talent") {
+				schoolTalents[talents[i]['requirements'][0][0]['training']].push(talents[i]);
+			}
 		}
 
 		let trainingAutocompletes = <?php echo json_encode($training_autocomplete); ?>;
@@ -2340,65 +2395,6 @@
 			userMotivators.push(motivator);
 		}
 		user['motivators'] = userMotivators;
-		setAttributes(user);
-
-		// get feat list and requirements
-		var feat_sets = {};
-		var req_sets = [];
-		// sort requirements into sets
-		for (var i in feat_reqs) {
-			if (feat_sets[feat_reqs[i]['feat_id']] == null) {
-				feat_sets[feat_reqs[i]['feat_id']] = [];
-			}
-			if (req_sets[feat_reqs[i]['req_set_id']] == null) {
-				req_sets[feat_reqs[i]['req_set_id']] = [];
-			}
-			var req = {};
-			req[feat_reqs[i]['type']] = feat_reqs[i]['value'];
-			req_sets[feat_reqs[i]['req_set_id']].push(req);
-			if (req_sets[feat_reqs[i]['req_set_id']].length > 1) {
-				continue;
-			} else {
-				feat_sets[feat_reqs[i]['feat_id']].push(req_sets[feat_reqs[i]['req_set_id']]);
-			}
-		}
-		// add requirements to feat list
-		for (var i in feat_list) {
-			for (var j in feat_sets) {
-				if (feat_list[i]['id'] == j) {
-					feat_list[i]['requirements'] = feat_sets[j];
-				}
-			}
-		}
-
-		// check for user feats
-		// get feat description from feat_or_trait table if feat_id is present
-		for (var i in user_feats) {
-			// store name and description values (may be custom)
-			user_feats[i]['display_name'] = user_feats[i]['name'];
-			var feat_id_null = true;
-			if (user_feats[i]['feat_id'] != null && user_feats[i]['feat_id'] != 0) {
-				feat_id_null = false;
-				// get name, description, type, and cost from feat list
-				for (var j in feat_list) {
-					if (feat_list[j]['id'] == user_feats[i]['feat_id']) {
-						user_feats[i]['name'] = feat_list[j]['name'];
-						if (user_feats[i]['description'] == "") {
-							user_feats[i]['description'] = feat_list[j]['description'];
-						}
-						user_feats[i]['type'] = feat_list[j]['type'];
-						user_feats[i]['cost'] = feat_list[j]['cost'];
-					}
-				}
-			}
-			let talent = new UserTalent(user_feats[i]);
-			userTalents.push(talent);
-			addFeatElements(talent);
-		}
-		user['talents'] = userTalents;
-
-		// set feat list
-		setFeatList();
 		
 		// character creation mode
 		if (user['is_new'] || xp_awards.length == 0) {
@@ -2418,11 +2414,42 @@
 			}
 		}
 
+		// check for user feats
+		// get feat description from feat_or_trait table if feat_id is present
+		for (var i in user_feats) {
+			// store name and description values (may be custom)
+			user_feats[i]['display_name'] = user_feats[i]['name'];
+			var feat_id_null = true;
+			if (user_feats[i]['feat_id'] != null && user_feats[i]['feat_id'] != 0) {
+				feat_id_null = false;
+				// get name, description, type, and cost from feat list
+				for (var j in talents) {
+					if (talents[j]['id'] == user_feats[i]['feat_id']) {
+						user_feats[i]['name'] = talents[j]['name'];
+						if (user_feats[i]['description'] == "") {
+							user_feats[i]['description'] = talents[j]['description'];
+						}
+						user_feats[i]['type'] = talents[j]['type'];
+						user_feats[i]['cost'] = talents[j]['cost'];
+					}
+				}
+			}
+			let talent = new UserTalent(user_feats[i]);
+			userTalents.push(talent);
+			addFeatElements(talent);
+		}
+		user['talents'] = userTalents;
+
 		// check for user trainings
 		for (var i in userTrainings) {
 			addTrainingElements(userTrainings[i], null);
 		}
 		user['trainings'] = userTrainings;
+
+		setAttributes(user);
+
+		// set feat list
+		setFeatList();
 
 		// check for user weapons
 		loadingItems = true;

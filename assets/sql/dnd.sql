@@ -89,6 +89,7 @@
     gender varchar(64),
     other varchar(255),
     size varchar(64),
+    age_category varchar(64),
     background varchar(2000),
     -- Attributes
     strength int DEFAULT 0,
