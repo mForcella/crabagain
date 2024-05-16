@@ -1320,12 +1320,6 @@ function adjustAttribute(attribute, val) {
 	newVal = is_stealth ? newVal + (size_mod * -1) : newVal + size_mod + age_mod;
 	originalVal = is_stealth ? originalVal + (size_mod * -1) : originalVal + size_mod + age_mod;
 
-	// if ((attribute == "strength" || attribute == "fortitude" || is_stealth) &&  $("#power_mod").val() != "") {
-	// 	modVal = parseInt($("#power_mod").val());
-	// 	newVal += is_stealth ? modVal * -1 : modVal;
-	// 	originalVal += is_stealth ? modVal * -1 : modVal;
-	// }
-
 	// check if we are allocating attribute points
 	if (allocatingAttributePts) {
 		// only allow +1 increase from saved val

@@ -88,7 +88,37 @@ function setFeatList() {
 								}
 								break;
 							default: // skill
-								satisfied = satisfied ? true : parseInt(user[key]) >= parseInt(req[key]);
+								// get adjusted value for attributes
+								let attribute = key.replace("_","");
+								var size_mod;
+								var age_mod;
+								switch(attribute) {
+									case "strength":
+									case "fortitude":
+										size_mod = $("#power_mod").val() == "" ? 0 : parseInt($("#power_mod").val());
+										age_mod = $("#age_power_mod").val() == "" ? 0 : parseInt($("#age_power_mod").val());
+										break;
+									case "speed":
+									case "agility":
+										size_mod = 0;
+										age_mod = $("#age_dexterity_mod").val() == "" ? 0 : parseInt($("#age_dexterity_mod").val());
+										break;
+									case "intellect":
+									case "innovation":
+										size_mod = 0;
+										age_mod = $("#age_intelligence_mod").val() == "" ? 0 : parseInt($("#age_intelligence_mod").val());
+										break;
+									case "intuition":
+									case "vitality":
+										size_mod = 0;
+										age_mod = $("#age_spirit_mod").val() == "" ? 0 : parseInt($("#age_spirit_mod").val());
+										break;
+									default:
+										size_mod = 0;
+										age_mod = 0;
+								}
+								let attribute_val = parseInt(user[key]) + size_mod + age_mod;
+								satisfied = satisfied ? true : attribute_val >= parseInt(req[key]);
 								break;
 						}
 					}
@@ -653,7 +683,7 @@ class UserTalent {
 					}
 				}
 			}
-			if (talent.name == "Diehard") {
+			if (this.name == "Diehard") {
 				$("#damage").trigger("change");
 			}
 			if (this.name == "Quick and the Dead") {
