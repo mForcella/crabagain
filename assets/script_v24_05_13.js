@@ -6,6 +6,7 @@ var xp_awards;
 var inputChanges = false;
 var allocatingAttributePts = false;
 var pointsAllocated = 0;
+var maxSkillsAllocated = 1;
 var characterCreation = false;
 var adminEditMode = false;
 var addingNewSchool = false;
@@ -223,6 +224,8 @@ $("#level").on("change", function() {
 	// adjust attribute points
 	$("#attribute_pts").val($(this).val()*12 - pointsAllocated).trigger("change");
 	user['attribute_pts'] = $(this).val()*12 - pointsAllocated;
+	// set max skills/focus to level value
+	maxSkillsAllocated = $(this).val();
 });
 
 $(".motivator-input").on("click", function() {
@@ -421,6 +424,7 @@ function GMEditMode() {
 	$("#xp").attr("readonly", false).attr("type", "number").attr("data-toggle", null);
 	$(".motivator-input").addClass("pointer");
 	$("#size").attr("data-toggle", "modal").removeClass("cursor-auto");
+	$("#age_category").attr("data-toggle", "modal").removeClass("cursor-auto");
 	$("#race").attr("readonly", false);
 }
 
@@ -432,15 +436,7 @@ function endGMEdit() {
 	$(".attribute-col").find(".hidden-icon").each(function() {
 		$(this).hide();
 	});
-	if (!characterCreation) {
-		$("#new_feat_btn").hide();
-		$("#race").attr("readonly", true);
-	}
-	$("#feats").find(".glyphicon").hide();
-	$("#attribute_pts").attr("readonly", true).attr("type", "");
 	$("#xp").attr("readonly", true).attr("type", "").attr("data-toggle", "modal");
-	$(".motivator-input").removeClass("pointer");
-	$("#size").attr("data-toggle", null).addClass("cursor-auto");
 
 	// add hover functions back to edit buttons
 	if (characterCreation) {
@@ -458,6 +454,14 @@ function endGMEdit() {
 				$(this).find(".hover-hide").show();
 			});
 		}
+	} else {
+		$("#new_feat_btn").hide();
+		$("#race").attr("readonly", true);
+		$("#size").attr("data-toggle", null).addClass("cursor-auto");
+		$("#age_category").attr("data-toggle", null).addClass("cursor-auto");
+		$("#feats").find(".glyphicon").hide();
+		$("#attribute_pts").attr("readonly", true).attr("type", "");
+		$(".motivator-input").removeClass("pointer");
 	}
 }
 
@@ -531,10 +535,6 @@ function endEditAttributes(accept) {
 	$(".attribute-pts").toggleClass("active");
 	$(".glyphicon-menu-hamburger").show();
 	$(".attribute-col").find(".hidden-icon").hide();
-	$(".feat").find(".glyphicon-remove").hide();
-	if (!characterCreation) {
-		$("#new_feat_btn").hide();
-	}
 	// restore attribute-col hover function for edit buttons
 	if (characterCreation) {
 		if (!is_mobile) {
@@ -551,6 +551,9 @@ function endEditAttributes(accept) {
 				$(this).find(".hover-hide").show();
 			});
 		}
+	} else {
+		$("#new_feat_btn").hide();
+		$(".feat").find(".glyphicon-remove").hide();
 	}
 	if (accept) {
 		// set pointsAllocated value
@@ -746,14 +749,12 @@ $("#damage").on("change", function() {
 	if (damage == -1) {
 		damage = resilience - 1;
 		$("#damage").val(resilience - 1);
-		$("#wounds_val").val( parseInt($("#wounds_val").val())-1 <= 0 ? 0 : parseInt($("#wounds_val").val())-1 );
-		$("#wound_penalty_val").val( parseInt($("#wound_penalty_val").val())-1 <= 0 ? 0 : parseInt($("#wound_penalty_val").val())-1 );
+		$("#wounds_val").val( parseInt($("#wounds_val").val()) - 1 <= 0 ? 0 : parseInt($("#wounds_val").val()) - 1 );
 	}
 	// check for wound increase
 	while (parseInt($(this).val()) >= parseInt($(this).attr("max"))) {
 		$(this).val($(this).val() - $(this).attr("max")).trigger("input");
-		$("#wounds_val").val( parseInt($("#wounds_val").val())+1 >= 4 ? 4 : parseInt($("#wounds_val").val())+1 );
-		$("#wound_penalty_val").val( parseInt($("#wound_penalty_val").val())+1 >= 4 ? 4 : parseInt($("#wound_penalty_val").val())+1 );
+		$("#wounds_val").val( parseInt($("#wounds_val").val()) + 1 >= 4 ? 4 : parseInt($("#wounds_val").val()) + 1 );
 	}
 	let wounds = parseInt($("#wounds_val").val());
 	var totalDamage = damage + (wounds * resilience);
@@ -765,7 +766,19 @@ $("#damage").on("change", function() {
 	}
 	$("#total_damage").val(totalDamage).trigger("change");
 	$("#wounds").val($("#wounds_val option:selected").text());
-	$("#wound_penalty").val($("#wound_penalty_val option:selected").text());
+
+	// get text value for wound penalty
+	let penalties = [0, -1, -3, -5];
+	if (parseInt($("#wounds_val").val()) == 4) {
+		$("#wound_penalty").val("Yer Dead");
+	} else {
+		let wound_penalty = penalties[parseInt($("#wounds_val").val())];
+		// need to check for diehard talent, reduce wound penalty by 1
+		if (hasTalent("Diehard") && wound_penalty < 0) {
+			wound_penalty += 1;
+		}
+		$("#wound_penalty").val(wound_penalty == 0 ? "None" : wound_penalty);
+	}
 });
 
 function editAge() {

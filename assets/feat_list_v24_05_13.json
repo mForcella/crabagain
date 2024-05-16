@@ -869,7 +869,7 @@
 	},
 	{
 		"name":"Snake-oil Salesman",
-		"description":"Everyone's got to make a living, and you can give people a good show and some hope in a bottle, who are you to argue? But not everything is smoke and mirrors, and you're determined to find the truth behind the rumors you've heard about otherworldly forces at work in the world - if for no other reason than to monetize real magic. Because you've travelled so much, you know people everywhere, and most of them never want to see you again. Anytime you visit a town or city, you must use a Motivator Bonus to declare yourself unknown, otherwise your bad reputation will precede you. You gain the Sleight of Hand AND Perform Skill.",
+		"description":"Everyone's got to make a living, and if you can give people a good show and some hope in a bottle, who are you to argue? But not everything is smoke and mirrors, and you're determined to find the truth behind the rumors you've heard about otherworldly forces at work in the world - if for no other reason than to monetize real magic. Because you've travelled so much, you know people everywhere, and most of them never want to see you again. Anytime you visit a town or city, you must use a Motivator Bonus to declare yourself unknown, otherwise your bad reputation will precede you. You gain the Sleight of Hand AND Perform Skill.",
 		"type":"social_background",
 		"cost":0
 	},

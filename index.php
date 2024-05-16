@@ -402,7 +402,7 @@
 	    ?>
 	    <!-- allocate attribute points -->
 	    <?php
-	    	if ($can_edit == 1) {
+	    	if ($can_edit == 1 || $user['is_new']) {
 	    		echo '
 				    <div class="nav-item">
 				       <span id="attribute_pts_span" class="glyphicon '. ($user['attribute_pts'] == 0 ? 'disabled' : '') .'" onclick="allocateAttributePts(this)"><span class="nav-item-label"><i class="fa-solid fa-shield-heart nav-icon"></i> Allocate Attribute Points</span></span>
@@ -914,13 +914,6 @@
 							<div class="row">
 								<div class="col-sm-12 no-pad">
 									<input type="text" class="form-control" id="wound_penalty" readonly value="<?php echo $wound_penalty_val ?>">
-									<select id="wound_penalty_val" class="form-control hidden">
-										<option value="0">None</option>
-										<option value="1" <?php echo $wounds == 1 ? 'selected' : '' ?>>-1</option>
-										<option value="2" <?php echo $wounds == 2 ? 'selected' : '' ?>>-3</option>
-										<option value="3" <?php echo $wounds == 3 ? 'selected' : '' ?>>-5</option>
-										<option value="4" <?php echo $wounds == 4 ? 'selected' : '' ?>>Yer Dead</option>
-									</select>
 								</div>
 							</div>
 						</div>
@@ -1358,7 +1351,7 @@
 						for ($i = 0; $i < 4; $i++) {
 							echo $i == 2 ? '</div></div><div class="form-group no-margin"><div class="row">' : '';
 							echo '<div class="col-sm-6 no-pad '. ($i == 0 || $i == 2 ? 'bottom-pad-mobile' : '' ) .'"><div class="row"><div class="col-xs-8">';
-							echo '<input class="form-control motivator-input '. (isset($user_motivators[$i]) && $user_motivators[$i]['primary_'] ? 'bold' : '') .' '. ($set_motivators ? 'pointer' : '') .'" type="text" name="motivators[]" id="motivator_'.$i.'" readonly value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['motivator'] : '') .'">';
+							echo '<input class="form-control motivator-input '. (isset($user_motivators[$i]) && $user_motivators[$i]['primary_'] ? 'bold' : '') .' '. (count($awards) == 0 ? 'pointer' : '') .'" type="text" name="motivators[]" id="motivator_'.$i.'" readonly value="'. (isset($user_motivators[$i]) ? $user_motivators[$i]['motivator'] : '') .'">';
 							echo '</div>';
 							echo '<label class="control-label col-xs-2 no-pad align-right font-mobile-small" for="motivator_pts_'.$i.'">Pts:</label>';
 							echo '<div class="col-xs-2 no-pad">';
@@ -2352,7 +2345,7 @@
 		let talents = <?php echo json_encode($talents); ?>;
 		// talents with no ID are either not active for campaign or not in DB
 		let no_id = <?php echo json_encode($no_id); ?>;
-		// console.log(no_id);
+		console.log(no_id);
 		let race_traits = <?php echo json_encode($race_traits); ?>;
 		let counts = <?php echo json_encode($counts); ?>;
 		

@@ -96,10 +96,10 @@ function setFeatList() {
 				// if a previous requirement wasn't satisfied, feat is not eligible
 				is_eligible = !is_eligible ? false : satisfied;
 			});
-			if (is_eligible && !eligible_feats.includes(feat)) {
+			if (is_eligible && !eligible_feats.includes(feat) && feat['id'] != undefined) {
 				feat['satisfied'] = true;
 				eligible_feats.push(feat);
-			} else if (!ineligible_feats.includes(feat)) {
+			} else if (!ineligible_feats.includes(feat) && feat['id'] != undefined) {
 				feat['satisfied'] = false;
 				ineligible_feats.push(feat);
 			}
@@ -416,7 +416,7 @@ function newFeat() {
 					talentCount += 1;
 				}
 			}
-			if ((!addingNewSchool) && (talentCount > 0 || skillCount > 0)) {
+			if ((!addingNewSchool) && (talentCount >= maxSkillsAllocated || skillCount >= maxSkillsAllocated)) {
 				alert("Only one new talent or unique skill can be added per level.");
 				return;
 			}
@@ -534,6 +534,9 @@ function addFeatElements(talent) {
 			}
 		}
 	}
+	if (talent.name == "Diehard") {
+		$("#damage").trigger("change");
+	}
 	if (talent.name == "Quick and the Dead") {
 		adjustInitiative();
 	}
@@ -649,6 +652,9 @@ class UserTalent {
 						$("#weapon_crit_"+userWeapons[i].equipped_index[j]).val(crit);
 					}
 				}
+			}
+			if (talent.name == "Diehard") {
+				$("#damage").trigger("change");
 			}
 			if (this.name == "Quick and the Dead") {
 				adjustInitiative();
@@ -881,12 +887,12 @@ function newTraining() {
 				}
 			}
 
-			if ((skillType == "skill" || skillType == "school" || skillType == "esoteric") && skillCount > 0 || talentCount > 0) {
+			if ((skillType == "skill" || skillType == "school" || skillType == "esoteric") && skillCount >= maxSkillsAllocated || talentCount >= maxSkillsAllocated) {
 				alert("Only one new talent or unique skill can be added per level.");
 				return;
 			}
 
-			if ((skillType == "focus" || skillType == "training") && trainingCount > 0) {
+			if ((skillType == "focus" || skillType == "training") && trainingCount >= maxSkillsAllocated) {
 				alert("Only one new focus or training can be added per level.");
 				return;
 			}
