@@ -1,16 +1,20 @@
 <?php
 
 	session_set_cookie_params(604800);
+	ini_set('session.cookie_lifetime', 604800);
+	ini_set('session.gc_maxlifetime', 604800);
 	session_start();
 
 	if (isset($_POST['logout'])) {
 	  session_destroy();
 	  header('Location: /login.php');
+    exit();
 	}
 
 	// make sure we are logged in - check for existing session
 	if (!isset($_SESSION['login_id'])) {
     header('Location: /login.php');
+    exit();
 	}
 	$login_id = $_SESSION['login_id'];
 
@@ -22,6 +26,7 @@
 	if (!isset($_GET["campaign"])) {
 		// redirect to campaign select page
 		header('Location: /select_campaign.php');
+    exit();
 	}
 
 	// delete any unnamed (unsaved) users
@@ -43,6 +48,7 @@
 	$result = $db->query($sql);
 	if ($result->num_rows === 0) {
 		header('Location: /select_campaign.php');
+    exit();
   }
 
 	// make sure user id variables are valid - redirect to new character if not
@@ -52,6 +58,7 @@
 		$result = $db->query($sql);
 		if ($result->num_rows === 0) {
 			header('Location: /?campaign='.$campaign_id);
+    	exit();
 	  }
 	}
 
@@ -405,7 +412,7 @@
 	    	if ($can_edit == 1 || $user['is_new']) {
 	    		echo '
 				    <div class="nav-item">
-				       <span id="attribute_pts_span" class="glyphicon '. ($user['attribute_pts'] == 0 ? 'disabled' : '') .'" onclick="allocateAttributePts(this)"><span class="nav-item-label"><i class="fa-solid fa-shield-heart nav-icon"></i> Allocate Attribute Points</span></span>
+				       <span id="attribute_pts_span" class="glyphicon '. ($user['attribute_pts'] == 0 && count($awards) != 0 ? 'disabled' : '') .'" onclick="allocateAttributePts(this)"><span class="nav-item-label"><i class="fa-solid fa-shield-heart nav-icon"></i> Allocate Attribute Points</span></span>
 				    </div>
 				   ';
 	    	}
@@ -522,7 +529,7 @@
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="character_name">Name</label>
 						<div class="col-sm-6 col-xs-8 mobile-pad-bottom">
-							<input class="form-control <?php echo $user['is_new'] ? '' : 'track-changes' ?>" type="text" id="character_name" name="character_name" value="<?php echo htmlspecialchars($user['character_name']) ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
+							<input class="form-control <?php echo $user['is_new'] ? '' : 'track-changes' ?>" type="text" id="character_name" name="character_name" value="<?php echo htmlspecialchars(isset($user['character_name']) ? $user['character_name'] : "") ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 						</div>
 						<!-- unlock on character creation -->
 						<label class="control-label col-sm-2 col-xs-4 font-small smaller" for="attribute_pts">Attribute Pts</label>
@@ -598,16 +605,16 @@
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="race">Race</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">
-							<input class="form-control track-changes" type="text" id="race" name="race" value="<?php echo htmlspecialchars($user['race']) ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user" <?php echo $user['is_new'] || count($awards) == 0 ? '' : 'readonly' ?> >
+							<input class="form-control track-changes" type="text" id="race" name="race" value="<?php echo htmlspecialchars(isset($user['race']) ? $user['race'] : "") ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user" <?php echo $user['is_new'] || count($awards) == 0 ? '' : 'readonly' ?> >
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="age">Age</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">
-							<input class="form-control" type="text" name="age" id="age_text" value="<?php echo htmlspecialchars($user['age']) ?>">
+							<input class="form-control" type="text" name="age" id="age_text" value="<?php echo htmlspecialchars(isset($user['age']) ? $user['age'] : "") ?>">
 							<input class="form-control hidden-number track-changes" type="number" id="age" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user" data-column="age">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="gender">Gender</label>
 						<div class="col-sm-2 col-xs-8 desktop-no-pad-left">
-							<input class="form-control track-changes" type="text" id="gender" name="gender" value="<?php echo htmlspecialchars($user['gender']) ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
+							<input class="form-control track-changes" type="text" id="gender" name="gender" value="<?php echo htmlspecialchars(isset($user['gender']) ? $user['gender'] : "") ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 						</div>
 					</div>
 					<div class="form-group">
@@ -634,22 +641,22 @@
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="weight">Weight</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">
-							<input class="form-control" type="text" name="weight" id="weight_text" value="<?php echo htmlspecialchars($user['weight']) ?>">
+							<input class="form-control" type="text" name="weight" id="weight_text" value="<?php echo htmlspecialchars(isset($user['weight']) ? $user['weight'] : "") ?>">
 							<input class="form-control hidden-number track-changes" type="number" id="weight" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user" data-column="weight">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="eyes">Eyes</label>
 						<div class="col-sm-2 col-xs-8 desktop-no-pad-left">
-							<input class="form-control track-changes" type="text" id="eyes" name="eyes" value="<?php echo htmlspecialchars($user['eyes']) ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
+							<input class="form-control track-changes" type="text" id="eyes" name="eyes" value="<?php echo htmlspecialchars(isset($user['eyes']) ? $user['eyes'] : "") ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="hair">Hair</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom desktop-no-pad-left">
-							<input class="form-control track-changes" type="text" id="hair" name="hair" value="<?php echo htmlspecialchars($user['hair']) ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
+							<input class="form-control track-changes" type="text" id="hair" name="hair" value="<?php echo htmlspecialchars(isset($user['hair']) ? $user['hair'] : "") ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 						</div>
 						<label class="control-label col-sm-2 col-xs-4" for="other">Other</label>
 						<div class="col-sm-6 col-xs-8 desktop-no-pad-left">
-							<input class="form-control track-changes" type="text" id="other" name="other" value="<?php echo htmlspecialchars($user['other']) ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
+							<input class="form-control track-changes" type="text" id="other" name="other" value="<?php echo htmlspecialchars(isset($user['other']) ? $user['other'] : "") ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
 						</div>
 					</div>
 				</div>
@@ -819,28 +826,35 @@
 						<div class="col-sm-3 pad-left-right-zero">
 							<label class="control-label col-sm-7 col-xs-4" for="magic">Magic</label>
 							<div class="col-sm-5 col-xs-8 no-pad-input mobile-pad-bottom">
-							<input class="form-control" type="text" name="magic" id="magic_text" value="<?php echo htmlspecialchars($user['magic']) ?>">
+								<?php
+									// $id = isset($user['id']) ? $user['id'] : "";
+									// $magic = isset($user['magic']) ? $user['magic'] : "";
+									// $fear = isset($user['fear']) ? $user['fear'] : "";
+									// $poison = isset($user['poison']) ? $user['poison'] : "";
+									// $disease = isset($user['disease']) ? $user['disease'] : "";
+								?>
+							<input class="form-control" type="text" name="magic" id="magic_text" value="<?php echo htmlspecialchars(isset($user['magic']) ? $user['magic'] : "") ?>">
 							<input class="form-control hidden-number track-changes" type="number" id="magic" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user" data-column="magic">
 							</div>
 						</div>
 						<div class="col-sm-3 pad-left-right-zero">
 							<label class="control-label col-sm-7 col-xs-4" for="fear">Fear</label>
 							<div class="col-sm-5 col-xs-8 no-pad-input mobile-pad-bottom">
-							<input class="form-control" type="text" name="fear" id="fear_text" value="<?php echo htmlspecialchars($user['fear']) ?>">
+							<input class="form-control" type="text" name="fear" id="fear_text" value="<?php echo htmlspecialchars(isset($user['fear']) ? $user['fear'] : "") ?>">
 							<input class="form-control hidden-number track-changes" type="number" id="fear" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user" data-column="fear">
 							</div>
 						</div>
 						<div class="col-sm-3 pad-left-right-zero">
 							<label class="control-label col-sm-7 col-xs-4" for="poison">Poison</label>
 							<div class="col-sm-5 col-xs-8 no-pad-input mobile-pad-bottom">
-							<input class="form-control" type="text" name="poison" id="poison_text" value="<?php echo htmlspecialchars($user['poison']) ?>">
+							<input class="form-control" type="text" name="poison" id="poison_text" value="<?php echo htmlspecialchars(isset($user['poison']) ? $user['poison'] : "") ?>">
 							<input class="form-control hidden-number track-changes" type="number" id="poison" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user" data-column="poison">
 							</div>
 						</div>
 						<div class="col-sm-3 pad-left-right-zero">
 							<label class="control-label col-sm-7 col-xs-4" for="disease">Disease</label>
 							<div class="col-sm-5 col-xs-8 no-pad-input">
-							<input class="form-control" type="text" name="disease" id="disease_text" value="<?php echo htmlspecialchars($user['disease']) ?>">
+							<input class="form-control" type="text" name="disease" id="disease_text" value="<?php echo htmlspecialchars(isset($user['disease']) ? $user['disease'] : "") ?>">
 							<input class="form-control hidden-number track-changes" type="number" id="disease" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user" data-column="disease">
 							</div>
 						</div>
@@ -1441,7 +1455,7 @@
 							<div id="feats">
 
 								<div class="feat <?php echo $user['is_new'] || count($awards) == 0 ? '' : 'cursor-auto' ?>" id="size" data-toggle="<?php echo $user['is_new'] || count($awards) == 0 ? 'modal' : '' ?>" data-target="#edit_size_modal">
-									<p class="feat-title">Size : </p>
+									<p class="feat-title">Size Category : </p>
 						    	<?php
 						    		$size = isset($user['size']) ? $user['size'] : 'Medium';
 						    	?>
@@ -1613,7 +1627,7 @@
 					</div>
 					<div class="form-group">
 						<div class="col-xs-12">
-							<textarea class="form-control track-changes" rows="6" name="background" id="background" maxlength="2000" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user"><?php echo htmlspecialchars($user['background']) ?></textarea>
+							<textarea class="form-control track-changes" rows="6" name="background" id="background" maxlength="2000" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user"><?php echo htmlspecialchars(isset($user['background']) ? $user['background'] : "") ?></textarea>
 						</div>
 					</div>
 				</div>
@@ -1850,16 +1864,33 @@
         	<label class="control-label" id="select_feat_type_label">Type</label>
         	<select class="form-control" id="select_feat_type">
         		<option id="standard_option" value="standard_talent_name">Standard Talent</option>
-        		<option id="race_trait_option" value="race_trait_name" hidden>Race Trait</option>
-        		<!--  hide unless user has magic -->
-        		<option id="magic_option" value="magic_talent_name">Magical Talent</option>
-        		<option value="social_background_name">Social Background</option>
-        		<option value="social_trait_name">Social Trait</option>
-        		<option value="physical_trait_pos_name">Physical Trait (Positive)</option>
-        		<option value="physical_trait_neg_name">Physical Trait (Negative)</option>
-        		<option value="morale_trait_name">Morale Trait</option>
-        		<option value="compelling_action_name">Compelling Action</option>
-        		<option value="profession_name">Profession</option>
+        		<option id="race_trait_option" value="race_trait_name" hidden disabled>Race Trait</option>
+        		<?php
+	        		if (isset($counts['magic_talent']) && $counts['magic_talent'] > 0) {
+	        			echo '<option id="magic_option" value="magic_talent_name">Magical Talent</option>';
+	        		}
+	        		if (isset($counts['social_background']) && $counts['social_background'] > 0) {
+	        			echo '<option value="social_background_name" '.(count($awards) > 0 ? 'disabled' : '').'>Social Background</option>';
+	        		}
+	        		if (isset($counts['social_trait']) && $counts['social_trait'] > 0) {
+	        			echo '<option value="social_trait_name" '.(count($awards) > 0 ? 'disabled' : '').'>Social Trait</option>';
+	        		}
+	        		if (isset($counts['physical_trait_pos']) && $counts['physical_trait_pos'] > 0) {
+	        			echo '<option value="physical_trait_pos_name" '.(count($awards) > 0 ? 'disabled' : '').'>Physical Trait (Positive)</option>';
+	        		}
+	        		if (isset($counts['physical_trait_neg']) && $counts['physical_trait_neg'] > 0) {
+	        			echo '<option value="physical_trait_neg_name" '.(count($awards) > 0 ? 'disabled' : '').'>Physical Trait (Negative)</option>';
+	        		}
+	        		if (isset($counts['morale_trait']) && $counts['morale_trait'] > 0) {
+	        			echo '<option value="morale_trait_name" '.(count($awards) > 0 ? 'disabled' : '').'>Morale Trait</option>';
+	        		}
+	        		if (isset($counts['compelling_action']) && $counts['compelling_action'] > 0) {
+	        			echo '<option value="compelling_action_name" '.(count($awards) > 0 ? 'disabled' : '').'>Compelling Action</option>';
+	        		}
+	        		if (isset($counts['profession']) && $counts['profession'] > 0) {
+	        			echo '<option value="profession_name" '.(count($awards) > 0 ? 'disabled' : '').'>Profession</option>';
+	        		}
+        		?>
         	</select>
         	<label class="control-label">Name</label>
         	<input class="form-control clearable feat-type" type="text" id="standard_talent_name">
@@ -2345,7 +2376,7 @@
 		let talents = <?php echo json_encode($talents); ?>;
 		// talents with no ID are either not active for campaign or not in DB
 		let no_id = <?php echo json_encode($no_id); ?>;
-		console.log(no_id);
+		// console.log(no_id);
 		let race_traits = <?php echo json_encode($race_traits); ?>;
 		let counts = <?php echo json_encode($counts); ?>;
 		

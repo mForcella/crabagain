@@ -420,7 +420,7 @@
 	}
 	.panel {
 		border: 1px solid black;
-		display: table;
+		display: block;
 		margin: 0 auto;
 		width: 100%;
 		max-width: 1200px;
@@ -874,7 +874,7 @@
 					</span>
 				</label>
 			</div>
-			<div class="panel panel-default">
+			<div class="panel panel-default" <?php if( $counts['race_count'] == 0 ) { echo 'style="display:none;"'; } ?> >
 				<table class="table" id="race_table">
 					<tr>
 						<th>Enabled <input type='checkbox' class="race-check" checked onclick="checkAll(this, 'race-check')"></th>
@@ -959,17 +959,17 @@
 			<div class="title">
 				<h4 class="table-heading" id="magical_talents">Magical Talents</h4>
 				<label class="toggle-switchy" for="magical_talents_toggle" data-size="sm" data-text="false">
-					<input checked type="checkbox" id="magical_talents_toggle" checked onclick="enable(this, 'magical-talent-check')">
+					<input checked type="checkbox" id="magical_talents_toggle" checked onclick="enable(this, 'magical_talent-check')">
 					<span class="toggle">
 						<span class="switch"></span>
 					</span>
 				</label>
 			</div>
 			<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('magical_talent')"></span> -->
-			<div class="panel panel-default">
-				<table class="table fixed-width" id="physical_trait_pos_table">
+			<div class="panel panel-default" <?php if( $counts['magical_talent_count'] == 0 ) { echo 'style="display:none;"'; } ?> >
+				<table class="table fixed-width" id="magical_talent_table">
 					<tr>
-						<th>Enabled <input type='checkbox' class="magical-talent-check" checked onclick="checkAll(this, 'magical-talent-check')"></th>
+						<th>Enabled <input type='checkbox' class="magical_talent-check" checked onclick="checkAll(this, 'magical_talent-check')"></th>
 						<th>Name</th>
 						<th>Description</th>
 						<th>Requirements</th>
@@ -996,7 +996,7 @@
 								}
 								echo 
 								"<tr class='table-row' id='row_".$talent->id."'>
-									<td class='center'><input id='check_".$talent->id."' class='magical-talent-check' type='checkbox' ".(isset($talent->active) || $counts['magical_talent_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td class='center'><input id='check_".$talent->id."' class='magical_talent-check' type='checkbox' ".(isset($talent->active) || $counts['magical_talent_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
 									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
 									<td class='highlight-hover'>".$talent->description."</td>
 									<td>".$reqs."</td>
@@ -1011,17 +1011,17 @@
 			<div class="title">
 				<h4 class="table-heading" id="section_physical_trait_pos">Physical Traits (Positive)</h4>
 				<label class="toggle-switchy" for="physical_trait_pos_toggle" data-size="sm" data-text="false">
-					<input checked type="checkbox" id="physical_trait_pos_toggle" checked onclick="enable(this, 'physical-trait-pos-check')">
+					<input checked type="checkbox" id="physical_trait_pos_toggle" checked onclick="enable(this, 'physical_trait_pos-check')">
 					<span class="toggle">
 						<span class="switch"></span>
 					</span>
 				</label>
 			</div>
 			<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('physical_trait_pos')"></span> -->
-			<div class="panel panel-default">
+			<div class="panel panel-default" <?php if( $counts['physical_pos_count'] == 0 ) { echo 'style="display:none;"'; } ?> >
 				<table class="table fixed-width" id="physical_trait_pos_table">
 					<tr>
-						<th>Enabled <input type='checkbox' class="physical-trait-pos-check" checked onclick="checkAll(this, 'physical-trait-pos-check')"></th>
+						<th>Enabled <input type='checkbox' class="physical_trait_pos-check" checked onclick="checkAll(this, 'physical_trait_pos-check')"></th>
 						<th>Name</th>
 						<th>Description</th>
 						<th class="center">Cost</th>
@@ -1032,7 +1032,7 @@
 							if ($talent->type == 'physical_trait' && $talent->cost > 0) {
 								echo 
 								"<tr class='table-row' id='row_".$talent->id."'>
-									<td class='center'><input id='check_".$talent->id."' class='physical-trait-pos-check' type='checkbox' ".(isset($talent->active) || $counts['physical_pos_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td class='center'><input id='check_".$talent->id."' class='physical_trait_pos-check' type='checkbox' ".(isset($talent->active) || $counts['physical_pos_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
 									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
 									<td class='highlight-hover'>".$talent->description."</td>
 									<td class='center highlight-hover'>".$talent->cost."</td>
@@ -1047,17 +1047,17 @@
 			<div class="title">
 				<h4 class="table-heading" id="section_physical_trait_neg">Physical Traits (Negative)</h4>
 				<label class="toggle-switchy" for="physical_trait_neg_toggle" data-size="sm" data-text="false">
-					<input checked type="checkbox" id="physical_trait_neg_toggle" checked onclick="enable(this, 'physical-trait-neg-check')">
+					<input checked type="checkbox" id="physical_trait_neg_toggle" checked onclick="enable(this, 'physical_trait_neg-check')">
 					<span class="toggle">
 						<span class="switch"></span>
 					</span>
 				</label>
 			</div>
 			<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('physical_trait_neg')"></span> -->
-			<div class="panel panel-default">
+			<div class="panel panel-default" <?php if( $counts['physical_neg_count'] == 0 ) { echo 'style="display:none;"'; } ?> >
 				<table class="table fixed-width" id="physical_trait_neg_table">
 					<tr>
-						<th>Enabled <input type='checkbox' class="physical-trait-neg-check" checked onclick="checkAll(this, 'physical-trait-neg-check')"></th>
+						<th>Enabled <input type='checkbox' class="physical_trait_neg-check" checked onclick="checkAll(this, 'physical_trait_neg-check')"></th>
 						<th>Name</th>
 						<th>Description</th>
 						<th class="center">Bonus</th>
@@ -1068,7 +1068,7 @@
 							if ($talent->type == 'physical_trait' && $talent->cost < 0) {
 								echo 
 								"<tr class='table-row' id='row_".$talent->id."'>
-									<td class='center'><input id='check_".$talent->id."' class='physical-trait-neg-check' type='checkbox' ".(isset($talent->active) || $counts['physical_neg_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td class='center'><input id='check_".$talent->id."' class='physical_trait_neg-check' type='checkbox' ".(isset($talent->active) || $counts['physical_neg_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
 									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
 									<td class='highlight-hover'>".$talent->description."</td>
 									<td class='center highlight-hover'>".(intval($talent->cost)*-1)."</td>
@@ -1083,17 +1083,17 @@
 			<div class="title">
 				<h4 class="table-heading" id="section_social_trait">Social Traits</h4>
 				<label class="toggle-switchy" for="social_trait_toggle" data-size="sm" data-text="false">
-					<input checked type="checkbox" id="social_trait_toggle" onclick="enable(this, 'social-trait-check')">
+					<input checked type="checkbox" id="social_trait_toggle" onclick="enable(this, 'social_trait-check')">
 					<span class="toggle">
 						<span class="switch"></span>
 					</span>
 				</label>
 			</div>
 			<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('social_trait')"></span> -->
-			<div class="panel panel-default">
+			<div class="panel panel-default" <?php if( $counts['social_count'] == 0 ) { echo 'style="display:none;"'; } ?> >
 				<table class="table fixed-width" id="social_trait_table">
 					<tr>
-						<th>Enabled <input type='checkbox' class="social-trait-check" checked onclick="checkAll(this, 'social-trait-check')"></th>
+						<th>Enabled <input type='checkbox' class="social_trait-check" checked onclick="checkAll(this, 'social_trait-check')"></th>
 						<th>Name</th>
 						<th>Description</th>
 						<!-- <th>Edit</th> -->
@@ -1103,7 +1103,7 @@
 							if ($talent->type == 'social_trait') {
 								echo 
 								"<tr class='table-row' id='row_".$talent->id."'>
-									<td class='center'><input id='check_".$talent->id."' class='social-trait-check' type='checkbox' ".(isset($talent->active) || $counts['social_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td class='center'><input id='check_".$talent->id."' class='social_trait-check' type='checkbox' ".(isset($talent->active) || $counts['social_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
 									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
 									<td class='highlight-hover'>".$talent->description."</td>
 								</tr>";
@@ -1117,17 +1117,17 @@
 			<div class="title">
 				<h4 class="table-heading" id="section_morale_trait">Morale Traits</h4>
 				<label class="toggle-switchy" for="morale_trait_toggle" data-size="sm" data-text="false">
-					<input checked type="checkbox" id="morale_trait_toggle" checked onclick="enable(this, 'morale-trait-check')">
+					<input checked type="checkbox" id="morale_trait_toggle" checked onclick="enable(this, 'morale_trait-check')">
 					<span class="toggle">
 						<span class="switch"></span>
 					</span>
 				</label>
 			</div>
 			<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('morale_trait')"></span> -->
-			<div class="panel panel-default">
+			<div class="panel panel-default" <?php if( $counts['morale_count'] == 0 ) { echo 'style="display:none;"'; } ?> >
 				<table class="table fixed-width" id="morale_trait_table">
 					<tr>
-						<th>Enabled <input type='checkbox' class="morale-trait-check" checked onclick="checkAll(this, 'morale-trait-check')"></th>
+						<th>Enabled <input type='checkbox' class="morale_trait-check" checked onclick="checkAll(this, 'morale_trait-check')"></th>
 						<th>Name</th>
 						<th>Positive State</th>
 						<th>Negative State</th>
@@ -1141,7 +1141,7 @@
 								$neg_state = explode('Negative State: ', $talent->description)[1];
 								echo 
 								"<tr class='table-row' id='row_".$talent->id."'>
-									<td class='center'><input id='check_".$talent->id."' class='morale-trait-check' type='checkbox' ".(isset($talent->active) || $counts['morale_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td class='center'><input id='check_".$talent->id."' class='morale_trait-check' type='checkbox' ".(isset($talent->active) || $counts['morale_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
 									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
 									<td class='highlight-hover'>".$pos_state."</td>
 									<td class='highlight-hover'>".$neg_state."</td>
@@ -1156,17 +1156,17 @@
 			<div class="title">
 				<h4 class="table-heading" id="section_compelling_action">Compelling Actions</h4>
 				<label class="toggle-switchy" for="compelling_action_toggle" data-size="sm" data-text="false">
-					<input checked type="checkbox" id="compelling_action_toggle" checked onclick="enable(this, 'compelling-action-check')">
+					<input checked type="checkbox" id="compelling_action_toggle" checked onclick="enable(this, 'compelling_action-check')">
 					<span class="toggle">
 						<span class="switch"></span>
 					</span>
 				</label>
 			</div>
 			<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('compelling_action')"></span> -->
-			<div class="panel panel-default">
+			<div class="panel panel-default" <?php if( $counts['compelling_count'] == 0 ) { echo 'style="display:none;"'; } ?> >
 				<table class="table fixed-width" id="compelling_action_table">
 					<tr>
-						<th>Enabled <input type='checkbox' class="compelling-action-check" checked onclick="checkAll(this, 'compelling-action-check')"></th>
+						<th>Enabled <input type='checkbox' class="compelling_action-check" checked onclick="checkAll(this, 'compelling_action-check')"></th>
 						<th>Name</th>
 						<th>Description</th>
 						<!-- <th>Edit</th> -->
@@ -1176,7 +1176,7 @@
 							if ($talent->type == 'compelling_action') {
 								echo 
 								"<tr class='table-row' id='row_".$talent->id."'>
-									<td class='center'><input id='check_".$talent->id."' class='compelling-action-check' type='checkbox' ".(isset($talent->active) || $counts['compelling_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td class='center'><input id='check_".$talent->id."' class='compelling_action-check' type='checkbox' ".(isset($talent->active) || $counts['compelling_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
 									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
 									<td class='highlight-hover'>".$talent->description."</td>
 								</tr>";
@@ -1197,7 +1197,7 @@
 				</label>
 			</div>
 			<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('profession')"></span> -->
-			<div class="panel panel-default">
+			<div class="panel panel-default" <?php if( $counts['profession_count'] == 0 ) { echo 'style="display:none;"'; } ?> >
 				<table class="table fixed-width" id="profession_table">
 					<tr>
 						<th>Enabled <input type='checkbox' class="profession-check" checked onclick="checkAll(this, 'profession-check')"></th>
@@ -1231,7 +1231,7 @@
 				</label>
 			</div>
 			<!-- <span class="glyphicon glyphicon-plus-sign" onclick="newFeatModal('social_background')"></span> -->
-			<div class="panel panel-default">
+			<div class="panel panel-default" <?php if( $counts['social_background_count'] == 0 ) { echo 'style="display:none;"'; } ?> >
 				<table class="table fixed-width" id="social_background_table">
 					<tr>
 						<th>Enabled <input type='checkbox' class="social_background-check" checked onclick="checkAll(this, 'social_background-check')"></th>
@@ -1879,10 +1879,8 @@
 	// get feat counts
 	var total_count = <?php echo json_encode($total_count); ?>;
 	var counts = <?php echo json_encode($counts); ?>;
+	// TODO can't distinguish between new campaign (count = 0) and nothing selected (count = 0)
 	if (total_count != 0) {
-		if (counts['physical_pos_count'] == 0) {
-			$("#physical_trait_pos_toggle").trigger("click");
-		}
 		if (counts['physical_pos_count'] == 0) {
 			$("#physical_trait_pos_toggle").trigger("click");
 		}
@@ -1891,6 +1889,9 @@
 		}
 		if (counts['social_count'] == 0) {
 			$("#social_trait_toggle").trigger("click");
+		}
+		if (counts['social_background_count'] == 0) {
+			$("#social_background_toggle").trigger("click");
 		}
 		if (counts['morale_count'] == 0) {
 			$("#morale_trait_toggle").trigger("click");
@@ -2046,6 +2047,12 @@
 
 	function enable(e, type) {
 		$("."+type).attr("disabled", !e.checked);
+		let section = type.split("-check")[0];
+		if (e.checked) {
+			$("#"+section+"_table").parent().slideDown(500);
+		} else {
+			$("#"+section+"_table").parent().slideUp(500);
+		}
 	}
 
 	function checkAll(e, type) {

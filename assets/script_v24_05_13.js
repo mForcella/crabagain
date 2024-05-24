@@ -327,7 +327,7 @@ $(document).mouseup(function(e) {
 $("#background").height( $("#background")[0].scrollHeight );
 
 $("#attribute_pts").on("input change", function() {
-	if (parseInt($(this).val()) == 0) {
+	if (parseInt($(this).val()) == 0 && !characterCreation) {
 		$("#attribute_pts_span").addClass("disabled");
 	} else {
 		$("#attribute_pts_span").removeClass("disabled");
@@ -560,7 +560,7 @@ function endEditAttributes(accept) {
 		pointsAllocated += $("#attribute_pts").val() - $(".attribute-count").html().split(" Points")[0];
 		// update #attribute_pts input val from .attribute-count
 		$("#attribute_pts").val($(".attribute-count").html().split(" Points")[0]).trigger("change");
-		if (parseInt($("#attribute_pts").val()) == 0) {
+		if (parseInt($("#attribute_pts").val()) == 0 && !characterCreation) {
 			$("#attribute_pts_span").addClass("disabled");
 		}
 		// mark all trainings and talents as not new
@@ -773,9 +773,13 @@ $("#damage").on("change", function() {
 		$("#wound_penalty").val("Yer Dead");
 	} else {
 		let wound_penalty = penalties[parseInt($("#wounds_val").val())];
-		// need to check for diehard talent, reduce wound penalty by 1
+		// check for diehard talent, reduce wound penalty by 1
 		if (hasTalent("Diehard") && wound_penalty < 0) {
 			wound_penalty += 1;
+		}
+		// check for low pain tolerance trait, increase wound penalty by 1
+		if (hasTalent("Low Pain Tolerance") && wound_penalty < 0) {
+			wound_penalty -= 1;
 		}
 		$("#wound_penalty").val(wound_penalty == 0 ? "None" : wound_penalty);
 	}
@@ -1261,6 +1265,7 @@ function adjustFate() {
 	// get vitality
 	var vitality = $("#vitality_val").val();
 	fate += vitality >= 0 ? Math.floor(vitality/2) : Math.ceil(vitality/3);
+	fate = fate < 0 ? 0 : fate;
 	$("#fate").val(fate);
 }
 

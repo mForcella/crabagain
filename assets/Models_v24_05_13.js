@@ -117,6 +117,10 @@ function setFeatList() {
 										size_mod = 0;
 										age_mod = 0;
 								}
+								// ignore size penalties for Acrobat
+								if (feat['name'] == "Acrobat" && size_mod < 0) {
+									size_mod = 0;
+								}
 								let attribute_val = parseInt(user[key]) + size_mod + age_mod;
 								satisfied = satisfied ? true : attribute_val >= parseInt(req[key]);
 								break;
@@ -442,7 +446,7 @@ function newFeat() {
 			}
 			var talentCount = 0;
 			for (var i in userTalents) {
-				if (userTalents[i].is_new) {
+				if (userTalents[i].is_new && (userTalents[i].type == "standard_talent" || userTalents[i].type == "magic_talent")) {
 					talentCount += 1;
 				}
 			}
@@ -564,7 +568,7 @@ function addFeatElements(talent) {
 			}
 		}
 	}
-	if (talent.name == "Diehard") {
+	if (talent.name == "Diehard" || talent.name == "Low Pain Tolerance") {
 		$("#damage").trigger("change");
 	}
 	if (talent.name == "Quick and the Dead") {
@@ -683,7 +687,7 @@ class UserTalent {
 					}
 				}
 			}
-			if (this.name == "Diehard") {
+			if (this.name == "Diehard" || this.name == "Low Pain Tolerance") {
 				$("#damage").trigger("change");
 			}
 			if (this.name == "Quick and the Dead") {
@@ -912,7 +916,7 @@ function newTraining() {
 				}
 			}
 			for (var i in userTalents) {
-				if (userTalents[i].is_new) {
+				if (userTalents[i].is_new && (userTalents[i].type == "standard_talent" || userTalents[i].type == "magic_talent")) {
 					talentCount += 1;
 				}
 			}
@@ -937,11 +941,17 @@ function newTraining() {
 			$(".attribute-count").html(pts - skillPts +" Points");
 		}
 
+		// get starting skill value
+		let skillValue = (skillType == "skill" || skillType == "school" || skillType == "esoteric") ? 0 : 1;
+		if (hasTalent("Jack of All Trades") && skillType == "skill") {
+			skillValue += 1;
+		}
+
 		// create new training object
 		let newTraining = new UserTraining({
 			'attribute_group':attribute,
 			'name':trainingName,
-			'value': (skillType == "skill" || skillType == "school" || skillType == "esoteric") ? 0 : 1,
+			'value': skillValue,
 			'magic_school':skillType == "school",
 			'governing_school':skillType == "school" && schoolCount == 0 ? 1 : 0
 		});
@@ -1699,7 +1709,7 @@ class UserWeapon {
 		this.quantity = weapon['quantity'];
 		this.damage = parseInt(weapon['damage']);
 		this.max_damage = weapon['max_damage'] == null || weapon['max_damage'] == "" ? null : parseInt(weapon['max_damage']);
-		this.range_ = weapon['range_'] == null ? null : parseInt(weapon['range_']);
+		this.range_ = weapon['range_'] == null || weapon['range_'] == "" ? null : parseInt(weapon['range_']);
 		this.rof = weapon['type'] == "Melee" ? null : weapon['rof'];
 		this.defend = weapon['defend'] == null || weapon['defend'] == "" ? null : parseInt(weapon['defend']);
 		this.crit = weapon['crit'] == null || weapon['crit'] == "" ? null : parseInt(weapon['crit']);
