@@ -1,11 +1,14 @@
 <?php
 
 	session_set_cookie_params(604800);
+	ini_set('session.cookie_lifetime', 604800);
+	ini_set('session.gc_maxlifetime', 604800);
 	session_start();
 
 	// make sure we are logged in - check for existing session
 	if (!isset($_SESSION['login_id'])) {
     	header('Location: /login.php');
+    	exit();
 	}
 	$login_id = $_SESSION['login_id'];
 
@@ -18,6 +21,7 @@
 	if (!isset($_GET["campaign"])) {
 		// redirect to campaign select page
 		header('Location: /select_campaign.php');
+		exit();
 	}
 	$campaign;
 	$campaign_id = $_GET["campaign"];
