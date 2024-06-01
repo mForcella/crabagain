@@ -4,3 +4,4 @@ email_config.php
 .DS_Store
 phpinfo.php
 /logs
+/session

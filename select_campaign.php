@@ -3,6 +3,9 @@
 	session_set_cookie_params(604800);
 	ini_set('session.cookie_lifetime', 604800);
 	ini_set('session.gc_maxlifetime', 604800);
+	$doc_root = dirname(__FILE__);
+	$path = str_replace('/public_html', '', $doc_root).'/session';
+	ini_set('session.save_path', $path);
 	session_start();
 
 	// check for logout
