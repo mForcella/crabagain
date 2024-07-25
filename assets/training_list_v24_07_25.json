@@ -1,5 +1,5 @@
 {
-	"Strength":
+	"strength":
 	{
 		"esoteric":[
 			
@@ -16,7 +16,7 @@
 			"Lift"
 		]
 	},
-	"Fortitude":
+	"fortitude":
 	{
 		"esoteric":[
 			
@@ -32,7 +32,7 @@
 			"Resist Disease"
 		]
 	},
-	"Speed":
+	"speed":
 	{
 		"esoteric":[
 			
@@ -48,7 +48,7 @@
 			"React"
 		]
 	},
-	"Agility":
+	"agility":
 	{
 		"esoteric":[
 			
@@ -64,7 +64,7 @@
 			"Attack (specific weapon)"
 		]
 	},
-	"Awareness":
+	"awareness":
 	{
 		"esoteric":[
 			"Spiritualism",
@@ -83,7 +83,7 @@
 			"Taste"
 		]
 	},
-	"Precision":
+	"precision_":
 	{
 		"esoteric":[
 			
@@ -103,7 +103,7 @@
 			"Throw (specific weapon)"
 		]
 	},
-	"Allure":
+	"allure":
 	{
 		"esoteric":[
 			
@@ -121,7 +121,7 @@
 			"Barter"
 		]
 	},
-	"Deception":
+	"deception":
 	{
 		"esoteric":[
 			
@@ -139,7 +139,7 @@
 			"Disguise"
 		]
 	},
-	"Innovation":
+	"innovation":
 	{
 		"esoteric":[
 			"Divination",
@@ -162,7 +162,7 @@
 			"Craft (specific item)"
 		]
 	},
-	"Intellect":
+	"intellect":
 	{
 		"esoteric":[
 			"Mesmerism",
@@ -189,7 +189,7 @@
 			"Profession (specific profession)"
 		]
 	},
-	"Intuition":
+	"intuition":
 	{
 		"esoteric":[
 			"Spiritualism",
@@ -210,7 +210,7 @@
 			"Interrogate"
 		]
 	},
-	"Vitality":
+	"vitality":
 	{
 		"esoteric":[
 			"Mesmerism",

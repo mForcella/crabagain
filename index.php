@@ -1022,19 +1022,19 @@
 									<label class="control-label">
 										<span class="attribute-val" id="strength_text"></span>
 										<input type="hidden" class="track-changes" name="strength" id="strength_val" value="<?php echo $user['strength'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" id="Strength_up" onclick="adjustAttribute('strength', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" id="Strength_down" onclick="adjustAttribute('strength', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="strength_up" onclick="adjustAttribute('strength', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="strength_down" onclick="adjustAttribute('strength', -1)"></span>
 									</label>
 								</div>
 							</div>
 							<div class="row training">
 								<div class="col-md-12">
 									<div class="row">
-										<div id="Strength"></div>
+										<div id="strength"></div>
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" id="Strength_btn" onclick="newTrainingModal('Strength')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="strength_btn" onclick="newTrainingModal('strength')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -1048,19 +1048,19 @@
 									<label class="control-label">
 										<span class="attribute-val" id="fortitude_text"></span>
 										<input type="hidden" class="track-changes" name="fortitude" id="fortitude_val" value="<?php echo $user['fortitude'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" id="Fortitude_up" onclick="adjustAttribute('fortitude', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" id="Fortitude_down" onclick="adjustAttribute('fortitude', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="fortitude_up" onclick="adjustAttribute('fortitude', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="fortitude_down" onclick="adjustAttribute('fortitude', -1)"></span>
 									</label>
 								</div>
 							</div>
 							<div class="row training">
 								<div class="col-md-12">
 									<div class="row">
-										<div id="Fortitude"></div>
+										<div id="fortitude"></div>
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" id="Fortitude_btn" onclick="newTrainingModal('Fortitude')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="fortitude_btn" onclick="newTrainingModal('fortitude')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -1076,19 +1076,19 @@
 									<label class="control-label">
 										<span class="attribute-val" id="speed_text"></span>
 										<input type="hidden" class="track-changes" name="speed" id="speed_val" value="<?php echo $user['speed'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" id="Speed_up" onclick="adjustAttribute('speed', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" id="Speed_down" onclick="adjustAttribute('speed', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="speed_up" onclick="adjustAttribute('speed', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="speed_down" onclick="adjustAttribute('speed', -1)"></span>
 									</label>
 								</div>
 							</div>
 							<div class="row training">
 								<div class="col-md-12">
 									<div class="row">
-										<div id="Speed"></div>
+										<div id="speed"></div>
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" id="Speed_btn" onclick="newTrainingModal('Speed')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="speed_btn" onclick="newTrainingModal('speed')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -1102,19 +1102,19 @@
 									<label class="control-label">
 										<span class="attribute-val" id="agility_text"></span>
 										<input type="hidden" class="track-changes" name="agility" id="agility_val" value="<?php echo $user['agility'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" id="Agility_up" onclick="adjustAttribute('agility', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" id="Agility_down" onclick="adjustAttribute('agility', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="agility_up" onclick="adjustAttribute('agility', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="agility_down" onclick="adjustAttribute('agility', -1)"></span>
 									</label>
 								</div>
 							</div>
 							<div class="row training">
 								<div class="col-md-12">
 									<div class="row">
-										<div id="Agility"></div>
+										<div id="agility"></div>
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" id="Agility_btn" onclick="newTrainingModal('Agility')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="agility_btn" onclick="newTrainingModal('agility')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -1130,19 +1130,19 @@
 									<label class="control-label">
 										<span class="attribute-val" id="precision__text"></span>
 										<input type="hidden" class="track-changes" name="precision_" id="precision__val" value="<?php echo $user['precision_'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" id="Precision_up" onclick="adjustAttribute('precision_', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" id="Precision_down" onclick="adjustAttribute('precision_', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="precision__up" onclick="adjustAttribute('precision_', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="precision__down" onclick="adjustAttribute('precision_', -1)"></span>
 									</label>
 								</div>
 							</div>
 							<div class="row training">
 								<div class="col-md-12">
 									<div class="row">
-										<div id="Precision"></div>
+										<div id="precision_"></div>
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" id="Precision_btn" onclick="newTrainingModal('Precision')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="precision__btn" onclick="newTrainingModal('precision_')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -1156,19 +1156,19 @@
 									<label class="control-label">
 										<span class="attribute-val" id="awareness_text"></span>
 										<input type="hidden" class="track-changes" name="awareness" id="awareness_val" value="<?php echo $user['awareness'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" id="Awareness_up" onclick="adjustAttribute('awareness', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" id="Awareness_down" onclick="adjustAttribute('awareness', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="awareness_up" onclick="adjustAttribute('awareness', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="awareness_down" onclick="adjustAttribute('awareness', -1)"></span>
 									</label>
 								</div>
 							</div>
 							<div class="row training">
 								<div class="col-md-12">
 									<div class="row">
-										<div id="Awareness"></div>
+										<div id="awareness"></div>
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" id="Awareness_btn" onclick="newTrainingModal('Awareness')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="awareness_btn" onclick="newTrainingModal('awareness')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -1184,19 +1184,19 @@
 									<label class="control-label">
 										<span class="attribute-val" id="allure_text"></span>
 										<input type="hidden" class="track-changes" name="allure" id="allure_val" value="<?php echo $user['allure'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" id="Allure_up" onclick="adjustAttribute('allure', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" id="Allure_down" onclick="adjustAttribute('allure', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="allure_up" onclick="adjustAttribute('allure', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="allure_down" onclick="adjustAttribute('allure', -1)"></span>
 									</label>
 								</div>
 							</div>
 							<div class="row training">
 								<div class="col-md-12">
 									<div class="row">
-										<div id="Allure"></div>
+										<div id="allure"></div>
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" id="Allure_btn" onclick="newTrainingModal('Allure')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="allure_btn" onclick="newTrainingModal('allure')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -1210,19 +1210,19 @@
 									<label class="control-label">
 										<span class="attribute-val" id="deception_text"></span>
 										<input type="hidden" class="track-changes" name="deception" id="deception_val" value="<?php echo $user['deception'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" id="Deception_up" onclick="adjustAttribute('deception', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" id="Deception_down" onclick="adjustAttribute('deception', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="deception_up" onclick="adjustAttribute('deception', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="deception_down" onclick="adjustAttribute('deception', -1)"></span>
 									</label>
 								</div>
 							</div>
 							<div class="row training">
 								<div class="col-md-12">
 									<div class="row">
-										<div id="Deception"></div>
+										<div id="deception"></div>
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" id="Deception_btn" onclick="newTrainingModal('Deception')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="deception_btn" onclick="newTrainingModal('deception')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -1238,19 +1238,19 @@
 									<label class="control-label">
 										<span class="attribute-val" id="intellect_text"></span>
 										<input type="hidden" class="track-changes" name="intellect" id="intellect_val" value="<?php echo $user['intellect'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" id="Intellect_up" onclick="adjustAttribute('intellect', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" id="Intellect_down" onclick="adjustAttribute('intellect', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="intellect_up" onclick="adjustAttribute('intellect', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="intellect_down" onclick="adjustAttribute('intellect', -1)"></span>
 									</label>
 								</div>
 							</div>
 							<div class="row training">
 								<div class="col-md-12">
 									<div class="row">
-										<div id="Intellect"></div>
+										<div id="intellect"></div>
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" id="Intellect_btn" onclick="newTrainingModal('Intellect')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="intellect_btn" onclick="newTrainingModal('intellect')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -1264,19 +1264,19 @@
 									<label class="control-label">
 										<span class="attribute-val" id="innovation_text"></span>
 										<input type="hidden" class="track-changes" name="innovation" id="innovation_val" value="<?php echo $user['innovation'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" id="Innovation_up" onclick="adjustAttribute('innovation', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" id="Innovation_down" onclick="adjustAttribute('innovation', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="innovation_up" onclick="adjustAttribute('innovation', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="innovation_down" onclick="adjustAttribute('innovation', -1)"></span>
 									</label>
 								</div>
 							</div>
 							<div class="row training">
 								<div class="col-md-12">
 									<div class="row">
-										<div id="Innovation"></div>
+										<div id="innovation"></div>
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" id="Innovation_btn" onclick="newTrainingModal('Innovation')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="innovation_btn" onclick="newTrainingModal('innovation')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -1292,19 +1292,19 @@
 									<label class="control-label">
 										<span class="attribute-val" id="intuition_text"></span>
 										<input type="hidden" class="track-changes" name="intuition" id="intuition_val" value="<?php echo $user['intuition'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" id="Intuition_up" onclick="adjustAttribute('intuition', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" id="Intuition_down" onclick="adjustAttribute('intuition', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="intuition_up" onclick="adjustAttribute('intuition', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="intuition_down" onclick="adjustAttribute('intuition', -1)"></span>
 									</label>
 								</div>
 							</div>
 							<div class="row training">
 								<div class="col-md-12">
 									<div class="row">
-										<div id="Intuition"></div>
+										<div id="intuition"></div>
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" id="Intuition_btn" onclick="newTrainingModal('Intuition')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="intuition_btn" onclick="newTrainingModal('intuition')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>
@@ -1318,19 +1318,19 @@
 									<label class="control-label">
 										<span class="attribute-val" id="vitality_text"></span>
 										<input type="hidden" class="track-changes" name="vitality" id="vitality_val" value="<?php echo $user['vitality'] ?>" data-id="<?php echo htmlspecialchars($user['id']) ?>" data-table="user">
-										<span class="glyphicon glyphicon-plus hidden-icon" id="Vitality_up" onclick="adjustAttribute('vitality', 1)"></span>
-										<span class="glyphicon glyphicon-minus hidden-icon" id="Vitality_down" onclick="adjustAttribute('vitality', -1)"></span>
+										<span class="glyphicon glyphicon-plus hidden-icon" id="vitality_up" onclick="adjustAttribute('vitality', 1)"></span>
+										<span class="glyphicon glyphicon-minus hidden-icon" id="vitality_down" onclick="adjustAttribute('vitality', -1)"></span>
 									</label>
 								</div>
 							</div>
 							<div class="row training">
 								<div class="col-md-12">
 									<div class="row">
-										<div id="Vitality"></div>
+										<div id="vitality"></div>
 									</div>
 									<div class="row">
 										<div class="col-md-12 button-bar">
-											<button type="button" class="btn btn-default" id="Vitality_btn" onclick="newTrainingModal('Vitality')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
+											<button type="button" class="btn btn-default" id="vitality_btn" onclick="newTrainingModal('vitality')"><span class="glyphicon glyphicon-plus-sign hidden-icon"></span></button>
 										</div>
 									</div>
 								</div>

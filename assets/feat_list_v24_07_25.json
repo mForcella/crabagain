@@ -103,11 +103,10 @@
 	},
 	{
 		"name":"Gunslinger",
-		"description":"You reduce loading time (or cocking time) for all guns by 1 Action step (i.e. Standard to Quick). If loading or cocking would already be a Quick Action, you can now do so as a Free Action in conjunction with any other action. If it is done in conjunction with a Quick Action attack, you cannot Aim on that Attack, and you cannot be Dual Wielding. You also double the Fire Rates on firearms, but you cannot Aim if you go above the normal Fire Rate. Other gun's Fire Rates are not affected. Additionally, you can make trick shots using any gun with a projectile that can ricochet or reflect off of a specific surface. Whether or not a surface is acceptable is at the GMs discretion. This is always an Aimed Called Shot at +5 DL, and it allows you to completely ignore an enemy's Cover even if they have Full Cover. This does not go through enemy Cover, but rather around it.",
+		"description":"You're a master with guns of all kinds. You reduce loading time for all guns by 1 Action step (i.e. Standard to Quick). If loading would already be a Quick Action, you can now do so as a Free Action in conjunction with any other Quick Action. When using a single Revolver, you double the Fire Rate when attacking with Quick Actions. Additionally, you can make trick shots by ricocheting bullets off of sufficiently hard surfaces. This is always a Called Shot at +5 DL, and it allows you to completely ignore an enemy's Cover. This does not go through enemy Cover, but rather around it. ",
 		"requirements":[
-			[{"speed":6}],
-			[{"precision_":4}],
-			[{"feat":"Quick and the Dead"}],
+			[{"speed":4}],
+			[{"precision_":6}],
 			[{"feat":"Take Aim"}]
 		],
 		"type":"standard_talent",

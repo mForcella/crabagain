@@ -1273,6 +1273,7 @@ function adjustFate() {
 function adjustAttribute(attribute, val) {
 	var originalVal = parseInt($("#" + attribute+"_val").val());
 	var newVal = originalVal + parseInt(val);
+
 	// training values should not be negative, and should not be greater than parent attribute value
 	if (attribute.includes("training_")) {
 		let parent_attribute = $("#"+attribute+"_row").parent().attr("id").toLowerCase();
@@ -1281,7 +1282,6 @@ function adjustAttribute(attribute, val) {
 			return;
 		}
 	}
-	$("#"+attribute+"_val").val(newVal).trigger("change");
 
 	// check for attribute mods
 	var modVal = 0;
@@ -1353,6 +1353,8 @@ function adjustAttribute(attribute, val) {
 			$(".attribute-count").html(pts + Math.abs(originalVal > 0 ? cost : newVal)+" Points");
 		}
 	}
+
+	$("#"+attribute+"_val").val(newVal).trigger("change");
 	$("#"+attribute+"_text").html(newVal >= 0 ? "+"+newVal : newVal);
 	// adjust stats based on attribute
 	switch(attribute) {

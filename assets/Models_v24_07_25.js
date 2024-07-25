@@ -92,6 +92,7 @@ function setFeatList() {
 								let attribute = key.replace("_","");
 								var size_mod;
 								var age_mod;
+								var additional_mod = 0;
 								switch(attribute) {
 									case "strength":
 									case "fortitude":
@@ -117,11 +118,23 @@ function setFeatList() {
 										size_mod = 0;
 										age_mod = 0;
 								}
-								// ignore size penalties for Acrobat
+								// Acrobat: ignore size penalties
 								if (feat['name'] == "Acrobat" && size_mod < 0) {
 									size_mod = 0;
 								}
-								let attribute_val = parseInt(user[key]) + size_mod + age_mod;
+								// Gunslinger: add Firearm bonus to Precision
+								if (feat['name'] == "Gunslinger") {
+									// check for skill focus: Firearms, Rifles, Pistols
+									let guns = ['firearm', 'rifle', 'pistol'];
+									for ( var i in userTrainings ) {
+										for ( var j in guns ) {
+											if ( userTrainings[i]['name'].toLowerCase().includes(guns[j]) && userTrainings[i]['value'] > additional_mod ) {
+												additional_mod = userTrainings[i]['value'];
+											}
+										}
+									}
+								}
+								let attribute_val = parseInt(user[key]) + size_mod + age_mod + additional_mod;
 								satisfied = satisfied ? true : attribute_val >= parseInt(req[key]);
 								break;
 						}
@@ -783,7 +796,10 @@ function newTrainingModal(attribute) {
 	// look for esoteric knowledge, show esoteric skills
 	$("#esoteric_inputs").hide();
 	for (var i in userTrainings) {
-		if (userTrainings[i]['name'] == "Esoteric Knowledge" && userTrainings[i]['value'] >= 4) {
+		// get total training value
+		let training_val = userTrainings[i]['value'];
+		let attribute_val = parseInt(user[userTrainings[i]['attribute_group']]);
+		if (userTrainings[i]['name'] == "Esoteric Knowledge" && training_val + attribute_val >= 4) {
 			// check attribute for esoteric skills
 			var skills = trainingAutocompletes[attribute]['esoteric'];
 			if (skills.length > 0) {
@@ -804,7 +820,7 @@ function newTrainingModal(attribute) {
 	$("#esoteric_name").val("").hide().removeClass("x onX");
 
 	// if vitality, check for magic talents
-	if (attribute == "Vitality" && user['magic_talents'] == true) {
+	if (attribute == "vitality" && user['magic_talents'] == true) {
 		$("#magic_inputs").show();
 
 		// if divine magic, only one school is allowed
@@ -921,7 +937,7 @@ function newTraining() {
 				}
 			}
 
-			if ((skillType == "skill" || skillType == "school" || skillType == "esoteric") && skillCount >= maxSkillsAllocated || talentCount >= maxSkillsAllocated) {
+			if ( (skillType == "skill" || skillType == "school" || skillType == "esoteric") && (skillCount >= maxSkillsAllocated || talentCount >= maxSkillsAllocated) ) {
 				alert("Only one new talent or unique skill can be added per level.");
 				return;
 			}
