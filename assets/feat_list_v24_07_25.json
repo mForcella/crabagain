@@ -237,7 +237,7 @@
 		"name":"Anatomical Warfare",
 		"description":"You might lack combat training, but you make up for it with your knowledge of anatomy. Any time you make an Aimed Called Shot and succeed, you can score an automatic Critical Hit at an additional +1 Damage OR cause an automatic Knockdown as long as you deal at least 1 Damage to Resilience. Using these abilities on non-Human species or Larger Scale Enemies may require an Intellect Check at the GM’s discretion. This can stack with Sneak Attack Damage at an additional +1 Damage.",
 		"requirements":[
-			[{"intellect":4}, {"training":"First Aid"}]
+			[{"intellect":4}, {"training":{"First Aid":4}}]
 		],
 		"type":"standard_talent",
 		"cost":4

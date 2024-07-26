@@ -69,7 +69,18 @@ function setFeatList() {
 								break;
 							case 'training':
 								for (var i in userTrainings) {
-									satisfied = satisfied ? true : userTrainings[i].name.includes(req[key]);
+									// check if req[key] is Object (talent requires training value)
+									if (req[key].constructor === Object) {
+										for (var t in req[key]) {
+											if (userTrainings[i].name == t) {
+												let training_val = parseInt(userTrainings[i].value);
+												let attribute_val = user[userTrainings[i].attribute_group];
+												satisfied = satisfied ? true : (training_val + attribute_val) >= req[key][t];
+											}
+										}
+									} else {
+										satisfied = satisfied ? true : userTrainings[i].name.includes(req[key]);
+									}
 								}
 								break;
 							case 'character_creation':
@@ -287,6 +298,13 @@ function featSelectFunction(ui) {
 							item = item == "Precision_" ? "Precision" : item;
 							item = item == "Governing" ? "Governing School" : item;
 							req = isNaN(req) ? req : "+"+req;
+							// check for training value requirement ( Object = { training : value } )
+							if (req.constructor == Object) {
+								for (var t in req) {
+									item = t;
+									req = "+"+req[item];
+								}
+							}
 							requirements += key == "character_creation" ? "*only available during character creation" : 
 								item + " : " + req;
 						}
