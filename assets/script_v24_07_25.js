@@ -51,7 +51,6 @@ var exclamations = [
 	"Poop-a-doodle-doo!",
 	"Dancin' Danzig!",
 	"Leapin' linguine!",
-	"Dorka Dorka Dorkass!",
 	"Rock'em Sock'em Robots!",
 	"Toaster Pastry Pop Tarts!",
 	"Testicular torsion!",
@@ -63,7 +62,8 @@ var exclamations = [
 	"Excelsior!",
 	"Party on!",
 	"Cowabunga!",
-	"Puddin' pops!"
+	"Puddin' pops!",
+	"Vroom vroom, bitches!"
 ];
 
 var banners = [
@@ -1273,6 +1273,8 @@ function adjustFate() {
 function adjustAttribute(attribute, val) {
 	var originalVal = parseInt($("#" + attribute+"_val").val());
 	var newVal = originalVal + parseInt(val);
+	console.log(originalVal);
+	console.log(newVal);
 
 	// training values should not be negative, and should not be greater than parent attribute value
 	if (attribute.includes("training_")) {
@@ -1322,6 +1324,8 @@ function adjustAttribute(attribute, val) {
 			age_mod = 0;
 	}
 
+	let newVal_NoMod = newVal;
+	let originalVal_NoMod = originalVal;
 	newVal = is_stealth ? newVal + (size_mod * -1) : newVal + size_mod + age_mod;
 	originalVal = is_stealth ? originalVal + (size_mod * -1) : originalVal + size_mod + age_mod;
 
@@ -1344,7 +1348,7 @@ function adjustAttribute(attribute, val) {
 				$(".attribute-count").html(newPts + " Points");
 			} else {
 				$("#"+attribute+"_text").html(originalVal >= 0 ? "+" + originalVal : originalVal);
-				$("#"+attribute+"_val").val(originalVal).trigger("change");
+				$("#"+attribute+"_val").val(originalVal_NoMod).trigger("change");
 				return;
 			}
 		} else {
@@ -1354,7 +1358,7 @@ function adjustAttribute(attribute, val) {
 		}
 	}
 
-	$("#"+attribute+"_val").val(newVal).trigger("change");
+	$("#"+attribute+"_val").val(newVal_NoMod).trigger("change");
 	$("#"+attribute+"_text").html(newVal >= 0 ? "+"+newVal : newVal);
 	// adjust stats based on attribute
 	switch(attribute) {

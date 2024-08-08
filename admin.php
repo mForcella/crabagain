@@ -812,6 +812,7 @@
 						// get damage and wounds
 						$damage = $user['damage'];
 						$wounds = 0;
+						// TODO possible timeout error
 						while ($damage >= $resilience) {
 							$wounds += 1;
 							$damage -= $resilience;
@@ -940,7 +941,11 @@
 									for($i = 0; $i < count($req_set); $i++) {
 										foreach($req_set[$i] as $key => $value) {
 											$reqs .= $i > 0 ? "OR " : "&#8226;";
-											if ($key == "character_creation") {
+											if (is_object($value)) {
+												foreach($value as $k => $v) {
+													$reqs .= $k.": ".$v;
+												}
+											} else if ($key == "character_creation") {
 												$reqs .= "Character Creation Only"."<br>";
 											} else {
 												$reqs .= str_replace("_", "", ucfirst($key)).": ".$value."<br>";
