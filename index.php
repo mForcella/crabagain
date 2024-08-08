@@ -316,7 +316,7 @@
     }
 	} else {
 		// if no user set, create a new user entry
-		$sql = "INSERT INTO user VALUES ()";
+		$sql = "INSERT INTO user (attribute_pts) VALUES (12)";
 		$db->query($sql);
     $sql = "SELECT * FROM user WHERE id = ".$db->insert_id;
     $result = $db->query($sql);

@@ -76,7 +76,7 @@
     login_id int,
     -- XP, morale and leveling
     xp int DEFAULT 0,
-    attribute_pts int DEFAULT 0,
+    attribute_pts int DEFAULT 12,
     morale int DEFAULT 0,
     -- Physical characteristics and descriptors
     character_name varchar(64),
