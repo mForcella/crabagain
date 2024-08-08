@@ -777,19 +777,19 @@ ul {
 	}
 }
 #resilience_adjust {
-	display: none;
-	margin-left: 20px;
+	text-align: center;
+	user-select: none; /* standard syntax */
+    -webkit-user-select: none; /* webkit (safari, chrome) browsers */
+    -moz-user-select: none; /* mozilla browsers */
+    -khtml-user-select: none; /* webkit (konqueror) browsers */
+    -ms-user-select: none; /* IE10+ */
 }
-@media screen and (max-width:991px) {
-	#resilience_adjust {
-		display: inline-block;
-	}
+#resilience_adjust path {
+	cursor: pointer;
 }
-/*@media (hover: hover) and (pointer: fine) {
-	#resilience_adjust {
-		display: none;
-	}
-}*/
+.btn-resilience {
+	background-color: gray;
+}
 .row {
 	margin: 0;
 }

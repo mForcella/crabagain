@@ -869,16 +869,18 @@
 				<!-- section: health -->
 				<div class="section form-horizontal">
 					<div class="section-title" id="section_health"><span>Health</span> <i class="fa-solid fa-heart"></i></div>
+
+					<div id="resilience_adjust">
+						<button type="button" class="btn btn-resilience" onclick="adjustResilience(1)"><span class="fa-solid fa-circle-plus"></span></button>
+						<button type="button" class="btn btn-resilience" onclick="adjustResilience(-1)"><span class="fa-solid fa-circle-minus"></span></button>
+					</div>
+						
 					<div class="form-group">
 
 						<div class="col-sm-4">
 							<div class="row">
 								<label class="control-label col-sm-12 center full-width" for="damage">
 									Resilience
-									<div id="resilience_adjust">
-										<span class="fa-solid fa-circle-plus" onclick="adjustResilience(1)"></span>
-										<span class="fa-solid fa-circle-minus" onclick="adjustResilience(-1)"></span>
-									</div>
 								</label>
 							</div>
 							<div class="row">
@@ -894,7 +896,7 @@
 										$wound_val = $wounds == 0 ? "None" : ($wounds == 1 ? "Wounded" : ($wounds == 2 ? "Incapacitated" : ($wounds == 3 ? "Mortally Wounded" : "Yer Dead")));
 										$wound_penalty_val = $wounds == 0 ? "None" : ($wounds == 1 ? "-1" : ($wounds == 2 ? "-3" : ($wounds == 3 ? "-5" : "Yer Dead")));
 									?>
-									<input class="form-control" id="damage" type="number" min="<?php echo $wounds == 0 ? 0 : -1 ?>" value="<?php echo $damage ?>">
+									<input class="form-control" id="damage" type="text" min="<?php echo $wounds == 0 ? 0 : -1 ?>" value="<?php echo $damage ?>" readonly>
 									<input type="hidden" class="track-changes" name="damage" id="total_damage" data-table="user" data-column="damage" data-id="<?php echo htmlspecialchars($user['id']) ?>">
 								</div>
 								<div class="col-xs-2 center no-pad">

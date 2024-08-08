@@ -127,6 +127,13 @@ $(document).on('input', '.clearable', function() {
     }
 });
 
+// prevent focus on resilience adjust buttons
+$('.btn-resilience').on('mousedown', 
+    function(event) {
+        event.preventDefault();
+    }
+);
+
 function deleteDatabaseObject(table, id) {
 	if ($("#can_edit").val() == 0) {
 		return;
@@ -1273,8 +1280,6 @@ function adjustFate() {
 function adjustAttribute(attribute, val) {
 	var originalVal = parseInt($("#" + attribute+"_val").val());
 	var newVal = originalVal + parseInt(val);
-	console.log(originalVal);
-	console.log(newVal);
 
 	// training values should not be negative, and should not be greater than parent attribute value
 	if (attribute.includes("training_")) {
@@ -1331,10 +1336,10 @@ function adjustAttribute(attribute, val) {
 
 	// check if we are allocating attribute points
 	if (allocatingAttributePts) {
-		// only allow +1 increase from saved val
+		// disallow lowering an attribute and only allow +1 increase from saved val
 		if (!characterCreation) {
 			var savedVal = attributes.indexOf(attribute) == -1 ? trainingVals[attribute] : attributeVals[attributes.indexOf(attribute)];
-			if (newVal < savedVal || newVal > parseInt(savedVal) + 1) {
+			if (newVal_NoMod < savedVal || newVal_NoMod > parseInt(savedVal) + 1) {
 				return;
 			}
 		}
