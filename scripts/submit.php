@@ -15,7 +15,7 @@
 	}
 
 	// set character name and campaign id
-	$login_id = $_SESSION['login_id'];
+	$login_id = $_POST['login_id'];
 	$user_id = $_POST['user_id'];
 	$character_name = $_POST['character_name'];
 	$campaign_id = $_POST['campaign_id'];

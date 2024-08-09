@@ -932,7 +932,13 @@ function setDefend() {
 
 function setToughness() {
 	// get base toughness value from strength
-	var strength = user['strength'] == undefined ? 0 : user['strength'];
+	var strength = user['strength'] == undefined ? 0 : parseInt(user['strength']);
+
+	// check for size/age modifiers
+	let size_mod = $("#power_mod").val() == "" ? 0 : parseInt($("#power_mod").val());
+	let age_mod = $("#age_power_mod").val() == "" ? 0 : parseInt($("#age_power_mod").val());
+	strength = strength + size_mod + age_mod;
+
 	var toughness = strength > 0 ? Math.floor(strength/2) : Math.ceil(strength/3);
 	var bonus = 0;
 	for (var i in userProtections) {

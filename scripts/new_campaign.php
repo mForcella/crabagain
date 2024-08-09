@@ -38,13 +38,15 @@
 	$db->query($sql);
 
 	// add other players to campaign
-	$users = $_POST['users'];
 	$logins = [];
-	$sql = "SELECT id,email FROM login WHERE id IN (".implode(',',$users).")";
-	$result = $db->query($sql);
-	if ($result) {
-		while($row = $result->fetch_assoc()) {
-			array_push($logins, $row);
+	if (isset($_POST['users'])) {
+		$users = $_POST['users'];
+		$sql = "SELECT id,email FROM login WHERE id IN (".implode(',',$users).")";
+		$result = $db->query($sql);
+		if ($result) {
+			while($row = $result->fetch_assoc()) {
+				array_push($logins, $row);
+			}
 		}
 	}
 

@@ -521,7 +521,7 @@
 		<input type="hidden" id="user_email" name="email" value="<?php echo $user["email"] ?>">
 		<input type="hidden" id="campaign_role" value="<?php echo $campaign_role ?>">
 		<input type="hidden" id="can_edit" value="<?php echo $can_edit ?>">
-		<input type="hidden" id="login_id" value="<?php echo $login_id ?>">
+		<input type="hidden" id="login_id" name="login_id" value="<?php echo $login_id ?>">
 		<input type="hidden" id="uuid">
 		<div class="row">
 			<div class="col-md-6">
@@ -871,8 +871,9 @@
 					<div class="section-title" id="section_health"><span>Health</span> <i class="fa-solid fa-heart"></i></div>
 
 					<div id="resilience_adjust">
-						<button type="button" class="btn btn-resilience" onclick="adjustResilience(1)"><span class="fa-solid fa-circle-plus"></span></button>
-						<button type="button" class="btn btn-resilience" onclick="adjustResilience(-1)"><span class="fa-solid fa-circle-minus"></span></button>
+						<button type="button" class="btn btn-resilience btn-wound" onclick="adjustResilience(1)"><span class="fa-solid fa-circle-plus"></span></button>
+						<i class="fa-solid icon-blood custom-icon"></i>
+						<button type="button" class="btn btn-resilience btn-heal" onclick="adjustResilience(-1)"><span class="fa-solid fa-circle-minus"></span></button>
 					</div>
 						
 					<div class="form-group">
