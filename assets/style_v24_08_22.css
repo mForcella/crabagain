@@ -124,13 +124,21 @@ html, body {
 	position: fixed;
 }
 
-/* detect touchscreen */
+/* detect mobile/touchscreen */
 #is_mobile {
-	display: none;
+	display: block;
+}
+@media screen and (min-width:992px) {
+  #is_mobile {
+  	display: none;
+  }
+}
+#is_touchscreen {
+	display: block;
 }
 @media (hover: hover) and (pointer: fine) {
-  #is_mobile {
-  	display: block;
+  #is_touchscreen {
+  	display: none;
   }
 }
 
@@ -573,7 +581,7 @@ button.glyphicon {
     background-image: url("image/armor.svg");
 }
 .icon-misc {
-    background-image: url("image/misc.svg");
+    background-image: url("image/icon-misc-1.svg");
 }
 .icon-attack {
     background-image: url("image/attack.svg");
@@ -589,8 +597,11 @@ button.glyphicon {
 }
 .icon-blood {
     background-image: url("image/icon-cut.svg");
-    transform: scale(2.0);
+    transform: scale(1.9);
     margin: 0 15px;
+}
+.icon-note {
+    background-image: url("image/icon-note-2.svg");
 }
 .italic {
 	font-style: italic;
@@ -793,13 +804,7 @@ ul {
 	cursor: pointer;
 }
 .btn-resilience {
-	background-color: gray;
-}
-.btn-wound {
-	background-color: #B69494
-}
-.btn-heal {
-	background-color: #9FABBE;
+	background-color: #B69494;
 }
 .row {
 	margin: 0;

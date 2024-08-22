@@ -53,7 +53,7 @@ function setFeatList() {
 	var ineligible_feats = [];
 	// set autocomplete list for feats
 	$.each(talents, function(i, feat) {
-		if (feat['type'] == 'feat' || feat['type'] == 'standard_talent' || feat['type'] == 'magic_talent' || feat['type'] == "school_talent") {
+		if (feat['type'] == 'feat' || feat['type'] == 'standard_talent' || feat['type'] == 'magic_talent' || feat['type'] == "school_talent" || feat['type'] == "martial_arts_talent") {
 			var is_eligible = true;
 			// feat[requirements] is an array of arrays - each array must return true
 			$.each(feat['requirements'], function(j, requirements) {
@@ -167,28 +167,37 @@ function setFeatList() {
 	// sort and merge feat lists - eligible feats at the top of the list in bold
 	var standard_list1 = [];
 	var magic_list1 = [];
+	var martial_arts_list1 = [];
 	for (var i in eligible_feats) {
 		if (eligible_feats[i]['type'] == 'magic_talent' || eligible_feats[i]['type'] == 'school_talent') {
 			magic_list1.push(eligible_feats[i]['name']);
+		} else if (eligible_feats[i]['type'] == 'martial_arts_talent') {
+			martial_arts_list1.push(eligible_feats[i]['name']);
 		} else {
 			standard_list1.push(eligible_feats[i]['name']);
 		}
 	}
 	standard_list1.sort();
 	magic_list1.sort();
+	martial_arts_list1.sort();
 	var standard_list2 = [];
 	var magic_list2 = [];
+	var martial_arts_list2 = [];
 	for (var i in ineligible_feats) {
 		if (ineligible_feats[i]['type'] == 'magic_talent' || ineligible_feats[i]['type'] == 'school_talent') {
 			magic_list2.push(ineligible_feats[i]['name']);
+		} else if (ineligible_feats[i]['type'] == 'martial_arts_talent') {
+			martial_arts_list2.push(ineligible_feats[i]['name']);
 		} else {
 			standard_list2.push(ineligible_feats[i]['name']);
 		}
 	}
 	standard_list2.sort();
 	magic_list2.sort();
-	var standardList = standard_list1.concat(standard_list2);
-	var magicList = magic_list1.concat(magic_list2);
+	martial_arts_list2.sort();
+	let standardList = standard_list1.concat(standard_list2);
+	let magicList = magic_list1.concat(magic_list2);
+	let martialArtsList = martial_arts_list1.concat(martial_arts_list2);
 
 	$("#standard_talent_name").autocomplete({
 		source: function(input, add) {
@@ -207,6 +216,20 @@ function setFeatList() {
 	$("#magic_talent_name").autocomplete({
 		source: function(input, add) {
 			featSourceFunction(input, add, magicList);
+		},
+		create: function (event, ui) {
+			$(this).data("ui-autocomplete")._renderItem = function(ul, item) {
+				return featCreateFunction(ul, item);
+			};
+		},
+		select: function(event, ui) {
+			return featSelectFunction(ui);
+		}
+	});
+
+	$("#martial_arts_talent_name").autocomplete({
+		source: function(input, add) {
+			featSourceFunction(input, add, martialArtsList);
 		},
 		create: function (event, ui) {
 			$(this).data("ui-autocomplete")._renderItem = function(ul, item) {
@@ -550,16 +573,16 @@ function addFeatElements(talent) {
 
 	var feat_title_descrip = createElement('div', '', feat_container);
 
-  $('<p />', {
-  	'id': id_val+"_name",
-  	'class': 'feat-title',
-  	'text': talent.display_name+" : "
-  }).appendTo(feat_title_descrip);
+	$('<p />', {
+		'id': id_val+"_name",
+		'class': 'feat-title',
+		'text': talent.display_name+" : "
+	}).appendTo(feat_title_descrip);
 
-  var feat_descrip = $('<p />', {
-  	'id': id_val+"_descrip",
-    'text': featDescription.length > 100 ? featDescription.substring(0,100)+"..." : featDescription
-  }).appendTo(feat_title_descrip);
+	var feat_descrip = $('<p />', {
+		'id': id_val+"_descrip",
+		'text': featDescription.length > 100 ? featDescription.substring(0,100)+"..." : featDescription
+	}).appendTo(feat_title_descrip);
 
 	// if allocating points, make sure remove button is visible
 	var removeBtn = createElement('span', 'glyphicon glyphicon-remove hidden-icon', feat_container, id_val+"_remove");
@@ -585,8 +608,8 @@ function addFeatElements(talent) {
 	});
 
 	// add hidden inputs
-  createInput('', 'hidden', 'feat_names[]', talent.display_name, feat_container, id_val+"_name_val");
-  createInput('', 'hidden', 'feat_descriptions[]', featDescription, feat_container, id_val+"_descrip_val");
+  	createInput('', 'hidden', 'feat_names[]', talent.display_name, feat_container, id_val+"_name_val");
+  	createInput('', 'hidden', 'feat_descriptions[]', featDescription, feat_container, id_val+"_descrip_val");
 	createInput('', 'hidden', 'feat_ids[]', talent.feat_id, feat_container);
 	createInput('', 'hidden', 'user_feat_ids[]', talent.id, feat_container);
 

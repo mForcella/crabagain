@@ -392,6 +392,7 @@
 
 	<!-- use div visibility to determine if we're on mobile -->
 	<div id="is_mobile"></div>
+	<div id="is_touchscreen"></div>
 
 	<!-- user menu -->
 	<nav class="navbar">
@@ -981,7 +982,9 @@
 
 				<!-- section: actions, move -->
 				<div class="section form-horizontal two-column">
-					<div class="section-title" id="section_actions"><span>Actions, Move, Initiative</span> <i class="fa-solid fa-hourglass"></i></div>
+					<div class="section-title" id="section_actions"><span>Actions, Move, Initiative</span> 
+						<i class="fa-solid fa-hourglass"></i>
+					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-2 col-xs-4" for="standard">Standard</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
@@ -1349,7 +1352,8 @@
 				<!-- section: motivators -->
 				<div class="section form-horizontal">
 					<div class="section-title section-motivators">
-						<span class="motivator-title"><span>Motivators</span></span> <i class="fa-solid fa-yin-yang"></i>
+						<span class="motivator-title"><span>Motivators</span></span> 
+						<i class="fa-solid fa-yin-yang"></i>
 						<div class="form-group motivator-bonus">
 							<label for="bonuses">Bonuses:</label>
 							<?php
@@ -1533,7 +1537,10 @@
 			<!-- section: healing -->
 			<div class="col-md-12">
 				<div class="section form-horizontal">
-					<div class="section-title"><span>Healings, Potions, & Drugs</span> <i class="fa-solid fa-flask"></i></div>
+					<div class="section-title"><span>Healings, Potions, & Drugs</span> 
+						<i class="fa-solid fa-flask"></i>
+						<!-- <i class="fa-solid icon-healing custom-icon"></i> -->
+					</div>
 					<div class="form-group">
 						<label class="control-label col-xs-4 mobile-hide center" for="healings[]">Item</label>
 						<label class="control-label col-xs-5 mobile-hide center" for="healing_effect[]">Effect</label>
@@ -1550,7 +1557,9 @@
 			<!-- section: misc -->
 			<div class="col-md-12">
 				<div class="section form-horizontal">
-					<div class="section-title"><span>Misc & Special Items</span> <i class="fa-solid icon-misc custom-icon"></i></div>
+					<div class="section-title"><span>Misc & Special Items</span> 
+						<i class="fa-solid icon-misc custom-icon"></i>
+					</div>
 					<div class="form-group">
 						<label class="control-label col-xs-4 mobile-hide center" for="misc[]">Item</label>
 						<label class="control-label col-xs-5 mobile-hide center" for="misc_notes[]">Notes</label>
@@ -1613,7 +1622,10 @@
 			<!-- section: notes -->
 			<div class="col-md-12">
 				<div class="section form-horizontal">
-					<div class="section-title" id="section_notes"><span>Notes</span> <i class="fa-solid fa-scroll"></i></div>
+					<div class="section-title" id="section_notes"><span>Notes</span> 
+						<!-- <i class="fa-solid fa-scroll"></i> -->
+						<i class="fa-solid icon-note custom-icon"></i>
+					</div>
 					<div class="form-group">
 						<div class="col-xs-12">
 							<ul id="notes"></ul>
@@ -1875,6 +1887,9 @@
 	        		if (isset($counts['magic_talent']) && $counts['magic_talent'] > 0) {
 	        			echo '<option id="magic_option" value="magic_talent_name">Magical Talent</option>';
 	        		}
+	        		// if (isset($counts['martial_arts_talent']) && $counts['martial_arts_talent'] > 0) {
+	        		// 	echo '<option id="martial_arts_option" value="martial_arts_talent_name">Martial Arts Talent</option>';
+	        		// }
 	        		if (isset($counts['social_background']) && $counts['social_background'] > 0) {
 	        			echo '<option value="social_background_name" '.(count($awards) > 0 ? 'disabled' : '').'>Social Background</option>';
 	        		}
@@ -1901,6 +1916,7 @@
         	<label class="control-label">Name</label>
         	<input class="form-control clearable feat-type" type="text" id="standard_talent_name">
         	<input class="form-control clearable feat-type hidden" type="text" id="magic_talent_name">
+        	<input class="form-control clearable feat-type hidden" type="text" id="martial_arts_talent_name">
         	<select class="form-control feat-type feat-select hidden" id="race_trait_name">
         		<?php
         			foreach ($race_traits as $trait) {

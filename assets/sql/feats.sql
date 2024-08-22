@@ -357,7 +357,83 @@ INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (@feat_set_id, 't
 SET @feat_id := @feat_id + 1;
 SET @feat_set_id := @feat_set_id + 1;
 
+
+-- MARTIAL ARTS TALENTS --
+
+SET @feat_id := (SELECT id FROM feat_or_trait ORDER BY id DESC LIMIT 0, 1);
+SET @feat_id := @feat_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Instant Stand', '', 'martial_arts_talent', 4);
+SET @feat_id := @feat_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Improved Disarm', '', 'martial_arts_talent', 4);
+SET @feat_id := @feat_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Meditate', '', 'martial_arts_talent', 4);
+SET @feat_id := @feat_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Defensive Throw', '', 'martial_arts_talent', 4);
+SET @feat_id := @feat_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Relentless Defense (MA)', '', 'martial_arts_talent', 4);
+SET @feat_id := @feat_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Reversal', '', 'martial_arts_talent', 4);
+SET @feat_id := @feat_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Riposte', '', 'martial_arts_talent', 4);
+SET @feat_id := @feat_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Drunken Master', '', 'martial_arts_talent', 4);
+SET @feat_id := @feat_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Wisdom of the Ancients', '', 'martial_arts_talent', 4);
+SET @feat_id := @feat_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Fists of Stone', '', 'martial_arts_talent', 4);
+SET @feat_id := @feat_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'The Way of Wind', '', 'martial_arts_talent', 4);
+SET @feat_id := @feat_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Instant Knockout', '', 'martial_arts_talent', 4);
+SET @feat_id := @feat_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Stunning Strike', '', 'martial_arts_talent', 4);
+SET @feat_id := @feat_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Zen Warrior', '', 'martial_arts_talent', 4);
+SET @feat_id := @feat_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Flurry of Fists', '', 'martial_arts_talent', 4);
+SET @feat_id := @feat_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'The Way of Water', '', 'martial_arts_talent', 4);
+SET @feat_id := @feat_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Instant Kill', '', 'martial_arts_talent', 4);
+SET @feat_id := @feat_id + 1;
+
+INSERT INTO feat_or_trait (id, name, description, type, cost) VALUES (@feat_id, 'Quivering Palm', '', 'martial_arts_talent', 4);
+SET @feat_id := @feat_id + 1;
+
+
+-- HEROIC TALENTS --
+
+SET @feat_id := (SELECT id FROM feat_or_trait ORDER BY id DESC LIMIT 0, 1);
+SET @feat_id := @feat_id + 1;
+
+
+-- DIVINE VOWS --
+
+SET @feat_id := (SELECT id FROM feat_or_trait ORDER BY id DESC LIMIT 0, 1);
+SET @feat_id := @feat_id + 1;
+
+
+-- NEW TALENT INSERT SQL START --
+
 SET @feat_id := (SELECT id FROM feat_or_trait ORDER BY id DESC LIMIT 0, 1);
 SET @feat_set_id := (SELECT id FROM feat_or_trait_req_set ORDER BY id DESC LIMIT 0, 1);
 SET @feat_id := @feat_id + 1;
 SET @feat_set_id := @feat_set_id + 1;
+

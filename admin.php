@@ -271,6 +271,14 @@
 			$total_count += $row['count'];
 		}
 	}
+	$sql = "SELECT count(*) AS count FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_id = $campaign_id AND type = 'martial_arts_talent'";
+	$result = $db->query($sql);
+	if ($result) {
+		while($row = $result->fetch_assoc()) {
+			$counts['martial_arts_talent_count'] = $row['count'];
+			$total_count += $row['count'];
+		}
+	}
 
 	// get feat active status
 	$campaign_feats = [];
@@ -673,6 +681,9 @@
 	.highlight-hover:hover {
 		text-shadow: 0px 0px 3px #404040;
 	}
+	.col-req {
+		min-width: 150px;
+	}
 
 	/*@media (max-width: 868px) {
 		.name-row, .select-row {
@@ -748,6 +759,7 @@
 			<option value="">Races</option>
 			<option value="#section_standard">Standard Talents</option>
 			<option value="#magical_talents">Magical Talents</option>
+			<option value="#martial_arts_talents">Martial Arts Talents</option>
 			<option value="#section_physical_trait_pos">Physical Traits (Positive)</option>
 			<option value="#section_physical_trait_neg">Physical Traits (Negative)</option>
 			<option value="#section_social_trait">Social Traits</option>
@@ -928,7 +940,7 @@
 						<th>Enabled</th>
 						<th>Name</th>
 						<th>Description</th>
-						<th>Requirements</th>
+						<th class="col-req">Requirements</th>
 						<!-- <th>Edit</th> -->
 					</tr>
 					<?php
@@ -943,7 +955,7 @@
 											$reqs .= $i > 0 ? "OR " : "&#8226;";
 											if (is_object($value)) {
 												foreach($value as $k => $v) {
-													$reqs .= $k.": ".$v;
+													$reqs .= $k.": ".$v."<br>";
 												}
 											} else if ($key == "character_creation") {
 												$reqs .= "Character Creation Only"."<br>";
@@ -984,7 +996,7 @@
 						<th>Enabled <input type='checkbox' class="magical_talent-check" checked onclick="checkAll(this, 'magical_talent-check')"></th>
 						<th>Name</th>
 						<th>Description</th>
-						<th>Requirements</th>
+						<th class="col-req">Requirements</th>
 						<!-- <th>Edit</th> -->
 					</tr>
 					<?php
@@ -1019,6 +1031,58 @@
 					?>
 				</table>
 			</div>
+
+			<!-- <div class="title">
+				<h4 class="table-heading" id="martial_arts_talents">Martial Arts Talents</h4>
+				<label class="toggle-switchy" for="martial_arts_talent_toggle" data-size="sm" data-text="false">
+					<input checked type="checkbox" id="martial_arts_talent_toggle" checked onclick="enable(this, 'martial_arts_talent-check')">
+					<span class="toggle">
+						<span class="switch"></span>
+					</span>
+				</label>
+			</div>
+			<div class="panel panel-default" <?php if( $counts['martial_arts_talent_count'] == 0 ) { echo 'style="display:none;"'; } ?> >
+				<table class="table fixed-width" id="martial_arts_talent_table">
+					<tr>
+						<th>Enabled <input type='checkbox' class="martial_arts_talent-check" checked onclick="checkAll(this, 'martial_arts_talent-check')"></th>
+						<th>Name</th>
+						<th>Description</th>
+						<th class="col-req">Requirements</th>
+					</tr>
+					<?php
+						foreach($talents as $talent) {
+							$reqs = "";
+							if ($talent->type == 'martial_arts_talent') {
+								// build requirement string
+								foreach($talent->requirements as $req_set) {
+									$reqs .= "<span class='highlight-hover'>";
+									for($i = 0; $i < count($req_set); $i++) {
+										foreach($req_set[$i] as $key => $value) {
+											$reqs .= $i > 0 ? "OR " : "&#8226;";
+											if (is_object($value)) {
+												foreach($value as $k => $v) {
+													$reqs .= $k.": ".$v."<br>";
+												}
+											} else {
+												$reqs .= str_replace("_", "", ucfirst($key)).": ".$value."<br>";
+											}
+										}
+									}
+									$reqs .= "</span>";
+								}
+								echo 
+								"<tr class='table-row' id='row_".$talent->id."'>
+									<td class='center'><input id='check_".$talent->id."' class='martial_arts_talent-check' type='checkbox' ".(isset($talent->active) || $counts['martial_arts_talent_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
+									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
+									<td class='highlight-hover'>".$talent->description."</td>
+									<td>".$reqs."</td>
+								</tr>";
+								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
+							}
+						}
+					?>
+				</table>
+			</div> -->
 
 			<div class="title">
 				<h4 class="table-heading" id="section_physical_trait_pos">Physical Traits (Positive)</h4>
@@ -1919,6 +1983,9 @@
 		}
 		if (counts['race_count'] == 0) {
 			$("#race_toggle").trigger("click");
+		}
+		if (counts['martial_arts_talent_count'] == 0) {
+			$("#martial_arts_talent_toggle").trigger("click");
 		}
 	}
 

@@ -96,11 +96,15 @@ var slide = window.setInterval(function() {
 	});
 }, 15000);
 
-// detect if we're on a touchscreen
-var is_mobile = $('#is_mobile').css('display')=='none';
+// detect if we're on a tablet, mobile or touchscreen
+let is_mobile_width = $('#is_mobile').css('display') == 'block';
+let is_touchscreen = $('#is_touchscreen').css('display') == 'block';
+let is_mobile = is_mobile_width || is_touchscreen;
 
 // hover function for clearable inputs
-function tog(v) { return v?'addClass':'removeClass'; }
+function tog(v) {
+	return v ? 'addClass' : 'removeClass';
+}
 
 // back to select campaign page
 function back() {
@@ -738,7 +742,8 @@ $("#morale").on("input change", function() {
 	setMotivatorBonus();
 });
 
-// mobile damage adjustment button functions
+// TODO can simplify these rules now that damage increase/decrease is always 1
+// damage adjustment button functions
 function adjustResilience(val) {
 	if (parseInt($("#damage").val()) + parseInt(val) < $("#damage").attr("min")) {
 		return;
@@ -748,22 +753,26 @@ function adjustResilience(val) {
 
 // set max damage to resilience
 $("#damage").attr("max", $("#resilience").val());
+
 // on damage change, modify wounds
 $("#damage").on("change", function() {
 	var damage = parseInt($(this).val());
 	let resilience = parseInt($(this).attr("max"));
+
 	// check for wound reduction
 	if (damage == -1) {
 		damage = resilience - 1;
 		$("#damage").val(resilience - 1);
 		$("#wounds_val").val( parseInt($("#wounds_val").val()) - 1 <= 0 ? 0 : parseInt($("#wounds_val").val()) - 1 );
 	}
+
 	// check for wound increase
-	while (parseInt($(this).val()) >= parseInt($(this).attr("max"))) {
-		$(this).val($(this).val() - $(this).attr("max")).trigger("input");
+	while ( parseInt( $(this).val() ) >= parseInt( $(this).attr("max") ) ) {
+		$(this).val( $(this).val() - $(this).attr("max") ).trigger("input");
+		damage = parseInt($(this).val());
 		$("#wounds_val").val( parseInt($("#wounds_val").val()) + 1 >= 4 ? 4 : parseInt($("#wounds_val").val()) + 1 );
 	}
-	let wounds = parseInt($("#wounds_val").val());
+	let wounds = parseInt( $("#wounds_val").val() );
 	var totalDamage = damage + (wounds * resilience);
 	$("#damage").attr("min", wounds == 0 ? 0 : -1);
 	// check for max total damage
@@ -779,7 +788,7 @@ $("#damage").on("change", function() {
 	if (parseInt($("#wounds_val").val()) == 4) {
 		$("#wound_penalty").val("Yer Dead");
 	} else {
-		let wound_penalty = penalties[parseInt($("#wounds_val").val())];
+		let wound_penalty = penalties[ parseInt( $("#wounds_val").val() ) ];
 		// check for diehard talent, reduce wound penalty by 1
 		if (hasTalent("Diehard") && wound_penalty < 0) {
 			wound_penalty += 1;
@@ -1875,6 +1884,8 @@ $("#new_feat_modal").on('shown.bs.modal', function() {
 		let feat_type = $(this).val().split("_name")[0];
 		if ($(this).val() == "standard_talent_name") {
 			$(this).attr("hidden", false);
+		} else if ($(this).val() == "martial_arts_talent_name") {
+			$(this).attr("hidden", !hasTalent("Martial Arts"));
 		} else if ($(this).val() == "race_trait_name") {
 			$(this).attr("hidden", true);
 		} else if ($(this).val() == "magic_talent_name") {
@@ -1893,6 +1904,7 @@ $("#new_feat_modal").on('hidden.bs.modal', function() {
 	$("#feat_cancel_btn").removeClass("hidden");
 	$("#standard_talent_name").val("").removeClass("x onX").attr("disabled", false);
 	$("#magic_talent_name").val("").removeClass("x onX").attr("disabled", false);
+	$("#martial_arts_talent_name").val("").removeClass("x onX").attr("disabled", false);
 	$("#feat_description").val("").height("125px").attr("disabled", false);
 	$("#feat_id").val("");
 	$("#user_feat_id").val("");
