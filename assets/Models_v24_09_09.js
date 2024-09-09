@@ -648,8 +648,11 @@ function addFeatElements(talent) {
 		let size_adjust = talent.name == "Dwarf" ? -1 : 1;
 		let race = getRace($("#race").val());
 		let base = race == false ? 2 : sizes.indexOf(race['size']);
+		let old_size = $("#character_size_select").val();
 		$("#character_size_select").val(sizes[base + size_adjust]);
-		editSize(true);
+		if (old_size != $("#character_size_select").val()) {
+			editSize(true);
+		}
 		$("#size").attr("data-toggle", null).addClass("cursor-auto");
 	}
 
@@ -767,8 +770,11 @@ class UserTalent {
 				];
 				let race = getRace($("#race").val());
 				let base = race == false ? 2 : sizes.indexOf(race['size']);
+				let old_size = $("#character_size_select").val();
 				$("#character_size_select").val(sizes[base]);
-				editSize(true);
+				if (old_size != $("#character_size_select").val()) {
+					editSize(true);
+				}
 				$("#size").attr("data-toggle", characterCreation ? "modal" : null).removeClass(characterCreation ? "cursor-auto" : "");
 			}
 		}

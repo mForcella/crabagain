@@ -21,6 +21,11 @@
 	$campaign_id = $_POST['campaign_id'];
 	$sql = "UPDATE user SET character_name = '$character_name', campaign_id = $campaign_id, login_id = $login_id WHERE id = ".$user_id;
 	$db->query($sql);
+			
+	$save_sql = "INSERT INTO sql_query (query, source, type, login_id, character_id) VALUES ('".addslashes($sql)."', 'submit.php', 'update', $login_id, $user_id)";
+	$db->query($save_sql);
+
+	$db->close();
 
 	header("Location: /?campaign=".$_POST['campaign_id']."&user=".$user_id,  true,  301 );  exit;
 

@@ -34,6 +34,10 @@
 		$token = bin2hex(random_bytes(16));
 		$sql = "UPDATE login SET reset_token = '$token' WHERE email = '$email'";
 		$db->query($sql);
+
+		$save_sql = "INSERT INTO sql_query (query, source, type, login_id) VALUES ('".addslashes($sql)."', 'email_password_reset_link.php', 'update', ".$login['id'].")";
+		$db->query($save_sql);
+		
 		$db->close();
 
 		// generate reset link

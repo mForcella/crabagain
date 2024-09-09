@@ -60,11 +60,13 @@
 		}
 	}
 	$campaigns = [];
-	$sql = "SELECT * from campaign WHERE id IN (".implode(',',$campaign_ids).")";
-	$result = $db->query($sql);
-	if ($result) {
-		while($row = $result->fetch_assoc()) {
-			array_push($campaigns, $row);
+	if (count($campaign_ids) > 0) {
+		$sql = "SELECT * from campaign WHERE id IN (".implode(',',$campaign_ids).")";
+		$result = $db->query($sql);
+		if ($result) {
+			while($row = $result->fetch_assoc()) {
+				array_push($campaigns, $row);
+			}
 		}
 	}
 

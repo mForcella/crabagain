@@ -23,6 +23,9 @@
 	    // update password and reset token
 	    $sql = "UPDATE login SET password = '$hashed_password', reset_token = '' WHERE id = $login_id";
 	    $db->query($sql);
+	    
+		$save_sql = "INSERT INTO sql_query (query, source, type, login_id) VALUES ('".addslashes($sql)."', 'reset_password.php', 'update', $login_id)";
+		$db->query($save_sql);
 
 	    // redirect to login page
 	    $_SESSION['msg'] = "<h4 class='success'>Your password has been successfully reset</h4>";

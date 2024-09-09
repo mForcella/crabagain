@@ -22,6 +22,10 @@
 		// update database and set account confirmed
 		$sql = "UPDATE login SET confirmed = 1, confirmation_code = '' WHERE id = $login_id";
 		$db->query($sql);
+
+		$save_sql = "INSERT INTO sql_query (query, source, type, login_id) VALUES ('".addslashes($sql)."', 'confirm_account.php', 'update', $login_id)";
+		$db->query($save_sql);
+		
 		// success - start session and redirect to select campaign
     	$_SESSION['login_id'] = $login_id;
     	header('Location: /select_campaign.php');

@@ -37,6 +37,9 @@
 	$invite_code = bin2hex(random_bytes(16));
 	$sql = "INSERT INTO invitation (invite_code, email, campaign_id) VALUES ('$invite_code', '$email', $campaign_id)";
 	$db->query($sql);
+			
+	$save_sql = "INSERT INTO sql_query (query, source, type, login_id) VALUES ('".addslashes($sql)."', 'send_invite.php', 'insert', $login_id)";
+	$db->query($save_sql);
 
 	// generate invite link
 	$protocol = isset($_SERVER["HTTPS"]) ? 'https://' : 'http://';

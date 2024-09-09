@@ -257,6 +257,20 @@
     FOREIGN KEY (race_id) REFERENCES race(id) ON DELETE CASCADE
   );
 
+  CREATE TABLE sql_query (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    query text,
+    source varchar(255),
+    type varchar(64),
+    login_id int,
+    character_id int,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (login_id) REFERENCES login(id) ON DELETE CASCADE,
+    FOREIGN KEY (character_id) REFERENCES user(id) ON DELETE CASCADE
+  );
+
+
+
   insert into feat_or_trait (name,description,type,cost) values ("Iron Soul","Asgari add half their Soma Bonus to their Caster Level for Soma Magic only.","race_trait",0);
   insert into feat_or_trait (name,description,type,cost) values ("Master of the Wild","Vanir add half their Avani Bonus to their Caster Level for Avani Magic only.","race_trait",0);
   insert into feat_or_trait (name,description,type,cost) values ("Mentalist","Pangu add half their Nous Bonus to their Caster Level for Nous Magic only.","race_trait",0);

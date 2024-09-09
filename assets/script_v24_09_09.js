@@ -145,7 +145,7 @@ function deleteDatabaseObject(table, id) {
 	// console.log("deleteDatabaseObject");
 	$.ajax({
 		url: '/scripts/delete_database_object.php',
-		data: { 'table' : table, 'id' : id },
+		data: { 'table' : table, 'id' : id, 'user_id' : $("#user_id").val(), 'login_id' : $("#login_id").val() },
 		ContentType: "application/json",
 		type: 'POST',
 		success: function(response) {
@@ -161,7 +161,7 @@ function insertDatabaseObject(table, object, columns, override=false) {
 	// console.log("insertDatabaseObject");
 	$.ajax({
 		url: '/scripts/insert_database_object.php',
-		data: { 'table' : table, 'data' : object, 'columns' : columns, 'user_id' : $("#user_id").val() },
+		data: { 'table' : table, 'data' : object, 'columns' : columns, 'user_id' : $("#user_id").val(), 'login_id' : $("#login_id").val() },
 		ContentType: "application/json",
 		type: 'POST',
 		success: function(response) {
@@ -184,7 +184,7 @@ function updateDatabaseObject(table, object, columns) {
 	// console.log("updateDatabaseObject");
 	$.ajax({
 		url: '/scripts/update_database_object.php',
-		data: { 'table' : table, 'data' : object, 'columns' : columns },
+		data: { 'table' : table, 'data' : object, 'columns' : columns, 'user_id' : $("#user_id").val(), 'login_id' : $("#login_id").val() },
 		ContentType: "application/json",
 		type: 'POST',
 		success: function(response) {
@@ -201,7 +201,7 @@ function updateDatabaseColumn(table, column, value, id) {
 	// console.log("updateDatabaseColumn");
 	$.ajax({
 		url: '/scripts/update_database_column.php',
-		data: { 'table' : table, 'column' : column, 'value': value, 'id': id },
+		data: { 'table' : table, 'column' : column, 'value' : value, 'id' : id, 'user_id' : $("#user_id").val(), 'login_id' : $("#login_id").val() },
 		ContentType: "application/json",
 		type: 'POST',
 		success: function(response) {
@@ -801,10 +801,13 @@ $("#damage").on("change", function() {
 	}
 });
 
-function editAge() {
+function editAge(modify_user) {
 	let age = $("#character_age_select").val();
-	user['age_category'] = age;
-	updateDatabaseColumn('user', 'age_category', age, user['id']);
+
+	if (modify_user) {
+		user['age_category'] = age;
+		updateDatabaseColumn('user', 'age_category', age, user['id']);
+	}
 
 	// update size texts
 	let age_text = age == "Child" ? "Child; -2 Power, -1 Dexterity, -2 Intelligence, -1 Spirit" : ( age == "Adolescent" ? "Adolescent; -1 Power, +1 Dexterity" : (age == "Middle-Aged" ? "Middle-Aged; -1 Dexterity, +1 Spirit" : ( age == "Elder" ? "Elder; -1 Power, -2 Dexterity, +1 Intelligence, +2 Spirit" : ( age == "Venerable" ? "Venerable; -2 Power, -3 Dexterity, +2 Intelligence, +3 Spirit" : age))));
@@ -1121,7 +1124,7 @@ function setAttributes(user) {
 	setMoraleEffect(user['morale'] == null ? 0 : parseInt(user['morale']));
 	setMotivatorBonus();
 	// set age and size text
-	editAge();
+	editAge(false);
 	editSize(false);
 	// set initiative
 	adjustInitiative();
@@ -1143,7 +1146,8 @@ function setAttributes(user) {
 					data: {
 						'xp_award_id' : xp_awards[i]['id'],
 						'user' : user['id'],
-						'xp' : $("#xp").val()
+						'xp' : $("#xp").val(),
+						'login_id' : $("#login_id").val()
 					},
 					ContentType: "application/json",
 					type: 'POST',
@@ -1158,7 +1162,7 @@ function setAttributes(user) {
 }
 
 // enable race autocomplete
-function setRaceInput() {
+function setRaceInput(modify_user) {
 	$("#race").autocomplete({
 		source: function(input, add) {
 			let suggestions = [];
@@ -1194,8 +1198,12 @@ function selectRace(input) {
 	];
 	let size_adjust = hasTalent("Dwarf") ? -1 : (hasTalent("Giant") ? 1 : 0);
 	let base = race == false ? 2 : sizes.indexOf(race['size']);
+	let old_size = $("#character_size_select").val();
 	$("#character_size_select").val(sizes[base + size_adjust]);
-	editSize(true);
+	// check for size change
+	if (old_size != $("#character_size_select").val()) {
+		editSize(true);
+	}
 
 	if (race == false) {
 		$("#race_traits").html("");

@@ -251,7 +251,7 @@
 			// send ajax request
 			$.ajax({
 				url: '/scripts/delete_feat.php',
-				data: { 'feat_id' : feat_id },
+				data: { 'feat_id' : feat_id, 'login_id' : $("#login_id").val() },
 				ContentType: "application/json",
 				type: 'POST',
 				success: function(response){

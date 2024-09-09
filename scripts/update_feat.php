@@ -50,6 +50,9 @@
 		break;
 	}
 	$db->query($sql);
+			
+	$save_sql = "INSERT INTO sql_query (query, source, type, login_id) VALUES ('".addslashes($sql)."', 'update_feat.php', 'update', ".$_POST['login_id'].")";
+	$db->query($save_sql);
 	
 	// add reqs for standard feats
 	$feat_id = $_POST['feat_id'];

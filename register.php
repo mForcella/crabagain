@@ -74,15 +74,25 @@
 	        // insert new login
 			$sql = "INSERT into login (email, password, confirmation_code) VALUES ('$email', '$hashed_password', '$confirmation_code')";
 			$db->query($sql);
+			$login_id = $db->insert_id;
+			
+			$save_sql = "INSERT INTO sql_query (query, source, type, login_id) VALUES ('".addslashes($sql)."', 'register.php', 'insert', $login_id)";
+			$db->query($save_sql);
 
 			// check for invite code - add user to campaign
 			if ($invite_code != "") {
 				$sql = "INSERT into login_campaign (login_id, campaign_id, campaign_role) VALUES (".$db->insert_id.", ".$invitation['campaign_id'].", 2)";
 				$db->query($sql);
 
+				$save_sql = "INSERT INTO sql_query (query, source, type, login_id) VALUES ('".addslashes($sql)."', 'register.php', 'insert', $login_id)";
+				$db->query($save_sql);
+
 				// delete invitation
 				$sql = "DELETE FROM invitation WHERE id = ".$invitation['id'];
 				$db->query($sql);
+
+				$save_sql = "INSERT INTO sql_query (query, source, type, login_id) VALUES ('".addslashes($sql)."', 'register.php', 'delete', $login_id)";
+				$db->query($save_sql);
 			}
 
 			// generate confirmation link

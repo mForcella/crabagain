@@ -1841,7 +1841,7 @@
         		<option value="Venerable" <?php echo $age == "Venerable" ? 'selected' : '' ?>>Venerable (80+)</option>
         	</select>
         	<div class="button-bar">
-	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="editAge()">Ok</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="editAge(true)">Ok</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>

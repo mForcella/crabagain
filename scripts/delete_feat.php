@@ -32,6 +32,9 @@
 	// delete feat
 	$sql = "DELETE FROM feat_or_trait WHERE id = ".$_POST['feat_id'];
 	$db->query($sql);
+	
+	$save_sql = "INSERT INTO sql_query (query, source, type, login_id) VALUES ('".addslashes($sql)."', 'delete_feat.php', 'delete', ".$_POST['login_id'].")";
+	$db->query($save_sql);
 
 	$db->close();
 

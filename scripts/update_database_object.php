@@ -12,6 +12,7 @@
 
 	$data = $_POST['data'];
 	$columns = $_POST['columns'];
+	$user_id = $_POST['user_id'];
 
 	$sql = "UPDATE ".$_POST['table']." SET ";
 	foreach ($columns as $column) {
@@ -25,6 +26,10 @@
 	// echo $sql;
 
 	$db->query($sql);
+
+	$save_sql = "INSERT INTO sql_query (query, source, type, login_id, character_id) VALUES ('".addslashes($sql)."', 'update_database_object.php', 'update', ".$_POST['login_id'].", ".($user_id == "" ? NULL : $user_id).")";
+	$db->query($save_sql);
+
 	$db->close();
 	echo 'update ok';
 

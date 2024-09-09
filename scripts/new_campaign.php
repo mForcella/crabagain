@@ -33,15 +33,23 @@
 	$campaign_id = $db->insert_id;
 	echo $campaign_id;
 
+	$admin_id = $_POST['admin_id'];
+			
+	$save_sql = "INSERT INTO sql_query (query, source, type, login_id) VALUES ('".addslashes($sql)."', 'new_campaign.php', 'insert', $admin_id)";
+	$db->query($save_sql);
+
 	// make campaign creator admin
-	$sql = "INSERT into login_campaign (campaign_id, login_id, campaign_role) VALUES ($campaign_id, ".$_POST['admin_id'].", 1)";
+	$sql = "INSERT into login_campaign (campaign_id, login_id, campaign_role) VALUES ($campaign_id, $admin_id, 1)";
 	$db->query($sql);
+			
+	$save_sql = "INSERT INTO sql_query (query, source, type, login_id) VALUES ('".addslashes($sql)."', 'new_campaign.php', 'insert', $admin_id)";
+	$db->query($save_sql);
 
 	// add other players to campaign
 	$logins = [];
 	if (isset($_POST['users'])) {
 		$users = $_POST['users'];
-		$sql = "SELECT id,email FROM login WHERE id IN (".implode(',',$users).")";
+		$sql = "SELECT id, email FROM login WHERE id IN (".implode(',',$users).")";
 		$result = $db->query($sql);
 		if ($result) {
 			while($row = $result->fetch_assoc()) {
@@ -52,7 +60,7 @@
 
 	// get admin email address
 	$admin = "";
-	$sql = "SELECT email FROM login WHERE id = ".$_POST['admin_id'];
+	$sql = "SELECT email FROM login WHERE id = $admin_id";
 	$result = $db->query($sql);
 	if ($result) {
 		while($row = $result->fetch_assoc()) {
@@ -65,13 +73,16 @@
 	$domain = $_SERVER['HTTP_HOST'];
 	$url = "<a href='".$protocol.$domain."/?campaign=".$campaign_id."'>".$_POST['name']."!</a>";
 
-	foreach ($users as $login_id) {
-		$sql = "INSERT into login_campaign (campaign_id, login_id, campaign_role) VALUES ($campaign_id, $login_id, 2)";
+	foreach ($users as $user) {
+		$sql = "INSERT into login_campaign (campaign_id, login_id, campaign_role) VALUES ($campaign_id, $user, 2)";
 		$db->query($sql);
+			
+		$save_sql = "INSERT INTO sql_query (query, source, type, login_id) VALUES ('".addslashes($sql)."', 'new_campaign.php', 'insert', $admin_id)";
+		$db->query($save_sql);
 
 		// notify users that they have been added to a campaign
 		foreach ($logins as $login) {
-			if ($login['id'] == $login_id) {
+			if ($login['id'] == $user) {
 				$email = $login['email'];
 
 			    $mail = new PHPMailer;

@@ -734,9 +734,6 @@
 <body>
 	<div class="container">
 
-		<input type="hidden" id="campaign_id" value="<?php echo $campaign_id?>">
-		<input type="hidden" id="login_id" value="<?php echo $login_id?>">
-
 		<!-- button - scroll to top of page -->
 		<button id="scroll_top" class="no-vis"><span class="glyphicon glyphicon-arrow-up" onclick="scrollToTop()"></span></button>
 
@@ -883,7 +880,8 @@
 		</div>
 
 		<form id="campaign_form">
-			<input type="hidden" id="campaign_id" name="campaign_id" value="<?php echo $campaign['id'] ?>">
+			<input type="hidden" id="campaign_id" name="campaign_id" value="<?php echo $campaign_id?>">
+			<input type="hidden" id="login_id" name="login_id" value="<?php echo $login_id?>">
 
 			<div class="title">
 				<h4 class="table-heading" id="section_races">Races</h4>
@@ -1517,7 +1515,8 @@
 				</div>
 				<div class="modal-body">
 					<form id="new_feat_form">
-						<input type="hidden" name="campaign_id" value="<?php echo $campaign['id'] ?>">
+						<input type="hidden" id="new_feat_campaign_id" name="campaign_id" value="<?php echo $campaign_id?>">
+						<input type="hidden" id="new_feat_login_id" name="login_id" value="<?php echo $login_id?>">
 						<input type="hidden" id="feat_id" name="feat_id">
 						<input type="hidden" id="feat_type_val" name="feat_type">
 						<label class="control-label">Name</label>
@@ -1757,7 +1756,7 @@
 	});
 
 	$(".active-checkbox").on("change", function() {
-		let login_id = this.id.split("select_")[1];
+		let login_id = $("#login_id").val();
 		let campaign_id = $("#campaign_id").val();
 		if ($(this).is(":checked")) {
 			// insert login_campaign
@@ -2070,7 +2069,7 @@
 			// add xp awards to database
 			$.ajax({
 			  url: '/scripts/set_xp_awards.php',
-			  data: { 'users' : users, 'awards' : awards },
+			  data: { 'users' : users, 'awards' : awards, 'login_id' : $("#login_id").val() },
 			  ContentType: "application/json",
 			  type: 'POST',
 			  success: function(response) {
@@ -2104,7 +2103,7 @@
 			// submit to ajax
 			$.ajax({
 				url: '/scripts/send_invite.php',
-				data: {'email':email, 'campaign_id':$("#campaign_id").val(), 'login_id':$("#login_id").val()},
+				data: {'email' : email, 'campaign_id' : $("#campaign_id").val(), 'login_id' : $("#login_id").val()},
 				ContentType: "application/json",
 				type: 'POST',
 				success: function(response){
@@ -2158,6 +2157,7 @@
 	// save settings on input change
 	$(document).ready(function() {
 		$("input:checkbox").change(function(){
+			// TODO enable writing individual changes to database
 			saveCampaignSettings();
 		});
 	});

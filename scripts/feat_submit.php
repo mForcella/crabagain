@@ -53,9 +53,12 @@
 		break;
 	}
 	$db->query($sql);
-	
-	// get insert ID and add reqs for standard feats
 	$feat_id = $db->insert_id;
+	
+	$save_sql = "INSERT INTO sql_query (query, source, type, login_id) VALUES ('".addslashes($sql)."', 'feat_submit.php', 'insert', ".$_POST['login_id'].")";
+	$db->query($save_sql);
+
+	// add reqs for standard feats
 	if ($type == "feat") {
 		$reqs = $_POST['feat_reqs'];
 		foreach ($reqs as $req) {
