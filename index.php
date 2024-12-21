@@ -695,9 +695,15 @@
 										</div>
 									</div>
 									<div class="form-group">
-										<label class="control-label col-md-7 col-xs-4" for="weapon_crit_1">Critical</label>
+										<label class="control-label col-md-7 col-xs-4" for="weapon_crit_1">Crit TR</label>
 										<div class="col-md-5 col-xs-8 no-pad-left">
 											<input class="form-control" readonly id="weapon_crit_1" name="weapon_1_crit">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-md-7 col-xs-4" for="weapon_crit_dmg_1">Crit Dmg</label>
+										<div class="col-md-5 col-xs-8 no-pad-left">
+											<input class="form-control" readonly id="weapon_crit_dmg_1" name="weapon_1_crit_dmg">
 										</div>
 									</div>
 									<div class="form-group">
@@ -732,9 +738,15 @@
 										</div>
 									</div>
 									<div class="form-group">
-										<label class="control-label col-md-7 col-xs-4" for="weapon_crit_2">Critical</label>
+										<label class="control-label col-md-7 col-xs-4" for="weapon_crit_2">Crit TR</label>
 										<div class="col-md-5 col-xs-8 no-pad-left">
 											<input class="form-control" readonly id="weapon_crit_2" name="weapon_2_crit">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-md-7 col-xs-4" for="weapon_crit_dmg_2">Crit Dmg</label>
+										<div class="col-md-5 col-xs-8 no-pad-left">
+											<input class="form-control" readonly id="weapon_crit_dmg_2" name="weapon_2_crit_dmg">
 										</div>
 									</div>
 									<div class="form-group">
@@ -769,9 +781,15 @@
 										</div>
 									</div>
 									<div class="form-group">
-										<label class="control-label col-md-7 col-xs-4" for="weapon_crit_3">Critical</label>
+										<label class="control-label col-md-7 col-xs-4" for="weapon_crit_3">Crit TR</label>
 										<div class="col-md-5 col-xs-8 no-pad-left">
 											<input class="form-control" readonly id="weapon_crit_3" name="weapon_3_crit">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-md-7 col-xs-4" for="weapon_crit_dmg_3">Crit Dmg</label>
+										<div class="col-md-5 col-xs-8 no-pad-left">
+											<input class="form-control" readonly id="weapon_crit_dmg_3" name="weapon_3_crit_dmg">
 										</div>
 									</div>
 									<div class="form-group">
@@ -2151,12 +2169,16 @@
         </div>
         <div class="modal-body">
         	<label class="control-label">Weapon Type</label>
+        	<!-- TODO add weapon type: mixed? -->
         	<select class="form-control" id="weapon_type">
         		<option value="Melee">Melee</option>
         		<option value="Ranged">Ranged</option>
         	</select>
         	<label class="control-label">Weapon Name*</label>
         	<input class="form-control" type="text" id="weapon_name">
+        	<label class="control-label">Attack Attribute</label>
+        	<select class="form-control" id="weapon_attack_attribute">
+        	</select>
         	<label class="control-label">Quantity</label>
         	<input class="form-control" type="number" min="0" id="weapon_quantity">
         	<label class="control-label">Damage*</label>

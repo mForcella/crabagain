@@ -110,6 +110,9 @@
 			}
 			$user['toughness_bonus'] = $toughness_bonus;
 
+			// TODO adjust toughness bonus based on size
+
+
 			// get defend bonus from equipped melee weapons
 			$defend_bonus = 0;
 			$sql = "SELECT defend FROM user_weapon WHERE user_id = ".$user["id"]." AND equipped = 1";
@@ -838,9 +841,12 @@
 						$dodge += $user['dodge_mod'];
 
 						// get toughness
-						$toughness = $user['strength'] >= 0 ?
-								floor($user['strength']/2) :
-								(ceil($user['strength']/3) == 0 ? 0 : ceil($user['strength']/3));
+						$strength_actual = $user['strength'];
+						$size_modifier = $user['size'] == "Small" ? -2 : ($user['size'] == "Large" ? 2 : 0);
+						$strength_actual += $size_modifier;
+						$toughness = $strength_actual >= 0 ?
+								floor($strength_actual/2) :
+								(ceil($strength_actual/3) == 0 ? 0 : ceil($strength_actual/3));
 
 						// get defend
 						$defend = isset($user) ? 10 + $user['agility'] : 10;
@@ -1401,7 +1407,7 @@
 								<tr>
 									<td class='select-row'>
 										<label class='toggle-switchy' for='select_".$login['id']."' data-size='sm' data-text='false'>
-											<input class='active-checkbox' type='checkbox' id='select_".$login['id']."' ".($login['active'] ? 'checked' : '')." ".($login['admin'] ? 'disabled' : '').">
+											<input class='active-chk' type='checkbox' id='select_".$login['id']."' ".($login['active'] ? 'checked' : '')." ".($login['admin'] ? 'disabled' : '').">
 											<span class='toggle'>
 												<span class='switch'></span>
 											</span>
@@ -1755,7 +1761,7 @@
 		$("#select_"+id).trigger("click");
 	});
 
-	$(".active-checkbox").on("change", function() {
+	$(".active-chk").on("change", function() {
 		let login_id = $("#login_id").val();
 		let campaign_id = $("#campaign_id").val();
 		if ($(this).is(":checked")) {

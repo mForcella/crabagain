@@ -1408,7 +1408,7 @@ function adjustAttribute(attribute, val) {
 						let damage = userWeapons[i].damage;
 						let max_damage = userWeapons[i].max_damage == null ? 0 : userWeapons[i].max_damage;
 						let damage_mod =  userWeapons[i].getDamageMod();
-						$("#weapon_damage_"+id).val(damage_mod > 0 ? damage+" (+"+damage_mod+")" : damage);
+						$("#weapon_damage_"+id).val(damage + damage_mod);
 					}
 				}
 			});
@@ -1428,6 +1428,10 @@ function adjustAttribute(attribute, val) {
 			// adjust dodge and defend
 			setDodge();
 			setDefend();
+			// adjust crit mods if necessary
+			if (hasTalent("Improved Critical Hit")) {
+				adjustCritMods(attribute);
+			}
 			break;
 		case 'precision_':
 			// adjust ranged weapon damage
@@ -1438,10 +1442,14 @@ function adjustAttribute(attribute, val) {
 						let damage = userWeapons[i].damage;
 						let max_damage = userWeapons[i].max_damage == null ? 0 : userWeapons[i].max_damage;
 						let damage_mod =  userWeapons[i].getDamageMod();
-						$("#weapon_damage_"+id).val(damage_mod > 0 ? damage+" (+"+damage_mod+")" : damage);
+						$("#weapon_damage_"+id).val(damage + damage_mod);
 					}
 				}
 			});
+			// adjust crit mods if necessary
+			if (hasTalent("Improved Critical Hit")) {
+				adjustCritMods(attribute);
+			}
 			break;
 		case 'awareness':
 			// adjust initiative
@@ -1467,11 +1475,27 @@ function adjustAttribute(attribute, val) {
 				if (userTrainings[i].name == "Brawl" && hasTalent("Relentless Defense")) {
 					setDodge();
 				}
+				// if updating an attack skill for an equipped weapon, may need to adjust crit mods
+				if (hasTalent("Improved Critical Hit")) {
+					adjustCritMods(userTrainings[i].name);
+				}
 			}
 		}
 	}
 	// adjust eligibility of feat list
 	setFeatList();
+}
+
+function adjustCritMods(attribute) {
+	for (var j in userWeapons) {
+		if (userWeapons[j].equipped && userWeapons[j].attack_attribute == attribute) {
+			for (var k in userWeapons[j].equipped_index) {
+				let dropdownID = userWeapons[j].equipped_index[k];
+				$("#weapon_crit_"+dropdownID).val(userWeapons[j].getCritModifier());
+				$("#weapon_crit_dmg_"+dropdownID).val(userWeapons[j].damage + userWeapons[j].getDamageMod() + userWeapons[j].getCritDamageMod());
+			}
+		}
+	}
 }
 
 // show all icons for editing attribute values
@@ -1603,6 +1627,52 @@ $("#new_school_modal").on('hidden.bs.modal', function() {
 		newSchool();
 	}
 });
+
+
+$("#weapon_type").on("change", function() {
+	setAttackAttributes();
+});
+
+// set the dropdown for a weapon's attack attribute options
+function setAttackAttributes() {
+	$("#weapon_attack_attribute").html("");
+	// get user precision/agility skills
+	let precision_skills = [];
+	let agility_skills = [];
+	for (var i in userTrainings) {
+		if (userTrainings[i].attribute_group == "precision_") {
+			precision_skills.push(userTrainings[i]);
+		}
+		if (userTrainings[i].attribute_group == "agility") {
+			agility_skills.push(userTrainings[i]);
+		}
+	}
+	if ($("#weapon_type").val() == "Ranged") {
+		// if ranged, get precision skills
+		$('<option />', {
+			'value': 'precision_',
+			'text': 'Precision',
+		}).appendTo($("#weapon_attack_attribute"));
+		for (var i in precision_skills) {
+			$('<option />', {
+			  'value': precision_skills[i]['name'],
+			  'text': precision_skills[i]['name'],
+			}).appendTo($("#weapon_attack_attribute"));
+		}
+	} else {
+		// if melee, get agility skills
+		$('<option />', {
+			'value': 'agility',
+			'text': 'Agility',
+		}).appendTo($("#weapon_attack_attribute"));
+		for (var i in agility_skills) {
+			$('<option />', {
+			  'value': agility_skills[i]['name'],
+			  'text': agility_skills[i]['name'],
+			}).appendTo($("#weapon_attack_attribute"));
+		}
+	}
+}
 
 function updateTotalWeight(showMsg = false) {
 	var totalWeight = 0

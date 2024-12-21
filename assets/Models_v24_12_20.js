@@ -1476,6 +1476,7 @@ function newWeapon() {
 	// check if we are editing
 	var editing = $("#weapon_modal_title").html() == "Edit Weapon";
 	var type = $("#weapon_type").val();
+	var attack_attribute = $("#weapon_attack_attribute").val();
 	var name = $("#weapon_name").val();
 	var damage = $("#weapon_damage").val();
 	var max_damage = $("#weapon_max_damage").val();
@@ -1526,6 +1527,7 @@ function newWeapon() {
 		// update weapon object
 		let weapon = getWeapon(originalName);
 		weapon.type = type;
+		weapon.attack_attribute = attack_attribute;
 		weapon.damage = parseInt(damage);
 		weapon.defend = defend == "" ? null : parseInt(defend);
 		weapon.crit = crit == "" ? null : parseInt(crit);
@@ -1562,6 +1564,7 @@ function newWeapon() {
 		let newWeapon = new UserWeapon({
 			'type':type,
 			'name':name,
+			'attack_attribute':attack_attribute,
 			'quantity':1,
 			'damage':damage,
 			'max_damage':max_damage,
@@ -1738,6 +1741,7 @@ class UserWeapon {
 	id;
 	name;
 	type;
+	attack_attribute;
 	quantity;
 	damage;
 	max_damage;
@@ -1753,6 +1757,7 @@ class UserWeapon {
 	database_columns = [
 		'name',
 		'type',
+		'attack_attribute',
 		'quantity',
 		'damage',
 		'max_damage',
@@ -1769,6 +1774,7 @@ class UserWeapon {
 		this.id = parseInt(weapon['id']);
 		this.name = weapon['name'];
 		this.type = weapon['type'];
+		this.attack_attribute = weapon['attack_attribute'];
 		this.quantity = weapon['quantity'];
 		this.damage = parseInt(weapon['damage']);
 		this.max_damage = weapon['max_damage'] == null || weapon['max_damage'] == "" ? null : parseInt(weapon['max_damage']);
@@ -1819,11 +1825,10 @@ class UserWeapon {
 		if (equip) {
 			$("#weapon_select_"+dropdownID).val(this.name);
 			// get weapon damage
-			let damage_mod = this.getDamageMod();
-			$("#weapon_damage_"+dropdownID).val(damage_mod != 0 ? this.damage+" (+"+damage_mod+")" : this.damage);
+			$("#weapon_damage_"+dropdownID).val(this.damage + this.getDamageMod());
 			// look for crit modifiers
-			let crit = this.getCritModifier();
-			$("#weapon_crit_"+dropdownID).val(crit);
+			$("#weapon_crit_"+dropdownID).val(this.getCritModifier());
+			$("#weapon_crit_dmg_"+dropdownID).val(this.damage + this.getDamageMod() + this.getCritDamageMod());
 			$("#weapon_range_"+dropdownID).val(this.range_ == null || this.range_ == "" ? "-" : this.range_);
 			$("#weapon_rof_"+dropdownID).val(this.rof == "" ? "-" : this.rof);
 			if (updateDatabase) {
@@ -1837,6 +1842,7 @@ class UserWeapon {
 			$("#weapon_select_"+dropdownID).val("");
 			$("#weapon_damage_"+dropdownID).val("");
 			$("#weapon_crit_"+dropdownID).val("");
+			$("#weapon_crit_dmg_"+dropdownID).val("");
 			$("#weapon_range_"+dropdownID).val("");
 			$("#weapon_rof_"+dropdownID).val("");
 			let index = this.equipped_index.indexOf(dropdownID);
@@ -1850,6 +1856,9 @@ class UserWeapon {
 
 	// set modal values and launch
 	edit(input_id) {
+		// set weapon type and attack attribute dropdown list
+		$("#weapon_type").val(this.type);
+		setAttackAttributes();
 		for (let [key,val] of Object.entries(this)) {
 			$("#weapon_"+key).val(val);
 		}
@@ -1862,19 +1871,45 @@ class UserWeapon {
 		return this.database_columns;
 	}
 
-	// calculate critical threat range modifier based on weapon and user feats
+	// calculate critical threat range modifier based on weapon and character feats and skills
 	getCritModifier() {
-		var crit = 6;
+		var crit_mod = 6;
+		// check for weapon modifiers
 		if (this.crit != null && this.crit != '') {
-			crit -= parseInt(this.crit);
+			crit_mod -= parseInt(this.crit);
 		}
-		for (var i in userTalents) {
-			if (userTalents[i]['name'].toLowerCase() == "improved critical hit") {
-				crit -= 1;
-				break;
+		// check for talent/attack modifiers
+		if (hasTalent("Improved Critical Hit")) {
+			var attack_value = 0;
+			for (var i in userTrainings) {
+				if (userTrainings[i].name == this.attack_attribute) {
+					attack_value += userTrainings[i].value;
+				}
 			}
+			attack_value += this.type == "Melee" ? parseInt(user.agility) : parseInt(user.precision_);
+			attack_value = attack_value > 12 ? 12 : attack_value;
+			crit_mod -= Math.floor(attack_value/4);
 		}
-		return crit;
+		return crit_mod;
+	}
+
+	// calculate critical damage for a weapon based on character feats and skills
+	getCritDamageMod() {
+		var crit_mod = 0;
+		if (hasTalent("Improved Critical Hit")) {
+			var attack_value = 0;
+			for (var i in userTrainings) {
+				if (userTrainings[i].name == this.attack_attribute) {
+					attack_value += userTrainings[i].value;
+				}
+			}
+			attack_value += this.type == "Melee" ? parseInt(user.agility) : parseInt(user.precision_);
+			attack_value = attack_value > 12 ? 12 : attack_value;
+			crit_mod += Math.floor(attack_value/4);
+		}
+		// set minimum crit mod damage to 1
+		crit_mod = crit_mod == 0 ? 1 : crit_mod;
+		return crit_mod;
 	}
 
 	// calculate damage mod based on character attributes

@@ -152,6 +152,7 @@
     id int PRIMARY KEY AUTO_INCREMENT,
     name varchar(64),
     type varchar(64),
+    attack_attribute varchar(255),
     quantity varchar(64),
     damage int,
     max_damage int,
