@@ -1895,7 +1895,7 @@ class UserWeapon {
 
 	// calculate critical damage for a weapon based on character feats and skills
 	getCritDamageMod() {
-		var crit_mod = 0;
+		var crit_mod = 1;
 		if (hasTalent("Improved Critical Hit")) {
 			var attack_value = 0;
 			for (var i in userTrainings) {
@@ -1907,8 +1907,6 @@ class UserWeapon {
 			attack_value = attack_value > 12 ? 12 : attack_value;
 			crit_mod += Math.floor(attack_value/4);
 		}
-		// set minimum crit mod damage to 1
-		crit_mod = crit_mod == 0 ? 1 : crit_mod;
 		return crit_mod;
 	}
 

@@ -51,7 +51,7 @@
 	$login_data = [];
 	$login_campaigns = [];
 	$login_ids = [];
-	$sql = "SELECT * FROM login WHERE 1 ORDER BY email ASC";
+	$sql = "SELECT * FROM login WHERE confirmed = 1 ORDER BY email ASC";
 	$result_1 = $db->query($sql);
 	if ($result_1) {
 		while($row = $result_1->fetch_assoc()) {
@@ -1762,7 +1762,7 @@
 	});
 
 	$(".active-chk").on("change", function() {
-		let login_id = $("#login_id").val();
+		let login_id = this.id.split("select_")[1];
 		let campaign_id = $("#campaign_id").val();
 		if ($(this).is(":checked")) {
 			// insert login_campaign
@@ -1772,7 +1772,6 @@
 				ContentType: "application/json",
 				type: 'POST',
 				success: function(response) {
-					// console.log(response);
 					let login_campaign = {'id':response, 'campaign_id':campaign_id, 'login_id':login_id};
 					login_campaigns.push(login_campaign);
 					updateTables();
@@ -2162,8 +2161,11 @@
 
 	// save settings on input change
 	$(document).ready(function() {
-		$("input:checkbox").change(function(){
-			// TODO enable writing individual changes to database
+		$("input:checkbox").change(function() {
+			if ($(this).hasClass("active-chk")) {
+				return;
+			}
+			// TODO enable writing individual changes to database?
 			saveCampaignSettings();
 		});
 	});
