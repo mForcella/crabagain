@@ -816,22 +816,23 @@
 							}
 						}
 
-						// get resilience
-						$resilience = $user['fortitude'] >= 0 ? 
-								3 + floor($user['fortitude']/2) :
-								3 + ceil($user['fortitude']/3);
-
-						// get damage and wounds
-						$damage = $user['damage'];
-						$wounds = 0;
-						// TODO possible timeout error
-						while ($damage >= $resilience) {
-							$wounds += 1;
-							$damage -= $resilience;
-						}
-
 						// get size modifier
 						$size_modifier = $user['size'] == "Small" ? 2 : ($user['size'] == "Large" ? -2 : 0);
+
+						// get resilience
+						// $fortitude = $user['fortitude'] - $size_modifier;
+
+						// $resilience = $fortitude >= 0 ? 
+						// 		3 + floor($fortitude/2) :
+						// 		3 + ceil($fortitude/3);
+
+						// get damage and wounds
+						// $damage = $user['damage'];
+						// $wounds = 0;
+						// while ($damage >= $resilience) {
+						// 	$wounds += 1;
+						// 	$damage -= $resilience;
+						// }
 
 						// get dodge
 						$dodge = $user['agility'] >= 0 ?
@@ -855,7 +856,7 @@
 
 						echo 
 						"<tr class='table-row user-row'>
-							<td class='name-row'><a href='/?campaign=".$campaign['id']."&user=".$user['id']."'><strong>".$user['character_name']."</strong></a></td>
+							<td class='name-row highlight-hover'><a href='/?campaign=".$campaign['id']."&user=".$user['id']."'><strong>".$user['character_name']."</strong></a></td>
 							<td id='xp_".$user['id']."'>"
 							.$user['xp']
 							.($user['xp_award'] == 0 ? 
@@ -865,8 +866,8 @@
 									: ' ('.$user['xp_award'].')'))
 							."</td>
 							<td id='level_".$user['id']."'>".$level."</td>
-							<td><input class='short-input form-control' id='damage_".$user['id']."' min='0' type='number' value='".$damage."'> / ".$resilience."</td>
-							<td><input class='short-input form-control' id='wounds_".$user['id']."' max='3' min='0' type='number' value='".$wounds."'> / 3</td>
+							<td id='damage_".$user['id']."'></td>
+							<td id='wounds_".$user['id']."'></td>
 							<td>".$user['primary']."/".$user['secondary']."</td>
 							<td>".$toughness.($user['toughness_bonus'] > 0 ? ' (+'.$user['toughness_bonus'].')' : '')."</td>
 							<td>".$defend.($user['defend_bonus'] > 0 ? ' (+'.$user['defend_bonus'].')' : '')."</td>
@@ -2168,6 +2169,41 @@
 			// TODO enable writing individual changes to database?
 			saveCampaignSettings();
 		});
+
+		updateWounds();
+
+		// reload damage/wounds every 30 seconds
+		setInterval(function(){
+		    updateWounds()
+		}, 30000)
 	});
+
+	// get updated damage/wound values for players
+	function updateWounds() {
+		$.ajax({
+			url: '/scripts/update_wounds.php',
+			data: { 'campaign_id' : $("#campaign_id").val() },
+			ContentType: "application/json",
+			type: 'POST',
+			success: function(response) {
+				let users = JSON.parse(response);
+				for (var i in users) {
+					// check for size modifier
+					let fortitude = users[i]['size'] == "Small" ? users[i]['fortitude'] - 2 : (users[i]['size'] == "Large" ? parseInt(users[i]['fortitude']) + 2 : users[i]['fortitude'] );
+					let resilience = fortitude >= 0 ? 3 + Math.floor(fortitude / 2) : 3 - Math.ceil(fortitude / 3);
+					let damage = users[i]['damage'];
+					var wounds = 0;
+					while (damage >= resilience) {
+						wounds += 1;
+						damage -= resilience;
+					}
+					let user_id = users[i]['id'];
+					$("#damage_"+user_id).html(damage + " / " + resilience);
+					$("#wounds_"+user_id).html(wounds + " / 3");
+				}
+			}
+		});
+	}
+
 
 </script>

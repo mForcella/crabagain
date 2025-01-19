@@ -45,6 +45,10 @@
 		}
 	}
 
+	// delete any accounts that have been unconfirmed for a week
+	$sql = "DELETE FROM login WHERE confirmed = 0 AND created_at < now() - INTERVAL 7 DAY";
+	$db->query($sql);
+
 	// make sure campaign id variables are valid - redirect to select campaign if not
 	$campaign_id = $_GET["campaign"];
 	$sql = "SELECT * FROM campaign WHERE id = $campaign_id";
@@ -906,7 +910,8 @@
 							<div class="row">
 								<div class="col-xs-5 no-pad">
 									<?php 
-										$resilience = $user['fortitude'] >= 0 ? 3 + floor($user['fortitude']/2) : 3 + ceil($user['fortitude']/3);
+										$fortitude = $user['size'] == "Small" ? $user['fortitude'] - 2 : ( $user['size'] == "Large" ? $user['fortitude'] + 2 : $user['fortitude'] );
+										$resilience = $fortitude >= 0 ? 3 + floor($fortitude/2) : 3 + ceil($fortitude/3);
 										$damage = $user['damage'] != null ? $user['damage'] : 0;
 										$wounds = 0;
 										while ($damage >= $resilience) {
