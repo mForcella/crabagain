@@ -124,6 +124,17 @@
 			}
 			$user['defend_bonus'] = $defend_bonus;
 
+			// get list of talents/traits
+			$sql = "SELECT user_feat.name FROM user_feat JOIN feat_or_trait ON user_feat.feat_id = feat_or_trait.id WHERE user_id = ".$user["id"]." AND type NOT IN ('social_background','profession')";
+			$result = $db->query($sql);
+			$talents = [];
+			if ($result) {
+				while($row = $result->fetch_assoc()) {
+					array_push($talents, $row['name']);
+				}
+			}
+			$user['talents'] = $talents;
+
 			// check for user feat Lightning Reflexes
 			$sql = "SELECT count(*) as count FROM user_feat WHERE user_id = ".$user["id"]." AND LOWER(name) = 'lightning reflexes'";
 			$result = $db->query($sql);
@@ -154,6 +165,17 @@
 								$user['dodge_mod'] += floor($row['value']/2);
 							}
 						}
+					}
+				}
+			}
+
+			// check for user feat Keen Senses
+			$sql = "SELECT count(*) as count FROM user_feat WHERE user_id = ".$user["id"]." AND LOWER(name) = 'keen senses'";
+			$result = $db->query($sql);
+			if ($result) {
+				while($row = $result->fetch_assoc()) {
+					if ($row['count'] > 0) {
+							$user['ks'] = true;
 					}
 				}
 			}
@@ -485,7 +507,7 @@
 	.base-award-label {
 		font-size: 16px;
 	}
-	#xp_modal .modal-content, #edit_players_modal .modal-content {
+	#xp_modal .modal-content, #edit_players_modal .modal-content, #talents_modal .modal-content {
 		background-color: #cccccc;
 	}
 	#xp_modal .note {
@@ -661,6 +683,7 @@
 	}
 	.name-row {
 		max-width: 164px;
+		text-align: left;
 	}
 	.mobile-name-row {
 		display: none;
@@ -686,6 +709,10 @@
 	}
 	.col-req {
 		min-width: 150px;
+	}
+	sup {
+		font-size: 0.6em;
+		margin-left: 1px;
 	}
 
 	/*@media (max-width: 868px) {
@@ -778,6 +805,7 @@
 		<div class="panel panel-default <?php if(count($users) == 0) { echo 'hidden'; } ?> ">
 			<table class="table user-table center">
 				<tr>
+					<th></th>
 					<th class="name-row"></th>
 					<th>XP</th>
 					<th>Lvl</th>
@@ -856,7 +884,8 @@
 
 						echo 
 						"<tr class='table-row user-row'>
-							<td class='name-row highlight-hover'><a href='/?campaign=".$campaign['id']."&user=".$user['id']."'><strong>".$user['character_name']."</strong></a></td>
+							<td class='highlight-hover pointer show-talents' id='talents_".$user['id']."'><i class='fa-solid fa-trophy'></i></td>
+							<td class='name-row highlight-hover'></i> <a href='/?campaign=".$campaign['id']."&user=".$user['id']."'><strong>".$user['character_name']."</strong></a></td>
 							<td id='xp_".$user['id']."'>"
 							.$user['xp']
 							.($user['xp_award'] == 0 ? 
@@ -872,7 +901,7 @@
 							<td>".$toughness.($user['toughness_bonus'] > 0 ? ' (+'.$user['toughness_bonus'].')' : '')."</td>
 							<td>".$defend.($user['defend_bonus'] > 0 ? ' (+'.$user['defend_bonus'].')' : '')."</td>
 							<td>".$dodge."</td>
-							<td>".$user['awareness']."</td>
+							<td>".$user['awareness'].(isset($user['ks']) && $user['ks'] == true ? '<sup>KS</sup>' : '')."</td>
 							<td>".$user['vitality']."</td>
 						</tr>";
 					}
@@ -1429,6 +1458,25 @@
 		    	</div>
 		    </div>
 		  </div>
+		</div>
+	</div>
+
+	<!-- talents modal -->
+	<div class="modal" id="talents_modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">Talents and Traits</h4>
+				</div>
+				<div class="modal-body">
+
+					<div id="talents"></div>
+
+					<div class="button-bar">
+						<button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 
@@ -2031,6 +2079,29 @@
 	$("#xp_modal").on('shown.bs.modal', function(){
 		scrollToTop();
 	});
+
+	$(".show-talents").on("click", function() {
+		// get user ID
+		let user_id = this.id.split("talents_")[1];
+		showTalents(user_id);
+	});
+
+	function showTalents(user_id) {
+		// get user talents
+		for (var i in users) {
+			if (users[i]['id'] == user_id) {
+				talents = users[i]['talents'];
+				// launch talents modal
+				$("#talents").html("");
+				for (var j in talents) {
+					$('<p />', {
+						'html': talents[j]
+					}).appendTo($("#talents"));
+				}
+				$("#talents_modal").modal("show");
+			}
+		}
+	}
 
 	// add award val to modal inputs
 	function awardXP() {
