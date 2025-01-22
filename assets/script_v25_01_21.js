@@ -410,6 +410,18 @@ function GMEditMode() {
 	toggleMenu();
   	$(".gm-menu").toggleClass("active");
 	$(".glyphicon-menu-hamburger").hide().toggleClass("active");
+	$(".lock-status").hide();
+	$(".lock-status-open").show();
+	$("#can_edit").val(1);
+
+	// enable editing other inputs, etc
+	$(".track-changes").attr("readonly", false);
+	$(".motivator-pts").attr("readonly", false);
+	$("select").attr("disabled", false);
+	$(".modal-body textarea").attr("readonly", false);
+	$(".modal-body input").attr("readonly", false);
+	$(".modal-body select").attr("disabled", false);
+	$(".glyphicon-plus-sign").attr("data-toggle", "modal");
 
 	// show hidden attribute icons
 	$(".attribute-col").find(".hidden-icon").each(function() {
@@ -448,6 +460,19 @@ function endGMEdit() {
 		$(this).hide();
 	});
 	$("#xp").attr("readonly", true).attr("type", "").attr("data-toggle", "modal");
+	$(".lock-status").show();
+	$(".lock-status-open").hide();
+	$("#can_edit").val(0);
+
+	// disable inputs, etc
+	$(".track-changes").attr("readonly", true);
+	$(".motivator-pts").attr("readonly", true);
+	$("select").attr("disabled", true);
+	$(".modal-body textarea").attr("readonly", true);
+	$(".modal-body input").attr("readonly", true);
+	$(".modal-body select").attr("disabled", true);
+	$(".glyphicon-plus-sign").attr("data-toggle", null);
+	$("#user_select").attr("disabled", false);
 
 	// add hover functions back to edit buttons
 	if (characterCreation) {
@@ -745,6 +770,9 @@ $("#morale").on("input change", function() {
 // TODO can simplify these rules now that damage increase/decrease is always 1
 // damage adjustment button functions
 function adjustResilience(val) {
+	if ($("#can_edit").val() == 0) {
+		return;
+	}
 	if (parseInt($("#damage").val()) + parseInt(val) < $("#damage").attr("min")) {
 		return;
 	}

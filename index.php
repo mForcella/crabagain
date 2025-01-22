@@ -335,7 +335,8 @@
 	}
 
 	// check if user can edit (always true for campaign admin)
-	$can_edit = $campaign_role == 1 ? 1 : 0;
+	// $can_edit = $campaign_role == 1 ? 1 : 0;
+	$can_edit = 0;
 	$sql = "SELECT id FROM user WHERE login_id = $login_id";
 	$result = $db->query($sql);
   if ($result) {
@@ -376,6 +377,24 @@
 		.login-name .glyphicon:hover {
 			cursor: default;
 		}
+		.fa-lock, .fa-lock-open {
+			position: absolute;
+			top: 20px;
+			left: 20px;
+	    font-size: 3.9rem;
+	    color: white;
+	    z-index: 999;
+	    display: none;
+    	-webkit-text-stroke: 2px black;
+		}
+		.fa-lock path, .fa-lock-open path {
+			stroke: black;
+			stroke-width: 25px;
+			margin-left: -2px;
+		}
+		.fa-lock.locked {
+			display: block;
+		}
 	</style>
 
 </head>
@@ -397,6 +416,10 @@
 	<!-- use div visibility to determine if we're on mobile -->
 	<div id="is_mobile"></div>
 	<div id="is_touchscreen"></div>
+
+  <!-- edit lock status -->
+	<span id="" class="lock-status white fa fa-solid fa-lock <?php echo $can_edit == 1 || $user['is_new'] == true ? '' : 'locked' ?>"></span>
+	<span id="" class="fa lock-status-open white fa-solid fa-lock-open"></span>
 
 	<!-- user menu -->
 	<nav class="navbar">
@@ -1461,7 +1484,7 @@
 										}
 									?>
 								</select>
-			        	<label>Turdiary Motivator (Optional)</label>
+			        	<label>Quaternary Motivator (Optional)</label>
 								<select class="form-control" id="m4" onchange="motivatorCheck(this.id)">
 									<?php 
 										foreach ($motivators as $motivator) {

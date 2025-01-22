@@ -1385,7 +1385,10 @@ function setMotivators() {
 
 		// get point values
 		let val = i == 0 ? 2 : (i == 3 ? 0 : 1);
-		$("#motivator_pts_"+i).val(val);
+		if (!adminEditMode) {
+			// don't update existing motivator points in GM edit mode
+			$("#motivator_pts_"+i).val(val);
+		}
 		$("#motivator_primary_"+i).val(i != 3 ? 1 : 0);
 		motivator['points'] = val;
 		motivator['primary_'] = i != 3 ? 1 : 0;
@@ -1402,7 +1405,7 @@ function setMotivators() {
 			updateDatabaseColumn('user_motivator', 'primary_', motivator['primary_'], userMotivators[i].id);
 		}
 		// insert if userMotivators[i] does not exist and motivator_name is not ""
-		else if (userMotivators[i] == null && motivator_name != "") {
+		else if ((userMotivators[i] == undefined || userMotivators[i] == null) && motivator_name != "") {
 			let userMotivator = new UserMotivator(motivator);
 			userMotivators.push(userMotivator);
 			insertDatabaseObject('user_motivator', userMotivator, userMotivator.getColumns());
@@ -1597,8 +1600,11 @@ function addWeaponElements(weapon) {
 	let div5 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // weight
 	let div2 = createElement('div', 'col-xs-1 no-pad-mobile', div0); // qty
 	let div6 = createElement('div', 'col-xs-1 no-pad-mobile center remove-btn', div); // delete btn
-	let remove = createElement('span', 'glyphicon glyphicon-remove', div6);
-	remove.on("click", function() {
+	let removeBtn = createElement('span', 'glyphicon glyphicon-remove', div6);
+	removeBtn.on("click", function() {
+		if ($("#can_edit").val() == 0) {
+			return;
+		}
 		weapon.delete(id_val);
 	});
 
@@ -2077,6 +2083,9 @@ function addProtectionElements(protection, newProtection) {
 	// add remove button
 	let removeBtn = createElement('span', 'glyphicon glyphicon-remove', div6);
 	removeBtn.on("click", function() {
+		if ($("#can_edit").val() == 0) {
+			return;
+		}
 		protection.delete(id_val);
 	});
 
@@ -2288,6 +2297,9 @@ function addHealingElements(healing) {
 	// add remove button
 	createElement('span', 'glyphicon glyphicon-remove', div5, id_val+"_remove");
 	$("#"+id_val+"_remove").on("click", function() {
+		if ($("#can_edit").val() == 0) {
+			return;
+		}
 		healing.delete(id_val);
 	});
 
@@ -2472,6 +2484,9 @@ function addMiscElements(misc) {
 	// add remove button
 	createElement('span', 'glyphicon glyphicon-remove', div5, id_val+"_remove");
 	$("#"+id_val+"_remove").on("click", function() {
+		if ($("#can_edit").val() == 0) {
+			return;
+		}
 		misc.delete(id_val);
 	});
 
@@ -2621,7 +2636,12 @@ function addNoteElements(note) {
 
 	// enable edit and delete
 	span.click(function() { note.edit(); });
-	remove.click(function() { note.delete(id_val); });
+	remove.click(function() {
+		if ($("#can_edit").val() == 0) {
+			return;
+		}
+		note.delete(id_val);
+	});
 }
 
 class UserNote {
