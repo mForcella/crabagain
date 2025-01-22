@@ -58,32 +58,6 @@
 	$save_sql = "INSERT INTO sql_query (query, source, type, login_id) VALUES ('".addslashes($sql)."', 'feat_submit.php', 'insert', ".$_POST['login_id'].")";
 	$db->query($save_sql);
 
-	// add reqs for standard feats
-	if ($type == "feat") {
-		$reqs = $_POST['feat_reqs'];
-		foreach ($reqs as $req) {
-			$sql = "INSERT INTO feat_or_trait_req_set (feat_id) VALUES (".$feat_id.")";
-			$db->query($sql);
-			$req_set_id = $db->insert_id;
-			$req_parts = explode(" OR ", $req);
-			foreach ($req_parts as $req_part) {
-				$type_and_val = explode(": ", $req_part);
-				// convert req type for db
-				$req_type = $type_and_val[0] == "Precision" ? lcfirst($type_and_val[0])."_" : lcfirst($type_and_val[0]);
-				$sql = "INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (".$req_set_id.", '".$req_type."', '".addslashes($type_and_val[1])."');";
-				$db->query($sql);
-			}
-		}
-		// check for 'character_creation' = true
-		if (isset($_POST['feat_character_create']) && $_POST['feat_character_create'] == 'on') {
-			$sql = "INSERT INTO feat_or_trait_req_set (feat_id) VALUES (".$feat_id.")";
-			$db->query($sql);
-			$req_set_id = $db->insert_id;
-			$sql = "INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (".$req_set_id.", 'character_creation', 'true');";
-			$db->query($sql);
-		}
-	}
-
 	// if campaign has campign_feat entries for current feat type, create new campign_feat entry
 	// $sql = "SELECT count(*) as count FROM campaign_feat JOIN feat_or_trait ON campaign_feat.feat_id = feat_or_trait.id WHERE campaign_id = ".$_POST['campaign_id']." AND type = .".$_POST['feat_type']."'";
 	// $result = $db->query($sql);

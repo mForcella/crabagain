@@ -85,6 +85,9 @@ function setFeatList() {
 								break;
 							case 'character_creation':
 								satisfied = characterCreation;
+								if (!characterCreation) {
+									$("#row_"+feat['id']).addClass("hidden");
+								}
 								break;
 							case 'governing':
 								// get user's governing magic school name and/or value
@@ -156,9 +159,14 @@ function setFeatList() {
 			});
 			if (is_eligible && !eligible_feats.includes(feat) && feat['id'] != undefined) {
 				feat['satisfied'] = true;
+				// update talents table
+				$("#row_"+feat['id']).addClass("bold");
+				$("#satisfied_"+feat['id']).html("YES");
 				eligible_feats.push(feat);
 			} else if (!ineligible_feats.includes(feat) && feat['id'] != undefined) {
 				feat['satisfied'] = false;
+				$("#row_"+feat['id']).removeClass("bold");
+				$("#satisfied_"+feat['id']).html("NO");
 				ineligible_feats.push(feat);
 			}
 		}

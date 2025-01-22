@@ -1505,7 +1505,7 @@
 
 				<!-- section: feats & traits -->
 				<div class="section form-horizontal">
-					<div class="section-title" id="section_feats"><span>Talents & Traits</span> <i class="fa-solid fa-trophy"></i></div>
+					<div class="section-title" id="section_feats"><span class="pointer" data-toggle="modal" data-target="#talents_modal">Talents & Traits <i class="fa-solid fa-trophy"></i></span></div>
 					<div class="form-group">
 						<div class="col-sm-12">
 							<div id="feats">
@@ -2390,6 +2390,78 @@
 	        	<label for="suppress_alert" class="control-label">Yeah, I know, quit bugging me.</label>
 	        	<input type="checkbox" id="suppress_alert">
         	</div>
+        	<div class="button-bar">
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+	<!-- talents modal -->
+  <div class="modal" id="talents_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h4 class="modal-title">Talents!</h4>
+        </div>
+
+        <div class="modal-body">
+
+					<!-- <h4 class="table-heading center">Standard Talents</h4> -->
+					<div class="panel panel-default">
+						<table class="table fixed-width">
+							<tr>
+								<th>Name</th>
+								<th>Description</th>
+								<th class="col-req">Requirements</th>
+								<th>Eligible?</th>
+							</tr>
+							<?php
+								foreach($talents as $talent) {
+									$reqs = "";
+									if ($talent->type == 'standard_talent' && isset($talent->id)) {
+
+										// don't show talents user already has
+										foreach($feats as $user_feat) {
+											if ($user_feat['name'] == $talent->name) {
+												$talent->hidden = true;
+											}
+										}
+
+										// build requirement string
+										foreach($talent->requirements as $req_set) {
+											$reqs .= "<span class='highlight-hover'>";
+											for($i = 0; $i < count($req_set); $i++) {
+												foreach($req_set[$i] as $key => $value) {
+													$reqs .= $i > 0 ? "OR " : "&#8226;";
+													if (is_object($value)) {
+														foreach($value as $k => $v) {
+															$reqs .= $k.": ".$v."<br>";
+														}
+													} else if ($key == "character_creation") {
+														$reqs .= "Character Creation Only"."<br>";
+													} else {
+														$reqs .= str_replace("_", "", ucfirst($key)).": ".$value."<br>";
+													}
+												}
+											}
+											$reqs .= "</span>";
+										}
+										echo 
+										"<tr class='table-row' id='row_".$talent->id."' ".( isset($talent->hidden) ? 'hidden' : '').">
+											<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
+											<td class='highlight-hover'>".$talent->description."</td>
+											<td>".$reqs."</td>
+											<td id='satisfied_".$talent->id."'></td>
+										</tr>";
+									}
+								}
+							?>
+						</table>
+					</div>
+
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
         	</div>

@@ -606,7 +606,7 @@ button.glyphicon {
 .italic {
 	font-style: italic;
 }
-.bold {
+.bold, .bold label {
 	font-weight: bold;
 }
 .left-col {
@@ -760,6 +760,10 @@ ul {
 .penalty {
 	color: red;
 	font-weight: bold;
+}
+.pointer {
+	cursor: pointer;
+	position: relative;
 }
 @media screen and (max-width:767px) {
 	.resize-mobile {

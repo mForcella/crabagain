@@ -53,48 +53,6 @@
 			
 	$save_sql = "INSERT INTO sql_query (query, source, type, login_id) VALUES ('".addslashes($sql)."', 'update_feat.php', 'update', ".$_POST['login_id'].")";
 	$db->query($save_sql);
-	
-	// add reqs for standard feats
-	$feat_id = $_POST['feat_id'];
-	if ($type == "feat") {
-		// delete all current requirements
-		$sql = "SELECT id FROM feat_or_trait_req_set WHERE feat_id = ".$feat_id;
-		$result = $db->query($sql);
-		$req_set_ids = [];
-		if ($result) {
-			while($row = $result->fetch_assoc()) {
-				array_push($req_set_ids, $row['id']);
-			}
-		}
-		$sql = "DELETE FROM feat_or_trait_req WHERE req_set_id IN (".implode(',',$req_set_ids).")";
-		$db->query($sql);
-		$sql = "DELETE FROM feat_or_trait_req_set WHERE feat_id = ".$feat_id;
-		$db->query($sql);
-
-		// create new feat requirements
-		$reqs = $_POST['feat_reqs'];
-		foreach ($reqs as $req) {
-			$sql = "INSERT INTO feat_or_trait_req_set (feat_id) VALUES (".$feat_id.")";
-			$db->query($sql);
-			$req_set_id = $db->insert_id;
-			$req_parts = explode(" OR ", $req);
-			foreach ($req_parts as $req_part) {
-				$type_and_val = explode(": ", $req_part);
-				// convert req type for db
-				$req_type = $type_and_val[0] == "Precision" ? lcfirst($type_and_val[0])."_" : lcfirst($type_and_val[0]);
-				$sql = "INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (".$req_set_id.", '".$req_type."', '".addslashes($type_and_val[1])."');";
-				$db->query($sql);
-			}
-		}
-		// check for 'character_creation' = true
-		if (isset($_POST['feat_character_create']) && $_POST['feat_character_create'] == 'on') {
-			$sql = "INSERT INTO feat_or_trait_req_set (feat_id) VALUES (".$feat_id.")";
-			$db->query($sql);
-			$req_set_id = $db->insert_id;
-			$sql = "INSERT INTO feat_or_trait_req (req_set_id, type, value) VALUES (".$req_set_id.", 'character_creation', 'true');";
-			$db->query($sql);
-		}
-	}
 
 	// return update confirmation
 	echo "update ok";

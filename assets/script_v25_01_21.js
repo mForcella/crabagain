@@ -212,7 +212,7 @@ function updateDatabaseColumn(table, column, value, id) {
 
 // track changes to inputs and autosave to database
 $(".track-changes").on("change", function() {
-	if ($("#can_edit").val() == 0) {
+	if ($("#can_edit").val() == 0 && !characterCreation) {
 		return;
 	}
 	let id = $(this).data("id");

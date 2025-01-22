@@ -321,8 +321,14 @@
 
 	// assign talent ID
 	foreach($talent_list_json as $json) {
+		$json->id = null;
 		foreach($feats as $feat) {
 			if ($feat['name'] == $json->name) {
+				// check if description needs to be updated in database (from json file)
+				if (strcmp($feat['description'], $json->description) !== 0) {
+					$sql = "UPDATE feat_or_trait SET description = '".addslashes($json->description)."' WHERE id = ".$feat['id'];
+					$db->query($sql);
+				}
 				$json->id = $feat['id'];
 				array_push($talents, $json);
 			}
@@ -695,9 +701,6 @@
 	td .min, td.min {
 		min-width: 150px;
 	}
-	.pointer {
-		cursor: pointer;
-	}
 	.btn-primary {
 		margin: 0 10px;
 	}
@@ -713,6 +716,9 @@
 	sup {
 		font-size: 0.6em;
 		margin-left: 1px;
+	}
+	input[type='checkbox'] {
+		cursor: pointer;
 	}
 
 	/*@media (max-width: 868px) {
@@ -2045,6 +2051,14 @@
 	// get feat list and requirements
 	var campaign = <?php echo json_encode($campaign); ?>;
 	var talents = <?php echo json_encode($talents); ?>;
+	for (var i in talents) {
+		if (talents[i]['outdated'] == true) {
+			console.log(talents[i]);
+		}
+		if (talents[i]['id'] == null) {
+			console.log(talents[i]);
+		}
+	}
 	var logins = <?php echo json_encode($logins); ?>;
 	var users = <?php echo json_encode($users); ?>;
 	var login_campaigns = <?php echo json_encode($login_campaigns); ?>;
