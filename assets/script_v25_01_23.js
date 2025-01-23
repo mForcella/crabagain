@@ -139,7 +139,7 @@ $('.btn-resilience').on('mousedown',
 );
 
 function deleteDatabaseObject(table, id) {
-	if ($("#can_edit").val() == 0) {
+	if ($("#can_edit").val() == 0 && !characterCreation) {
 		return;
 	}
 	// console.log("deleteDatabaseObject");
@@ -155,7 +155,7 @@ function deleteDatabaseObject(table, id) {
 }
 
 function insertDatabaseObject(table, object, columns, override=false) {
-	if ($("#can_edit").val() == 0) {
+	if ($("#can_edit").val() == 0 && !characterCreation) {
 		return;
 	}
 	// console.log("insertDatabaseObject");
@@ -178,7 +178,7 @@ function insertDatabaseObject(table, object, columns, override=false) {
 
 // send updated object to database
 function updateDatabaseObject(table, object, columns) {
-	if ($("#can_edit").val() == 0) {
+	if ($("#can_edit").val() == 0 && !characterCreation) {
 		return;
 	}
 	// console.log("updateDatabaseObject");
@@ -195,7 +195,7 @@ function updateDatabaseObject(table, object, columns) {
 
 // send updated value to database
 function updateDatabaseColumn(table, column, value, id) {
-	if ($("#can_edit").val() == 0) {
+	if ($("#can_edit").val() == 0 && !characterCreation) {
 		return;
 	}
 	// console.log("updateDatabaseColumn");
@@ -901,13 +901,14 @@ function editSize(modify_user) {
 	let fortitude_mod = parseInt($("#fortitude_val").val()) + power_mod + age_mod;
 	$("#strength_text").html(strength_mod >= 0 ? "+"+strength_mod : strength_mod);
 	$("#fortitude_text").html(fortitude_mod >= 0 ? "+"+fortitude_mod : fortitude_mod);
+	
 	// check for stealth training
-	for (var i in userTrainings) {
-		if (userTrainings[i]['name'].toLowerCase() == "stealth") {
-			let stealth_mod = parseInt($("#training_"+userTrainings[i]['id']+"_val").val()) - power_mod;
-			$("#training_"+userTrainings[i]['id']+"_text").html(stealth_mod >= 0 ? "+"+stealth_mod : stealth_mod);
-		}
-	}
+	// for (var i in userTrainings) {
+	// 	if (userTrainings[i]['name'].toLowerCase() == "stealth") {
+	// 		let stealth_mod = parseInt($("#training_"+userTrainings[i]['id']+"_val").val()) - power_mod;
+	// 		$("#training_"+userTrainings[i]['id']+"_text").html(stealth_mod >= 0 ? "+"+stealth_mod : stealth_mod);
+	// 	}
+	// }
 
 	// update height dropdown values
 	let height = $("#height").val();
@@ -1343,17 +1344,11 @@ function adjustAttribute(attribute, val) {
 
 	// check for attribute mods
 	var modVal = 0;
-	// check for stealth training
-	var is_stealth = false;
-	for (var i in userTrainings) {
-		if (userTrainings[i]['name'].toLowerCase() == "stealth") {
-			is_stealth = userTrainings[i]['id'] == attribute.split("training_")[1];
-		}
-	}
 
 	// need to check for all attribute mods
 	var size_mod;
 	var age_mod;
+	// var stealth_mod;
 	switch(attribute) {
 		case "strength":
 		case "fortitude":
@@ -1380,10 +1375,19 @@ function adjustAttribute(attribute, val) {
 			age_mod = 0;
 	}
 
+	// check for stealth training
+	// var is_stealth = false;
+	// for (var i in userTrainings) {
+	// 	if (userTrainings[i]['name'].toLowerCase() == "stealth") {
+	// 		is_stealth = userTrainings[i]['id'] == attribute.split("training_")[1];
+	// 		stealth_mod = $("#power_mod").val() == "" ? 0 : parseInt($("#power_mod").val()) * -1;
+	// 	}
+	// }
+
 	let newVal_NoMod = newVal;
 	let originalVal_NoMod = originalVal;
-	newVal = is_stealth ? newVal + (size_mod * -1) : newVal + size_mod + age_mod;
-	originalVal = is_stealth ? originalVal + (size_mod * -1) : originalVal + size_mod + age_mod;
+	newVal = newVal + size_mod + age_mod;
+	originalVal = originalVal + size_mod + age_mod;
 
 	// check if we are allocating attribute points
 	if (allocatingAttributePts) {

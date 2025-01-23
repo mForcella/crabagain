@@ -324,9 +324,13 @@
 		$json->id = null;
 		foreach($feats as $feat) {
 			if ($feat['name'] == $json->name) {
-				// check if description needs to be updated in database (from json file)
+				// check for changes to the json file that need to propagate to the database (description, cost, etc)
 				if (strcmp($feat['description'], $json->description) !== 0) {
 					$sql = "UPDATE feat_or_trait SET description = '".addslashes($json->description)."' WHERE id = ".$feat['id'];
+					$db->query($sql);
+				}
+				if (isset($json->cost) && $feat['cost'] != $json->cost) {
+					$sql = "UPDATE feat_or_trait SET cost = $json->cost WHERE id = ".$feat['id'];
 					$db->query($sql);
 				}
 				$json->id = $feat['id'];
@@ -720,6 +724,9 @@
 	input[type='checkbox'] {
 		cursor: pointer;
 	}
+	.pointer.feat-description {
+/*		cursor: url('assets/image/edit-icon.png'), auto;*/
+	}
 
 	/*@media (max-width: 868px) {
 		.name-row, .select-row {
@@ -1010,7 +1017,7 @@
 								"<tr class='table-row' id='row_".$talent->id."'>
 									<td class='center'><input id='check_".$talent->id."' type='checkbox' ".(isset($talent->active) || $total_count == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
 									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
-									<td class='highlight-hover'>".$talent->description."</td>
+									<td class='highlight-hover pointer feat-description' id='description_".$talent->id."'>".$talent->description."</td>
 									<td>".$reqs."</td>
 								</tr>";
 								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
@@ -1062,7 +1069,7 @@
 								"<tr class='table-row' id='row_".$talent->id."'>
 									<td class='center'><input id='check_".$talent->id."' class='magical_talent-check' type='checkbox' ".(isset($talent->active) || $counts['magical_talent_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
 									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
-									<td class='highlight-hover'>".$talent->description."</td>
+									<td class='highlight-hover pointer feat-description' id='description_".$talent->id."'>".$talent->description."</td>
 									<td>".$reqs."</td>
 								</tr>";
 								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
@@ -1114,7 +1121,7 @@
 								"<tr class='table-row' id='row_".$talent->id."'>
 									<td class='center'><input id='check_".$talent->id."' class='martial_arts_talent-check' type='checkbox' ".(isset($talent->active) || $counts['martial_arts_talent_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
 									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
-									<td class='highlight-hover'>".$talent->description."</td>
+									<td class='highlight-hover pointer feat-description' id='description_".$talent->id."'>".$talent->description."</td>
 									<td>".$reqs."</td>
 								</tr>";
 								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
@@ -1150,8 +1157,8 @@
 								"<tr class='table-row' id='row_".$talent->id."'>
 									<td class='center'><input id='check_".$talent->id."' class='physical_trait_pos-check' type='checkbox' ".(isset($talent->active) || $counts['physical_pos_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
 									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
-									<td class='highlight-hover'>".$talent->description."</td>
-									<td class='center highlight-hover'>".$talent->cost."</td>
+									<td class='highlight-hover pointer feat-description' id='description_".$talent->id."'>".$talent->description."</td>
+									<td class='center highlight-hover pointer feat-cost' id='cost_".$talent->id."'>".$talent->cost."</td>
 								</tr>";
 								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
@@ -1186,8 +1193,8 @@
 								"<tr class='table-row' id='row_".$talent->id."'>
 									<td class='center'><input id='check_".$talent->id."' class='physical_trait_neg-check' type='checkbox' ".(isset($talent->active) || $counts['physical_neg_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
 									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
-									<td class='highlight-hover'>".$talent->description."</td>
-									<td class='center highlight-hover'>".(intval($talent->cost)*-1)."</td>
+									<td class='highlight-hover pointer feat-description' id='description_".$talent->id."'>".$talent->description."</td>
+									<td class='center highlight-hover pointer feat-cost' id='cost_".$talent->id."'>".(intval($talent->cost)*-1)."</td>
 								</tr>";
 								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
@@ -1221,7 +1228,7 @@
 								"<tr class='table-row' id='row_".$talent->id."'>
 									<td class='center'><input id='check_".$talent->id."' class='social_trait-check' type='checkbox' ".(isset($talent->active) || $counts['social_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
 									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
-									<td class='highlight-hover'>".$talent->description."</td>
+									<td class='highlight-hover pointer feat-description' id='description_".$talent->id."'>".$talent->description."</td>
 								</tr>";
 								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
@@ -1259,8 +1266,8 @@
 								"<tr class='table-row' id='row_".$talent->id."'>
 									<td class='center'><input id='check_".$talent->id."' class='morale_trait-check' type='checkbox' ".(isset($talent->active) || $counts['morale_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
 									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
-									<td class='highlight-hover'>".$pos_state."</td>
-									<td class='highlight-hover'>".$neg_state."</td>
+									<td class='highlight-hover pointer feat-description' id='description_pos_".$talent->id."'>".$pos_state."</td>
+									<td class='highlight-hover pointer feat-description' id='description_neg_".$talent->id."'>".$neg_state."</td>
 								</tr>";
 								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
@@ -1294,7 +1301,7 @@
 								"<tr class='table-row' id='row_".$talent->id."'>
 									<td class='center'><input id='check_".$talent->id."' class='compelling_action-check' type='checkbox' ".(isset($talent->active) || $counts['compelling_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
 									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
-									<td class='highlight-hover'>".$talent->description."</td>
+									<td class='highlight-hover pointer feat-description' id='description_".$talent->id."'>".$talent->description."</td>
 								</tr>";
 								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
@@ -1328,7 +1335,7 @@
 								"<tr class='table-row' id='row_".$talent->id."'>
 									<td class='center'><input id='check_".$talent->id."' class='profession-check' type='checkbox' ".(isset($talent->active) || $counts['profession_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
 									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
-									<td class='highlight-hover'>".$talent->description."</td>
+									<td class='highlight-hover pointer feat-description' id='description_".$talent->id."'>".$talent->description."</td>
 								</tr>";
 								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
@@ -1362,7 +1369,7 @@
 								"<tr class='table-row' id='row_".$talent->id."'>
 									<td class='center'><input id='check_".$talent->id."' class='social_background-check' type='checkbox' ".(isset($talent->active) || $counts['social_background_count'] == 0 ? 'checked' : '')." name='feat_status[]' value='".$talent->id."'></td>
 									<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
-									<td class='highlight-hover'>".$talent->description."</td>
+									<td class='highlight-hover pointer feat-description' id='description_".$talent->id."'>".$talent->description."</td>
 								</tr>";
 								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
@@ -1464,6 +1471,54 @@
 		    	</div>
 		    </div>
 		  </div>
+		</div>
+	</div>
+
+	<!-- edit talent modal -->
+	<div class="modal" id="edit_talent_modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-md modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">Edit Talent / Trait</h4>
+				</div>
+				<div class="modal-body">
+
+					<input type="hidden" id="talent_id">
+					<input type="hidden" id="edit_type">
+					<h4 id="talent_name" class="center"></h4>
+
+					<div id="description">
+						<label class="control-label">Description</label>
+						<textarea class="form-control" id="description_value" rows=9></textarea>
+					</div>
+
+					<div id="pos_state">
+						<label class="control-label">Positive State</label>
+						<textarea class="form-control" id="pos_state_value" rows=3></textarea>
+					</div>
+
+					<div id="neg_state">
+						<label class="control-label">Negative State</label>
+						<textarea class="form-control" id="neg_state_value" rows=3></textarea>
+					</div>
+
+					<div id="cost">
+						<div class="row">
+							<div class="col-sm-4"></div>
+							<div class="col-sm-4">
+								<label class="control-label" id="cost_label">Cost</label>
+								<input type="number" class="form-control" id="cost_value" min="1"></input>
+							</div>
+							<div class="col-sm-4"></div>
+						</div>
+					</div>
+
+					<div class="button-bar">
+						<button type="button" class="btn btn-primary" onclick="updateTalent()">Update Talent</button>
+						<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 
@@ -2051,14 +2106,6 @@
 	// get feat list and requirements
 	var campaign = <?php echo json_encode($campaign); ?>;
 	var talents = <?php echo json_encode($talents); ?>;
-	for (var i in talents) {
-		if (talents[i]['outdated'] == true) {
-			console.log(talents[i]);
-		}
-		if (talents[i]['id'] == null) {
-			console.log(talents[i]);
-		}
-	}
 	var logins = <?php echo json_encode($logins); ?>;
 	var users = <?php echo json_encode($users); ?>;
 	var login_campaigns = <?php echo json_encode($login_campaigns); ?>;
@@ -2069,6 +2116,9 @@
 		if (talents[i]['type'] == 'standard_talent') {
 			feats.push(talents[i]['name']);
 		}
+		// if (talents[i]['outdated'] == true) {
+		// 	console.log(talents[i]);
+		// }
 	}
 	$("#feat_val").autocomplete({
 		source: feats,
@@ -2094,6 +2144,123 @@
 		scrollToTop();
 	});
 
+	// edit talent/trait description
+	$(".feat-description").on("click", function() {
+		// get talent ID
+		let talent_id = this.id.split("description_")[1];
+		// check for morale traits
+		if (talent_id.includes("pos_")) {
+			talent_id = talent_id.split("pos_")[1];
+		}
+		if (talent_id.includes("neg_")) {
+			talent_id = talent_id.split("neg_")[1];
+		}
+		editTalent(talent_id, 'description');
+	});
+
+	// edit talent/trait description
+	$(".feat-cost").on("click", function() {
+		// get talent ID
+		let talent_id = this.id.split("cost_")[1];
+		editTalent(talent_id, 'cost');
+	});
+
+	function editTalent(talent_id, type) {
+		for (var i in talents) {
+			if (talents[i]['id'] == talent_id) {
+				// set name and ID
+				$("#talent_id").val(talent_id);
+				$("#edit_type").val(type);
+				$("#talent_name").html(talents[i]['name']);
+				// check edit type
+				if (type == "description") {
+					// hide cost inputs
+					$("#cost").hide();
+					// get talent description
+					let description = talents[i]['description'];
+					if (description.includes("Positive State:")) {
+						// TODO make sure ';' is not allowed in description
+						let pos_val = description.split(";")[0].split("Positive State: ")[1];
+						let neg_val = description.split("; Negative State: ")[1];
+						$("#description").hide();
+						$("#pos_state").show();
+						$("#neg_state").show();
+						$("#pos_state_value").val(pos_val);
+						$("#neg_state_value").val(neg_val);
+					} else {
+						$("#description").show();
+						$("#pos_state").hide();
+						$("#neg_state").hide();
+						$("#description_value").val(description);
+					}
+				} else if (type == "cost") {
+					// hide description inputs
+					$("#description").hide();
+					$("#pos_state").hide();
+					$("#neg_state").hide();
+					$("#cost").show();
+					$("#cost_value").val(talents[i]['cost'] < 0 ? talents[i]['cost'] * -1 : talents[i]['cost']);
+					$("#cost_label").html(talents[i]['cost'] < 0 ? "Bonus" : "Cost");
+				}
+				$("#edit_talent_modal").modal("show");
+			}
+		}
+	}
+
+	// update a talent description
+	function updateTalent() {
+		// confirm update
+		let conf = confirm("Are you sure you want to update this talent?");
+		if (conf) {
+			// get talent ID and description
+			let talent_id = $("#talent_id").val();
+			// check edit type
+			let edit_type = $("#edit_type").val();
+			var description;
+			var cost;
+			if (edit_type == 'description') {
+				if ($("#description_value").is(":hidden")) {
+					description = "Positive State: " + $("#pos_state_value").val() + "; Negative State: " + $("#neg_state_value").val();
+				} else {
+					description = $("#description_value").val();
+				}
+				// edit talent json array
+				for (var i in talents) {
+					if (talents[i]['id'] == talent_id) {
+						talents[i]['description'] = description;
+					}
+				}
+			} else if (edit_type == 'cost') {
+				cost = $("#cost_value").val();
+				// edit talent json array
+				for (var i in talents) {
+					if (talents[i]['id'] == talent_id) {
+						talents[i]['cost'] = $("#cost_label").html() == "Bonus" ? cost * -1 : cost;
+					}
+				}
+			}
+
+			// write new json array to file
+			$.ajax({
+				url: '/scripts/update_talents.php',
+				data: { 'talents' : talents },
+				ContentType: "application/json",
+				type: 'POST',
+				success: function(response) {
+					// update talent table row
+					if (edit_type == 'description') {
+						$("#description_"+talent_id).html(description);
+					} else {
+						$("#cost_"+talent_id).html(cost < 0 ? cost * -1 : cost);
+					}
+				}
+			});
+		}
+		// dismiss modal
+		$("#edit_talent_modal").modal("hide");
+	}
+
+	// show user talents/traits list
 	$(".show-talents").on("click", function() {
 		// get user ID
 		let user_id = this.id.split("talents_")[1];

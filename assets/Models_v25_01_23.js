@@ -1094,10 +1094,10 @@ function addTrainingElements(training, skillType) {
 	}).appendTo(label_right);
 
 	// check if new training is stealth, look for size mod
-	if (training.name.toLowerCase() == "stealth" && $("#power_mod").val() != "") {
-		let stealth_mod = parseInt(training.value) - parseInt($("#power_mod").val());
-		text.html(stealth_mod >= 0 ? "+"+stealth_mod : stealth_mod);
-	}
+	// if (training.name.toLowerCase() == "stealth" && $("#power_mod").val() != "") {
+	// 	let stealth_mod = parseInt(training.value) - parseInt($("#power_mod").val());
+	// 	text.html(stealth_mod >= 0 ? "+"+stealth_mod : stealth_mod);
+	// }
 
 	createInput('', 'hidden', 'training[]', training.name+":"+training.attribute_group, label_right, id_val+"_name");
 	createInput('', 'hidden', 'training_val[]', training.value == '' ? 0 : training.value, label_right, id_val+"_val");
