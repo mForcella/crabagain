@@ -15,33 +15,25 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "2",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Addicted",
         "description": "You have a vice that you can't seem to escape. You may choose one vice when this taken (i.e. alcohol, tobacco, gambling, sex, etc.), and may take this multiple times for multiple vices at the GM's discretion. Any time this vice is available to you, you must succeed a minimum Vitality roll DL 10 to resist. If you go a session without your vice, you receive a cumulative -1 penalty to Morale, up to -4 maximum.",
         "type": "compelling_action",
-        "cost": "-2",
-        "id": "76",
-        "active": "true"
+        "cost": "-2"
     },
     {
         "name": "All Thumbs",
         "description": "A mishap occurs on a Fate 1 or 2 when using technology.",
         "type": "physical_trait",
-        "cost": "-2",
-        "id": "46",
-        "active": "true"
+        "cost": "-2"
     },
     {
         "name": "Ambidexterity",
         "description": "You negate your -2 off-hand penalty.",
         "type": "physical_trait",
-        "cost": "2",
-        "id": "34",
-        "active": "true"
+        "cost": "2"
     },
     {
         "name": "Anatomical Warfare",
@@ -59,9 +51,7 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "24",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Arcane Blood",
@@ -74,15 +64,13 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "88"
+        "cost": "4"
     },
     {
         "name": "Archaeologist",
         "description": "You have studied and taught ancient civilizations and cultures of South America at world renowned Universities and are one of the best in your field. You can identify artifacts and structures of all known societies in South America and can make educated guesses about the purpose and nature of unknown ones. You can translate ancient writing from all known past civilizations in South American and may attempt translation of unknown ones. Archaeology must be learned under Intellect.",
         "type": "profession",
-        "cost": "0",
-        "id": "70"
+        "cost": "0"
     },
     {
         "name": "Arterial Bleeding",
@@ -100,25 +88,19 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "25",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Ascetic",
         "description": "You view the accumulation of wealth and the enjoyment of luxuries as bad for the soul. As such, you will avoid these things and must succeed a minimum Vitality roll DL 10 in order to receive money you don't need and enjoy activities or items that could be considered indulgent or unnecessary.",
         "type": "compelling_action",
-        "cost": "-2",
-        "id": "77",
-        "active": "true"
+        "cost": "-2"
     },
     {
         "name": "Bad Luck",
         "description": "A mishap occurs on a Fate 1 or 2.",
         "type": "physical_trait",
-        "cost": "-6",
-        "id": "47",
-        "active": "true"
+        "cost": "-6"
     },
     {
         "name": "Battle Fury",
@@ -134,17 +116,13 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "9",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Beautiful",
         "description": "+2 Charisma when sexuality is relevant.",
         "type": "physical_trait",
-        "cost": "4",
-        "id": "35",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Blood Magic",
@@ -176,8 +154,7 @@
             ]
         ],
         "type": "magic_talent",
-        "cost": "4",
-        "id": "116"
+        "cost": "4"
     },
     {
         "name": "Bond of Friendship",
@@ -203,16 +180,13 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "23",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Botanist\/Herbalist",
         "description": "Whether through academia or indigenous knowledge, you know the plants of the Amazon better than most. You can identify any Amazonian plants with a DL 10 or less, and as long as you are in or near the Amazon, you can find any plant from the Drug\/Poison Ingredients Lists once per day of travel without making a roll. Additionally, even if fail a roll or you are outside of the Amazon, a DL 15 will identify likely properties of any plants you encounter. Herbalism can be learned under Intuition or Intellect.",
         "type": "profession",
-        "cost": "0",
-        "id": "71"
+        "cost": "0"
     },
     {
         "name": "Brutal Throw",
@@ -233,75 +207,61 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "19",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Cartographer",
         "description": "The Cartographer is a master of maps and geography. You can create detailed maps of any area you have traveled through with impressive accuracy (DL 14). Additionally, if you have a map of an unexplored area, you can never become lost and can also roll Cartography without a map to attempt to find your direction (DL 10). Cartography can be learned under Awareness or Innovation.",
         "type": "profession",
-        "cost": "0",
-        "id": "72"
+        "cost": "0"
     },
     {
         "name": "Celebrity",
         "description": "Positive State: You gained 2 Renown last Session.; Negative State: You didn't gain any Renown last Session.",
         "type": "morale_trait",
-        "cost": "0",
-        "id": "58"
+        "cost": "0"
     },
     {
         "name": "Clumsy",
         "description": "A mishap occurs on a Fate 1 or 2 on movement-related rolls.",
         "type": "physical_trait",
-        "cost": "-4",
-        "id": "48",
-        "active": "true"
+        "cost": "-4"
     },
     {
         "name": "Courtier",
         "description": "You weren't rich, but you lived a wealthy life on the coattails of others, mainly by kissing the right asses and knowing how to manipulate your superiors. You gain 3 Bonus Skill Points to place in Diplomacy, Seduce or Sense Motive Focuses. You are Literate and gain 1d4 additional starting funds.",
         "type": "social_background",
-        "cost": "0",
-        "id": "104"
+        "cost": "0"
     },
     {
         "name": "Cowboy",
         "description": "You made your living on the range, and you had a way with Horses beyond mere training and commands. But you were at it all for a bit too long, and the tedium got to you. Now it's time to mosey on. Any time you encounter a Horse, wild or domestic, you can attempt to Tame it using your Intuition or Allure. The DL is determined by the GM, based on your relationship to the Horse as well as the Horses' relationship to their owner (if they have one). The maximum DL is 14. You gain the Ride Animal Skill and may use Train Animal on Horses only.",
         "type": "social_background",
-        "cost": "0",
-        "id": "133",
-        "active": "true"
+        "cost": "0"
     },
     {
         "name": "Craftsman",
         "description": "You made stuff, and you made it well enough to make a decent living, but never well enough to really get noticed. You gain a +2 Bonus in a single Craft Item Focus and you may apply the Bonus after initial Skill Points have been spent. You are Illiterate.",
         "type": "social_background",
-        "cost": "0",
-        "id": "108"
+        "cost": "0"
     },
     {
         "name": "Criminal",
         "description": "You've got a record, as well as some unscrupulous contacts.",
         "type": "social_trait",
-        "cost": "0",
-        "id": "28"
+        "cost": "0"
     },
     {
         "name": "Curious",
         "description": "You have an extremely difficult time resisting unknown, interesting, and new situations. If you ever wish to avoid such a situation a minimum Vitality roll DL 10 is required unless death seems certain.",
         "type": "compelling_action",
-        "cost": "-2",
-        "id": "78",
-        "active": "true"
+        "cost": "-2"
     },
     {
         "name": "Debt",
         "description": "Starting money is tripled, but you have to pay it back some time.",
         "type": "social_trait",
-        "cost": "0",
-        "id": "29"
+        "cost": "0"
     },
     {
         "name": "Defender",
@@ -314,24 +274,19 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "11",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Definitely Illegal",
         "description": "The frontier was the perfect place to make a living any way possible, and you took full advantage. But now it's time to do something bigger. You know your way around the seedy underbelly of American black markets, illegal businesses, criminal syndicates. Anytime you are in a new town, you can make an appropriate Attribute check to locate such businesses and activities, with a maximum DL of 10. You are fluent in the slang and culture of this world and will not be treated hostilely or with suspicion from such people unless you act in a contradictory way, or as the result of Fate. You gain the Security Skill AND any other Unique Skill of your choosing. You also have Bounty on your head (so watch your back).",
         "type": "social_background",
-        "cost": "0",
-        "id": "136",
-        "active": "true"
+        "cost": "0"
     },
     {
         "name": "Dependent",
         "description": "You have a staunch ally, but they always need something from you.",
         "type": "social_trait",
-        "cost": "0",
-        "id": "30"
+        "cost": "0"
     },
     {
         "name": "Diehard",
@@ -354,9 +309,7 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "10",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Divine Magic",
@@ -374,16 +327,13 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "89"
+        "cost": "4"
     },
     {
         "name": "Double-Jointed",
         "description": "You can always Take a 10 when escaping from bonds.",
         "type": "physical_trait",
-        "cost": "1",
-        "id": "36",
-        "active": "true"
+        "cost": "1"
     },
     {
         "name": "Dual Pistol Master",
@@ -406,9 +356,7 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "13",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Dual Weapon Master",
@@ -431,17 +379,13 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "12",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Dwarf",
         "description": "-1 Size Category.",
         "type": "physical_trait",
-        "cost": "-2",
-        "id": "49",
-        "active": "true"
+        "cost": "-2"
     },
     {
         "name": "Eclectic Knowledge",
@@ -454,9 +398,7 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "7",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Elemental Master",
@@ -469,8 +411,7 @@
             ]
         ],
         "type": "school_talent",
-        "cost": "4",
-        "id": "90"
+        "cost": "4"
     },
     {
         "name": "Elementalist",
@@ -483,8 +424,7 @@
             ]
         ],
         "type": "school_talent",
-        "cost": "4",
-        "id": "93"
+        "cost": "4"
     },
     {
         "name": "Enchanter",
@@ -511,16 +451,14 @@
             ]
         ],
         "type": "magic_talent",
-        "cost": "4",
-        "id": "117"
+        "cost": "4"
     },
     {
         "name": "Energy Weaver",
         "description": "Alfir add half their Ka Bonus to their Caster Level for Ka Magic only.",
         "type": "race_trait",
         "race": "Alfir",
-        "cost": "0",
-        "id": "125"
+        "cost": "0"
     },
     {
         "name": "Ensi",
@@ -533,68 +471,55 @@
             ]
         ],
         "type": "school_talent",
-        "cost": "4",
-        "id": "96"
+        "cost": "4"
     },
     {
         "name": "Ex-Military",
         "description": "You were a career soldier for many years, until that one mission went terribly wrong. Now you make your way as a hired gun, and you know guns well. You ignore Misfire on all weapons and reduce Accuracy penalties by 1. You also begin the game Trained in Demolitions and Tactics.",
         "type": "profession",
-        "cost": "0",
-        "id": "73"
+        "cost": "0"
     },
     {
         "name": "Extrovert",
         "description": "Positive State: A new NPC really likes you.; Negative State: You didn't hang out with any NPC friends.",
         "type": "morale_trait",
-        "cost": "0",
-        "id": "59"
+        "cost": "0"
     },
     {
         "name": "Fancypants",
         "description": "Positive State: You had a new luxury experience this Session.; Negative State: No luxury experience last Session.",
         "type": "morale_trait",
-        "cost": "0",
-        "id": "60"
+        "cost": "0"
     },
     {
         "name": "Focused",
         "description": "You gain an additional +1 on Aim, Ready & Full Round Actions.",
         "type": "physical_trait",
-        "cost": "3",
-        "id": "37",
-        "active": "true"
+        "cost": "3"
     },
     {
         "name": "For the Clan",
         "description": "If the honor or prowess of you or your people is ever questioned or insulted, you are obligated to defend your honor. This may not always lead to a fight, but if the offender is already considered an enemy, it often will. Resisting this desire is always a minimum Vitality roll DL 10 unless engaging would somehow further sully your honor.",
         "type": "compelling_action",
-        "cost": "-2",
-        "id": "79"
+        "cost": "-2"
     },
     {
         "name": "Frail Constitution",
         "description": "You are Unconscious after 3 Levels of Fatigue instead of 4.",
         "type": "physical_trait",
-        "cost": "-3",
-        "id": "129",
-        "active": "true"
+        "cost": "-3"
     },
     {
         "name": "Freed Slave",
         "description": "You were born into slavery but managed to escape from bondage and find freedom in the North. Life still hasn't been easy, but a positive mindset and a cunning mind have kept you safe and content, and you've found a few Northerners you think can trust. Unfortunately, it's also impossible to travel into Confederate lands without a white escort. Negative Morale Effects are reduced 1 Level (i.e. you suffer no effects until -4, and can never suffer the standard -8 Morale Effect). You also gain the Stealth AND Survival Skills.",
         "type": "social_background",
-        "cost": "0",
-        "id": "139",
-        "active": "true"
+        "cost": "0"
     },
     {
         "name": "Frontiersman",
         "description": "You've made a living staking claims, mapping out new territories, hunting, and trapping. The wilderness is your home and you generally prefer it to city-life, but things get lonesome out west, and you know you're destined for bigger things. You can create detailed maps of any area you have travelled through with a DL 14. Additionally, if you have a map of an area, you can never become delayed or lost. You gain the Survival Skill.",
         "type": "social_background",
-        "cost": "0",
-        "id": "132",
-        "active": "true"
+        "cost": "0"
     },
     {
         "name": "Gambler's Luck",
@@ -612,31 +537,25 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "27",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Gamer",
         "description": "Positive State: You won some kind of game this Session.; Negative State: You lost a game last Session.",
         "type": "morale_trait",
-        "cost": "0",
-        "id": "61"
+        "cost": "0"
     },
     {
         "name": "Giant",
         "description": "+1 Size Category.",
         "type": "physical_trait",
-        "cost": "2",
-        "id": "38",
-        "active": "true"
+        "cost": "2"
     },
     {
         "name": "Glutton",
         "description": "Positive State: All of your meals were excessive.; Negative State: None of your meals were decent last Session.",
         "type": "morale_trait",
-        "cost": "0",
-        "id": "62"
+        "cost": "0"
     },
     {
         "name": "Gunslinger",
@@ -659,25 +578,19 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "15",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Hardened",
         "description": "+2 Vitality vs. Fear.",
         "type": "physical_trait",
-        "cost": "2",
-        "id": "39",
-        "active": "true"
+        "cost": "2"
     },
     {
         "name": "Hardy Metabolism",
         "description": "+2 Fortitude vs. Poisons, Drugs and Alcohol.",
         "type": "physical_trait",
-        "cost": "2",
-        "id": "40",
-        "active": "true"
+        "cost": "2"
     },
     {
         "name": "Healer",
@@ -690,46 +603,37 @@
             ]
         ],
         "type": "school_talent",
-        "cost": "4",
-        "id": "98"
+        "cost": "4"
     },
     {
         "name": "High Education",
         "description": "+2 in one Academia Focus area",
         "type": "physical_trait",
-        "cost": "2",
-        "id": "41",
-        "active": "true"
+        "cost": "2"
     },
     {
         "name": "Highborn",
         "description": "Some people find you snooty, but you fit in well with high society.",
         "type": "social_trait",
-        "cost": "0",
-        "id": "31"
+        "cost": "0"
     },
     {
         "name": "Honest",
         "description": "You value truth and honesty, and will rarely lie, especially to a friend or ally. If you ever wish to lie, except in clearly dire situations, you must first succeed a minimum Vitality roll DL 10.",
         "type": "compelling_action",
-        "cost": "-2",
-        "id": "81",
-        "active": "true"
+        "cost": "-2"
     },
     {
         "name": "Honor-bound",
         "description": "If you ever make a promise, you will do your best to never break it. This is doubly so if the recipient is close friend or ally, or someone who has helped you in some way. If you wish to go back on your word, a minimum Vitality roll DL 10 is necessary.",
         "type": "compelling_action",
-        "cost": "-2",
-        "id": "82",
-        "active": "true"
+        "cost": "-2"
     },
     {
         "name": "I Know a Guy",
         "description": "You always run into someone you know, whether you want to or not.",
         "type": "social_trait",
-        "cost": "0",
-        "id": "32"
+        "cost": "0"
     },
     {
         "name": "I've Seen Worse",
@@ -755,9 +659,7 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "6",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Illusionist",
@@ -770,8 +672,7 @@
             ]
         ],
         "type": "school_talent",
-        "cost": "4",
-        "id": "94"
+        "cost": "4"
     },
     {
         "name": "Improved Critical Hit",
@@ -784,32 +685,25 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "20",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Incompetent",
         "description": "You receive another -2 bonus to Untrained Unique Skills.",
         "type": "physical_trait",
-        "cost": "-2",
-        "id": "50",
-        "active": "true"
+        "cost": "-2"
     },
     {
         "name": "Indigent",
         "description": "The slums are home, and it can be hard to fit in anywhere else.",
         "type": "social_trait",
-        "cost": "0",
-        "id": "33"
+        "cost": "0"
     },
     {
         "name": "Insomniac",
         "description": "You suffer a -2 penalty to rest-related rolls, including Healing.",
         "type": "physical_trait",
-        "cost": "-2",
-        "id": "51",
-        "active": "true"
+        "cost": "-2"
     },
     {
         "name": "Inspiring Presence",
@@ -825,17 +719,14 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "22",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Iron Soul",
         "description": "Asgari add half their Soma Bonus to their Caster Level for Soma Magic only.",
         "type": "race_trait",
         "race": "Asgari",
-        "cost": "0",
-        "id": "122"
+        "cost": "0"
     },
     {
         "name": "Jack of All Trades",
@@ -858,9 +749,7 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "8",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Keen Senses",
@@ -873,9 +762,7 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "3",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Lightning Reflexes",
@@ -888,9 +775,7 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "111",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Lord of the Damned",
@@ -923,16 +808,13 @@
             ]
         ],
         "type": "magic_talent",
-        "cost": "4",
-        "id": "119"
+        "cost": "4"
     },
     {
         "name": "Low Pain Tolerance",
         "description": "You receive an additional -1 penalty for Wounds.",
         "type": "physical_trait",
-        "cost": "-3",
-        "id": "52",
-        "active": "true"
+        "cost": "-3"
     },
     {
         "name": "Magic Adept",
@@ -964,8 +846,7 @@
             ]
         ],
         "type": "magic_talent",
-        "cost": "4",
-        "id": "113"
+        "cost": "4"
     },
     {
         "name": "Martial Arts",
@@ -983,9 +864,7 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "101",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Master Shapeshifter",
@@ -1013,8 +892,7 @@
             ]
         ],
         "type": "magic_talent",
-        "cost": "4",
-        "id": "127"
+        "cost": "4"
     },
     {
         "name": "Master of Magic",
@@ -1037,46 +915,39 @@
             ]
         ],
         "type": "magic_talent",
-        "cost": "4",
-        "id": "114"
+        "cost": "4"
     },
     {
         "name": "Master of the Wild",
         "description": "Vanir add half their Avani Bonus to their Caster Level for Avani Magic only.",
         "type": "race_trait",
         "race": "Vanir",
-        "cost": "0",
-        "id": "123"
+        "cost": "0"
     },
     {
         "name": "Medicine Wo\/Man",
         "description": "Through your indigenous knowledge, you know the plants of America better than most. You've chosen to work with the white man because you know that greater evils are at play, and besides... maybe not every white man is a monster. You may choose one region: Mountain, Desert, Coastal or Forest. You can identify any plants with a maximum DL of 10 in your chosen region. Additionally, even if you fail a roll or you are outside of your chosen region, a DL 14 will identify likely properties of any plants you encounter. You also gain the First Aid Skill.",
         "type": "social_background",
-        "cost": "0",
-        "id": "134",
-        "active": "true"
+        "cost": "0"
     },
     {
         "name": "Mentalist",
         "description": "Pangu add half their Nous Bonus to their Caster Level for Nous Magic only.",
         "type": "race_trait",
         "race": "Pangu",
-        "cost": "0",
-        "id": "124"
+        "cost": "0"
     },
     {
         "name": "Merchant",
         "description": "You came from a Merchant family, which meant you worked hard and often to keep yourselves above the peasant masses. You understand people and business well and travelled the world often buying, selling and trading. You gain 3 Bonus Skill Points to place in Appraise, Barter or Languages Focuses. You are Literate and gain 1d4 additional starting funds.",
         "type": "social_background",
-        "cost": "0",
-        "id": "105"
+        "cost": "0"
     },
     {
         "name": "Merrymaker",
         "description": "Positive State: You got drunk this Session.; Negative State: You didn't have any drinks last Session.",
         "type": "morale_trait",
-        "cost": "0",
-        "id": "63"
+        "cost": "0"
     },
     {
         "name": "Metal Master",
@@ -1089,15 +960,13 @@
             ]
         ],
         "type": "school_talent",
-        "cost": "4",
-        "id": "91"
+        "cost": "4"
     },
     {
         "name": "Miracle",
         "description": "Positive State: You used no Alignment Bonuses last Session.; Negative State: You used all Alignment Bonuses last Session.",
         "type": "morale_trait",
-        "cost": "0",
-        "id": "64"
+        "cost": "0"
     },
     {
         "name": "Nature Master",
@@ -1110,8 +979,7 @@
             ]
         ],
         "type": "school_talent",
-        "cost": "4",
-        "id": "92"
+        "cost": "4"
     },
     {
         "name": "Necromancer",
@@ -1134,75 +1002,61 @@
             ]
         ],
         "type": "magic_talent",
-        "cost": "4",
-        "id": "118"
+        "cost": "4"
     },
     {
         "name": "Night Vision",
         "description": "Low Light is Daylight & Night is Low Light.",
         "type": "physical_trait",
-        "cost": "2",
-        "id": "42",
-        "active": "true"
+        "cost": "2"
     },
     {
         "name": "Nobility",
         "description": "You had a posh upbringing that some might consider pampered and indulgent. You're well-read, well-educated and well-traveled. You gain 2 Bonus Skill Points to place in Diplomacy, Academia or Language Focuses. You are Literate and gain 2d4 additional starting funds.",
         "type": "social_background",
-        "cost": "0",
-        "id": "103"
+        "cost": "0"
     },
     {
         "name": "Old Money",
         "description": "Because of your deep pockets and fame, you have befriended (and bribed) people everywhere, but your family (or business) has been trying to cut you out. It's about time to make a name for yourself on your terms. Any time you visit a new town or city you may declare a relationship with an inhabitant. This can be someone of your own creation (with GM approval), or you can declare a relationship to a pre-existing NPC. The quality and nature of the relationship is still at the GM's discretion, but it will never be detrimental to you. Additionally, as long as you have access to a city with a bank, you can withdraw up to $50\/week and double your starting funds.",
         "type": "social_background",
-        "cost": "0",
-        "id": "135",
-        "active": "true"
+        "cost": "0"
     },
     {
         "name": "Pacifist",
         "description": "You value peace and harmony above all else and will do all you can to avoid violent conflict and even aggressive conversation. To resist this desire requires a minimum Vitality roll DL 10 unless you or someone close to you would be in immediate danger.",
         "type": "compelling_action",
-        "cost": "-2",
-        "id": "83",
-        "active": "true"
+        "cost": "-2"
     },
     {
         "name": "Peasant",
         "description": "You broke your body to keep the rich fat and barely enough food in your own belly. You've survived the hardest of times and come out strong for it. You gain 5 Bonus Skill Points to place in Lift, Resist Disease or Craft Item Focuses. You are Illiterate and lose 1d4 starting funds.",
         "type": "social_background",
-        "cost": "0",
-        "id": "109"
+        "cost": "0"
     },
     {
         "name": "Pennypincher",
         "description": "Positive State: You have more than 800 credits\/8 Gold\/$40.; Negative State: You have less than 400 credits\/4 Gold\/$20.",
         "type": "morale_trait",
-        "cost": "0",
-        "id": "65"
+        "cost": "0"
     },
     {
         "name": "Philanderer",
         "description": "Positive State: You had 1 new sexual encounter this Session.; Negative State: No new encounters last Session.",
         "type": "morale_trait",
-        "cost": "0",
-        "id": "66"
+        "cost": "0"
     },
     {
         "name": "Philanthropist",
         "description": "Somehow you got filthy rich, and you've spent most of your money funding the pursuit of the Lost City. Because of your deep pockets and fame, you have bought and befriended people everywhere. Any time you visit a new town or city you may declare a relationship with an inhabitant. This can be someone of your creation, with GM approval, or you can declare a relationship to any pre-existing NPC. The nature and quality of the relationship is still at the GM's discretion. Even after you have done this, you can always name-drop with anyone, which will provide anywhere from a +4 to -4 to any Charisma roll. The bonus\/penalty will be unknown to you until after the roll. Additionally, as long as you have access to a city with a bank, you can withdraw $100\/day.",
         "type": "profession",
-        "cost": "0",
-        "id": "74"
+        "cost": "0"
     },
     {
         "name": "Photographic Memory",
         "description": "If you saw it, you can remember it.",
         "type": "physical_trait",
-        "cost": "4",
-        "id": "43",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Powers of Observation",
@@ -1225,32 +1079,25 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "4",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Professor\/Researcher",
         "description": "Whether in the University, museums or research institutes, you were once well-respected by the few people that knew your name. Unfortunately, your \u201cextra-curricular\u201d research got you into trouble and you've found yourself in need of alternate employment. You may choose one eclectic, academic area as a Focus under Intellect (i.e. American Folklore, Cryptozoology, etc.). This Focus is treated as if you have Eclectic Knowledge if you ever fail a roll, and if you also have Eclectic Knowledge, you double your normal percentile chance. You also gain the Esoteric Knowledge Skill.",
         "type": "social_background",
-        "cost": "0",
-        "id": "130",
-        "active": "true"
+        "cost": "0"
     },
     {
         "name": "Prospector",
         "description": "You travelled west to make your fortune, and things went well for a while, but eventually, your home on the coast called you back for better things. Spending so much time underground had its benefits though. You always know direction in the dark, or when underground, and can identify likely mining areas on a detailed map (even if you have never visited the are) by making an appropriate Attribute roll of DL 10 maximum. You can identify any ores or precious metals, without rolling, and begin with either the Demolitions OR Engineering Skill.",
         "type": "social_background",
-        "cost": "0",
-        "id": "131",
-        "active": "true"
+        "cost": "0"
     },
     {
         "name": "Protector of the Wild",
         "description": "You view yourself as a guardian of wild places. If you ever witness abuse, misuse, or wanton destruction of wild places or animals, you are obliged to intercede in some way. If you wish to resist this compulsion, a minimum Vitality roll DL 10 is necessary.",
         "type": "compelling_action",
-        "cost": "-2",
-        "id": "84"
+        "cost": "-2"
     },
     {
         "name": "Psychic",
@@ -1263,16 +1110,13 @@
             ]
         ],
         "type": "school_talent",
-        "cost": "4",
-        "id": "95"
+        "cost": "4"
     },
     {
         "name": "Quick Healer",
         "description": "You always heal 1 additional Damage than you normally would.",
         "type": "physical_trait",
-        "cost": "4",
-        "id": "44",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Quick and the Dead",
@@ -1295,17 +1139,13 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "112",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Rebel Yell",
         "description": "You don't like being told what to do, how to act, or what you can and cannot say. When this happens, you will often reject the command or suggestion simply for the sake of maintaining your sense of autonomy. To resist this desire requires a minimum Vitality roll DL 10 unless it would put your life at risk, or the life of someone you care about.",
         "type": "compelling_action",
-        "cost": "-2",
-        "id": "80",
-        "active": "true"
+        "cost": "-2"
     },
     {
         "name": "Relentless Defense",
@@ -1333,16 +1173,13 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "102",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Rover",
         "description": "Positive State: You went to a new planet\/region this Session.; Negative State: You stayed in one place last Session.",
         "type": "morale_trait",
-        "cost": "0",
-        "id": "67"
+        "cost": "0"
     },
     {
         "name": "Salty Dog",
@@ -1360,16 +1197,13 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "1",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Scholar",
         "description": "You trained extensively with the most educated minds of your city, tirelessly transcribing texts and reading more books than even the wealthiest minds have consumed. You gain 4 Bonus Skill Points to place in Academia, Culture, Languages or Religion. You are Literate.",
         "type": "social_background",
-        "cost": "0",
-        "id": "106"
+        "cost": "0"
     },
     {
         "name": "Seer",
@@ -1382,8 +1216,7 @@
             ]
         ],
         "type": "school_talent",
-        "cost": "4",
-        "id": "97"
+        "cost": "4"
     },
     {
         "name": "Shapeshifter",
@@ -1414,8 +1247,7 @@
             ]
         ],
         "type": "magic_talent",
-        "cost": "4",
-        "id": "120"
+        "cost": "4"
     },
     {
         "name": "Shapeshifter Adept",
@@ -1433,16 +1265,13 @@
             ]
         ],
         "type": "magic_talent",
-        "cost": "4",
-        "id": "126"
+        "cost": "4"
     },
     {
         "name": "Show Me the Money",
         "description": "Anytime you have an opportunity to barter, gamble or otherwise make money without significant risk, you must do so, unless you succeed a Vitality roll of at least DL 10.",
         "type": "compelling_action",
-        "cost": "-2",
-        "id": "85",
-        "active": "true"
+        "cost": "-2"
     },
     {
         "name": "Silver Tongue",
@@ -1460,33 +1289,25 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "5",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Skittish",
         "description": "-2 Vitality vs. Fear, and an additional -2 when Surprised.",
         "type": "physical_trait",
-        "cost": "-2",
-        "id": "53",
-        "active": "true"
+        "cost": "-2"
     },
     {
         "name": "Slow Healer",
         "description": "You always heal 1 less Damage than you normally would.",
         "type": "physical_trait",
-        "cost": "-3",
-        "id": "54",
-        "active": "true"
+        "cost": "-3"
     },
     {
         "name": "Snake-oil Salesman",
         "description": "Everyone's got to make a living, and if you can give people a good show and some hope in a bottle, who are you to argue? But not everything is smoke and mirrors, and you're determined to find the truth behind the rumors you've heard about otherworldly forces at work in the world - if for no other reason than to monetize real magic. Because you've travelled so much, you know people everywhere, and most of them never want to see you again. Anytime you visit a town or city, you must use a Motivator Bonus to declare yourself unknown, otherwise your bad reputation will precede you. You gain the Sleight of Hand AND Perform Skill.",
         "type": "social_background",
-        "cost": "0",
-        "id": "137",
-        "active": "true"
+        "cost": "0"
     },
     {
         "name": "Sneak Attack",
@@ -1512,52 +1333,43 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "18",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Soldier",
         "description": "You spent some time enlisted in the military, defending your home. You've seen your share of battle, but you're ready for new adventures and some real freedom. You gain a +1 Bonus in Shoot and Attack. You must choose a specific Weapon Type for each Focus and you may apply the Bonus after initial Skill Points have been spent. You are Illiterate.",
         "type": "social_background",
-        "cost": "0",
-        "id": "107"
+        "cost": "0"
     },
     {
         "name": "Soldier\/Lawman",
         "description": "You were a career gunman for many years, and you've seen your fair share of combat and shoot-outs. Eventually, you grew tired of the life you built and ventured out to find new excitement, and maybe make a name for yourself. You know guns better than your own body and may ignore Misfire on all weapons and reduce Accuracy penalties by 1. Unfortunately, you made a lot of enemies along the way, and you are wanted dead or alive by an outlaw gang. You gain the Tactics AND Ride Animal Skills.",
         "type": "social_background",
-        "cost": "0",
-        "id": "138",
-        "active": "true"
+        "cost": "0"
     },
     {
         "name": "Solemn Oath",
         "description": "You have made a promise to an important individual or organization or have sworn vengeance against a person or organization. The oath must be agreed upon with the GM when this is taken and may take multiple Oath's at the GM's discretion. You must pursue this Oath whenever possible, and anything that could be a distraction from fulfilling your Oath, or is in conflict with your Oath, cannot be undertaken without a minimum Vitality roll of DL 10. This is Compelling Action is removed when the Oath is fulfilled.",
         "type": "compelling_action",
-        "cost": "-2",
-        "id": "86"
+        "cost": "-2"
     },
     {
         "name": "Spendthrift",
         "description": "Positive State: You have less than 20 credits\/4 Silver\/$1.; Negative State: You have more than 200 credits\/2 Gold\/$10.",
         "type": "morale_trait",
-        "cost": "0",
-        "id": "68"
+        "cost": "0"
     },
     {
         "name": "Street Rat",
         "description": "You've never had a family to look out for you, and the roof over your head was the sky more often than not. But it made you resilient and creative, and you know how to get along with the wrong kind of people. Any time you are in a town or city you can make an Intuition or Awareness roll to find black market or illegal activities, and these people will never be outright hostile toward you as long as you are alone. You also begin the game Trained in Stealth and either Security OR Sleight of Hand.",
         "type": "profession",
-        "cost": "0",
-        "id": "75"
+        "cost": "0"
     },
     {
         "name": "Street Urchin",
         "description": "You never had a real home and survived off of wit, luck and a lot of illegal activity. You're a survivor and as resourceful as they come. You gain 2 Bonus Skill Points to place in Disguise, Search, Listen or Run Focuses and gain the Security, Stealth or Sleight of Hand Unique Skill for free. You are Illiterate and lose 2d4 starting funds.",
         "type": "social_background",
-        "cost": "0",
-        "id": "110"
+        "cost": "0"
     },
     {
         "name": "Strength of Will",
@@ -1570,17 +1382,13 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "26",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Strong Constitution",
         "description": "You can ignore your first Level of Fatigue.",
         "type": "physical_trait",
-        "cost": "4",
-        "id": "128",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Superhuman",
@@ -1593,8 +1401,7 @@
             ]
         ],
         "type": "school_talent",
-        "cost": "4",
-        "id": "100"
+        "cost": "4"
     },
     {
         "name": "Take Aim",
@@ -1607,9 +1414,7 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "17",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "The Pummeling",
@@ -1627,9 +1432,7 @@
             ]
         ],
         "type": "standard_talent",
-        "cost": "4",
-        "id": "21",
-        "active": "true"
+        "cost": "4"
     },
     {
         "name": "Time Lord",
@@ -1670,16 +1473,13 @@
             ]
         ],
         "type": "magic_talent",
-        "cost": "4",
-        "id": "115"
+        "cost": "4"
     },
     {
         "name": "Tongue-Tied",
         "description": "A mishap occurs on a Fate 1 or 2 on speech-related rolls.",
         "type": "physical_trait",
-        "cost": "-4",
-        "id": "55",
-        "active": "true"
+        "cost": "-4"
     },
     {
         "name": "Tormentor",
@@ -1692,46 +1492,199 @@
             ]
         ],
         "type": "school_talent",
-        "cost": "4",
-        "id": "99"
+        "cost": "4"
     },
     {
         "name": "Unmistakable",
         "description": "Without a proper disguise, you're easy to spot in a crowd.",
         "type": "physical_trait",
-        "cost": "-1",
-        "id": "56",
-        "active": "true"
+        "cost": "-1"
     },
     {
         "name": "Warrior's Code",
         "description": "You value honor in battle above most things. As a result, you will rarely attack an Unaware or unarmed opponent and will attempt to stop or intercede in a fight you see as dishonorable. If you wish to resist this compulsion, a minimum Vitality roll DL 10 is necessary.",
         "type": "compelling_action",
-        "cost": "-2",
-        "id": "87",
-        "active": "true"
+        "cost": "-2"
     },
     {
         "name": "Weak Metabolism",
         "description": "-2 Fortitude vs. Poisons, Drugs and Alcohol.",
         "type": "physical_trait",
-        "cost": "-2",
-        "id": "57",
-        "active": "true"
+        "cost": "-2"
     },
     {
         "name": "Will to Live",
         "description": "You can re-roll a Death Save once per Encounter.",
         "type": "physical_trait",
-        "cost": "2",
-        "id": "45",
-        "active": "true"
+        "cost": "2"
     },
     {
         "name": "Wunderkind",
         "description": "Positive State: You succeeded all rolls last Session.; Negative State: You failed 2 or more rolls last Session.",
         "type": "morale_trait",
-        "cost": "0",
-        "id": "69"
+        "cost": "0"
+    },
+    {
+        "name":"Instant Stand",
+        "description":"If tripped, thrown or knocked down you can roll your Agility to negate the effects, as a Free Action.  In addition, when falling or jumping from extreme heights, you automatically reduce Falling Damage 1 Level for each Level of Martial Arts, up to 5 at Master.",
+        "requirements":[
+            [{"feat":"Martial Arts"}],
+            [{"agility":2}],
+            [{"speed":2}]
+        ],
+        "type":"martial_arts_talent",
+        "cost":4
+    },
+    {
+        "name":"Meditate",
+        "description":"If you have at least 10 full minutes to Meditate, you can focus all of your intention on one particular skill or task.  When you awaken from your meditation you gain a +4 bonus to this skill or task, which stacks with Full Round Action bonuses or taking a 10.  This bonus lasts for 1 hour, or until you use the skill.  In lieu of this, you may Meditate as a form of rest, halving your required sleep if a Vitality roll DL 10 is made.  This may also allow you to roll for healing as if you took a normal rest, but not more than once per day.",
+        "requirements":[
+            [{"feat":"Martial Arts"}],
+            [{"intuition":1}, {"vitality":1}],
+            [{"agility":2}],
+            [{"speed":2}]
+        ],
+        "type":"martial_arts_talent",
+        "cost":4
+    },
+    {
+        "name":"Defensive Throw",
+        "description":"If your opponent misses you with a Melee or Brawl attack, you may use a Free Attack Action, as a Reaction Check, to roll Strength or Agility against your opponent’s Attack roll. If you win the roll, your opponent falls prone, and you can inflict your Unarmed Damage on them if you choose to.",
+        "requirements":[
+            [{"feat":"Martial Arts"}],
+            [{"agility":2}],
+            [{"speed":2}]
+        ],
+        "type":"martial_arts_talent",
+        "cost":4
+    },
+    {
+        "name":"Riposte",
+        "description":"If your opponent misses you with a Melee or Brawl attack, you can make an immediate Standard Action Riposte Attack against them at -1. This only works if you are Unarmed or using a Light Weapon and cannot allow you to go over the 4 Standard Action maximum in a Round. This stacks Dual Weapon Master.",
+        "requirements":[
+            [{"feat":"Martial Arts"}],
+            [{"feat":"Defensive Throw"}],
+            [{"agility":4}],
+            [{"speed":4}]
+        ],
+        "type":"martial_arts_talent",
+        "cost":4
+    },
+    {
+        "name":"Stunning Strike",
+        "description":"You have a deep understanding of pressure points and the soft bits on people. If you make a called shot at +5 DL and hit, regardless of Damage dealt, your opponent must make a Fortitude check vs. your Attack roll or be paralyzed for 1d4 rounds. The target can still speak and breath but cannot use the rest of their body. The DL is further increased by another +5 if Armor is worn by the target.",
+        "requirements":[
+            [{"feat":"Martial Arts"}],
+            [{"vitality":2}],
+            [{"agility":4}],
+            [{"speed":4}]
+        ],
+        "type":"martial_arts_talent",
+        "cost":4
+    },
+    {
+        "name":"Power Strike",
+        "description":"You know how to hit your opponent in such a manner as to render them unconscious.  This is a standard Called Shot to the Head.  If you deal any Damage to their Resilience, the defender must succeed a Fortitude or Strength check against your Attack roll or fall unconscious for 1d4 rounds.",
+        "requirements":[
+            [{"feat":"Martial Arts"}],
+            [{"strength":2}],
+            [{"agility":4}],
+            [{"speed":4}]
+        ],
+        "type":"martial_arts_talent",
+        "cost":4
+    },
+    {
+        "name":"Wisdom of the Ancients",
+        "description":"You rely on your senses during combat just as much as your martial prowess and react before your opponent can even strike.  You now add half your Awareness bonus to Defend, Dodge and Reaction Checks and can no longer be caught Unaware.  If you also have Keen Senses, you can never be Surprised.",
+        "requirements":[
+            [{"feat":"Martial Arts"}],
+            [{"awareness":2}],
+            [{"agility":4}],
+            [{"speed":4}]
+        ],
+        "type":"martial_arts_talent",
+        "cost":4
+    },
+    {
+        "name":"Fists of Stone",
+        "description":"When you Meditate, you may focus power into your fists, making them more powerful and almost invulnerable to damage.  For a single Encounter, or 8 Combat Rounds, you gain +1 Damage and may punch wood, metal or stone with your bare fists without taking damage and can score Critical Hits on these substances. You also increase your Critical Threat Range and Damage against living things by +1.",
+        "requirements":[
+            [{"feat":"Martial Arts"}],
+            [{"feat":"Meditate"}],
+            [{"feat":"Power Strike"}],
+            [{"strength":4}],
+            [{"agility":6}],
+            [{"speed":6}]
+        ],
+        "type":"martial_arts_talent",
+        "cost":4
+    },
+    {
+        "name":"The Way of Wind",
+        "description":"You know how to use your opponent’s strength against them.  Whenever you are attempting trips, throws or knockdowns, you do not have to make an opposed Strength roll, and your opponent instead rolls against your Attack roll.  You may attempt this on bipedal opponents up to 2 sizes larger than you.  Additionally, any time you score a Critical Hit on any Melee or Brawl attack, you score an automatic Knockdown against any target up to 1 Size larger than you. If you also have Improved Critical Hit, this increases to 2 Size categories.",
+        "requirements":[
+            [{"feat":"Martial Arts"}],
+            [{"feat":"Relentless Defense"}],
+            [{"feat":"Defensive Throw"}],
+            [{"intuition":4}],
+            [{"agility":6}],
+            [{"speed":6}]
+        ],
+        "type":"martial_arts_talent",
+        "cost":4
+    },
+    {
+        "name":"Spirit Strike",
+        "description":"Your spirit is your greatest weapon, and it guides your strikes more than your physical prowess.  You now add half your Vitality bonus to all Standard Aim or Ready Actions with Melee and Brawl attacks. Additionally, once per Encounter after Meditating, if you make a Full Round, Unarmed Aim attack, you can add half your Vitality bonus to Damage.",
+        "requirements":[
+            [{"feat":"Martial Arts"}],
+            [{"feat":"Meditate"}],
+            [{"feat":"Stunning Strike"}],
+            [{"vitality":4}],
+            [{"agility":6}],
+            [{"speed":6}]
+        ],
+        "type":"martial_arts_talent",
+        "cost":4
+    },
+    {
+        "name":"Zen Warrior",
+        "description":"You can tap into your raw spirit and unleash a whirlwind of blows upon your enemies.  If you use an Alignment Bonus, each successive Melee or Brawl attack that hits in a Round gains a cumulative +1 Damage, up to a maximum of +8.  This resets after any miss. Alternately, you may use this ability in conjunction with a Full Round Spirit Strike and deal your Damage in 15 x10 ft cone, without touching your opponents.",
+        "requirements":[
+            [{"feat":"Martial Arts"}],
+            [{"feat":"Spirit Strike"}],
+            [{"vitality":6}],
+            [{"agility":8}],
+            [{"speed":8}]
+        ],
+        "type":"martial_arts_talent",
+        "cost":4
+    },
+    {
+        "name":"The Way of Water",
+        "description":"If you use an Alignment Bonus, and declare a Full Round Defense, you ignore all attacks against you for one Round, unless a Natural 20 is rolled.  If a Natural 20 is rolled, it still cannot gain Called Shot bonuses or score a Critical Hit.  If you also have Defender, you can only be hit on an Epic Success, and this is treated as a normal success. You may also use Riposte against each of these attacks, even if this would take you above the 4 Standard Action maximum.",
+        "requirements":[
+            [{"feat":"Martial Arts"}],
+            [{"feat":"The Way of Wind"}],
+            [{"intuition":6}],
+            [{"agility":8}],
+            [{"speed":8}]
+        ],
+        "type":"martial_arts_talent",
+        "cost":4
+    },
+    {
+        "name":"Fists of Fury",
+        "description":"If you make a Called Shot at +5 DL with Fists of Stone and deal at least 1 Damage against your opponent’s Resilience, you force an opposed Strength roll against their Fortitude OR Strength.  If you beat the target by 5 or more, they must save vs. Death. If the target is Unaware you receive +4 to your Strength.  This has no effect on creatures immune to Critical Hits.",
+        "requirements":[
+            [{"feat":"Martial Arts"}],
+            [{"feat":"Fists of Stone"}],
+            [{"strength":6}],
+            [{"agility":8}],
+            [{"speed":8}]
+        ],
+        "type":"martial_arts_talent",
+        "cost":4
     }
 ]

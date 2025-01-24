@@ -1933,9 +1933,9 @@
 	        		if (isset($counts['magic_talent']) && $counts['magic_talent'] > 0) {
 	        			echo '<option id="magic_option" value="magic_talent_name">Magical Talent</option>';
 	        		}
-	        		// if (isset($counts['martial_arts_talent']) && $counts['martial_arts_talent'] > 0) {
-	        		// 	echo '<option id="martial_arts_option" value="martial_arts_talent_name">Martial Arts Talent</option>';
-	        		// }
+	        		if (isset($counts['martial_arts_talent']) && $counts['martial_arts_talent'] > 0) {
+	        			echo '<option id="martial_arts_option" value="martial_arts_talent_name">Martial Arts Talent</option>';
+	        		}
 	        		if (isset($counts['social_background']) && $counts['social_background'] > 0) {
 	        			echo '<option value="social_background_name" '.(count($awards) > 0 ? 'disabled' : '').'>Social Background</option>';
 	        		}
@@ -2409,8 +2409,66 @@
 
         <div class="modal-body">
 
-					<!-- <h4 class="table-heading center">Standard Talents</h4> -->
+        	<!-- standard talents -->
 					<div class="panel panel-default">
+						<table class="table fixed-width">
+							<tr>
+								<th>Name</th>
+								<th>Description</th>
+								<th class="col-req">Requirements</th>
+								<th>Eligible?</th>
+							</tr>
+							<?php
+								$martial_arts_trained = false;
+								foreach($talents as $talent) {
+									$reqs = "";
+									if ($talent->type == 'standard_talent' && isset($talent->id)) {
+
+										// don't show talents user already has
+										foreach($feats as $user_feat) {
+											if ($user_feat['name'] == $talent->name) {
+												$talent->hidden = true;
+											}
+											if ($user_feat['name'] == "Martial Arts") {
+												$martial_arts_trained = true;
+											}
+										}
+
+										// build requirement string
+										foreach($talent->requirements as $req_set) {
+											$reqs .= "<span class='highlight-hover'>";
+											for($i = 0; $i < count($req_set); $i++) {
+												foreach($req_set[$i] as $key => $value) {
+													$reqs .= $i > 0 ? "OR " : "&#8226;";
+													if (is_object($value)) {
+														foreach($value as $k => $v) {
+															$reqs .= $k.": ".$v."<br>";
+														}
+													} else if ($key == "character_creation") {
+														$reqs .= "Character Creation Only"."<br>";
+													} else {
+														$reqs .= str_replace("_", "", ucfirst($key)).": ".$value."<br>";
+													}
+												}
+											}
+											$reqs .= "</span>";
+										}
+										echo 
+										"<tr class='table-row' id='row_".$talent->id."' ".( isset($talent->hidden) ? 'hidden' : '').">
+											<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
+											<td class='highlight-hover'>".$talent->description."</td>
+											<td>".$reqs."</td>
+											<td id='satisfied_".$talent->id."'></td>
+										</tr>";
+									}
+								}
+							?>
+						</table>
+					</div>
+
+					<!-- martial arts talents -->
+					<h4 class="table-heading center" <?php echo $martial_arts_trained && isset($counts['martial_arts_talent']) && $counts['martial_arts_talent'] > 0 ? "" : "hidden" ?> >Martial Arts Talents</h4>
+					<div class="panel panel-default" <?php echo $martial_arts_trained && isset($counts['martial_arts_talent']) && $counts['martial_arts_talent'] > 0 ? "" : "hidden" ?> >
 						<table class="table fixed-width">
 							<tr>
 								<th>Name</th>
@@ -2421,7 +2479,7 @@
 							<?php
 								foreach($talents as $talent) {
 									$reqs = "";
-									if ($talent->type == 'standard_talent' && isset($talent->id)) {
+									if ($talent->type == 'martial_arts_talent' && isset($talent->id)) {
 
 										// don't show talents user already has
 										foreach($feats as $user_feat) {
@@ -2440,8 +2498,58 @@
 														foreach($value as $k => $v) {
 															$reqs .= $k.": ".$v."<br>";
 														}
-													} else if ($key == "character_creation") {
-														$reqs .= "Character Creation Only"."<br>";
+													} else {
+														$reqs .= str_replace("_", "", ucfirst($key)).": ".$value."<br>";
+													}
+												}
+											}
+											$reqs .= "</span>";
+										}
+										echo 
+										"<tr class='table-row' id='row_".$talent->id."' ".( isset($talent->hidden) ? 'hidden' : '').">
+											<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
+											<td class='highlight-hover'>".$talent->description."</td>
+											<td>".$reqs."</td>
+											<td id='satisfied_".$talent->id."'></td>
+										</tr>";
+									}
+								}
+							?>
+						</table>
+					</div>
+
+					<!-- magic talents -->
+					<h4 class="table-heading center" <?php echo $user['magic_talents'] == true ? "" : "hidden" ?> >Magic Talents</h4>
+					<div class="panel panel-default" <?php echo $user['magic_talents'] == true ? "" : "hidden" ?> >
+						<table class="table fixed-width">
+							<tr>
+								<th>Name</th>
+								<th>Description</th>
+								<th class="col-req">Requirements</th>
+								<th>Eligible?</th>
+							</tr>
+							<?php
+								foreach($talents as $talent) {
+									$reqs = "";
+									if ( ($talent->type == 'magic_talent' || $talent->type == 'school_talent') && isset($talent->id)) {
+
+										// don't show talents user already has
+										foreach($feats as $user_feat) {
+											if ($user_feat['name'] == $talent->name) {
+												$talent->hidden = true;
+											}
+										}
+
+										// build requirement string
+										foreach($talent->requirements as $req_set) {
+											$reqs .= "<span class='highlight-hover'>";
+											for($i = 0; $i < count($req_set); $i++) {
+												foreach($req_set[$i] as $key => $value) {
+													$reqs .= $i > 0 ? "OR " : "&#8226;";
+													if (is_object($value)) {
+														foreach($value as $k => $v) {
+															$reqs .= $k.": ".$v."<br>";
+														}
 													} else {
 														$reqs .= str_replace("_", "", ucfirst($key)).": ".$value."<br>";
 													}

@@ -70,7 +70,7 @@ function setFeatList() {
 							case 'training':
 								for (var i in userTrainings) {
 									// check if req[key] is Object (talent requires training value)
-									if (req[key].constructor === Object) {
+									if (req[key] instanceof Object) {
 										for (var t in req[key]) {
 											if (userTrainings[i].name == t) {
 												let training_val = parseInt(userTrainings[i].value);

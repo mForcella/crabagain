@@ -1079,7 +1079,7 @@
 				</table>
 			</div>
 
-			<!-- <div class="title">
+			<div class="title">
 				<h4 class="table-heading" id="martial_arts_talents">Martial Arts Talents</h4>
 				<label class="toggle-switchy" for="martial_arts_talent_toggle" data-size="sm" data-text="false">
 					<input checked type="checkbox" id="martial_arts_talent_toggle" checked onclick="enable(this, 'martial_arts_talent-check')">
@@ -1124,12 +1124,11 @@
 									<td class='highlight-hover pointer feat-description' id='description_".$talent->id."'>".$talent->description."</td>
 									<td>".$reqs."</td>
 								</tr>";
-								// <td><span class='glyphicon glyphicon-edit' onclick='editFeat(\"".str_replace('\'','',$talent->name)."\")'></td>
 							}
 						}
 					?>
 				</table>
-			</div> -->
+			</div>
 
 			<div class="title">
 				<h4 class="table-heading" id="section_physical_trait_pos">Physical Traits (Positive)</h4>
@@ -2240,10 +2239,17 @@
 				}
 			}
 
-			// write new json array to file
+			// write new json array to file - omit active status and ID
+			let talents_submit = [];
+			for (var i in talents) {
+				let talent = talents[i];
+				delete talents[i]['active'];
+				delete talents[i]['id'];
+				talents_submit.push(talent);
+			}
 			$.ajax({
 				url: '/scripts/update_talents.php',
-				data: { 'talents' : talents },
+				data: { 'talents' : talents_submit },
 				ContentType: "application/json",
 				type: 'POST',
 				success: function(response) {

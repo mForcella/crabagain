@@ -64,23 +64,18 @@ INSERT INTO feat_or_trait (name, description, type, cost) VALUES ("Master Shapes
 -- MARTIAL ARTS TALENTS --
 
 INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Instant Stand', '', 'martial_arts_talent', 4);
-INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Improved Disarm', '', 'martial_arts_talent', 4);
 INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Meditate', '', 'martial_arts_talent', 4);
 INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Defensive Throw', '', 'martial_arts_talent', 4);
-INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Relentless Defense (MA)', '', 'martial_arts_talent', 4);
-INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Reversal', '', 'martial_arts_talent', 4);
 INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Riposte', '', 'martial_arts_talent', 4);
-INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Drunken Master', '', 'martial_arts_talent', 4);
+INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Stunning Strike', '', 'martial_arts_talent', 4);
+INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Power Strike', '', 'martial_arts_talent', 4);
 INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Wisdom of the Ancients', '', 'martial_arts_talent', 4);
 INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Fists of Stone', '', 'martial_arts_talent', 4);
 INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('The Way of Wind', '', 'martial_arts_talent', 4);
-INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Instant Knockout', '', 'martial_arts_talent', 4);
-INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Stunning Strike', '', 'martial_arts_talent', 4);
+INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Spirit Strike', '', 'martial_arts_talent', 4);
 INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Zen Warrior', '', 'martial_arts_talent', 4);
-INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Flurry of Fists', '', 'martial_arts_talent', 4);
 INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('The Way of Water', '', 'martial_arts_talent', 4);
-INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Instant Kill', '', 'martial_arts_talent', 4);
-INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Quivering Palm', '', 'martial_arts_talent', 4);
+INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Fists of Fury', '', 'martial_arts_talent', 4);
 
 
 -- HEROIC TALENTS --
