@@ -1686,5 +1686,47 @@
         ],
         "type":"martial_arts_talent",
         "cost":4
+    },
+    {
+        "name":"Vow of Poverty",
+        "description":"You have sworn against the pursuit of material things. You cannot accrue wealth or unnecessary items or partake in excesses and luxuries. Any wealth you might acquire must be given to those in need, or your Church, and not to other party members.",
+        "requirements":[],
+        "type":"divine_vow",
+        "cost":0
+    },
+    {
+        "name":"Vow of Peace",
+        "description":"You have sworn off of violence. While you may still defend yourself and others, you must do all in your power to ensure violence is avoided when possible, and when it cannot be avoided, that killing is avoided when possible. Even if you are struck, striking back should be a last resort unless you perceive death or severe bodily injury to be imminent.",
+        "requirements":[],
+        "type":"divine_vow",
+        "cost":0
+    },
+    {
+        "name":"Vow of Hedonism",
+        "description":"You find religious ecstasy only through excess, and your God speaks to you only at your moments of highest pleasure. You may only abstain during times when it would be virtually impossible for you to seek out pleasures, or if doing so would lead to personal harm, or harm to your God and their desires.",
+        "requirements":[],
+        "type":"divine_vow",
+        "cost":0
+    },
+    {
+        "name":"Vow of Protection",
+        "description":"You have sworn to protect the good and just in the world. Wherever you see people in need, so long as they align with you and your God morally, you are required to help. The only exception would be if helping would lead to your imminent death or somehow interfere with the greater needs of your God.",
+        "requirements":[],
+        "type":"divine_vow",
+        "cost":0
+    },
+    {
+        "name":"Vow of Freedom",
+        "description":"You have sworn to thwart authority at every turn. If anyone is being systemically oppressed by a system of law, bureaucracy, or set of rules, you are compelled to intercede. This does not necessarily mean aiding an individual or group of people, as long as the institution suffers in some way.",
+        "requirements":[],
+        "type":"divine_vow",
+        "cost":0
+    },
+    {
+        "name":"Vow of Truth",
+        "description":"You have sworn to never lie and seek out truth wherever it may hide. While a lie may be permitted from time to time, it can only be in greater service to your God. Additionally, if blatant lies surround you, you will be obliged to help reveal the truth, unless doing so would somehow be a disservice to your God or greater purpose.",
+        "requirements":[],
+        "type":"divine_vow",
+        "cost":0
     }
 ]

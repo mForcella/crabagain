@@ -139,7 +139,7 @@ $('.btn-resilience').on('mousedown',
 );
 
 function deleteDatabaseObject(table, id) {
-	if ($("#can_edit").val() == 0 && !characterCreation) {
+	if ($("#can_edit").val() == 0) {
 		return;
 	}
 	// console.log("deleteDatabaseObject");
@@ -155,7 +155,7 @@ function deleteDatabaseObject(table, id) {
 }
 
 function insertDatabaseObject(table, object, columns, override=false) {
-	if ($("#can_edit").val() == 0 && !characterCreation) {
+	if ($("#can_edit").val() == 0) {
 		return;
 	}
 	// console.log("insertDatabaseObject");
@@ -178,7 +178,7 @@ function insertDatabaseObject(table, object, columns, override=false) {
 
 // send updated object to database
 function updateDatabaseObject(table, object, columns) {
-	if ($("#can_edit").val() == 0 && !characterCreation) {
+	if ($("#can_edit").val() == 0) {
 		return;
 	}
 	// console.log("updateDatabaseObject");
@@ -195,7 +195,7 @@ function updateDatabaseObject(table, object, columns) {
 
 // send updated value to database
 function updateDatabaseColumn(table, column, value, id) {
-	if ($("#can_edit").val() == 0 && !characterCreation) {
+	if ($("#can_edit").val() == 0) {
 		return;
 	}
 	// console.log("updateDatabaseColumn");
@@ -212,7 +212,7 @@ function updateDatabaseColumn(table, column, value, id) {
 
 // track changes to inputs and autosave to database
 $(".track-changes").on("change", function() {
-	if ($("#can_edit").val() == 0 && !characterCreation) {
+	if ($("#can_edit").val() == 0) {
 		return;
 	}
 	let id = $(this).data("id");
@@ -1606,10 +1606,19 @@ function submitUser() {
 $("#vows_modal").on('hidden.bs.modal', function() {
 	// get selected radio value
 	var vow = $("input[type='radio'][name='vow']:checked").val();
-	// add new talent
-	$("#feat_name_val").val("Vow of "+vow);
-	$("#feat_description").val($("#"+vow+"_description").html());
-	newFeat();
+	// get vow from talents
+	let vow_id = vow.split("vow_")[1];
+	for (var i in talents) {
+		if (talents[i]['id'] == vow_id) {
+			let divine_vow = talents[i];
+			$("#feat_name_val").val(divine_vow['name']);
+			$("#feat_description").val(divine_vow['description']);
+			$("#feat_id").val(divine_vow['id']);
+			$("#feat_type").val(divine_vow['type']);
+			$("#feat_cost").val(divine_vow['cost']);
+			newFeat();
+		}
+	}
 	// scroll back to feats section
 	$([document.documentElement, document.body]).animate({
         scrollTop: $("#section_feats").offset().top-100
@@ -1994,10 +2003,12 @@ $("#new_feat_modal").on('shown.bs.modal', function() {
 		let feat_type = $(this).val().split("_name")[0];
 		if ($(this).val() == "standard_talent_name") {
 			$(this).attr("hidden", false);
-		} else if ($(this).val() == "martial_arts_talent_name") {
-			$(this).attr("hidden", !hasTalent("Martial Arts"));
 		} else if ($(this).val() == "race_trait_name") {
 			$(this).attr("hidden", true);
+		} else if ($(this).val() == "divine_vow_name") {
+			$(this).attr("hidden", true);
+		} else if ($(this).val() == "martial_arts_talent_name") {
+			$(this).attr("hidden", !hasTalent("Martial Arts"));
 		} else if ($(this).val() == "magic_talent_name") {
 			$(this).attr("hidden", !user['magic_talents']);
 		} else {

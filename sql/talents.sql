@@ -60,7 +60,6 @@ INSERT INTO feat_or_trait (name, description, type, cost) VALUES ("Shapeshifter 
 INSERT INTO feat_or_trait (name, description, type, cost) VALUES ("Master Shapeshifter", "Your body is as fluid is water. You can now Shift an additional 2 times without suffering Fatigue. You can alter your body partially into any part of an Animal you can normally Shift into, such as growing wings or Talons, rather than fully Shifting into an Eagle. Additionally, you may now learn to Shift into Magical Beasts.", "magic_talent", 4);
 
 
-
 -- MARTIAL ARTS TALENTS --
 
 INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Instant Stand', '', 'martial_arts_talent', 4);
@@ -78,13 +77,17 @@ INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('The Way of Wa
 INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Fists of Fury', '', 'martial_arts_talent', 4);
 
 
--- HEROIC TALENTS --
-
-SET @feat_id := (SELECT id FROM feat_or_trait ORDER BY id DESC LIMIT 0, 1);
-SET @feat_id := @feat_id + 1;
-
-
 -- DIVINE VOWS --
+
+INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Vow of Poverty', '', 'divine_vow', 0);
+INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Vow of Peace', '', 'divine_vow', 0);
+INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Vow of Hedonism', '', 'divine_vow', 0);
+INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Vow of Protection', '', 'divine_vow', 0);
+INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Vow of Freedom', '', 'divine_vow', 0);
+INSERT INTO feat_or_trait (name, description, type, cost) VALUES ('Vow of Truth', '', 'divine_vow', 0);
+
+
+-- HEROIC TALENTS --
 
 SET @feat_id := (SELECT id FROM feat_or_trait ORDER BY id DESC LIMIT 0, 1);
 SET @feat_id := @feat_id + 1;

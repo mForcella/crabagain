@@ -1,5 +1,6 @@
 <?php
 
+	// extend session life to 7 days
 	session_set_cookie_params(604800);
 	ini_set('session.cookie_lifetime', 604800);
 	ini_set('session.gc_maxlifetime', 604800);
@@ -32,7 +33,6 @@
     exit();
 	}
 
-	// delete any unnamed (unsaved) users
 	$db = new mysqli($db_config['servername'], $db_config['username'], $db_config['password'], $db_config['dbname']);
 
 	// get current login info (email)
@@ -69,6 +69,7 @@
 	  }
 	}
 
+	// delete any unnamed (unsaved) users
 	$sql = "DELETE FROM user WHERE character_name IS NULL";
 	$db->query($sql);
 	// TODO reset the auto-increment to max(id)+1 ?
@@ -123,9 +124,18 @@
     	array_push($feat_ids, $row['trait_id']);
     }
   }
+  // add divine vows
+	$sql = "SELECT id FROM feat_or_trait WHERE type = 'divine_vow'";
+	$result = $db->query($sql);
+  if ($result) {
+    while($row = $result->fetch_assoc()) {
+    	array_push($feat_ids, $row['id']);
+    }
+  }
 
 	// get active counts for each feat type
 	$counts = [];
+	$counts['divine_vow'] = 6;
 	$sql = "SELECT feat_or_trait.type, feat_or_trait.cost FROM campaign_feat JOIN feat_or_trait ON feat_or_trait.id = campaign_feat.feat_id WHERE campaign_feat.campaign_id = $campaign_id";
 	$result = $db->query($sql);
 	if ($result) {
@@ -329,14 +339,12 @@
 	    	$user = $row;
 	    	$user['is_new'] = true;
 		    $user['magic_talents'] = false;
-		    $user['attribute_pts'] = 12;
 	    }
 	  }
 	}
 
-	// check if user can edit (always true for campaign admin)
-	// $can_edit = $campaign_role == 1 ? 1 : 0;
-	$can_edit = 0;
+	// check if user can edit (always true for character creation)
+	$can_edit = $user['is_new'] == true ? 1 : 0;
 	$sql = "SELECT id FROM user WHERE login_id = $login_id";
 	$result = $db->query($sql);
   if ($result) {
@@ -1936,6 +1944,9 @@
 	        		if (isset($counts['martial_arts_talent']) && $counts['martial_arts_talent'] > 0) {
 	        			echo '<option id="martial_arts_option" value="martial_arts_talent_name">Martial Arts Talent</option>';
 	        		}
+	        		if (isset($counts['divine_vow']) && $counts['divine_vow'] > 0) {
+	        			echo '<option id="divine_vow_option" value="divine_vow_name">Divine Vow</option>';
+	        		}
 	        		if (isset($counts['social_background']) && $counts['social_background'] > 0) {
 	        			echo '<option value="social_background_name" '.(count($awards) > 0 ? 'disabled' : '').'>Social Background</option>';
 	        		}
@@ -1963,6 +1974,7 @@
         	<input class="form-control clearable feat-type" type="text" id="standard_talent_name">
         	<input class="form-control clearable feat-type hidden" type="text" id="magic_talent_name">
         	<input class="form-control clearable feat-type hidden" type="text" id="martial_arts_talent_name">
+        	<input class="form-control clearable feat-type hidden" type="text" id="divine_vow_name">
         	<select class="form-control feat-type feat-select hidden" id="race_trait_name">
         		<?php
         			foreach ($race_traits as $trait) {
@@ -2087,6 +2099,7 @@
     </div>
   </div>
 
+	<!-- divine vows modal -->
   <div class="modal" id="vows_modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-md modal-dialog-centered" role="document">
       <div class="modal-content">
@@ -2095,36 +2108,20 @@
         </div>
         <div class="modal-body">
         	<h4 class="center">Choose a Vow to follow in service to your God</h4>
-	        <div class="form-check">
-	        	<input class="form-check-input" type="radio" name="vow" id="Poverty" value="Poverty" checked="checked">
-			      <label class="form-check-label" for="Poverty">Vow of Poverty</label>
-			    </div>
-			    <label class="smaller narrow" id="Poverty_description" for="Poverty">You have sworn against the pursuit of material things. You cannot accrue wealth or unnecessary items or partake in excesses and luxuries. Any wealth you might acquire must be given to those in need, or your Church, and not to other party members.</label>
-	        <div class="form-check">
-	        	<input class="form-check-input" type="radio" name="vow" id="Peace" value="Peace">
-			      <label class="form-check-label" for="Peace">Vow of Peace</label>
-			    </div>
-			    <label class="smaller narrow" id="Peace_description" for="Peace">You have sworn off of violence. While you may still defend yourself and others, you must do all in your power to ensure violence is avoided when possible, and when it cannot be avoided, that killing is avoided when possible. Even if you are struck, striking back should be a last resort unless you perceive death or severe bodily injury to be imminent.</label>
-	        <div class="form-check">
-	        	<input class="form-check-input" type="radio" name="vow" id="Hedonism" value="Hedonism">
-			      <label class="form-check-label" for="Hedonism">Vow of Hedonism</label>
-			    </div>
-			    <label class="smaller narrow" id="Hedonism_description" for="Hedonism">You find religious ecstasy only through excess, and your God speaks to you only at your moments of highest pleasure. You may only abstain during times when it would be virtually impossible for you to seek out pleasures, or if doing so would lead to personal harm, or harm to your God and their desires.</label>
-	        <div class="form-check">
-	        	<input class="form-check-input" type="radio" name="vow" id="Protection" value="Protection">
-			      <label class="form-check-label" for="Protection">Vow of Protection</label>
-			    </div>
-			    <label class="smaller narrow" id="Protection_description" for="Protection">You have sworn to protect the good and just in the world. Wherever you see people in need, so long as they align with you and your God morally, you are required to help. The only exception would be if helping would lead to your imminent death or somehow interfere with the greater needs of your God.</label>
-	        <div class="form-check">
-	        	<input class="form-check-input" type="radio" name="vow" id="Freedom" value="Freedom">
-			      <label class="form-check-label" for="Freedom">Vow of Freedom</label>
-			    </div>
-			    <label class="smaller narrow" id="Freedom_description" for="Freedom">You have sworn to thwart authority at every turn. If anyone is being systemically oppressed by a system of law, bureaucracy, or set of rules, you are compelled to intercede. This does not necessarily mean aiding an individual or group of people, as long as the institution suffers in some way.</label>
-	        <div class="form-check">
-	        	<input class="form-check-input" type="radio" name="vow" id="Truth" value="Truth">
-			      <label class="form-check-label" for="Truth">Vow of Truth</label>
-			    </div>
-			    <label class="smaller narrow" id="Truth_description" for="Truth">You have sworn to never lie and seek out truth wherever it may hide. While a lie may be permitted from time to time, it can only be in greater service to your God. Additionally, if blatant lies surround you, you will be obliged to help reveal the truth, unless doing so would somehow be a disservice to your God or greater purpose.</label>
+        	<?php
+        		$i = 0;
+        		foreach ($talents as $talent) {
+        			if ($talent->type == "divine_vow") {
+        				echo
+					        "<div class='form-check'>
+					        	<input class='form-check-input' type='radio' name='vow' id='vow_".$talent->id."' value='vow_".$talent->id."' ".($i == 0 ? 'checked' : '').">
+							      <label class='form-check-label' for='vow_".$talent->id."'>".$talent->name."</label>
+							    </div>
+			    				<label class='smaller narrow' for='vow_".$talent->id."'>".$talent->description."</label>";
+        				$i = $i + 1;
+        			}
+        		}
+        	?>
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
         	</div>

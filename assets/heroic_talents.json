@@ -1,0 +1,88 @@
+[
+	{
+		"name":"Sharpshooter: Go for the Eyes",
+		"description":"You can now score Critical Hits when using Take Aim to score automatic hits. You also add an additional +2 Called Shot Damage, but still cannot make Called Shots when scoring automatic hits.",
+		"requirements":[
+			[{"awareness":6}, {"deception":6}],
+			[{"precision_":6}],
+			[{"feat":"Take Aim"}],
+			[{"feat":"Sneak Attack"}],
+			[{"feat":"Improved Critical Hit"}],
+			[{"training":"Stealth"}]
+		],
+		"type":"heroic_talent",
+		"cost":4
+	},
+	{
+		"name":"Sharpshooter: Unassuming Presence",
+		"description":"As long as you have Cover, you may apply your Stealth bonus to Defend and Dodge. The maximum bonus is +5, not including other bonuses. Additionally, attacking no longer grants enemies an Awareness roll to spot you, and they must actively search against your Stealth roll each Round.",
+		"requirements":[
+			[{"awareness":8}, {"deception":8}],
+			[{"precision_":8}],
+			[{"feat":"Take Aim"}],
+			[{"feat":"Sneak Attack"}],
+			[{"feat":"Improved Critical Hit"}],
+			[{"feat":"Go for the Eyes"}],
+			[{"training":"Stealth"}]
+		],
+		"type":"heroic_talent",
+		"cost":4
+	},
+	{
+		"name":"Sharpshooter: Dragon Sniper",
+		"description":"Once per Session, you may spend a Motivator Bonus during combat to increase your deadliness. If you successfully make a Called Shot to the head AND score Critical Hit dealing at least 1 Damage, you force your Enemy to Save vs. Death, modified by half your Precision (Base 15). This applies to each attack made that Round",
+		"requirements":[
+			[{"awareness":10}, {"deception":10}],
+			[{"precision_":10}],
+			[{"feat":"Take Aim"}],
+			[{"feat":"Sneak Attack"}],
+			[{"feat":"Improved Critical Hit"}],
+			[{"feat":"Unassuming Presence"}],
+			[{"training":"Stealth"}]
+		],
+		"type":"heroic_talent",
+		"cost":4
+	},
+	{
+		"name":"Swashbuckler: Blathering Blatherskite",
+		"description":"",
+		"requirements":[
+			[{"allure":6}, {"deception":6}],
+			[{"agility":6}, {"speed":6}],
+			[{"feat":"Silver Tongue"}],
+			[{"feat":"Acrobat"}],
+			[{"feat":"Inspiring Presence"}],
+			// [{"feat":{"dexterity":1}}]
+		],
+		"type":"heroic_talent",
+		"cost":4
+	},
+	{
+		"name":"Swashbuckler: Funambulist",
+		"description":"",
+		"requirements":[
+			[{"allure":8}, {"deception":8}],
+			[{"agility":8}, {"speed":8}],
+			[{"feat":"Silver Tongue"}],
+			[{"feat":"Acrobat"}],
+			[{"feat":"Inspiring Presence"}],
+			// [{"feat":{"dexterity":1}}]
+		],
+		"type":"heroic_talent",
+		"cost":4
+	},
+	{
+		"name":"Swashbuckler: Dread Pirate/Folk Hero",
+		"description":"",
+		"requirements":[
+			[{"allure":10}, {"deception":10}],
+			[{"agility":10}, {"speed":10}],
+			[{"feat":"Silver Tongue"}],
+			[{"feat":"Acrobat"}],
+			[{"feat":"Inspiring Presence"}],
+			// [{"feat":{"dexterity":1}}]
+		],
+		"type":"heroic_talent",
+		"cost":4
+	},
+]
