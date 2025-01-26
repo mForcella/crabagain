@@ -2247,6 +2247,13 @@
 				delete talents[i]['id'];
 				talents_submit.push(talent);
 			}
+			// sort talents by type
+			let sort_order = ['standard_talent', 'magic_talent', 'school_talent', 'martial_arts_talent', 'physical_trait', 'morale_trait', 'social_trait', 'compelling_action', 'social_background', 'profession', 'race_trait', 'divine_vow'];
+			talents_submit.sort(function(a, b) {
+				if (sort_order.indexOf(a['type']) < sort_order.indexOf(b['type'])) return -1;
+				if (sort_order.indexOf(a['type']) > sort_order.indexOf(b['type'])) return 1;
+				return 0;
+			});
 			$.ajax({
 				url: '/scripts/update_talents.php',
 				data: { 'talents' : talents_submit },
