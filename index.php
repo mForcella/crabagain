@@ -1936,7 +1936,7 @@
         	<label class="control-label" id="select_feat_type_label">Type</label>
         	<select class="form-control" id="select_feat_type">
         		<option id="standard_option" value="standard_talent_name">Standard Talent</option>
-        		<option id="race_trait_option" value="race_trait_name" hidden disabled>Race Trait</option>
+        		<option id="race_trait_option" value="race_trait_name" hidden>Race Trait</option>
         		<?php
 	        		if (isset($counts['magic_talent']) && $counts['magic_talent'] > 0) {
 	        			echo '<option id="magic_option" value="magic_talent_name">Magical Talent</option>';
@@ -1948,25 +1948,25 @@
 	        			echo '<option id="divine_vow_option" value="divine_vow_name">Divine Vow</option>';
 	        		}
 	        		if (isset($counts['social_background']) && $counts['social_background'] > 0) {
-	        			echo '<option value="social_background_name" '.(count($awards) > 0 ? 'disabled' : '').'>Social Background</option>';
+	        			echo '<option value="social_background_name">Social Background</option>';
 	        		}
 	        		if (isset($counts['social_trait']) && $counts['social_trait'] > 0) {
-	        			echo '<option value="social_trait_name" '.(count($awards) > 0 ? 'disabled' : '').'>Social Trait</option>';
+	        			echo '<option value="social_trait_name">Social Trait</option>';
 	        		}
 	        		if (isset($counts['physical_trait_pos']) && $counts['physical_trait_pos'] > 0) {
-	        			echo '<option value="physical_trait_pos_name" '.(count($awards) > 0 ? 'disabled' : '').'>Physical Trait (Positive)</option>';
+	        			echo '<option value="physical_trait_pos_name">Physical Trait (Positive)</option>';
 	        		}
 	        		if (isset($counts['physical_trait_neg']) && $counts['physical_trait_neg'] > 0) {
-	        			echo '<option value="physical_trait_neg_name" '.(count($awards) > 0 ? 'disabled' : '').'>Physical Trait (Negative)</option>';
+	        			echo '<option value="physical_trait_neg_name">Physical Trait (Negative)</option>';
 	        		}
 	        		if (isset($counts['morale_trait']) && $counts['morale_trait'] > 0) {
-	        			echo '<option value="morale_trait_name" '.(count($awards) > 0 ? 'disabled' : '').'>Morale Trait</option>';
+	        			echo '<option value="morale_trait_name">Morale Trait</option>';
 	        		}
 	        		if (isset($counts['compelling_action']) && $counts['compelling_action'] > 0) {
-	        			echo '<option value="compelling_action_name" '.(count($awards) > 0 ? 'disabled' : '').'>Compelling Action</option>';
+	        			echo '<option value="compelling_action_name">Compelling Action</option>';
 	        		}
 	        		if (isset($counts['profession']) && $counts['profession'] > 0) {
-	        			echo '<option value="profession_name" '.(count($awards) > 0 ? 'disabled' : '').'>Profession</option>';
+	        			echo '<option value="profession_name">Profession</option>';
 	        		}
         		?>
         	</select>
@@ -2143,7 +2143,7 @@
         			Skill / Training Type
         		</h4>
 	        	<div class="form-check" id="magic_inputs">
-		        	<input class="form-check-input" type="radio" name="skill_type" id="school" value="school">
+		        	<input class="form-check-input skill-check" type="radio" name="skill_type" id="school" value="school">
 		        	<label class="form-check-label" for="school">Magic School (4 attribute pt)</label>
         			<select class="form-control skill-name" id="school_name">
         				<option value=""></option>
@@ -2154,22 +2154,22 @@
         			</select>
 	        	</div>
 	        	<div class="form-check" id="esoteric_inputs">
-		        	<input class="form-check-input" type="radio" name="skill_type" id="esoteric" value="esoteric">
+		        	<input class="form-check-input skill-check" type="radio" name="skill_type" id="esoteric" value="esoteric">
 		        	<label class="form-check-label" for="esoteric">Esoteric Skill (4 attribute pts)</label>
         			<input class="form-control skill-name clearable" type="text" id="esoteric_name">
 	        	</div>
 	        	<div class="form-check">
-		        	<input class="form-check-input" type="radio" name="skill_type" id="skill" value="skill">
+		        	<input class="form-check-input skill-check" type="radio" name="skill_type" id="skill" value="skill">
 		        	<label class="form-check-label" for="skill">Unique Skill (2 attribute pts)</label>
         			<input class="form-control skill-name clearable" type="text" id="skill_name">
 	        	</div>
 	        	<div class="form-check">
-		        	<input class="form-check-input" type="radio" name="skill_type" id="training" value="training">
+		        	<input class="form-check-input skill-check" type="radio" name="skill_type" id="training" value="training">
 		        	<label class="form-check-label" for="training">Training (2 attribute pts)</label>
         			<input class="form-control skill-name clearable" type="text" id="training_name">
 	        	</div>
 	        	<div class="form-check">
-		        	<input class="form-check-input" type="radio" name="skill_type" id="focus" value="focus">
+		        	<input class="form-check-input skill-check" type="radio" name="skill_type" id="focus" value="focus">
 		        	<label class="form-check-label" for="focus">Focus (1 attribute pt)</label>
         			<input class="form-control skill-name clearable" type="text" id="focus_name">
         			<input class="form-control skill-name clearable" type="text" id="focus_name2">

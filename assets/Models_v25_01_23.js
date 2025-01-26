@@ -429,7 +429,7 @@ function newFeat() {
 	// only allow one profession, one compelling action, one social trait, one morale trait
 	if (featType == "profession") {
 		for (var j in userTalents) {
-			if (userTalents[j]['type'] == "profession") {
+			if (userTalents[j]['type'] == "profession" && !adminEditMode) {
 				alert("Only one Profession can be chosen");
 				return;
 			}
@@ -437,7 +437,7 @@ function newFeat() {
 	}
 	if (featType == "social_background") {
 		for (var j in userTalents) {
-			if (userTalents[j]['type'] == "social_background") {
+			if (userTalents[j]['type'] == "social_background" && !adminEditMode) {
 				alert("Only one Social Background can be chosen");
 				return;
 			}
@@ -445,7 +445,7 @@ function newFeat() {
 	}
 	if (featType == "compelling_action") {
 		for (var j in userTalents) {
-			if (userTalents[j]['type'] == "compelling_action") {
+			if (userTalents[j]['type'] == "compelling_action" && !adminEditMode) {
 				alert("Only one Compelling Action can be chosen");
 				return;
 			}
@@ -453,7 +453,7 @@ function newFeat() {
 	}
 	if (featType == "social_trait") {
 		for (var j in userTalents) {
-			if (userTalents[j]['type'] == "social_trait") {
+			if (userTalents[j]['type'] == "social_trait" && !adminEditMode) {
 				alert("Only one Social Trait can be chosen");
 				return;
 			}
@@ -461,7 +461,7 @@ function newFeat() {
 	}
 	if (featType == "morale_trait") {
 		for (var j in userTalents) {
-			if (userTalents[j]['type'] == "morale_trait") {
+			if (userTalents[j]['type'] == "morale_trait" && !adminEditMode) {
 				alert("Only one Morale Trait can be chosen");
 				return;
 			}

@@ -346,43 +346,27 @@ $("#attribute_pts").on("input change", function() {
 });
 
 // show hidden inputs on skill type radio select
+$(".skill-check").on("click", function() {
+	$("#esoteric_name").hide();
+	$("#skill_name").hide();
+	$("#training_name").hide();
+	$("#focus_name").hide();
+	$("#focus_name2").hide();
+	$("#school_name").hide();
+});
 $("#esoteric").on("click", function() {
 	$("#esoteric_name").show();
-	$("#skill_name").hide();
-	$("#training_name").hide();
-	$("#focus_name").hide();
-	$("#focus_name2").hide();
-	$("#school_name").hide();
 });
 $("#skill").on("click", function() {
-	$("#esoteric_name").hide();
 	$("#skill_name").show();
-	$("#training_name").hide();
-	$("#focus_name").hide();
-	$("#focus_name2").hide();
-	$("#school_name").hide();
 });
 $("#training").on("click", function() {
-	$("#esoteric_name").hide();
-	$("#skill_name").hide();
 	$("#training_name").show();
-	$("#focus_name").hide();
-	$("#focus_name2").hide();
-	$("#school_name").hide();
 });
 $("#focus").on("click", function() {
-	$("#esoteric_name").hide();
-	$("#skill_name").hide();
-	$("#training_name").hide();
 	$("#focus_name").show();
-	$("#school_name").hide();
 });
 $("#school").on("click", function() {
-	$("#esoteric_name").hide();
-	$("#skill_name").hide();
-	$("#training_name").hide();
-	$("#focus_name").hide();
-	$("#focus_name2").hide();
 	$("#school_name").show();
 });
 
@@ -2001,7 +1985,9 @@ $("#new_feat_modal").on('shown.bs.modal', function() {
 	// hide / show select options
 	$("#select_feat_type").find("option").each(function() {
 		let feat_type = $(this).val().split("_name")[0];
-		if ($(this).val() == "standard_talent_name") {
+		if (adminEditMode && $(this).val() != "race_trait_name" && $(this).val() != "divine_vow_name") {
+			$(this).attr("hidden", false);
+		} else if ($(this).val() == "standard_talent_name") {
 			$(this).attr("hidden", false);
 		} else if ($(this).val() == "race_trait_name") {
 			$(this).attr("hidden", true);
