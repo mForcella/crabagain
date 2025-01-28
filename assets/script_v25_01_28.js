@@ -353,6 +353,18 @@ $(".skill-check").on("click", function() {
 	$("#focus_name").hide();
 	$("#focus_name2").hide();
 	$("#school_name").hide();
+	$("#attack_name").hide();
+	$("#shoot_name").hide();
+	$("#throw_name").hide();
+});
+$("#attack").on("click", function() {
+	$("#attack_name").show();
+});
+$("#shoot").on("click", function() {
+	$("#shoot_name").show();
+});
+$("#throw").on("click", function() {
+	$("#throw_name").show();
 });
 $("#esoteric").on("click", function() {
 	$("#esoteric_name").show();

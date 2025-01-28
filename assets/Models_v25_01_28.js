@@ -844,7 +844,7 @@ class UserTalent {
 function newTrainingModal(attribute) {
 
 	// launch modal
-	$("#training_modal_title").html("New "+attribute+" Training");
+	$("#training_modal_title").html("New "+capitalize(attribute).replaceAll("_","")+" Training");
 	$("#attribute_type").val(attribute);
 	$("#training_name").val("");
 
@@ -863,6 +863,20 @@ function newTrainingModal(attribute) {
 		}
 	}
 
+	// show attack inputs for agility and precision
+	if (attribute == "agility") {
+		$("#attack_inputs").show();
+	} else {
+		$("#attack_inputs").hide();
+	}
+	if (attribute == "precision_") {
+		$("#shoot_inputs").show();
+		$("#throw_inputs").show();
+	} else {
+		$("#shoot_inputs").hide();
+		$("#throw_inputs").hide();
+	}
+
 	// deselect radios and hide and clear inputs
 	$("input:radio[name='skill_type']").each(function(i) {
 	      this.checked = false;
@@ -873,6 +887,9 @@ function newTrainingModal(attribute) {
 	$("#focus_name2").val("").hide().removeClass("x onX");
 	$("#school_name").val("").hide().removeClass("x onX");
 	$("#esoteric_name").val("").hide().removeClass("x onX");
+	$("#attack_name").val("").hide().removeClass("x onX");
+	$("#shoot_name").val("").hide().removeClass("x onX");
+	$("#throw_name").val("").hide().removeClass("x onX");
 
 	// if vitality, check for magic talents
 	if (attribute == "vitality" && user['magic_talents'] == true) {
@@ -914,7 +931,7 @@ function newTrainingModal(attribute) {
 			// check for specifics required
 			let val = ui.item.value;
 			if (val.includes("(specific")) {
-				$(this).val(val.split("(")[0]);
+				$(this).val(val.split(" (")[0]);
 				// show additional input
 				var specific = val.split("(specific ")[1];
 				specific = specific.slice(0, -1); 
@@ -945,13 +962,17 @@ function newTraining() {
 	var attribute = $("#attribute_type").val();
 
 	if (trainingName != "") {
+		// check for weapon focuses
+		if (skillType == "attack" || skillType == "shoot" || skillType == "throw") {
+			trainingName = capitalize(skillType) + ": " + trainingName;
+		}
 		// check for additional input
 		if ($("#focus_name2").is(":visible")) {
 			if ($("#focus_name2").val() == "") {
 				alert("Please specify a value");
 				return;
 			}
-			trainingName = $("#focus_name2").val();
+			trainingName += ": " + $("#focus_name2").val();
 		}
 		// check if user is already trained
 		for (var i in userTrainings) {

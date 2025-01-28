@@ -1072,7 +1072,7 @@
 
 				<!-- section: attributes -->
 				<div class="section form-horizontal">
-					<div class="section-title" id="section_attributes"><span>Attributes & Trainings</span> <i class="fa-solid fa-dice"></i></div>
+					<div class="section-title" id="section_attributes"><span class="pointer" data-toggle="modal" data-target="#trainings_modal">Attributes & Trainings</span> <i class="fa-solid fa-dice"></i></div>
 
 					<div class="form-group">
 						<div class="col-sm-6 attribute-col" id="col_strength">
@@ -2174,6 +2174,21 @@
         			<input class="form-control skill-name clearable" type="text" id="focus_name">
         			<input class="form-control skill-name clearable" type="text" id="focus_name2">
 	        	</div>
+	        	<div class="form-check" id="attack_inputs">
+		        	<input class="form-check-input skill-check" type="radio" name="skill_type" id="attack" value="attack">
+		        	<label class="form-check-label" for="attack">Attack (1 attribute pt)</label>
+        			<input class="form-control skill-name clearable" type="text" id="attack_name" placeholder="specific weapon">
+	        	</div>
+	        	<div class="form-check" id="shoot_inputs">
+		        	<input class="form-check-input skill-check" type="radio" name="skill_type" id="shoot" value="shoot">
+		        	<label class="form-check-label" for="shoot">Shoot (1 attribute pt)</label>
+        			<input class="form-control skill-name clearable" type="text" id="shoot_name" placeholder="specific weapon">
+	        	</div>
+	        	<div class="form-check" id="throw_inputs">
+		        	<input class="form-check-input skill-check" type="radio" name="skill_type" id="throw" value="throw">
+		        	<label class="form-check-label" for="throw">Throw (1 attribute pt)</label>
+        			<input class="form-control skill-name clearable" type="text" id="throw_name" placeholder="specific weapon">
+	        	</div>
         	</div>
         	<input type="hidden" id="attribute_type">
         	<div class="button-bar">
@@ -2400,13 +2415,14 @@
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
       <div class="modal-content">
 
-        <div class="modal-header">
+        <!-- <div class="modal-header">
           <h4 class="modal-title">Talents!</h4>
-        </div>
+        </div> -->
 
         <div class="modal-body">
 
         	<!-- standard talents -->
+        	<h4 class="table-heading center"><strong>--- Standard Talents ---</strong></h4>
 					<div class="panel panel-default">
 						<table class="table fixed-width">
 							<tr>
@@ -2463,8 +2479,60 @@
 						</table>
 					</div>
 
+					<!-- magic talents -->
+					<h4 class="table-heading center" <?php echo $user['magic_talents'] == true ? "" : "hidden" ?> ><strong>--- Magic Talents ---</strong></h4>
+					<div class="panel panel-default" <?php echo $user['magic_talents'] == true ? "" : "hidden" ?> >
+						<table class="table fixed-width">
+							<tr>
+								<th>Name</th>
+								<th>Description</th>
+								<th class="col-req">Requirements</th>
+								<th>Eligible?</th>
+							</tr>
+							<?php
+								foreach($talents as $talent) {
+									$reqs = "";
+									if ( ($talent->type == 'magic_talent' || $talent->type == 'school_talent') && isset($talent->id)) {
+
+										// don't show talents user already has
+										foreach($feats as $user_feat) {
+											if ($user_feat['name'] == $talent->name) {
+												$talent->hidden = true;
+											}
+										}
+
+										// build requirement string
+										foreach($talent->requirements as $req_set) {
+											$reqs .= "<span class='highlight-hover'>";
+											for($i = 0; $i < count($req_set); $i++) {
+												foreach($req_set[$i] as $key => $value) {
+													$reqs .= $i > 0 ? "OR " : "&#8226;";
+													if (is_object($value)) {
+														foreach($value as $k => $v) {
+															$reqs .= $k.": ".$v."<br>";
+														}
+													} else {
+														$reqs .= str_replace("_", "", ucfirst($key)).": ".$value."<br>";
+													}
+												}
+											}
+											$reqs .= "</span>";
+										}
+										echo 
+										"<tr class='table-row' id='row_".$talent->id."' ".( isset($talent->hidden) ? 'hidden' : '').">
+											<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
+											<td class='highlight-hover'>".$talent->description."</td>
+											<td>".$reqs."</td>
+											<td id='satisfied_".$talent->id."'></td>
+										</tr>";
+									}
+								}
+							?>
+						</table>
+					</div>
+
 					<!-- martial arts talents -->
-					<h4 class="table-heading center" <?php echo $martial_arts_trained && isset($counts['martial_arts_talent']) && $counts['martial_arts_talent'] > 0 ? "" : "hidden" ?> >Martial Arts Talents</h4>
+					<h4 class="table-heading center" <?php echo $martial_arts_trained && isset($counts['martial_arts_talent']) && $counts['martial_arts_talent'] > 0 ? "" : "hidden" ?> ><strong>--- Martial Arts Talents ---</strong></h4>
 					<div class="panel panel-default" <?php echo $martial_arts_trained && isset($counts['martial_arts_talent']) && $counts['martial_arts_talent'] > 0 ? "" : "hidden" ?> >
 						<table class="table fixed-width">
 							<tr>
@@ -2515,53 +2583,123 @@
 						</table>
 					</div>
 
-					<!-- magic talents -->
-					<h4 class="table-heading center" <?php echo $user['magic_talents'] == true ? "" : "hidden" ?> >Magic Talents</h4>
-					<div class="panel panel-default" <?php echo $user['magic_talents'] == true ? "" : "hidden" ?> >
+        	<div class="button-bar">
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+	<!-- trainings modal -->
+  <div class="modal" id="trainings_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+      <div class="modal-content">
+
+        <div class="modal-body">
+
+        	<h4 class="table-heading center"><strong>--- Focuses ---</strong></h4>
+        	<p class="center">Cost: 1 Attribute Pt; Starting Value: +1</p>
+					<div class="panel panel-default">
 						<table class="table fixed-width">
 							<tr>
-								<th>Name</th>
-								<th>Description</th>
-								<th class="col-req">Requirements</th>
-								<th>Eligible?</th>
+								<th>Attribute</th>
+								<th>Focus</th>
 							</tr>
 							<?php
-								foreach($talents as $talent) {
-									$reqs = "";
-									if ( ($talent->type == 'magic_talent' || $talent->type == 'school_talent') && isset($talent->id)) {
-
-										// don't show talents user already has
-										foreach($feats as $user_feat) {
-											if ($user_feat['name'] == $talent->name) {
-												$talent->hidden = true;
+								foreach($training_autocomplete as $attribute => $training_types) {
+									foreach($training_types as $training_type => $array) {
+										if ($training_type == "focus") {
+											foreach($array as $training) {
+													echo 
+													"<tr class='table-row'>
+														<td class='highlight-hover'>".str_replace("_", "", ucfirst($attribute))."</td>
+														<td class='highlight-hover'>".$training."</td>
+													</tr>";
 											}
 										}
-
-										// build requirement string
-										foreach($talent->requirements as $req_set) {
-											$reqs .= "<span class='highlight-hover'>";
-											for($i = 0; $i < count($req_set); $i++) {
-												foreach($req_set[$i] as $key => $value) {
-													$reqs .= $i > 0 ? "OR " : "&#8226;";
-													if (is_object($value)) {
-														foreach($value as $k => $v) {
-															$reqs .= $k.": ".$v."<br>";
-														}
-													} else {
-														$reqs .= str_replace("_", "", ucfirst($key)).": ".$value."<br>";
-													}
-												}
-											}
-											$reqs .= "</span>";
-										}
-										echo 
-										"<tr class='table-row' id='row_".$talent->id."' ".( isset($talent->hidden) ? 'hidden' : '').">
-											<td class='highlight-hover'><label for='check_".$talent->id."'>".$talent->name."</label></td>
-											<td class='highlight-hover'>".$talent->description."</td>
-											<td>".$reqs."</td>
-											<td id='satisfied_".$talent->id."'></td>
-										</tr>";
 									}
+								}
+							?>
+						</table>
+					</div>
+
+					<?php
+						// generate associate array of skills and attributes
+						$unique_skills = [];
+						$esoteric_skills = [];
+						foreach($training_autocomplete as $attribute => $training_types) {
+							foreach($training_types as $training_type => $array) {
+								foreach($array as $skill) {
+									if ($training_type == "skill") {
+										if (!isset($unique_skills[$skill])) {
+											$unique_skills[$skill] = [];
+										}
+										array_push($unique_skills[$skill], $attribute);
+									}
+									if ($training_type == "esoteric") {
+										if (!isset($esoteric_skills[$skill])) {
+											$esoteric_skills[$skill] = [];
+										}
+										array_push($esoteric_skills[$skill], $attribute);
+									}
+								}
+							}
+						}
+					?>
+        	<h4 class="table-heading center"><strong>--- Unique Skills ---</strong></h4>
+        	<p class="center">Cost: 2 Attribute Pts; Starting Value: +0</p>
+					<div class="panel panel-default">
+						<table class="table fixed-width">
+							<tr>
+								<th>Skill</th>
+								<th>Attributes</th>
+							</tr>
+							<?php
+								ksort($unique_skills);
+								foreach($unique_skills as $skill => $attributes) {
+									$attribute_string = "";
+									foreach($attributes as $attribute) {
+										$attribute_string .= str_replace("_", "", ucfirst($attribute)).", ";
+									}
+									echo 
+									"<tr class='table-row'>
+										<td class='highlight-hover'>".$skill."</td>
+										<td class='highlight-hover'>".rtrim($attribute_string, ", ")."</td>
+									</tr>";
+								}
+							?>
+						</table>
+					</div>
+
+					<?php
+						$esoteric_trained = false;
+						foreach($trainings as $training) {
+							if ($training['name'] == "Esoteric Knowledge") {
+								$esoteric_trained = true;
+							}
+						}
+					?>
+        	<h4 class="table-heading center" <?php echo $esoteric_trained ? '' : 'hidden' ?>><strong>--- Esoteric Skills ---</strong></h4>
+        	<p class="center" <?php echo $esoteric_trained ? '' : 'hidden' ?>>Cost: 2 Attribute Pts; Starting Value: +0</p>
+					<div class="panel panel-default" <?php echo $esoteric_trained ? '' : 'hidden' ?>>
+						<table class="table fixed-width">
+							<tr>
+								<th>Skill</th>
+								<th>Attributes</th>
+							</tr>
+							<?php
+								ksort($esoteric_skills);
+								foreach($esoteric_skills as $skill => $attributes) {
+									$attribute_string = "";
+									foreach($attributes as $attribute) {
+										$attribute_string .= str_replace("_", "", ucfirst($attribute)).", ";
+									}
+									echo 
+									"<tr class='table-row'>
+										<td class='highlight-hover'>".$skill."</td>
+										<td class='highlight-hover'>".rtrim($attribute_string, ", ")."</td>
+									</tr>";
 								}
 							?>
 						</table>
