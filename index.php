@@ -403,6 +403,10 @@
 		.fa-lock.locked {
 			display: block;
 		}
+		.help {
+			cursor: help;
+			position: relative;
+		}
 	</style>
 
 </head>
@@ -1072,7 +1076,7 @@
 
 				<!-- section: attributes -->
 				<div class="section form-horizontal">
-					<div class="section-title" id="section_attributes"><span class="pointer" data-toggle="modal" data-target="#trainings_modal">Attributes & Trainings</span> <i class="fa-solid fa-dice"></i></div>
+					<div class="section-title" id="section_attributes"><span class="help" data-toggle="modal" data-target="#trainings_modal">Attributes & Trainings <i class="fa-solid fa-dice"></i></span></div>
 
 					<div class="form-group">
 						<div class="col-sm-6 attribute-col" id="col_strength">
@@ -1513,7 +1517,7 @@
 
 				<!-- section: feats & traits -->
 				<div class="section form-horizontal">
-					<div class="section-title" id="section_feats"><span class="pointer" data-toggle="modal" data-target="#talents_modal">Talents & Traits <i class="fa-solid fa-trophy"></i></span></div>
+					<div class="section-title" id="section_feats"><span class="help" data-toggle="modal" data-target="#talents_modal">Talents & Traits <i class="fa-solid fa-trophy"></i></span></div>
 					<div class="form-group">
 						<div class="col-sm-12">
 							<div id="feats">
@@ -1707,7 +1711,6 @@
 			<!-- end section: background -->
 
 		</div>
-		<input type="hidden" name="password" id="password_val">
 		<input type="hidden" name="recaptcha_response" id="recaptcha_response">
 	</form>
 
@@ -2326,7 +2329,7 @@
   </div>
 
 	<!-- save character - bot test -->
-  <div class="modal" id="new_password_modal_2" tabindex="-1" role="dialog">
+  <!-- <div class="modal" id="new_password_modal_2" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -2341,7 +2344,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 
 	<!-- submitting status modal -->
   <div class="modal" id="submit_load_modal" tabindex="-1" role="dialog">

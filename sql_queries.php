@@ -6,7 +6,7 @@
 
   // get queries
   $queries = [];
-  $sql = "SELECT * FROM sql_query";
+  $sql = "SELECT * FROM sql_query ORDER BY created_at DESC LIMIT 1000";
   $result = $db->query($sql);
   if ($result) {
     while($row = $result->fetch_assoc()) {

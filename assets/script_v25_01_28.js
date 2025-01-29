@@ -1562,40 +1562,20 @@ function formSubmit() {
 		alert("Please provide a name for your character. A character without a name is like a crab without a carapace.");
 		return;
 	}
-	if (user['is_new']) {
-		// new user, set password
-		$("#new_password_modal_2").modal("show");
-	} else {
-		// prompt for password
-		$("#password_modal").modal("show");
-	}
+	submitUser();
 }
 
-// validate the form (current form, no password setting required)
+// validate the form
 function submitUser() {
-	// check secret code in ajax
-	$.ajax({
-		url: '/scripts/check_secret_word.php',
-		data: { 'secret_word' : $("#nerd_test").val().toLowerCase().trim() },
-		ContentType: "application/json",
-		type: 'POST',
-		success: function(response) {
-			if (response == 1) {
-				// show submitting message
-				$("#submit_load_modal").modal("show");
-				// get recaptcha token before submit
-				grecaptcha.ready(function () {
-					grecaptcha.execute('6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi', { action: 'new_user' }).then(function (token) {
-						$("#recaptcha_response").val(token);
-						$("#password_val").val("");
-						submitForm = true;
-						$("#user_form").submit();
-					});
-				});
-			} else {
-				alert("That's not the secret word, nerd");
-			}
-		}
+	// show submitting message
+	$("#submit_load_modal").modal("show");
+	// get recaptcha token before submit
+	grecaptcha.ready(function () {
+		grecaptcha.execute('6Lc_NB8gAAAAAF4AG63WRUpkeci_CWPoX75cS8Yi', { action: 'new_user' }).then(function (token) {
+			$("#recaptcha_response").val(token);
+			submitForm = true;
+			$("#user_form").submit();
+		});
 	});
 }
 
