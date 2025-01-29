@@ -124,7 +124,7 @@ $(document).on('input', '.clearable', function() {
     if (this.id == "magic_talent_name") {
     	$("#feat_description").val("").height("125px");
 		// hide additional inputs
-		hideMagicSelects("", "");
+		hideAdditionalInputs("", "");
     }
     if (this.id == "focus_name") {
     	$("#focus_name2").val("").hide();
@@ -1954,7 +1954,7 @@ $("#magic_talents").on("change", function() {
 		}
 	}
 	// show/hide additional dropdowns
-	hideMagicSelects(talent, "");
+	hideAdditionalInputs(talent, "");
 });
 
 // on new talent modal shown
@@ -1966,6 +1966,7 @@ $("#new_feat_modal").on('shown.bs.modal', function() {
 		$("#feat_description").focus();
 	}
 
+	// TODO only change modal title in GM mode? enable editing inputs in GM mode?
 	let editing = $("#feat_modal_title").html() == "Update Talent";
 	$("#select_feat_type").attr("disabled", editing);
 	$(".elemental_select").attr("disabled", editing);
@@ -1973,6 +1974,8 @@ $("#new_feat_modal").on('shown.bs.modal', function() {
 	$(".superhuman_select").attr("disabled", editing);
 	$("#animal_name").attr("disabled", editing);
 	$("#animal_level").attr("disabled", editing);
+	$("#addicted_name").attr("disabled", editing);
+	$("#oath_name").attr("disabled", editing);
 
 	// hide / show select options
 	$("#select_feat_type").find("option").each(function() {
@@ -2053,7 +2056,7 @@ $("#select_feat_type").on("change", function() {
 	// clear all inputs
 	$("#feat_description").val("");
 	// hide additional inputs
-	hideMagicSelects("", "");
+	hideAdditionalInputs("", "");
 });
 
 // make sure all magic dropdowns have the same value

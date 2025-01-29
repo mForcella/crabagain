@@ -250,6 +250,12 @@ function setFeatList() {
 	});
 }
 
+// check for talents that require additional input
+$("#compelling_action_name").on("change", function() {
+	let talent = $(this).val();
+	hideAdditionalInputs(talent, "");
+});
+
 // determine which feats to show in the autocomplete list
 function featSourceFunction(input, add, list) {
 	var suggestions = [];
@@ -358,7 +364,7 @@ function featSelectFunction(ui) {
 
 		// check for talents requiring additional selection
 		let talent = ui.item.value;
-		hideMagicSelects(talent, "");
+		hideAdditionalInputs(talent, "");
 
 		// auto fill description on feat selection
 		$("#feat_name_val").val(talent);
@@ -375,7 +381,9 @@ function featSelectFunction(ui) {
 }
 
 // show only the selected dropdown
-function hideMagicSelects(select, value) {
+function hideAdditionalInputs(select, value) {
+	$(".addicted_select").addClass("hidden");
+	$(".oath_select").addClass("hidden");
 	$(".elemental_select").addClass("hidden");
 	$(".elementalist_select").addClass("hidden");
 	$(".superhuman_select").addClass("hidden");
@@ -390,6 +398,12 @@ function hideMagicSelects(select, value) {
 		$(".shapeshifter_select").removeClass("hidden")
 		$("#animal_name").val(value);
 		// TODO any way to get animal level? would need to save cost to database; hide animal level input for now?
+	} else if (select == "Addicted") {
+		$(".addicted_select").removeClass("hidden");
+		$("#addicted_name").val(value);
+	} else if (select == "Solemn Oath") {
+		$(".oath_select").removeClass("hidden");
+		$("#oath_name").val(value);
 	}
 }
 
@@ -416,6 +430,20 @@ function newFeat() {
 			return;
 		}
 		featDisplayName += " ("+$("#animal_name").val()+")";
+	} else if (featName == "Addicted") {
+		// make sure addiction name isn't empty
+		if ($("#addicted_name").val() == "") {
+			alert("Please enter a specific addiction");
+			return;
+		}
+		featDisplayName += " ("+$("#addicted_name").val()+")";
+	} else if (featName == "Solemn Oath") {
+		// make sure addiction name isn't empty
+		if ($("#oath_name").val() == "") {
+			alert("Please enter a specific oath");
+			return;
+		}
+		featDisplayName += " ("+$("#oath_name").val()+")";
 	}
 
 	// make sure we're not adding a duplicate training name
@@ -796,7 +824,7 @@ class UserTalent {
 		if (subType) {
 			subType = subType.substring(0, subType.length - 1);
 		}
-		hideMagicSelects(this.name, subType);
+		hideAdditionalInputs(this.name, subType);
 
 		// set dropdown value
 		featType = featType == "school_talent" ? "magic_talent" : featType;

@@ -2056,6 +2056,14 @@
         		?>
         	</select>
 
+        	<div class="addicted_select hidden">
+	        		<input class="form-control" type="text" id="addicted_name" placeholder="specific addiction">
+        	</div>
+
+        	<div class="oath_select hidden">
+	        		<input class="form-control" type="text" id="oath_name" placeholder="specific oath">
+        	</div>
+
         	<select class="form-control elemental_select hidden">
         		<option value="Fire">Fire</option>
         		<option value="Ice">Ice</option>
