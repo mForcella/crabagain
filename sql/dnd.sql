@@ -31,6 +31,7 @@
     reset_token varchar(255),
     confirmed int DEFAULT 0,
     confirmation_code varchar(255),
+    role int DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
   );
 

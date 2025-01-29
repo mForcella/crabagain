@@ -47,6 +47,16 @@
 		}
 	}
 
+	// check if admin can edit talents
+	$can_edit = 0;
+	$sql = "SELECT role FROM login WHERE id = $login_id";
+	$result = $db->query($sql);
+	if ($result) {
+		while($row = $result->fetch_assoc()) {
+			$can_edit = $row['role'];
+		}
+	}
+
 	// get all login users and campaign membership status
 	$login_data = [];
 	$login_campaigns = [];
@@ -929,8 +939,9 @@
 		</div>
 
 		<form id="campaign_form">
-			<input type="hidden" id="campaign_id" name="campaign_id" value="<?php echo $campaign_id?>">
-			<input type="hidden" id="login_id" name="login_id" value="<?php echo $login_id?>">
+			<input type="hidden" id="campaign_id" name="campaign_id" value="<?php echo $campaign_id ?>">
+			<input type="hidden" id="login_id" name="login_id" value="<?php echo $login_id ?>">
+			<input type="hidden" id="can_edit" value="<?php echo $can_edit ?>">
 
 			<div class="title">
 				<h4 class="table-heading" id="section_races">Races</h4>
@@ -2145,6 +2156,10 @@
 
 	// edit talent/trait description
 	$(".feat-description").on("click", function() {
+		// check if user can edit
+		if ($("#can_edit").val() != 1) {
+			return;
+		}
 		// get talent ID
 		let talent_id = this.id.split("description_")[1];
 		// check for morale traits
@@ -2159,6 +2174,10 @@
 
 	// edit talent/trait description
 	$(".feat-cost").on("click", function() {
+		// check if user can edit
+		if ($("#can_edit").val() != 1) {
+			return;
+		}
 		// get talent ID
 		let talent_id = this.id.split("cost_")[1];
 		editTalent(talent_id, 'cost');
