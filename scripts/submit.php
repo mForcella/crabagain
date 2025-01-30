@@ -19,7 +19,7 @@
 	$user_id = $_POST['user_id'];
 	$character_name = $_POST['character_name'];
 	$campaign_id = $_POST['campaign_id'];
-	$sql = "UPDATE user SET character_name = '$character_name', campaign_id = $campaign_id, login_id = $login_id WHERE id = ".$user_id;
+	$sql = "UPDATE user SET character_name = '$character_name', campaign_id = $campaign_id, login_id = $login_id WHERE id = $user_id";
 	$db->query($sql);
 			
 	$save_sql = "INSERT INTO sql_query (query, source, type, login_id, character_id) VALUES ('".addslashes($sql)."', 'submit.php', 'update', $login_id, $user_id)";

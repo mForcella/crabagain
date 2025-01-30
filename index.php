@@ -69,14 +69,12 @@
 	  }
 	}
 
-	// delete any unnamed (unsaved) users
-	$sql = "DELETE FROM user WHERE character_name IS NULL";
+	// delete any unnamed (unsaved) users created more than 24 hours ago
+	$sql = "DELETE FROM user WHERE character_name IS NULL AND created_at < now() - INTERVAL 1 DAY";
 	$db->query($sql);
 	// TODO reset the auto-increment to max(id)+1 ?
 	// $sql = "ALTER TABLE `user` AUTO_INCREMENT = 1";
 	// $db->query($sql);
-	// would create issues if multiple people were creating characters at once
-	// move delete statement to window.unload function?
 
 	// check user campaign role
 	$campaign_role = 2;
@@ -330,6 +328,7 @@
     }
 	} else {
 		// if no user set, create a new user entry
+		// TODO don't create the user entry on page load, wait until data has been input
 		$sql = "INSERT INTO user (attribute_pts) VALUES (12)";
 		$db->query($sql);
     $sql = "SELECT * FROM user WHERE id = ".$db->insert_id;
