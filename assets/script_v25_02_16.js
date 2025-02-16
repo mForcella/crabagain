@@ -1023,10 +1023,11 @@ $("#training_name").on('keypress', function (event) {
 $("#new_training_modal").on('shown.bs.modal', function() {
 	$("#training_name").focus();
 });
-$("#new_training_modal").on('hidden.bs.modal', function() {
+// $("#new_training_modal").on('hidden.bs.modal', function() {
 
-});
+// });
 $("#new_weapon_modal").on('shown.bs.modal', function() {
+	$("#weapon_type").trigger("change");
 	$(focus_id == "" ? "#weapon_name" : focus_id).focus();
 	focus_id = "";
 });

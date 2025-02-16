@@ -946,7 +946,7 @@
 			<div class="title">
 				<h4 class="table-heading" id="section_races">Races</h4>
 				<label class="toggle-switchy" for="race_toggle" data-size="sm" data-text="false">
-					<input checked type="checkbox" id="race_toggle" checked onclick="enable(this, 'race-check')">
+					<input checked type="checkbox" id="race_toggle" onclick="enable(this, 'race-check')">
 					<span class="toggle">
 						<span class="switch"></span>
 					</span>
@@ -1041,7 +1041,7 @@
 			<div class="title">
 				<h4 class="table-heading" id="magical_talents">Magical Talents</h4>
 				<label class="toggle-switchy" for="magical_talents_toggle" data-size="sm" data-text="false">
-					<input checked type="checkbox" id="magical_talents_toggle" checked onclick="enable(this, 'magical_talent-check')">
+					<input checked type="checkbox" id="magical_talents_toggle" onclick="enable(this, 'magical_talent-check')">
 					<span class="toggle">
 						<span class="switch"></span>
 					</span>
@@ -1093,7 +1093,7 @@
 			<div class="title">
 				<h4 class="table-heading" id="martial_arts_talents">Martial Arts Talents</h4>
 				<label class="toggle-switchy" for="martial_arts_talent_toggle" data-size="sm" data-text="false">
-					<input checked type="checkbox" id="martial_arts_talent_toggle" checked onclick="enable(this, 'martial_arts_talent-check')">
+					<input checked type="checkbox" id="martial_arts_talent_toggle" onclick="enable(this, 'martial_arts_talent-check')">
 					<span class="toggle">
 						<span class="switch"></span>
 					</span>
@@ -1144,7 +1144,7 @@
 			<div class="title">
 				<h4 class="table-heading" id="section_physical_trait_pos">Physical Traits (Positive)</h4>
 				<label class="toggle-switchy" for="physical_trait_pos_toggle" data-size="sm" data-text="false">
-					<input checked type="checkbox" id="physical_trait_pos_toggle" checked onclick="enable(this, 'physical_trait_pos-check')">
+					<input checked type="checkbox" id="physical_trait_pos_toggle" onclick="enable(this, 'physical_trait_pos-check')">
 					<span class="toggle">
 						<span class="switch"></span>
 					</span>
@@ -1180,7 +1180,7 @@
 			<div class="title">
 				<h4 class="table-heading" id="section_physical_trait_neg">Physical Traits (Negative)</h4>
 				<label class="toggle-switchy" for="physical_trait_neg_toggle" data-size="sm" data-text="false">
-					<input checked type="checkbox" id="physical_trait_neg_toggle" checked onclick="enable(this, 'physical_trait_neg-check')">
+					<input checked type="checkbox" id="physical_trait_neg_toggle" onclick="enable(this, 'physical_trait_neg-check')">
 					<span class="toggle">
 						<span class="switch"></span>
 					</span>
@@ -1250,7 +1250,7 @@
 			<div class="title">
 				<h4 class="table-heading" id="section_morale_trait">Morale Traits</h4>
 				<label class="toggle-switchy" for="morale_trait_toggle" data-size="sm" data-text="false">
-					<input checked type="checkbox" id="morale_trait_toggle" checked onclick="enable(this, 'morale_trait-check')">
+					<input checked type="checkbox" id="morale_trait_toggle" onclick="enable(this, 'morale_trait-check')">
 					<span class="toggle">
 						<span class="switch"></span>
 					</span>
@@ -1289,7 +1289,7 @@
 			<div class="title">
 				<h4 class="table-heading" id="section_compelling_action">Compelling Actions</h4>
 				<label class="toggle-switchy" for="compelling_action_toggle" data-size="sm" data-text="false">
-					<input checked type="checkbox" id="compelling_action_toggle" checked onclick="enable(this, 'compelling_action-check')">
+					<input checked type="checkbox" id="compelling_action_toggle" onclick="enable(this, 'compelling_action-check')">
 					<span class="toggle">
 						<span class="switch"></span>
 					</span>
@@ -1323,7 +1323,7 @@
 			<div class="title">
 				<h4 class="table-heading" id="section_profession">Professions</h4>
 				<label class="toggle-switchy" for="profession_toggle" data-size="sm" data-text="false">
-					<input checked type="checkbox" id="profession_toggle" checked onclick="enable(this, 'profession-check')">
+					<input checked type="checkbox" id="profession_toggle" onclick="enable(this, 'profession-check')">
 					<span class="toggle">
 						<span class="switch"></span>
 					</span>
@@ -1357,7 +1357,7 @@
 			<div class="title">
 				<h4 class="table-heading" id="section_social_background">Social Backgrounds</h4>
 				<label class="toggle-switchy" for="social_background_toggle" data-size="sm" data-text="false">
-					<input checked type="checkbox" id="social_background_toggle" checked onclick="enable(this, 'social_background-check')">
+					<input checked type="checkbox" id="social_background_toggle" onclick="enable(this, 'social_background-check')">
 					<span class="toggle">
 						<span class="switch"></span>
 					</span>
@@ -2079,39 +2079,39 @@
 	// get feat counts
 	var total_count = <?php echo json_encode($total_count); ?>;
 	var counts = <?php echo json_encode($counts); ?>;
-	// TODO can't distinguish between new campaign (count = 0) and nothing selected (count = 0)
-	if (total_count != 0) {
-		if (counts['physical_pos_count'] == 0) {
-			$("#physical_trait_pos_toggle").trigger("click");
-		}
-		if (counts['physical_neg_count'] == 0) {
-			$("#physical_trait_neg_toggle").trigger("click");
-		}
-		if (counts['social_count'] == 0) {
-			$("#social_trait_toggle").trigger("click");
-		}
-		if (counts['social_background_count'] == 0) {
-			$("#social_background_toggle").trigger("click");
-		}
-		if (counts['morale_count'] == 0) {
-			$("#morale_trait_toggle").trigger("click");
-		}
-		if (counts['compelling_count'] == 0) {
-			$("#compelling_action_toggle").trigger("click");
-		}
-		if (counts['profession_count'] == 0) {
-			$("#profession_toggle").trigger("click");
-		}
-		if (counts['magical_talent_count'] == 0) {
-			$("#magical_talents_toggle").trigger("click");
-		}
-		if (counts['race_count'] == 0) {
-			$("#race_toggle").trigger("click");
-		}
-		if (counts['martial_arts_talent_count'] == 0) {
-			$("#martial_arts_talent_toggle").trigger("click");
-		}
+	if (counts['physical_pos_count'] == 0) {
+		$("#physical_trait_pos_toggle").trigger("click");
 	}
+	if (counts['physical_neg_count'] == 0) {
+		$("#physical_trait_neg_toggle").trigger("click");
+	}
+	if (counts['social_count'] == 0) {
+		$("#social_trait_toggle").trigger("click");
+	}
+	if (counts['social_background_count'] == 0) {
+		$("#social_background_toggle").trigger("click");
+	}
+	if (counts['morale_count'] == 0) {
+		$("#morale_trait_toggle").trigger("click");
+	}
+	if (counts['compelling_count'] == 0) {
+		$("#compelling_action_toggle").trigger("click");
+	}
+	if (counts['profession_count'] == 0) {
+		$("#profession_toggle").trigger("click");
+	}
+	if (counts['magical_talent_count'] == 0) {
+		$("#magical_talents_toggle").trigger("click");
+	}
+	if (counts['race_count'] == 0) {
+		$("#race_toggle").trigger("click");
+	}
+	if (counts['martial_arts_talent_count'] == 0) {
+		$("#martial_arts_talent_toggle").trigger("click");
+	}
+	// TODO new campaign - mark everything active - need to be able to determine if new campaign
+	// if (total_count == 0) {
+	// }
 
 	// get feat list and requirements
 	var campaign = <?php echo json_encode($campaign); ?>;

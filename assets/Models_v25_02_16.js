@@ -1887,6 +1887,12 @@ class UserWeapon {
 		// weapon is being equipped
 		if (equip) {
 			$("#weapon_select_"+dropdownID).val(this.name);
+			// make sure dropdown is expanded on mobile
+			if (is_mobile) {
+				if (!$("#weapon_"+dropdownID+"_container").is(":visible")) {
+					toggleWeapon("weapon_"+dropdownID, $("#weapon_"+dropdownID));
+				}
+			}
 			// get weapon damage
 			$("#weapon_damage_"+dropdownID).val(this.damage + this.getDamageMod());
 			// look for crit modifiers
@@ -1902,6 +1908,12 @@ class UserWeapon {
 		}
 		// weapon is being unequipped
 		else {
+			// collapse dropdown on mobile
+			// if (is_mobile) {
+			// 	if ($("#weapon_"+dropdownID+"_container").is(":visible")) {
+			// 		toggleWeapon("weapon_"+dropdownID, $("#weapon_"+dropdownID));
+			// 	}
+			// }
 			$("#weapon_select_"+dropdownID).val("");
 			$("#weapon_damage_"+dropdownID).val("");
 			$("#weapon_crit_"+dropdownID).val("");

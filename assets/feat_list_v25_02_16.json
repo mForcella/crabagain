@@ -1899,6 +1899,12 @@
         "cost": "0"
     },
     {
+        "name": "Time Cop",
+        "description": "You can detect spacetime anomalies in your vicinity using Vitality. The DL begins at 8 for very close anomalies and increases based on distance or specificity of information (such as whether it's person-based, object-based, etc). You can also investigate anomalies and determine possible past and future events around it. The DL begins at 8 for very recent past or future activity.",
+        "type": "profession",
+        "cost": "0"
+    },
+    {
         "name": "Energy Weaver",
         "description": "Alfir add half their Ka Bonus to their Caster Level for Ka Magic only.",
         "type": "race_trait",
