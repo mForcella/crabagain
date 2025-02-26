@@ -61,7 +61,8 @@
 	$login_data = [];
 	$login_campaigns = [];
 	$login_ids = [];
-	$sql = "SELECT * FROM login WHERE confirmed = 1 ORDER BY email ASC";
+	array_push($login_ids, -1);
+	$sql = "SELECT * FROM login WHERE confirmed = 1 OR id = -1 ORDER BY email ASC";
 	$result_1 = $db->query($sql);
 	if ($result_1) {
 		while($row = $result_1->fetch_assoc()) {
@@ -846,7 +847,7 @@
 						// make sure player is active in campaign - user['login_id'] is in login_campaigns
 						$active = false;
 						foreach($login_campaigns as $login) {
-							$active = $active || $login['login_id'] == $user['login_id'];
+							$active = $active || $login['login_id'] == $user['login_id'] || $user['login_id'] == -1;
 						}
 						if (!$active) {
 							continue;
@@ -2118,6 +2119,7 @@
 	var talents = <?php echo json_encode($talents); ?>;
 	var logins = <?php echo json_encode($logins); ?>;
 	var users = <?php echo json_encode($users); ?>;
+	console.log(users);
 	var login_campaigns = <?php echo json_encode($login_campaigns); ?>;
 
 	// set feat list for autocomplete

@@ -46,7 +46,7 @@
 	}
 
 	// delete any accounts that have been unconfirmed for a week
-	$sql = "DELETE FROM login WHERE confirmed = 0 AND created_at < now() - INTERVAL 7 DAY";
+	$sql = "DELETE FROM login WHERE confirmed = 0 AND role != 1 AND created_at < now() - INTERVAL 7 DAY";
 	$db->query($sql);
 
 	// make sure campaign id variables are valid - redirect to select campaign if not
@@ -97,7 +97,7 @@
   }
 
 	$users = [];
-	$sql = "SELECT * FROM user WHERE campaign_id = $campaign_id AND login_id IN (".implode(',',$login_ids).") ORDER BY character_name";
+	$sql = "SELECT * FROM user WHERE campaign_id = $campaign_id AND login_id IN (".implode(',',$login_ids).") OR login_id = -1 ORDER BY character_name";
 	$result = $db->query($sql);
   if ($result) {
     while($row = $result->fetch_assoc()) {
@@ -348,7 +348,7 @@
 	$result = $db->query($sql);
   if ($result) {
     while($row = $result->fetch_assoc()) {
-    	$can_edit = $can_edit == 1 || $row['id'] == $user['id'] ? 1 : 0;
+    	$can_edit = $can_edit == 1 || $row['id'] == $user['id'] || $user['login_id'] == -1 ? 1 : 0;
     }
   }
 
@@ -1521,7 +1521,7 @@
 						<div class="col-sm-12">
 							<div id="feats">
 
-								<div class="feat <?php echo $user['is_new'] || count($awards) == 0 ? '' : 'cursor-auto' ?>" id="size" data-toggle="<?php echo $user['is_new'] || count($awards) == 0 ? 'modal' : '' ?>" data-target="#edit_size_modal">
+								<div class="feat <?php echo $user['is_new'] || (count($awards) == 0 && $can_edit) ? '' : 'cursor-auto' ?>" id="size" data-toggle="<?php echo $user['is_new'] || (count($awards) == 0 && $can_edit) ? 'modal' : '' ?>" data-target="#edit_size_modal">
 									<p class="feat-title">Size Category : </p>
 						    	<?php
 						    		$size = isset($user['size']) ? $user['size'] : 'Medium';
@@ -1531,7 +1531,7 @@
 									<input type="hidden" id="power_mod">
 								</div>
 								
-								<div class="feat <?php echo $user['is_new'] || count($awards) == 0 ? '' : 'cursor-auto' ?>" id="age_category" data-toggle="<?php echo $user['is_new'] || count($awards) == 0 ? 'modal' : '' ?>" data-target="#edit_age_modal">
+								<div class="feat <?php echo $user['is_new'] || (count($awards) == 0 && $can_edit) ? '' : 'cursor-auto' ?>" id="age_category" data-toggle="<?php echo $user['is_new'] || (count($awards) == 0 && $can_edit) ? 'modal' : '' ?>" data-target="#edit_age_modal">
 									<p class="feat-title">Age Category : </p>
 						    	<?php
 						    		$age_category = isset($user['age_category']) ? $user['age_category'] : 'Adult';
@@ -2818,7 +2818,7 @@
 		user['motivators'] = userMotivators;
 		
 		// character creation mode
-		if (user['is_new'] || xp_awards.length == 0) {
+		if (user['is_new'] || xp_awards.length == 0 && $("#can_edit").val() == 1) {
 			characterCreation = true;
 			// show new feat btn
 			$("#new_feat_btn").show();
