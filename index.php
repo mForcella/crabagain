@@ -97,7 +97,7 @@
   }
 
 	$users = [];
-	$sql = "SELECT * FROM user WHERE campaign_id = $campaign_id AND login_id IN (".implode(',',$login_ids).") OR login_id = -1 ORDER BY character_name";
+	$sql = "SELECT * FROM user WHERE campaign_id = $campaign_id AND (login_id IN (".implode(',',$login_ids).") OR login_id = -1) ORDER BY character_name";
 	$result = $db->query($sql);
   if ($result) {
     while($row = $result->fetch_assoc()) {

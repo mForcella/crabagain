@@ -191,6 +191,17 @@
 				}
 			}
 
+			// check for user feat Powers of Observation
+			$sql = "SELECT count(*) as count FROM user_feat WHERE user_id = ".$user["id"]." AND LOWER(name) = 'powers of observation'";
+			$result = $db->query($sql);
+			if ($result) {
+				while($row = $result->fetch_assoc()) {
+					if ($row['count'] > 0) {
+							$user['po'] = true;
+					}
+				}
+			}
+
 			// get primary / secondary initiative
 			$user['primary'] = $user['awareness'] >= 0 ? 6 - floor($user['awareness']/2) : 6 - ceil($user['awareness']/3);
 			$user['secondary'] = $user['speed'] >= 0 ? 6 - floor($user['speed']/2) : 6 - ceil($user['speed']/3);
@@ -925,7 +936,8 @@
 							<td>".$toughness.($user['toughness_bonus'] > 0 ? ' (+'.$user['toughness_bonus'].')' : '')."</td>
 							<td>".$defend.($user['defend_bonus'] > 0 ? ' (+'.$user['defend_bonus'].')' : '')."</td>
 							<td>".$dodge."</td>
-							<td>".$user['awareness'].(isset($user['ks']) && $user['ks'] == true ? '<sup>KS</sup>' : '')."</td>
+							<td>".$user['awareness'] . ( isset($user['po']) && $user['po'] == true ? ('<sup>PO</sup>') : 
+								( isset($user['ks']) && $user['ks'] == true ? '<sup>KS</sup>' : '' )) . "</td>
 							<td>".$user['vitality']."</td>
 						</tr>";
 					}
@@ -1589,7 +1601,7 @@
 									// make sure player is active in campaign - user['login_id'] is in login_campaigns
 									$active = false;
 									foreach($login_campaigns as $login) {
-										$active = $active || $login['login_id'] == $user['login_id'];
+										$active = $active || $login['login_id'] == $user['login_id'] || $user['login_id'] == -1;
 									}
 									if (!$active) {
 										continue;

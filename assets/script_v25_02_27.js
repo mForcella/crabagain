@@ -1161,7 +1161,7 @@ function setAttributes(user) {
 	}
 
 	// check for pending xp awards
-	if (xp_awards.length > 0 && $("#login_id").val() == user['login_id']) {
+	if (xp_awards.length > 0 && $("#login_id").val() == user['login_id'] || user['login_id'] == -1) {
 		for (var i in xp_awards) {
 			if (xp_awards[i]['awarded'] == null) {
 				user['xp'] = parseInt(user['xp']) + parseInt(xp_awards[i]['xp_award']);
