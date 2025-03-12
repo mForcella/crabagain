@@ -1653,7 +1653,8 @@
 
 						<div class="col-xs-3">
 							<?php
-								$base = 100 + 20 * $user['strength'];
+								$size_modifier = $user['size'] == "Small" ? -2 : ($user['size'] == "Large" ? 2 : 0);
+								$base = 100 + 20 * ( $user['strength'] + $size_modifier );
 							?>
 							<input class="form-control" readonly name="unhindered" id="unhindered" value="<?php echo $base / 4 ?>">
 						</div>
