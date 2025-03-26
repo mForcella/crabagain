@@ -839,8 +839,8 @@ function editAge(modify_user) {
 	$("#age_category_val").val(age);
 
 	// update attributes
-	let power_mod = age == "Child" ? -2 : ( age == "Adolescent" ? -1 : (age == "Middle-Aged" ? 0 : ( age == "Elder" ? -1 : ( age == "Venerable" ? -2 : 0))));
-	$("#age_power_mod").val(power_mod);
+	let age_power_mod = age == "Child" ? -2 : ( age == "Adolescent" ? -1 : (age == "Middle-Aged" ? 0 : ( age == "Elder" ? -1 : ( age == "Venerable" ? -2 : 0))));
+	$("#age_power_mod").val(age_power_mod);
 	let dexterity_mod = age == "Child" ? -1 : ( age == "Adolescent" ? +1 : (age == "Middle-Aged" ? -1 : ( age == "Elder" ? -2 : ( age == "Venerable" ? -3 : 0))));
 	$("#age_dexterity_mod").val(dexterity_mod);
 	let intelligence_mod = age == "Child" ? -2 : ( age == "Adolescent" ? 0 : (age == "Middle-Aged" ? 0 : ( age == "Elder" ? +1 : ( age == "Venerable" ? +2 : 0))));
@@ -849,11 +849,11 @@ function editAge(modify_user) {
 	$("#age_spirit_mod").val(spirit_mod);
 
 	// check for size mod
-	let size_mod = $("#power_mod").val() == "" ? 0 : parseInt($("#power_mod").val());
+	let size_power_mod = $("#size_power_mod").val() == "" ? 0 : parseInt($("#size_power_mod").val());
 
 	// update attribute text
-	let strength_mod = parseInt($("#strength_val").val()) + power_mod + size_mod;
-	let fortitude_mod = parseInt($("#fortitude_val").val()) + power_mod + size_mod;
+	let strength_mod = parseInt($("#strength_val").val()) + age_power_mod + size_power_mod;
+	let fortitude_mod = parseInt($("#fortitude_val").val()) + age_power_mod + size_power_mod;
 	let speed_mod = parseInt($("#speed_val").val()) + dexterity_mod;
 	let agility_mod = parseInt($("#agility_val").val()) + dexterity_mod;
 	let intellect_mod = parseInt($("#intellect_val").val()) + intelligence_mod;
@@ -888,13 +888,13 @@ function editSize(modify_user) {
 	updateTotalWeight(false); // update movement
 
 	// check for age mod
-	let age_mod = $("#age_power_mod").val() == "" ? 0 : parseInt($("#age_power_mod").val());
+	let age_power_mod = $("#age_power_mod").val() == "" ? 0 : parseInt($("#age_power_mod").val());
 
 	// update strength and fortitude
-	let power_mod = size == "Tiny" ? -4 : (size == "Small" ? -2 : (size == "Large" ? 2 : (size == "Giant" ? 4 : 0)));
-	$("#power_mod").val(power_mod);
-	let strength_mod = parseInt($("#strength_val").val()) + power_mod + age_mod;
-	let fortitude_mod = parseInt($("#fortitude_val").val()) + power_mod + age_mod;
+	let size_power_mod = size == "Tiny" ? -4 : (size == "Small" ? -2 : (size == "Large" ? 2 : (size == "Giant" ? 4 : 0)));
+	$("#size_power_mod").val(size_power_mod);
+	let strength_mod = parseInt($("#strength_val").val()) + size_power_mod + age_power_mod;
+	let fortitude_mod = parseInt($("#fortitude_val").val()) + size_power_mod + age_power_mod;
 	$("#strength_text").html(strength_mod >= 0 ? "+"+strength_mod : strength_mod);
 	$("#fortitude_text").html(fortitude_mod >= 0 ? "+"+fortitude_mod : fortitude_mod);
 	
@@ -930,7 +930,8 @@ function setDodge() {
 	// get size value and agility value
 	let size = $("#character_size_select").val();
 	let agility = parseInt($("#agility_val").val());
-	var dodge = (agility >= 0 ? Math.floor(agility/2) : Math.ceil(agility/3)) + ( size == "Tiny" ? 4 : (size == "Small" ? 2 : (size == "Large" ? -2 : ( size == "Giant" ? -4 : 0))));
+	let size_mod = size == "Tiny" ? 4 : (size == "Small" ? 2 : (size == "Large" ? -2 : ( size == "Giant" ? -4 : 0)));
+	var dodge = (agility >= 0 ? Math.floor(agility/2) : Math.ceil(agility/3)) + size_mod;
 	// check for feats - Lightning Reflexes and Relentless Defense
 	if (hasTalent("Lightning Reflexes")) {
 		let speed = parseInt($("#speed_val").val());
@@ -945,9 +946,10 @@ function setDodge() {
 
 function setDefend() {
 	// get size value and agility value
-	var size = $("#character_size_select").val();
-	var agility = parseInt($("#agility_val").val());
-	var defend = 10 + agility + ( size == "Tiny" ? 4 : (size == "Small" ? 2 : (size == "Large" ? -2 : ( size == "Giant" ? -4 : 0))));
+	let size = $("#character_size_select").val();
+	let agility = parseInt($("#agility_val").val());
+	let size_mod = size == "Tiny" ? 4 : (size == "Small" ? 2 : (size == "Large" ? -2 : ( size == "Giant" ? -4 : 0)));
+	let defend = 10 + agility +size_mod;
 	// check for weapon defend modifier
 	var bonus = 0;
 	for (var i in userWeapons) {
@@ -972,9 +974,9 @@ function setToughness() {
 	var strength = user['strength'] == undefined ? 0 : parseInt(user['strength']);
 
 	// check for size/age modifiers
-	let size_mod = $("#power_mod").val() == "" ? 0 : parseInt($("#power_mod").val());
-	let age_mod = $("#age_power_mod").val() == "" ? 0 : parseInt($("#age_power_mod").val());
-	strength = strength + size_mod + age_mod;
+	let size_power_mod = $("#size_power_mod").val() == "" ? 0 : parseInt($("#size_power_mod").val());
+	let age_power_mod = $("#age_power_mod").val() == "" ? 0 : parseInt($("#age_power_mod").val());
+	strength = strength + size_power_mod + age_power_mod;
 
 	var toughness = strength > 0 ? Math.floor(strength/2) : Math.ceil(strength/3);
 	var bonus = 0;
@@ -1349,7 +1351,7 @@ function adjustAttribute(attribute, val) {
 	switch(attribute) {
 		case "strength":
 		case "fortitude":
-			size_mod = $("#power_mod").val() == "" ? 0 : parseInt($("#power_mod").val());
+			size_mod = $("#size_power_mod").val() == "" ? 0 : parseInt($("#size_power_mod").val());
 			age_mod = $("#age_power_mod").val() == "" ? 0 : parseInt($("#age_power_mod").val());
 			break;
 		case "speed":
@@ -1377,7 +1379,7 @@ function adjustAttribute(attribute, val) {
 	// for (var i in userTrainings) {
 	// 	if (userTrainings[i]['name'].toLowerCase() == "stealth") {
 	// 		is_stealth = userTrainings[i]['id'] == attribute.split("training_")[1];
-	// 		stealth_mod = $("#power_mod").val() == "" ? 0 : parseInt($("#power_mod").val()) * -1;
+	// 		stealth_mod = $("#size_power_mod").val() == "" ? 0 : parseInt($("#size_power_mod").val()) * -1;
 	// 	}
 	// }
 

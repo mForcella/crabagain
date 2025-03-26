@@ -880,7 +880,7 @@
 						}
 
 						// get size modifier
-						$size_modifier = $user['size'] == "Small" ? 2 : ($user['size'] == "Large" ? -2 : 0);
+						$size_modifier = $user['size'] == "Small" ? 2 : ($user['size'] == "Large" ? -2 : ($user['size'] == "Giant" ? -4 : 0));
 
 						// get resilience
 						// $fortitude = $user['fortitude'] - $size_modifier;
@@ -904,18 +904,18 @@
 						$dodge += $size_modifier;
 						$dodge += $user['dodge_mod'];
 
-						// get toughness
-						$strength_actual = $user['strength'];
-						$size_modifier = $user['size'] == "Small" ? -2 : ($user['size'] == "Large" ? 2 : 0);
-						$strength_actual += $size_modifier;
-						$toughness = $strength_actual >= 0 ?
-								floor($strength_actual/2) :
-								(ceil($strength_actual/3) == 0 ? 0 : ceil($strength_actual/3));
-
 						// get defend
 						$defend = isset($user) ? 10 + $user['agility'] : 10;
 						$defend += $size_modifier;
 						$defend += $user['defend_mod'];
+
+						// get toughness
+						$strength = $user['strength'];
+						$size_modifier = $user['size'] == "Small" ? -2 : ( $user['size'] == "Large" ? 2 : ( $user['size'] == "Giant" ? 4 : 0 ) );
+						$strength += $size_modifier;
+						$toughness = $strength >= 0 ?
+								floor($strength/2) :
+								(ceil($strength/3) == 0 ? 0 : ceil($strength/3));
 
 						echo 
 						"<tr class='table-row user-row'>
@@ -1972,7 +1972,7 @@
 			}
 
 			// get size modifier, dodge, defend, toughness
-			let size_modifier = user['size'] == "Small" ? 2 : (user['size'] == "Large" ? -2 : 0);
+			let size_modifier = user['size'] == "Small" ? 2 : ( user['size'] == "Large" ? -2 : ( user['size'] == "Giant" ? -4 : 0 ) );
 			var dodge = user['agility'] >= 0 ? Math.floor(user['agility']/2) : (Math.ceil(user['agility']/3) == 0 ? 0 : Math.ceil(user['agility']/3));
 			dodge = dodge + size_modifier + user['dodge_mod'];
 			let toughness = user['strength'] >= 0 ? Math.floor(user['strength']/2) : (Math.ceil(user['strength']/3) == 0 ? 0 : Math.ceil(user['strength']/3));
@@ -2487,7 +2487,7 @@
 				let users = JSON.parse(response);
 				for (var i in users) {
 					// check for size modifier
-					let fortitude = users[i]['size'] == "Small" ? users[i]['fortitude'] - 2 : (users[i]['size'] == "Large" ? parseInt(users[i]['fortitude']) + 2 : users[i]['fortitude'] );
+					let fortitude = users[i]['size'] == "Small" ? users[i]['fortitude'] - 2 : ( users[i]['size'] == "Large" ? parseInt(users[i]['fortitude']) + 2 : ( users[i]['size'] == "Giant" ? parseInt(users[i]['fortitude']) + 4 : users[i]['fortitude'] ));
 					let resilience = fortitude >= 0 ? 3 + Math.floor(fortitude / 2) : 3 - Math.ceil(fortitude / 3);
 					let damage = users[i]['damage'];
 					var wounds = 0;

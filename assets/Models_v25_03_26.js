@@ -110,7 +110,7 @@ function setFeatList() {
 								switch(attribute) {
 									case "strength":
 									case "fortitude":
-										size_mod = $("#power_mod").val() == "" ? 0 : parseInt($("#power_mod").val());
+										size_mod = $("#size_power_mod").val() == "" ? 0 : parseInt($("#size_power_mod").val());
 										age_mod = $("#age_power_mod").val() == "" ? 0 : parseInt($("#age_power_mod").val());
 										break;
 									case "speed":
@@ -1143,8 +1143,8 @@ function addTrainingElements(training, skillType) {
 	}).appendTo(label_right);
 
 	// check if new training is stealth, look for size mod
-	// if (training.name.toLowerCase() == "stealth" && $("#power_mod").val() != "") {
-	// 	let stealth_mod = parseInt(training.value) - parseInt($("#power_mod").val());
+	// if (training.name.toLowerCase() == "stealth" && $("#size_power_mod").val() != "") {
+	// 	let stealth_mod = parseInt(training.value) - parseInt($("#size_power_mod").val());
 	// 	text.html(stealth_mod >= 0 ? "+"+stealth_mod : stealth_mod);
 	// }
 
@@ -1989,8 +1989,9 @@ class UserWeapon {
 	getDamageMod() {
 		if (this.type == "Melee") {
 			// check for strength modifier for melee weapons
-			var damage_mod = parseInt($("#strength_val").val()) >= 0 ? 
-				Math.floor(parseInt($("#strength_val").val())/2) : Math.ceil(parseInt($("#strength_val").val())/3);
+			var strength = parseInt($("#strength_val").val()) + parseInt($("#size_power_mod").val()) + parseInt($("#age_power_mod").val());
+			var damage_mod = strength >= 0 ? 
+				Math.floor(strength/2) : Math.ceil(strength/3);
 		} else {
 			// check for precision modifier for ranged weapons
 			var damage_mod = parseInt($("#precision__val").val()) >= 0 ? 

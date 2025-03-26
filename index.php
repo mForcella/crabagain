@@ -867,7 +867,7 @@
 						<label class="control-label col-sm-2 col-xs-4" for="defend">Defend</label>
 						<div class="col-sm-2 col-xs-8 mobile-pad-bottom">
 							<?php
-								$size_modifier = $user['size'] == "Small" ? 2 : ($user['size'] == "Large" ? -2 : 0);
+								$size_modifier = $user['size'] == "Small" ? 2 : ( $user['size'] == "Large" ? -2 : ( $user['size'] == "Giant" ? -4 : 0 ) );
 								$defend = 10 + $user['agility'] + $size_modifier;
 							?>
 							<input class="form-control" readonly name="defend" id="defend" value="<?php echo $defend ?>">
@@ -944,7 +944,7 @@
 							<div class="row">
 								<div class="col-xs-5 no-pad">
 									<?php 
-										$fortitude = $user['size'] == "Small" ? $user['fortitude'] - 2 : ( $user['size'] == "Large" ? $user['fortitude'] + 2 : $user['fortitude'] );
+										$fortitude = $user['size'] == "Small" ? $user['fortitude'] - 2 : ( $user['size'] == "Large" ? $user['fortitude'] + 2 : ( $user['size'] == "Giant" ? $user['fortitude'] + 4 : $user['fortitude'] ) );
 										$resilience = $fortitude >= 0 ? 3 + floor($fortitude/2) : 3 + ceil($fortitude/3);
 										$damage = $user['damage'] != null ? $user['damage'] : 0;
 										$wounds = 0;
@@ -1528,7 +1528,7 @@
 						    	?>
 									<p id="character_size_text"><?php echo $size ?></p>
 									<input type="hidden" name="size" id="character_size_val" value="<?php echo $size ?>">
-									<input type="hidden" id="power_mod">
+									<input type="hidden" id="size_power_mod">
 								</div>
 								
 								<div class="feat <?php echo $user['is_new'] || (count($awards) == 0 && $can_edit) ? '' : 'cursor-auto' ?>" id="age_category" data-toggle="<?php echo $user['is_new'] || (count($awards) == 0 && $can_edit) ? 'modal' : '' ?>" data-target="#edit_age_modal">
@@ -1653,7 +1653,7 @@
 
 						<div class="col-xs-3">
 							<?php
-								$size_modifier = $user['size'] == "Small" ? -2 : ($user['size'] == "Large" ? 2 : 0);
+								$size_modifier = $user['size'] == "Small" ? -2 : ( $user['size'] == "Large" ? 2 : ( $user['size'] == "Giant" ? 4 : 0 ) );
 								$base = 100 + 20 * ( $user['strength'] + $size_modifier );
 							?>
 							<input class="form-control" readonly name="unhindered" id="unhindered" value="<?php echo $base / 4 ?>">
@@ -1860,6 +1860,7 @@
         	<label class="control-label">Please select your character size</label>
         	<?php
         		$size = isset($user['size']) ? $user['size'] : 'Medium';
+        		echo $size;
         	?>
         	<select class="form-control" id="character_size_select">
         		<option value="Tiny" <?php echo $size == "Tiny" ? 'selected' : '' ?>>Tiny (2’0”–2’11”)</option>
