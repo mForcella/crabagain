@@ -1520,6 +1520,23 @@ class UserMotivator {
 }
 
 
+// User Item (General)
+function transferItem(type) {
+	// get item being transferred
+	let id = $("#"+type+"_id").val();
+	let name = $("#"+type+"_name").val();
+	// show alert
+	let conf = confirm("Transfer item, "+name+", to another player?");
+	if (conf) {
+		// show transfer modal
+
+	}
+}
+function completeTransfer() {
+	// update database and inputs
+}
+
+
 // UserWeapon
 
 function getWeapon(weapon_id) {
@@ -1666,7 +1683,7 @@ function addWeaponElements(weapon) {
 	});
 
 	let name_input = createInput('', 'text', 'weapons[]', weapon.name, div1, id_val+"_name");
-	let qty_input = createInput('qty', 'number', 'weapon_qty[]', weapon.quantity, div2, id_val+"_qty");
+	let qty_input = createInput('qty', 'text', 'weapon_qty[]', weapon.quantity, div2, id_val+"_qty");
 	// check for max damage
 	let damageText = weapon.max_damage != null ? weapon.damage +" ("+weapon.max_damage+")" : weapon.damage;
 	let dmg_input = createInput('', 'text', '', damageText, div3, id_val+"_damage");
