@@ -154,14 +154,14 @@ function deleteDatabaseObject(table, id) {
 	});
 }
 
-function insertDatabaseObject(table, object, columns, override=false) {
+function insertDatabaseObject(table, object, columns, user_id=null, override=false) {
 	if ($("#can_edit").val() == 0) {
 		return;
 	}
 	// console.log("insertDatabaseObject");
 	$.ajax({
 		url: '/scripts/insert_database_object.php',
-		data: { 'table' : table, 'data' : object, 'columns' : columns, 'user_id' : $("#user_id").val(), 'login_id' : $("#login_id").val() },
+		data: { 'table' : table, 'data' : object, 'columns' : columns, 'user_id' : user_id == null ? $("#user_id").val() : user_id, 'login_id' : $("#login_id").val() },
 		ContentType: "application/json",
 		type: 'POST',
 		success: function(response) {

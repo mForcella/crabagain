@@ -1520,6 +1520,76 @@ class UserMotivator {
 }
 
 
+// User Item (General)
+function transferItem(type) {
+	// get item being transferred
+	let id = $("#"+type+"_id").val();
+	let name = $("#"+type+"_name").val();
+	$("#transfer_type").val(type);
+	// show alert
+	let conf = confirm("Transfer item, "+name+", to another player?");
+	if (conf) {
+		// set max quantity value from item
+		let item;
+		switch(type) {
+			case "weapon":
+				item = getWeapon(id);
+				break;
+			case "protection":
+				item = getProtection(id);
+				break;
+			case "healing":
+				item = getHealing(id);
+				break;
+			default:
+				item = getMisc(id);
+		}
+		$("#transfer_quantity").attr("max", item.quantity).val(0);
+		// show transfer modal
+		$("#transfer_modal").modal("show");
+		// dismiss other item modals
+		$("#new_weapon_modal").modal("hide");
+		$("#new_protection_modal").modal("hide");
+		$("#new_healing_modal").modal("hide");
+		$("#new_misc_modal").modal("hide");
+	}
+}
+function completeTransfer() {
+	// make sure user is selected and quantity is greater than 0
+	if ($("#transfer_player").val() != "" && $("#transfer_quantity").val() > 0) {
+		// get item being transferred
+		let type = $("#transfer_type").val();
+		let id = $("#"+type+"_id").val();
+		// update quantity input
+		let original_qty = $("#"+type+"_"+id+"_quantity").val();
+		let transfer_qty = $("#transfer_quantity").val();
+		$("#"+type+"_"+id+"_quantity").val( parseInt(original_qty) - parseInt(transfer_qty) );
+		// get item object
+		let item;
+		switch(type) {
+			case "weapon":
+				item = getWeapon(id);
+				break;
+			case "protection":
+				item = getProtection(id);
+				break;
+			case "healing":
+				item = getHealing(id);
+				break;
+			default:
+				item = getMisc(id);
+		}
+		// insert database object for other player
+		item.quantity = parseInt(transfer_qty);
+		insertDatabaseObject('user_'+type, item, item.getColumns(), $("#transfer_player").val());
+		// update database quantity for current item
+		item.quantity = parseInt(original_qty) - parseInt(transfer_qty);
+		updateDatabaseColumn('user_'+type, 'quantity', item.quantity, item.id);
+		alert("Item successfully transferred. Your friends thank you for your generosity.");
+	}
+}
+
+
 // UserWeapon
 
 function getWeapon(weapon_id) {
@@ -1577,7 +1647,7 @@ function newWeapon() {
 		$("#"+weapon_id+"_rof").val(rof);
 		$("#"+weapon_id+"_defend").val(defend);
 		$("#"+weapon_id+"_crit").val(crit);
-		$("#"+weapon_id+"_qty").val(qty);
+		$("#"+weapon_id+"_quantity").val(qty);
 		// update mobile row
 		$("#"+weapon_id+"_mobile_title").html(name+" : ");
 		$("#"+weapon_id+"_mobile_details").html("Damage: "+damage_text+"; Weight: "+weight+"lbs; Qty: "+qty+"; "+noteMod+notes);
@@ -1666,7 +1736,7 @@ function addWeaponElements(weapon) {
 	});
 
 	let name_input = createInput('', 'text', 'weapons[]', weapon.name, div1, id_val+"_name");
-	let qty_input = createInput('qty', 'number', 'weapon_qty[]', weapon.quantity, div2, id_val+"_qty");
+	let qty_input = createInput('qty', 'text', 'weapon_quantity[]', weapon.quantity, div2, id_val+"_quantity");
 	// check for max damage
 	let damageText = weapon.max_damage != null ? weapon.damage +" ("+weapon.max_damage+")" : weapon.damage;
 	let dmg_input = createInput('', 'text', '', damageText, div3, id_val+"_damage");
@@ -1711,7 +1781,7 @@ function addWeaponElements(weapon) {
 	note_input.attr("readonly", true);
 	wgt_input.attr("readonly", true);
 	enableHighlight(name_input, "weapons[]");
-	enableHighlight(qty_input, "weapon_qty[]");
+	enableHighlight(qty_input, "weapon_quantity[]");
 	enableHighlight(dmg_input, "weapon_damage[]");
 	enableHighlight(note_input, "weapon_notes[]");
 	enableHighlight(wgt_input, "weapon_weight[]");

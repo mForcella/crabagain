@@ -2253,6 +2253,7 @@
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" onclick="newWeapon()">Ok</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+	        	<button type="button" class="btn btn-primary" onclick="transferItem('weapon')">Transfer</button>
         	</div>
         </div>
       </div>
@@ -2279,6 +2280,7 @@
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" onclick="newProtection()">Ok</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+	        	<button type="button" class="btn btn-primary" onclick="transferItem('protection')">Transfer</button>
         	</div>
         </div>
       </div>
@@ -2305,6 +2307,7 @@
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" onclick="newHealing()">Ok</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+	        	<button type="button" class="btn btn-primary" onclick="transferItem('healing')">Transfer</button>
         	</div>
         </div>
       </div>
@@ -2330,6 +2333,42 @@
         	<input type="hidden" id="misc_id">
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" onclick="newMisc()">Ok</button>
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+	        	<button type="button" class="btn btn-primary" onclick="transferItem('misc')">Transfer</button>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+	<!-- item transfer modal -->
+  <div class="modal" id="transfer_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="transfer_modal_title">Transfer Item</h4>
+        </div>
+        <div class="modal-body">
+        	<input type="hidden" id="transfer_type">
+        	<!-- item name -->
+        	<label class="control-label" id="transfer_name"></label>
+        	<!-- item qty -->
+        	<label class="control-label">Select Item Quantity to Transfer</label>
+        	<input class="form-control" type="number" min="0" id="transfer_quantity">
+        	<!-- player select -->
+        	<label class="control-label">Select Player to Transfer To</label>
+        	<select class="form-control" id="transfer_player">
+        		<option value="" selected></option>
+						<?php
+							foreach($users as $option) {
+								if ($option['id'] != $user['id']) {
+									echo '<option value='.$option['id'].'>'.$option['character_name'].'</option>';
+								}
+							}
+						?>
+        	</select>
+        	<div class="button-bar">
+	        	<button type="button" class="btn btn-primary" onclick="completeTransfer()" data-dismiss="modal">Ok</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
         	</div>
         </div>
