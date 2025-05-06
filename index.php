@@ -2253,7 +2253,7 @@
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" onclick="newWeapon()">Ok</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-	        	<button type="button" class="btn btn-primary" onclick="transferItem('weapon')">Transfer</button>
+	        	<button type="button" class="btn btn-primary" id="transfer_weapon" onclick="transferItem('weapon')">Transfer</button>
         	</div>
         </div>
       </div>
@@ -2280,7 +2280,7 @@
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" onclick="newProtection()">Ok</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-	        	<button type="button" class="btn btn-primary" onclick="transferItem('protection')">Transfer</button>
+	        	<button type="button" class="btn btn-primary" id="transfer_protection" onclick="transferItem('protection')">Transfer</button>
         	</div>
         </div>
       </div>
@@ -2307,7 +2307,7 @@
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" onclick="newHealing()">Ok</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-	        	<button type="button" class="btn btn-primary" onclick="transferItem('healing')">Transfer</button>
+	        	<button type="button" class="btn btn-primary" id="transfer_healing" onclick="transferItem('healing')">Transfer</button>
         	</div>
         </div>
       </div>
@@ -2334,7 +2334,7 @@
         	<div class="button-bar">
 	        	<button type="button" class="btn btn-primary" onclick="newMisc()">Ok</button>
 	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-	        	<button type="button" class="btn btn-primary" onclick="transferItem('misc')">Transfer</button>
+	        	<button type="button" class="btn btn-primary" id="transfer_misc" onclick="transferItem('misc')">Transfer</button>
         	</div>
         </div>
       </div>

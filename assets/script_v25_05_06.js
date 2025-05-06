@@ -167,10 +167,13 @@ function insertDatabaseObject(table, object, columns, user_id=null, override=fal
 		success: function(response) {
 			// console.log(response);
 			// get back insert ID and update object
-			object['id'] = response;
-			// check for callback function
-			if (object.postInsertCallback != undefined) {
-				object.postInsertCallback(response);
+			// make sure response is a valid ID
+			if ( !isNaN(parseFloat(response)) && isFinite(response) ) {
+				object['id'] = response;
+				// check for callback function
+				if (object.postInsertCallback != undefined) {
+					object.postInsertCallback(response);
+				}
 			}
 		}
 	});
@@ -188,6 +191,9 @@ function updateDatabaseObject(table, object, columns) {
 		ContentType: "application/json",
 		type: 'POST',
 		success: function(response) {
+			// if (response != "ok") {
+			// 	console.log(response);
+			// }
 			// console.log(response);
 		}
 	});
@@ -205,6 +211,9 @@ function updateDatabaseColumn(table, column, value, id) {
 		ContentType: "application/json",
 		type: 'POST',
 		success: function(response) {
+			// if (response != "ok") {
+			// 	console.log(response);
+			// }
 			// console.log(response);
 		}
 	});
@@ -1029,7 +1038,13 @@ $("#new_training_modal").on('shown.bs.modal', function() {
 
 // });
 $("#new_weapon_modal").on('shown.bs.modal', function() {
-	$("#weapon_type").trigger("change");
+	// reset weapon attack attribute dropdown for new weapons
+	if ($("#weapon_modal_title").html() == "New Weapon") {
+		$("#weapon_type").trigger("change");
+		$("#transfer_weapon").hide();
+	} else {
+		$("#transfer_weapon").show();
+	}
 	$(focus_id == "" ? "#weapon_name" : focus_id).focus();
 	focus_id = "";
 });
@@ -1047,6 +1062,11 @@ $("#new_weapon_modal").on('hidden.bs.modal', function() {
 	$("#weapon_quantity").val("");
 });
 $("#new_protection_modal").on('shown.bs.modal', function() {
+	if ($("#protection_modal_title").html() == "New Protection") {
+		$("#transfer_protection").hide();
+	} else {
+		$("#transfer_protection").show();
+	}
 	$(focus_id == "" ? "#protection_name" : focus_id).focus();
 	focus_id = "";
 });
@@ -1058,6 +1078,11 @@ $("#new_protection_modal").on('hidden.bs.modal', function() {
 	$("#protection_weight").val("");
 });
 $("#new_healing_modal").on('shown.bs.modal', function() {
+	if ($("#healing_modal_title").html() == "New Healing/Potion/Drug") {
+		$("#transfer_healing").hide();
+	} else {
+		$("#transfer_healing").show();
+	}
 	$(focus_id == "" ? "#healing_name" : focus_id).focus();
 	focus_id = "";
 });
@@ -1069,6 +1094,11 @@ $("#new_healing_modal").on('hidden.bs.modal', function() {
 	$("#healing_weight").val("");
 });
 $("#new_misc_modal").on('shown.bs.modal', function() {
+	if ($("#misc_modal_title").html() == "New Miscellaneous Item") {
+		$("#transfer_misc").hide();
+	} else {
+		$("#transfer_misc").show();
+	}
 	$(focus_id == "" ? "#misc_name" : focus_id).focus();
 	focus_id = "";
 });

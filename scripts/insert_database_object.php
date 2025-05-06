@@ -29,8 +29,13 @@
 	$sql = rtrim($sql, ",") . ")";
 	// echo $sql;
 
-	$db->query($sql);
-	echo $db->insert_id;
+	try {
+		$db->query($sql);
+		echo $db->insert_id;
+	} catch (mysqli_sql_exception $e) {
+		error_log("\nSQL Query: $sql\n", 3, "error_log");
+		echo $db->error;
+	}
 
 	$do_not_write = [
 		"user_feat" => ["description"],

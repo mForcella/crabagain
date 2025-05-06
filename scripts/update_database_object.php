@@ -25,7 +25,13 @@
 	$sql .= " WHERE id = ".$data['id'];
 	// echo $sql;
 
-	$db->query($sql);
+	try {
+		$db->query($sql);
+		echo 'ok';
+	} catch (mysqli_sql_exception $e) {
+		error_log("\nSQL Query: $sql\n", 3, "error_log");
+		echo $db->error;
+	}
 
 	$do_not_write = [
 		"user_feat" => ["description"],
@@ -57,6 +63,5 @@
 	$db->query($save_sql);
 
 	$db->close();
-	echo 'update ok';
 
 ?>

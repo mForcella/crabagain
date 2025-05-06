@@ -1580,6 +1580,11 @@ function completeTransfer() {
 				item = getMisc(id);
 		}
 		// insert database object for other player
+		// if weapon, set attack attribute and equipped values
+		if (type == "weapon") {
+			item.equipped = 0;
+			item.attack_attribute = "";
+		}
 		item.quantity = parseInt(transfer_qty);
 		insertDatabaseObject('user_'+type, item, item.getColumns(), $("#transfer_player").val());
 		// update database quantity for current item
@@ -1631,6 +1636,7 @@ function newWeapon() {
 		$("#"+weapon_id+"_type").val(type);
 		var originalName = $("#"+weapon_id+"_name").val();
 		$("#"+weapon_id+"_name").val(name);
+		// $("#"+weapon_id+"_attack_attribute").val(attack_attribute);
 		$("#"+weapon_id+"_weight").val(weight);
 		$("#"+weapon_id+"_damage_val").val(damage);
 		var damage_text = max_damage != "" ? damage +" ("+max_damage+")" : damage;
@@ -2005,7 +2011,9 @@ class UserWeapon {
 		$("#weapon_type").val(this.type);
 		setAttackAttributes();
 		for (let [key,val] of Object.entries(this)) {
-			$("#weapon_"+key).val(val);
+			if (key != "type") {
+				$("#weapon_"+key).val(val);
+			}
 		}
 		focus_id = "#weapon_"+input_id;
 		$("#weapon_modal_title").html("Edit Weapon");

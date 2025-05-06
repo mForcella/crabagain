@@ -11,7 +11,13 @@
 	}
 
 	$sql = "UPDATE ".$_POST['table']." SET ".$_POST['column']." = '".addslashes($_POST['value'])."' WHERE id = ".$_POST['id'];
-	$db->query($sql);
+	try {
+		$db->query($sql);
+		echo "ok";
+	} catch (mysqli_sql_exception $e) {
+		error_log("\nSQL Query: $sql\n", 3, "error_log");
+		echo $db->error;
+	}
 	
 	$user_id = $_POST['user_id'];
 
@@ -38,6 +44,5 @@
 	$db->close();
 	// echo $sql;
 
-	echo "update ok";
 
 ?>
