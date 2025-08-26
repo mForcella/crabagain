@@ -24,6 +24,8 @@
 	// establish database connection
 	include_once('config/db_config.php');
 	include_once('config/keys.php');
+	// TODO PHP Fatal error:  Uncaught mysqli_sql_exception: No such file or directory in /data0/crabagain.com/public_html/login.php:27
+	// last error 2025-04-20
 	$db = new mysqli($db_config['servername'], $db_config['username'], $db_config['password'], $db_config['dbname']);
 
 	$email = isset($_POST['email']) ? $_POST['email'] : "";
@@ -49,15 +51,28 @@
 				} else if (password_verify($password, $login['password'])) {
 		        	// set session values (login_id)
 		        	$_SESSION['login_id'] = $login['id'];
-		        	// redirect to most recently updated character page if available
-		        	$sql = "SELECT id, campaign_id FROM user WHERE login_id = ".$login['id']." ORDER BY created_at ASC";
+		        	// redirect to most recently created campaign page if available
+		        	$sql = "SELECT campaign_id, campaign_role FROM login_campaign WHERE login_id = ".$login['id']." ORDER BY created_at DESC LIMIT 1";
 					$result = $db->query($sql);
 					if ($result->num_rows > 0) {
 						while($row = $result->fetch_assoc()) {
-		        			header('Location: /?campaign='.$row['campaign_id'].'&user='.$row['id']);
+							if ($row['campaign_role'] == 1) {
+								$location = '/admin.php?campaign='.$row['campaign_id'];
+							} else {
+								$location = '/?campaign='.$row['campaign_id'];
+								// check for campaign characters
+					        	$sql = "SELECT id FROM user WHERE campaign_id = ".$row['campaign_id']." AND login_id = ".$login['id']." ORDER BY created_at DESC LIMIT 1";
+								$result_2 = $db->query($sql);
+								if ($result_2->num_rows > 0) {
+									while($row_2 = $result_2->fetch_assoc()) {
+										$location .= '&user='.$row_2['id'];
+									}
+								}
+							}
+		        			header('Location: '.$location);
 						}
 					}
-					// no characters found - show campaign select page
+					// no campaigns found - show campaign select page
 					else {
 		        		header('Location: /select_campaign.php');
 					}

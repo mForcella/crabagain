@@ -13,9 +13,10 @@
 	$sql = "DELETE FROM ".$_POST['table']." WHERE id = ".$_POST['id'];
 	$db->query($sql);
 
-	$user_id = $_POST['user_id'];
+	$user_id = isset($_POST['user_id']) ? $_POST['user_id'] : NULL;
+	$login_id = isset($_POST['login_id']) ? $_POST['login_id'] : NULL;
 
-	$save_sql = "INSERT INTO sql_query (query, source, type, login_id, character_id) VALUES ('".addslashes($sql)."', 'delete_database_object.php', 'delete', ".$_POST['login_id'].", ".($user_id == "" ? NULL : $user_id).")";
+	$save_sql = "INSERT INTO sql_query (query, source, type, login_id, character_id) VALUES ('".addslashes($sql)."', 'delete_database_object.php', 'delete', ".$login_id.", ".$user_id.")";
 	$db->query($save_sql);
 	
 	$db->close();

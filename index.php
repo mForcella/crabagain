@@ -557,7 +557,7 @@
 	<form id="user_form" method="post" action="/scripts/submit.php" novalidate>
 		<input type="hidden" id="user_id" name="user_id" value="<?php echo $user['id'] ?>">
 		<input type="hidden" id="campaign_id" name="campaign_id" value="<?php echo $_GET["campaign"] ?>">
-		<input type="hidden" id="user_email" name="email" value="<?php echo $user["email"] ?>">
+		<input type="hidden" id="user_email" name="email" value="<?php echo isset($user["email"]) ? $user["email"] : "" ?>">
 		<input type="hidden" id="campaign_role" value="<?php echo $campaign_role ?>">
 		<input type="hidden" id="can_edit" value="<?php echo $can_edit ?>">
 		<input type="hidden" id="login_id" name="login_id" value="<?php echo $login_id ?>">

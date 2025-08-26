@@ -19,7 +19,7 @@
 	}
 
 	// make sure email is valid
-	$email = $_POST['email'];
+	$email = isset($_POST['email']) ? $_POST['email'] : "";
 	$sql = "SELECT * from login WHERE email = '$email'";
 	$result = $db->query($sql);
 	$login;

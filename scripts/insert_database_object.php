@@ -67,7 +67,9 @@
 		}
 	}
 
-	$save_sql = "INSERT INTO sql_query (query, source, type, login_id, character_id) VALUES ('".addslashes($sql)."', 'insert_database_object.php', 'insert', ".$_POST['login_id'].", ".($user_id == "" ? NULL : $user_id).")";
+	$login_id = isset($_POST['login_id']) ? $_POST['login_id'] : NULL;
+
+	$save_sql = "INSERT INTO sql_query (query, source, type, login_id, character_id) VALUES ('".addslashes($sql)."', 'insert_database_object.php', 'insert', ".$login_id.", ".($user_id == "" ? NULL : $user_id).")";
 	$db->query($save_sql);
 	
 	$db->close();

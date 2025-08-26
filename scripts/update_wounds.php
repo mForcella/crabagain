@@ -1,6 +1,8 @@
 <?php
 
 	include_once('../config/db_config.php');
+	// PHP Fatal error:  Uncaught mysqli_sql_exception: No such file or directory in /data0/crabagain.com/public_html/scripts/update_wounds.php:4
+	// last error 2025-06-18
 	$db = new mysqli($db_config['servername'], $db_config['username'], $db_config['password'], $db_config['dbname']);
 
 	if ($db->connect_error) {
